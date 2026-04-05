@@ -19,7 +19,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
-        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="54"/>
         <CursorPos X="25" Y="68"/>
         <UsageCount Value="200"/>
@@ -477,8 +477,75 @@
         <CursorPos X="10" Y="38"/>
         <UsageCount Value="8"/>
       </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runformula.pas"/>
+        <UnitName Value="RunFormula"/>
+        <TopLine Value="388"/>
+        <CursorPos Y="408"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflaerr.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="13"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflamsg.inc"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="22"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflaopt.inc"/>
+        <EditorIndex Value="8"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runfladef.inc"/>
+        <EditorIndex Value="5"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflaparse.inc"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="13"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\Help\Rus\runflahelp.txt"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="10"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="2">
+    <JumpHistory HistoryIndex="3">
       <Position>
         <Filename Value="rfdemounit.pas"/>
         <Caret Line="20" Column="16" TopLine="8"/>
@@ -489,7 +556,11 @@
       </Position>
       <Position>
         <Filename Value="rfdemounit.pas"/>
-        <Caret Line="68" Column="11" TopLine="54"/>
+        <Caret Line="68" Column="25" TopLine="54"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runformula.pas"/>
+        <Caret TopLine="391"/>
       </Position>
     </JumpHistory>
     <RunParams>
