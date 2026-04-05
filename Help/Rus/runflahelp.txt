@@ -1,4 +1,4 @@
-//***************************************************
+//********************************************************
 //  RunFormula Expression Parser and Evaluator
 //  RunFormula Help File
 //  Rev. 2.04.2026
@@ -10,7 +10,7 @@
 //  Licensed under the MIT License.
 //  See LICENSE file in the project root or copy at https://opensource.org
 //  for full license information.
-//***************************************************
+//********************************************************
 
 // TODO - Множество Мандельброт
 

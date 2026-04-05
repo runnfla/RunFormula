@@ -1,4 +1,4 @@
-//************************************************
+//*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Definitions include file
 //  Rev. 5.04.2026
@@ -13,7 +13,7 @@
 //  See LICENSE file in the project root
 //  or copy at https://opensource.org for full
 //  license information.
-//************************************************
+//*****************************************************
 
 // TODO -
 
