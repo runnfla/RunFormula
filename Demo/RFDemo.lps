@@ -20,7 +20,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
         <EditorIndex Value="9"/>
-        <CursorPos X="56" Y="16"/>
+        <TopLine Value="54"/>
+        <CursorPos X="45" Y="58"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -479,7 +480,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <TopLine Value="52"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="43"/>
         <CursorPos X="25" Y="58"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
@@ -521,10 +523,9 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="217"/>
-        <CursorPos X="52" Y="227"/>
+        <TopLine Value="218"/>
+        <CursorPos X="16" Y="227"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -539,8 +540,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="262"/>
-        <CursorPos Y="277"/>
+        <TopLine Value="265"/>
+        <CursorPos X="33" Y="273"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -553,7 +554,7 @@
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="10">
+    <JumpHistory HistoryIndex="13">
       <Position>
         <Filename Value="rfdemounit.pas"/>
         <Caret Line="20" Column="16" TopLine="8"/>
@@ -595,8 +596,20 @@
         <Caret Line="292" TopLine="274"/>
       </Position>
       <Position>
-        <Filename Value="..\RunFormula\runflaparse.inc"/>
-        <Caret Line="16" Column="56" TopLine="360"/>
+        <Filename Value="rfdemounit.pas"/>
+        <Caret Line="61" Column="13" TopLine="52"/>
+      </Position>
+      <Position>
+        <Filename Value="rfdemounit.pas"/>
+        <Caret Line="60" Column="25" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="rfdemounit.pas"/>
+        <Caret Line="68" Column="11" TopLine="61"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="286" Column="15" TopLine="265"/>
       </Position>
     </JumpHistory>
     <RunParams>

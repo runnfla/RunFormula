@@ -58,8 +58,7 @@ var
 implementation
 
 uses
-  RunFormula in '../RunFormula/runformula.pas',
-  Variants;
+  RunFormula, Variants;
 
 {$R *.lfm}
 
