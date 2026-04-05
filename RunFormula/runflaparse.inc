@@ -233,7 +233,7 @@ var TextFin : PChar;
       if c=#0 then raise EError.Create(UnexpectedEnd, Result);
       inc(Result);
     until false;
-    if not (c in CharSet) then raise EError.Create(InvalidChar);
+    if not (c in CharSet) then raise EError.Create(InvalidChar, Result);
   end;
 
   function IsKey(constref Key:ShortString):boolean;   //DONE -oParse -cRev.2026.03.31: Func IsKey
