@@ -31,7 +31,7 @@ uses RunFormula in 'RunFormula/runformula.pas';
 How to use RunFormula.\
 The simplest way to use it is to call the RunFlaParse and RunFlaExecStr or RunFlaExecVrt functions sequentially and passing the result of the first to the second. For example:
 
-ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3')) ); // displays 27
+ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3')) );      // displays 27
 
 The RunFlaParse function converts the source formula into bytecode, and the RunFlaExecStr/RunFlaExecVrt functions execute this code.
 The result of RunFlaExecStr is a string, and RunFlaExecVrt is a Variant value.
