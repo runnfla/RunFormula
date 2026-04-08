@@ -110,6 +110,11 @@ begin
   Save:=false;
 end;
 
+function AppendResult(const ParamCount:SizeInt; Context:pointer):Variant;
+begin
+  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParam(0-ParamCount, Context);
+end;
+
 procedure TDemoForm.ParseButtonClick(Sender: TObject);
 const Digits: array[0..$F] of char = '0123456789ABCDEF';
 var Error : TRunFlaError;
@@ -119,6 +124,7 @@ var Error : TRunFlaError;
     sp : PChar;
 begin
   ResultMemo.Clear;
+  RunFlaFuncReg('appendresult', @AppendResult);
   cod:=RunFlaParse(FlaSynEdit.Text, Error);
   with Error do if Code<>OK then begin
     ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code];
@@ -165,7 +171,7 @@ begin
       TagVar : S:=': ID '+IntToStr(Index)+' <'+
                  string(fin+PSizeInt(fin+Index*SI+OpTokenSize)^+OpTokenSize)+'>';
       TagFunc : S:=': Index '+IntToStr(Index);
-      TagCall : S:=': Goto '+IntToStr(p-PByte(cod)-Index);
+      TagCall : S:=': Address '+IntToStr(p-PByte(cod)-Index);
       TagText : S:=': Text "'+string(@Text)+'" (length '+IntToStr(length(string(@Text)))+')';
       else SetLength(S, 0);
     end;
@@ -173,11 +179,6 @@ begin
     ResultMemo.Append('');
     inc(p, sz);
   end;
-end;
-
-function AppendResult(const ParamCount:SizeInt; Context:pointer):Variant;
-begin
-  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParam(0-ParamCount, Context);
 end;
 
 procedure TDemoForm.ExecButtonClick(Sender: TObject);

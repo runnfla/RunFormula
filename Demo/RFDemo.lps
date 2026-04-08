@@ -19,8 +19,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <CursorPos X="48" Y="7"/>
+        <TopLine Value="161"/>
+        <CursorPos X="30" Y="174"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -47,7 +49,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="27"/>
         <CursorPos Y="53"/>
-        <UsageCount Value="49"/>
+        <UsageCount Value="50"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
       <Unit>
@@ -479,7 +481,6 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="38" Y="6"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
@@ -543,6 +544,7 @@
       <Unit>
         <Filename Value="..\Help\Rus\runflahelp.txt"/>
         <EditorIndex Value="10"/>
+        <TopLine Value="130"/>
         <CursorPos X="36" Y="16"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
