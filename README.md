@@ -10,7 +10,7 @@ Supported:
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div == <> < <= >= > & (string concatenation) ** (exponentiation).\
 Variables are supported, supported run-time initialization of variables by calling an external function.\
 A set of built-in functions, ability to register and use additional user-defined functions.\
-Algorithmic functions: if() repeat() exit() return() continue() break().\
+Algorithmic functions: if() repeat() exit() result() continue() break().\
 Ability to define functions (subroutines) directly in the formula body.\
 The define directive is supported.\
 Compiling source formula to the bytecode, allowing for multiple execution.
