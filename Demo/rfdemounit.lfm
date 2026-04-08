@@ -7,6 +7,7 @@ object DemoForm: TDemoForm
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120
+  LCLVersion = '4.2.0.0'
   object Label1: TLabel
     Left = 16
     Height = 20
@@ -534,10 +535,10 @@ object DemoForm: TDemoForm
       '  S = S & "--------------------------" & "^M" & "^J";'
       '   AppendResult(S);'
       ''
-      '  J = 9;  K = 1.1;'
-      '  repeat(J>0;'
+      '  T = 9;  K = 1.1;'
+      '  repeat(T>0;'
       '   begin'
-      '    J = J - 1;'
+      '    T = T - 1;'
       '    AppendResult(K & ":  ");'
       '    PrintLine(K);'
       '    AppendResult("^M" & "^J");'
