@@ -9,6 +9,7 @@
 //  Filename: runflaterm.inc
 
 //  Copyright (C) 2026 Alexander Torubarov
+//  Licensed under the MIT License.
 //  See LICENSE file in the project root
 //  or copy at https://opensource.org for full
 //  license information.

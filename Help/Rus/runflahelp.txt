@@ -1,4 +1,4 @@
-//********************************************************
+//*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  RunFormula Help File
 //  Rev. 8.04.2026
@@ -8,9 +8,10 @@
 
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
-//  See LICENSE file in the project root or copy at https://opensource.org
-//  for full license information.
-//********************************************************
+//  See LICENSE file in the project root
+//  or copy at https://opensource.org for full
+//  license information.
+//*****************************************************
 
 // TODO - Множество Мандельброт
 
@@ -218,8 +219,9 @@ Variant       -->     +           +              -              -       if strin
 
 В этой функции параметр Name - имя (в нижнем регистре) запрашиваемой переменной.
 Параметр Save определяет, должно ли быть сохранено значение в переменной (True), либо
-значение должно запрашиваться каждый раз (False). Например, определим такую
-глобальную функцию:
+значение должно запрашиваться каждый раз (False). Переменная (при установленном значении
+Save) всегда сохраняется в глобальном списке переменных.
+Например, определим такую глобальную функцию:
 
   function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
   begin
@@ -396,9 +398,10 @@ RunFlaFuncReg возвращает код ошибки из списка TRunFla
   Регистр символов не учитывается. Перед использованием в формуле идентификатора он должен быть определен.
   В подставляемом тексте также могут использоваться идентификаторы других определений.
   Например:
-  define result " 2 plus 7 "
+
+  define MySum " 2 plus 7 "
   define plus  ' + '
-  result                        // результат 9
+  MySum                        // результат 9
 
 9. Запуск байт-кода.
 Результат функции RunFlaParse (байт-код) может быть сохранен, а функции
