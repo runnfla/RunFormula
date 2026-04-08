@@ -1,0 +1,64 @@
+//*****************************************************
+//  RunFormula Expression Parser and Evaluator
+//  Error codes include file
+//  Rev. 4.04.2026
+
+//  Author: Alexander Torubarov
+//  Contact: runfla@yandex.com
+
+//  Filename: runflaerr.inc
+
+//  Copyright (C) 2026 Alexander Torubarov
+//  Licensed under the MIT License.
+//  See LICENSE file in the project root
+//  or copy at https://opensource.org for full
+//  license information.
+//*****************************************************
+
+// TODO -
+
+type
+  TRunFlaErrCode = (
+    OK = 0,
+    Unknown,
+    Malloc,
+    Overflow,
+    MaxList,
+    FuncExists,
+    InvalidChar,
+    UnexpectedEnd,
+    IncompType_SI,
+    IncompType_SF,
+    IncompType_FI,
+    IncompType_CI,
+    IncompType_CF,
+    IncompType_SC,
+    IncompType_GI,
+    IncompType_CG,
+    IncompType_SG,
+    InvalidStrVal,
+    DivZero,
+    MissingBracket,
+    IllegalBracket,
+    UnknownFunc,
+    VarExpected,
+    VariantError,
+    UnknownVar,
+    ParamNumber,
+    IllegalOp,
+    DefExists,
+    MaxDepth,
+    Unsupported,
+    VarExists,
+    OpExpected,
+    NotOpExpected,
+    DefaultExpected,
+    InvalidValue,
+    InvalidRange
+  );
+
+  TRunFlaError = packed record
+    Code : TRunFlaErrCode;
+    Position : integer;
+  end;
+
