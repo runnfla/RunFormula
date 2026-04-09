@@ -8,16 +8,18 @@
 
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
-//  See LICENSE file in the project root
-//  or copy at https://opensource.org for full
-//  license information.
+//  See the LICENSE file in the project root
+//  or a copy available at https://opensource.org
+//  for full license information.
 //*****************************************************
 
 // TODO - Множество Мандельброт
 
 1. Краткое описание.
-Модуль RunFormula предназначен для вычисления математических выражений, записанных в
-текстовом виде, при необходимости, с помощью алгоритма.
+
+Модуль RunFormula предназначен для вычисления математических выражений, при необходимости,
+с помощью алгоритма, записанных в текстовом виде.
+
 Поддерживаются:
   - целые числа в десятичном, шестнадцатеричном и двоичном виде;
   - вещественные числа в форматах с точкой и порядком;
