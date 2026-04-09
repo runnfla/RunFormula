@@ -9,12 +9,12 @@ Supported data types:
 - Strings and ASCII characters.
 
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div == <> < <= >= > & (string concatenation) ** (integer exponentiation).\
-Variables are supported, supported run-time initialization of variables by calling an external function.\
-A set of built-in functions, ability to register and use additional user-defined functions.\
-Algorithmic functions: if() repeat() exit() result() continue() break().\
-Ability to define functions (subroutines) directly in the formula body.\
-The define directive is supported.\
-Compiling source formula to the bytecode, allowing for multiple execution.
+Variables and runtime initialization of variables via external function.\
+A set of built-in functions and ability to register and use custom user-defined functions.\
+Control flow functions: if() repeat() exit() result() continue() break().\
+Ability to use inline function definitions directly within the formula.\
+Support for the define directive.\
+Compiling the source formula into bytecode for multiple execution.
 
 How to include RunFormula in your project.
 - Copy all files from the RunFormula directory (runformula.pas and all .inc files) to
