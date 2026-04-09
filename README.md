@@ -2,23 +2,23 @@
 The RunFormula unit is intended to evaluate mathematical expressions provided as text using programmed logic if necessary.
 
 Supported data types:
-- Integers in decimal, hexadecimal and binary formats;
-- Floating-point numbers in decimal and scientific notation;
-- Complex numbers and operations on them;
-- Intervals and operations on them;
-- Strings and ASCII characters;
+- integers in decimal, hexadecimal and binary formats;
+- floating-point numbers in decimal and scientific notation;
+- complex numbers and operations on them;
+- intervals and operations on them;
+- strings and ASCII characters;
 
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div == <> < <= >= > & (string concatenation) ** (integer exponentiation).\
 Variables and runtime initialization of variables via external function.\
-A set of built-in functions and ability to register and use custom user-defined functions.\
+A set of built-in functions and the ability to register and use additional user-defined functions.\
 Control flow functions: if() repeat() exit() result() continue() break()\
 Ability to use inline function definitions directly within the formula.\
 Support for the define directive.\
 Compiling the source formula into bytecode for multiple execution.
 
 #### Integrating RunFormula into your project
-- Copy all files from the `RunFormula` directory (`runformula.pas` and all .inc files) to your project or a separate directory;
-- Add `RunFormula` to the `uses` clause of either the `interface` or `implementation` section;
+- Copy all files from the `RunFormula` directory (`runformula.pas` and all .inc files) to your project or a separate directory.
+- Add `RunFormula` to the `uses` clause of either the `interface` or `implementation` section.
 
 For example, like this:
 ```
