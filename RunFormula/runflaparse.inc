@@ -205,7 +205,7 @@ var TextFin : PChar;
     V.Chr:=Chr;
     ValueToken(V);
   end;
-
+{
   procedure GapToken(const L, R:TRFloat);             //DONE -oParse -cRev.2026.04.06: Proc GapToken
   var V : TValRec = (VType : VGap);
   begin
@@ -221,7 +221,7 @@ var TextFin : PChar;
     V.IGap:=R;
     ValueToken(V);
   end;
-
+}
   procedure TextToken;                                //DONE -oParse -cRev.2026.04.06: Proc TextToken
   var sz, lng : SizeInt;
   begin

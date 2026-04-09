@@ -19,9 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="161"/>
+        <TopLine Value="162"/>
         <CursorPos X="30" Y="174"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -522,15 +521,17 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="31" Y="3"/>
+        <TopLine Value="206"/>
+        <CursorPos X="2" Y="224"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="31" Y="3"/>
+        <CursorPos X="47" Y="7"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit>
