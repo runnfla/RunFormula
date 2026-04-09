@@ -6,7 +6,7 @@ Supported data types:
 - Floating-point numbers in decimal and scientific notation;
 - Complex numbers and operations on them;
 - Intervals and operations on them;
-- Strings and ASCII characters.
+- Strings and ASCII characters;
 
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div == <> < <= >= > & (string concatenation) ** (integer exponentiation).\
 Variables and runtime initialization of variables via external function.\
@@ -16,10 +16,9 @@ Ability to use inline function definitions directly within the formula.\
 Support for the define directive.\
 Compiling the source formula into bytecode for multiple execution.
 
-#### Integrating RunFormula into your project.
-- Copy all files from the RunFormula directory (runformula.pas and all .inc files) to
-your project or a separate directory;
-- Include the RunFormula unit to the interface or implementation section.
+#### Integrating RunFormula into your project
+- Copy all files from the `RunFormula` directory (`runformula.pas` and all .inc files) to your project or a separate directory;
+- Add the `RunFormula` to the interface or implementation uses clause.
 
 For example, like this:
 ```
@@ -33,14 +32,15 @@ implementation
 uses RunFormula in 'RunFormula/runformula.pas';
 ```
 
-#### How to use RunFormula.
-The simplest way is to call RunFlaParse and then pass its output to RunFlaExecStr or RunFlaExecVrt for execution.\
+#### How to use RunFormula
+The simplest way is to call `RunFlaParse` and then pass its output to the `RunFlaExecStr` or `RunFlaExecVrt` functions.\
 For example:
 ```
-ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3')) );      // displays 27
+ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );      // displays 27
 ```
-The RunFlaParse function converts the source formula into bytecode, and the RunFlaExecStr/RunFlaExecVrt functions execute this code.
-The result of RunFlaExecStr is a string, and RunFlaExecVrt is a Variant value. Advanced usage is described in the relevant help topics.
+`RunFlaParse` compiles the formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string
+while that of `RunFlaExecVrt` is a Variant.\
+See  the corresponding help topics for advanced usage.
 
 Author: Alexander Torubarov\
 Contact: runfla@yandex.com
