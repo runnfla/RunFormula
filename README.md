@@ -11,7 +11,7 @@ Supported data types:
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div == <> < <= >= > & (string concatenation) ** (integer exponentiation).\
 Variables and runtime initialization of variables via external function.\
 A set of built-in functions and ability to register and use custom user-defined functions.\
-Control flow functions: if() repeat() exit() result() continue() break().\
+Control flow functions: if() repeat() exit() result() continue() break()\
 Ability to use inline function definitions directly within the formula.\
 Support for the define directive.\
 Compiling the source formula into bytecode for multiple execution.
