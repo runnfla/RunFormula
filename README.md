@@ -38,9 +38,9 @@ For example:
 ```
 ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );      // displays 27
 ```
-`RunFlaParse` compiles the formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string
-while that of `RunFlaExecVrt` is a Variant.\
-See  the corresponding help topics for advanced usage.
+`RunFlaParse` compiles the original formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string,
+while `RunFlaExecVrt` returns a Variant.\
+See the corresponding help topics for advanced usage.
 
 --\
 **Author:** Alexander Torubarov\
