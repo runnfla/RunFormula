@@ -1,6 +1,5 @@
 # RunFormula
 The RunFormula unit is intended to evaluate mathematical expressions provided as text using programmed logic if necessary.\
-
 Supported:
 - Integers in decimal, hexadecimal and binary notation;
 - Real numbers in dotted and exponent formats;
