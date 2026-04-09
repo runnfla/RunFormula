@@ -1,63 +1,64 @@
-//***************************************************
-// RunFormula Expression Parser and Evaluator
-// RunFormula Help File
-// Rev. 2.04.2026
+//*****************************************************
+//  RunFormula Expression Parser and Evaluator
+//  RunFormula Help File
+//  Rev. 9.04.2026
 
-// Author: Alexander Torubarov
-// Contact: runfla@yandex.com
+//  Author: Alexander Torubarov
+//  Contact: runfla@yandex.com
 
-// Copyright (C) 2026 Alexander Torubarov
-// Licensed under the MIT License.
-// See LICENSE file in the project root or copy at https://opensource.org
-// for full license information.
-//***************************************************
+//  Copyright (C) 2026 Alexander Torubarov
+//  Licensed under the MIT License.
+//  See the LICENSE file in the project root
+//  or a copy available at https://opensource.org
+//  for full license information.
+//*****************************************************
 
-// TODO - Mandelbrot Set
+1.a. Brief description.
 
-1. Brief description.
-The RunFormula module is designed to calculate mathematical expressions written in
-in text form, if necessary, using an algorithm.
-Supported:
-  - integers in decimal, hexadecimal and binary form;
-  - real numbers in formats with a point and order;
-  - complex numbers and operations with them;
-  - intervals and operations with them;
-  - ASCII text strings and characters;
-Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div
-  == <> < <= >= > & (string concatenation) ** (exponentiation).
-Variables and initialization of variables as needed via external request are supported
-functions during calculation.
-There is a set of built-in functions, the ability to register and use additional ones
-user-defined functions.
-There are algorithmic functions if() repeat() exit() return() continue() break().
-The ability to define functions (subroutines) directly in the body of a formula.
-The define directive is supported.
-The transformation of the original formula into byte code is used with the possibility of its multiple conversion
-execution.
+The RunFormula unit is designed to calculate mathematical expressions presented
+in text form, using, if necessary, program logic.
 
-How to connect RunFormula to your project.
-  - copy all files from the RunFormula directory (runformula.pas and all .inc files) to
-    your project or in a separate catalog;
-  - Add the RunFormula module to the interface or implementation section. For example, like this:
+Supported data types:
+- integers in decimal, hexadecimal and binary formats;
+- floating point numbers in decimal and scientific notation;
+- complex numbers and operations on them;
+- intervals and operations on them;
+- ASCII strings and characters;
 
-    implementation
-      uses RunFormula;
+Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod
+div == <> < <= >= > & (string concatenation) ** (exponentiation).
+Variables and runtime variable initialization are supported via
+external function.
+There is a set of built-in functions and the ability to register and use
+additional user functions.
+Flow control functions: if() repeat() exit() result() continue() break()
+The ability to define and use functions directly in a formula.
+Support for the define directive.
+Compiling the source formula into bytecode for multiple execution.
 
-  or, if a separate directory is used:
+1.b. Integration of RunFormula into the project.
+- Copy all files from the RunFormula directory (runformula.pas and all .inc files)
+to a project or to a separate directory;
+- Add RunFormula to the uses section of the interface or implementation section.
+For example, like this:
 
-    implementation
-      uses RunFormula in 'RunFormula/runformula.pas';
+implementation
+uses RunFormula;
 
-How to use RunFormula.
-The simplest way to use it is to call the RunFlaParse and RunFlaParse functions in sequence.
-RunFlaExecStr or RunFlaExecVrt with the result of the first passed to the second. For example:
+or, if a separate directory is used:
 
-    ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3')) ); // displays 27
+implementation
+uses RunFormula in 'RunFormula/runformula.pas';
 
-The RunFlaParse function converts the source formula into bytecode, and the functions
-RunFlaExecStr/RunFlaExecVrt execute this code. The result of the RunFlaExecStr function is
-text string, RunFlaExecVrt - Variant type value.
-Advanced usage methods are described in the relevant help sections.
+The simplest way to use RunFormula is to call RunFlaParse and pass it
+output to the RunFlaExecStr or RunFlaExecVrt functions. For example:
+
+ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) ); // displays 27
+
+RunFlaParse compiles the source formula into bytecode for execution by the RunFlaExecStr functions.
+or RunFlaExecVrt. The result of RunFlaExecStr is a string, and RunFlaExecVrt is
+Variant type variable.
+Please see the relevant help sections for more information on usage.
 
 2. Formula syntax.
 2.a. Comments.
@@ -71,34 +72,34 @@ slash. For example:
 An integer can be specified in decimal, hexadecimal, or binary format.
 For example:
 
-  X = 12345 // integer in decimal form
-  X = 0xA12B // integer in hexadecimal form
-  X = 0a12bH // integer in hexadecimal form
-  X = 10101b // integer in binary form
+X = 12345 // integer in decimal form
+X = 0xA12B // integer in hexadecimal form
+X = 0a12bH // integer in hexadecimal form
+X = 10101b // integer in binary form
 
 Characters are not case-sensitive, except for the 0x prefix.
 On overflow, the decimal number is converted to a real number, but for hexadecimal
-and binary numbers are not overflow checked.
+and binary numbers overflow is not checked.
 When specifying negative numbers, it is recommended not to separate the minus from the number:
 
-  X = -999 // this is recommended
-  X = - 999 // this is not recommended, but allowed
+X = -999 // this is recommended
+X = - 999 // this is not recommended, but allowed
 
 Care should be taken when specifying a large negative hexadecimal or
 binary number. For example:
 
-  X = -0x8000000000000000 // result -9223372036854775808, integer
-  X = - 0x80000000000000000 // result -9.22337203685478E+18, real
+X = -0x8000000000000000 // result -9223372036854775808, integer
+X = - 0x80000000000000000 // result -9.22337203685478E+18, real
 
 2.c. Real numbers.
 A real number can be given as a decimal number with a point or as
 numbers with order. For example:
 
-  X = 12.34
-  Y = 0.12
-  X = 1E1
-  Y = 0.2e-4
-  Z = -23E+34
+X = 12.34
+Y = 0.12
+X = 1E1
+Y = 0.2e-4
+Z = -23E+34
 
 When specifying negative numbers, it is also recommended not to separate the minus sign from the number.
 
@@ -106,39 +107,39 @@ When specifying negative numbers, it is also recommended not to separate the min
 The text string can be specified in quotes or apostrophes. If the string is specified in
 If it's in quotation marks, it can contain apostrophes and vice versa. For example:
 
-  X = '"A"' & "'s'" // result "A"'s'
+X = '"A"' & "'s'" // result is "A"'s'
 
 An empty string can be specified as "", '', or the constant None.
 
-2.e. ASCII characters.
+2.e. ASCII symbols.
 An ASCII character can be specified as a string containing that character. Unlike a string,
 an ASCII character can participate in arithmetic operations as an integer corresponding to
 its code. A control character can also be specified using the "^" prefix. For example:
 
-  X = "B" - "A" // result 1
-  X = "B" & "A" // result BA
-  X = "One" & "^M" & "^J" & "Two" // output One and Two in 2 lines
+X = "B" - "A" // result 1
+X = "B" & "A" // result BA
+X = "One" & "^M" & "^J" & "Two" // output One and Two in 2 lines
 
 2.f. Constants.
 There are predefined constants:
-  False // 0 integer
-  True // 1 integer
-  None // empty string
-  Pi. // 3.14159265358979323846
-  E. // 2.71828182845904523536
-  i. // imaginary 1
+False // 0 integer
+True // 1 integer
+None // empty string
+Pi // 3.14159265358979323846
+E // 2.71828182845904523536
+J // imaginary 1
 The characters are not case-sensitive.
 
 2.g. Complex numbers.
-To define a complex number, one should use an expression with a constant i. i.e., imaginary 1,
+To define a complex number, one should use an expression with a constant j - imaginary 1,
 or the built-in function Cplex(R, I). For example:
 
-  X = 4+5*i. // result (4.5)
-  X = Cplex(2, 3) // result (2,3)
+X = 4+5*j // result (4.5)
+X = Cplex(2, 3) // result (2,3)
 
 2.h. Intervals.
 Ranges can be specified using the Range(L, R) function. For example:
-  X = Range(19, 23.5) // result [19:23.5]
+X = Range(19, 23.5) // result [19:23.5]
 
 2.i. Brackets.
 An expression can be enclosed in parentheses, the value of the "parentheses" is the result of this
@@ -146,8 +147,8 @@ expressions. Multiple expressions can be enclosed in parentheses, separated by a
 semicolon. Then the expressions in parentheses are evaluated sequentially from left to right,
 and the result of the "brackets" is the value of the last expression. For example:
 
-  5 * (4 - 7) // result -15
-  5 * ( 21 , 21 + 1; 21 + 2 ) // result 115
+5 * (4 - 7) // result -15
+5 * ( 21 , 21 + 1; 21 + 2 ) // result 115
 
 Parentheses can be nested within each other. Before the closing parenthesis, a comma or
 Using a semicolon is allowed, but not recommended.
@@ -157,7 +158,7 @@ parentheses.
 3.a. Mathematical operations.
 The table lists the supported mathematical operations for different value types.
 
-                    Integer Real Complex Interval ASCII Character String
+Integer Real Complex Interval ASCII Character String
 
 == <> < > <= >= + + + + integer +
 + - * + + + + integer -
@@ -174,20 +175,20 @@ When integer overflow occurs in + - * operations, the result is converted to a f
 
 3.b. Operation priority.
 In an expression, mathematical operations are performed according to the following precedence:
-  maximum: - not // unary
-                   **
-                   shl (<<) shr (>>) div mod
-                   * / and
-                   + - or xor
-                   &
-                   == <> < > <= >=
-  minimum: = // assignment
+maximum: - not // unary
+**
+shl (<<) shr (>>) div mod
+* / and
++ - or xor
+&
+== <> < > <= >=
+minimum: = // assignment
 
 3.c. Type conversion.
 The value type can be converted according to the following table. It also
-The Variant type is specified, which is used to pass values ​​to external functions.
+The Variant type is specified, which is used to pass values to external functions.
 
-                    Integer Real Complex Interval ASCII Character String Variant
+Integer Real Complex Interval ASCII Character String Variant
 
 Integer --> + + X+0*i [X:X] - + +
 Real --> - + X+0*i [X:X] - + +
@@ -202,34 +203,35 @@ Variables can be used in an expression. Letters are allowed in the variable name
 Latin alphabet, numbers, period symbol (except the first character), symbol
 underscores. The characters are not case-sensitive.
 The value of a variable is determined using the assignment operation:
-  <variable> = <expression>
+<variable> = <expression>
 Before being used in an expression, a variable must be defined using the operator
 assignment. The result of an assignment operation is equal to the value being assigned. For example:
 
-  X=2+4 // result 6
-  abc=18/3 // result 6
-  ( X=4, Y=6.1; Z=X+Y ) // result 10.1
+X=2+4 // result 6
+abc=18/3 // result 6
+( X=4, Y=6.1; Z=X+Y ) // result 10.1
 
 4.b. Initialization of variables during computation.
 A variable's value can be assigned during evaluation by calling an external variable.
 global function of the following type:
 
-  function(constref Name:string; out Save:boolean):Variant;
+function(constref Name:string; out Save:boolean):Variant;
 
 In this function, the Name parameter is the name (in lowercase) of the variable being requested.
 The Save parameter determines whether the value should be saved in the variable (True), or
-the value must be requested each time (False). For example, let's define such
-global function:
+the value should be requested each time (False). Variable (when the value is set
+Save) is always saved in the global variable list.
+For example, let's define the following global function:
 
-  function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
-  begin
-    Result:=InputBox('', 'Get value for variable '+Name, '');
-    Save:=false;
-  end;
+function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
+begin
+Result:=InputBox('', 'Get value for variable '+Name, '');
+Save:=false;
+end;
 
 Let's specify its address in the RunFlaExecStr/RunFlaExecVrt function:
 
-  ShowMessage( RunFlaExecStr(RunFlaParse('A & A'), Error, @MyRunFlaVar) );
+ShowMessage( RunFlaExecStr(RunFlaParse('A & A'), Error, @MyRunFlaVar) );
 
 For information about the Error parameter, see the error handling help section.
 The result will be a string display consisting of the two inputs combined.
@@ -270,22 +272,22 @@ In the variable value query functions (TRunFlaVar) and additional functions defi
 by the user (TRunFlaFunc), it is possible to interrupt the calculation and generate an error with
 code from the TRunFlaErrCode list. The RunFlaRaise procedure is used for this. For example:
 
-  function MySumFunc(const ParamCount:SizeInt; Context:pointer):Variant;
-  begin
-    if ParamCount<>2 then RunFlaRaise(ParamNumber); // checking the number of parameters
-    Result:=RunFlaParam(0-ParamCount, Context)+RunFlaParam(1-ParamCount, Context);
-  end;
+function MySumFunc(const ParamCount:SizeInt; Context:pointer):Variant;
+begin
+if ParamCount<>2 then RunFlaRaise(ParamNumber); // checking the number of parameters
+Result:=RunFlaParam(0-ParamCount, Context)+RunFlaParam(1-ParamCount, Context);
+end;
 
 5.e. Text error message.
 To convert the error code into a text message, use the RunFlaErrorMsg list,
 defined in the runflamsg.inc file. For example:
 
-  procedure TForm1.ExecButtonClick(Sender: TObject);
-  var Error : TRunFlaError;
-  begin
-    ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3x', Error), Error) );
-    ShowMessage( RunFlaErrorMsg[Error.Code] + ' at: ' + IntToStr( Error.Position ));
-  end;
+procedure TForm1.ExecButtonClick(Sender: TObject);
+var Error : TRunFlaError;
+begin
+ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3x', Error), Error) );
+ShowMessage( RunFlaErrorMsg[Error.Code] + ' at: ' + IntToStr( Error.Position ));
+end;
 
 This list and file can be replaced by the user.
 
@@ -297,7 +299,7 @@ RunFormula has a set of predefined functions described in the corresponding help
 It is possible to register and use additional user functions.
 The user-defined function must be global and have the following header:
 
-  function MyFunc(const ParamCount:SizeInt; Context:pointer):Variant;
+function MyFunc(const ParamCount:SizeInt; Context:pointer):Variant;
 
 In it, ParamCount is the number of parameters passed, Context is the pointer required
 to obtain the parameter values. The result type of the user-defined function is Variant.
@@ -315,7 +317,7 @@ registration with change of function address and overriding of predefined functi
 In this case, RunFlaFuncReg will return the error code FuncExist, but the information will be changed.
 
 6.d. Obtaining parameter values.
-To obtain the values ​​of the parameters of a user-defined function, use the RunFlaParam function.
+To obtain the values of the parameters of a user-defined function, use the RunFlaParam function.
 In it, Offset is calculated as <0-based number of the required parameter> - ParamCount, Context
 must be passed from the header of the user-defined function.
 Note: The value of the parameter (including in the case of a predefined function) is calculated
@@ -323,32 +325,32 @@ only when requested within the function itself.
 
 6.e. Example of a user-defined function.
 
-  function MyIFFunc(const ParamCount:SizeInt; Context:pointer):Variant;
-  begin
-    if ParamCount<>3 then RunFlaRaise(ParamNumber); // check the number of parameters
-    if RunFlaParam(0-ParamCount, Context)>0 // testing the first parameter
-      then Result:=RunFlaParam(1-ParamCount, Context) // if >0 return the second
-      else Result:=RunFlaParam(2-ParamCount, Context); // if not, then the third
-  end;
-                                                             // registration with error checking
-  if RunFlaFuncReg('myiffunc', @MyIFFunc)<>OK then ShowMessage('Registration Error');
+function MyIFFunc(const ParamCount:SizeInt; Context:pointer):Variant;
+begin
+if ParamCount<>3 then RunFlaRaise(ParamNumber); // check the number of parameters
+if RunFlaParam(0-ParamCount, Context)>0 // testing the first parameter
+then Result:=RunFlaParam(1-ParamCount, Context) // if >0 return the second
+else Result:=RunFlaParam(2-ParamCount, Context); // if not, then the third
+end;
+// registration with error checking
+if RunFlaFuncReg('myiffunc', @MyIFFunc)<>OK then ShowMessage('Registration Error');
 
-  Now if we introduce the formula
+Now if we introduce the formula
 
-  ( X=10, Y=20, MyIfFunc(10, X+10, Y-20) )
+( X=10, Y=20, MyIfFunc(10, X+10, Y-20) )
 
-  we get the result 20. In this case, the subtraction Y-20 will not be performed.
+we get the result 20. In this case, the subtraction Y-20 will not be performed.
 
 7. Subroutine functions defined in the formula.
 7.a. Defining a subroutine function.
 A formula can use subroutine functions defined directly within the formula itself.
 For example:
 
-  ( func ABC(A, B, C);
-       A+B+C
-     endfunc;
+( func ABC(A, B, C);
+A+B+C
+endfunc;
 
-     ABC(10, 20, 30)
+ABC(10, 20, 30)
 
 A subroutine function must be defined before it can be used. A subroutine function can
 be defined in any place in the formula where it is permissible to indicate an expression, including
@@ -356,10 +358,10 @@ inside another subroutine function, but the scope of all subroutine functions is
 global, regardless of the place of their definition.
 A subroutine function is defined as:
 
-  func <Name>( <formal parameters separated by [,;]> )[,;]
-    one or more expressions separated by [,;]
-    the result of a subroutine function is the result of the last expression
-  endfunc
+func <Name>( <formal parameters separated by [,;]> )[,;]
+one or more expressions separated by [,;]
+the result of a subroutine function is the result of the last expression
+endfunc
 
 A comma or semicolon before endfunc is not allowed.
 
@@ -369,13 +371,13 @@ a variable or value assignment is searched for hierarchically
 from local scope to global scope. In order to create a variable (with the ability to
 its initialization) in the local scope without searching, the Local function is used. For example:
 
-   ( func ABC(A, B, C);
-         local(X, Y=10, Z=A);
-         X=2;
-         X+Y+Z+B+C
-      endfunc;
+( func ABC(A, B, C);
+local(X, Y=10, Z=A);
+X=2;
+X+Y+Z+B+C
+endfunc;
 
-      ABC(1, 2, 3)
+ABC(1, 2, 3)
 
 Formal variables are also created in the local scope.
 
@@ -383,30 +385,31 @@ Formal variables are also created in the local scope.
 The parameters can specify a default value, which is used if it
 not passed in the call. For example:
 
-        ( func ABC(A, B=15, C=34+23);
-              A+B+C
-           endfunc;
+( func ABC(A, B=15, C=34+23);
+A+B+C
+endfunc;
 
-           ABC(1) )
+ABC(1) )
 
 8. Directives.
 8.a. The define directive.
 The define <identifier> "text" directive replaces the specified identifier in the formula with text.
 The identifier may contain Latin letters, numbers, the period symbol (except for the first symbol), and the underscore symbol.
-  The identifier is not case-sensitive. It must be defined before being used in a formula.
-  The substituted text may also use identifiers from other definitions.
-  For example:
-  define result "2 plus 7"
-  define plus ' + '
-  result // result 9
+The identifier is not case-sensitive. It must be defined before being used in a formula.
+The substituted text may also use identifiers from other definitions.
+For example:
+
+define MySum "2 plus 7"
+define plus ' + '
+MySum // result 9
 
 9. Running bytecode.
 The result of the RunFlaParse function (bytecode) can be stored, and the functions
 RunFlaExecStr/RunFlaExecVrt can be called multiple times with it without prior
 calling RunFlaParse. This requires the following conditions to be met:
-  - user functions must be registered in the volume and order
-  which was before the RunFlaParse call
-  - to get information about the error, the TRunFlaError.Code field and the global variable
-  RunFlaErrCode must be initialized to OK.
-  - if the source code of RunFormula has changed, then RunFlaParse must be executed again.
-
+- user functions must be registered in the volume and order
+which was before the RunFlaParse call
+- to get information about the error, the TRunFlaError.Code field and the global variable
+RunFlaErrCode must be initialized to OK.
+- if the source code of RunFormula has changed, then RunFlaParse must be executed again.
+                                      

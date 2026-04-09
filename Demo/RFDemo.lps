@@ -543,7 +543,7 @@
         <Filename Value="..\Help\Rus\runflahelp.txt"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <CursorPos X="54" Y="6"/>
+        <CursorPos X="57"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
