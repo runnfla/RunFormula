@@ -1,11 +1,12 @@
 # RunFormula
-The RunFormula unit is intended to evaluate mathematical expressions provided as text using programmed logic if necessary.\
-Supported:
-- Integers in decimal, hexadecimal and binary notation;
-- Real numbers in dotted and exponent formats;
-- Complex numbers and operations with it;
-- Intervals and operations with it;
-- ASCII strings and characters.
+The RunFormula unit is intended to evaluate mathematical expressions provided as text using programmed logic if necessary.
+
+Supported data types:
+- Integers in decimal, hexadecimal and binary formats;
+- Floating-point numbers in decimal and scientific notation;
+- Complex numbers and operations on them;
+- Intervals and operations on them;
+- Strings and ASCII characters.
 
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod div == <> < <= >= > & (string concatenation) ** (exponentiation).\
 Variables are supported, supported run-time initialization of variables by calling an external function.\
