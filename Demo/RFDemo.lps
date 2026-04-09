@@ -47,7 +47,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="27"/>
         <CursorPos Y="53"/>
-        <UsageCount Value="51"/>
+        <UsageCount Value="52"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
       <Unit>
@@ -479,8 +479,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="29" Y="11"/>
+        <CursorPos X="41" Y="6"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit>
@@ -542,8 +541,9 @@
       </Unit>
       <Unit>
         <Filename Value="..\Help\Rus\runflahelp.txt"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <CursorPos X="63" Y="8"/>
+        <CursorPos X="54" Y="6"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
