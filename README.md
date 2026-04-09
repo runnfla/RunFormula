@@ -42,9 +42,10 @@ ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );      // displays 27
 while that of `RunFlaExecVrt` is a Variant.\
 See  the corresponding help topics for advanced usage.
 
-Author: Alexander Torubarov\
-Contact: runfla@yandex.com
+--\
+**Author:** Alexander Torubarov\
+**Contact:** runfla@yandex.com
 
 Copyright (C) 2026 Alexander Torubarov\
 Licensed under the MIT License.\
-See LICENSE file in the project root or copy at https://opensource.org for full license information. 
+See `LICENSE` file in the project root or a copy available at https://opensource.org.
