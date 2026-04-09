@@ -16,27 +16,31 @@ Ability to use inline function definitions directly within the formula.\
 Support for the define directive.\
 Compiling the source formula into bytecode for multiple execution.
 
-How to include RunFormula in your project.
+#### Integrating RunFormula into your project.
 - Copy all files from the RunFormula directory (runformula.pas and all .inc files) to
 your project or a separate directory;
-- Include the RunFormula unit to the interface or implementation section. For example, like this:
+- Include the RunFormula unit to the interface or implementation section.
 
-implementation\
+For example, like this:
+```
+implementation
 uses RunFormula;
+```
 
 or, if using a separate directory:
-
-implementation\
+```
+implementation
 uses RunFormula in 'RunFormula/runformula.pas';
+```
 
-How to use RunFormula.\
-The simplest way to use it is to call the RunFlaParse and RunFlaExecStr or RunFlaExecVrt functions sequentially and passing the result of the first to the second. For example:
-
+#### How to use RunFormula.
+The simplest way is to call RunFlaParse and then pass its output to RunFlaExecStr or RunFlaExecVrt for execution.\
+For example:
+```
 ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3')) );      // displays 27
-
+```
 The RunFlaParse function converts the source formula into bytecode, and the RunFlaExecStr/RunFlaExecVrt functions execute this code.
-The result of RunFlaExecStr is a string, and RunFlaExecVrt is a Variant value.
-Advanced usage is described in the relevant help topics.
+The result of RunFlaExecStr is a string, and RunFlaExecVrt is a Variant value. Advanced usage is described in the relevant help topics.
 
 Author: Alexander Torubarov\
 Contact: runfla@yandex.com
