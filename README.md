@@ -14,7 +14,8 @@ A set of built-in functions and the ability to register and use additional user-
 Control flow functions: if() repeat() exit() result() continue() break()\
 Ability to use inline function definitions directly within the formula.\
 Support for the define directive.\
-Compiling the source formula into bytecode for multiple execution.
+Compiling the source formula into bytecode for multiple execution.\
+Minimal dependencies (only SysUtils in the base configuration).
 
 #### Integrating RunFormula into your project
 - Copy all files from the `RunFormula` directory (`runformula.pas` and all .inc files) to your project or a separate directory.
