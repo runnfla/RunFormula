@@ -7,7 +7,6 @@ object DemoForm: TDemoForm
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120
-  LCLVersion = '4.2.0.0'
   object Label1: TLabel
     Left = 16
     Height = 20
@@ -638,21 +637,40 @@ object DemoForm: TDemoForm
     OnClick = TestsButtonClick
   end
   object VrtCheckBox: TCheckBox
-    Left = 1078
+    Left = 1080
     Height = 24
-    Top = 224
+    Top = 264
     Width = 140
     Anchors = [akTop, akRight]
     Caption = 'Use Variant Result'
     TabOrder = 6
   end
   object SaveCheckBox: TCheckBox
-    Left = 1078
+    Left = 1080
     Height = 24
-    Top = 264
+    Top = 304
     Width = 111
     Anchors = [akTop, akRight]
     Caption = 'Save Variable'
     TabOrder = 7
+  end
+  object ByteCodeCheckBox: TCheckBox
+    Left = 1080
+    Height = 24
+    Top = 344
+    Width = 115
+    Anchors = [akTop, akRight]
+    Caption = 'Bytecode only'
+    TabOrder = 8
+  end
+  object LoopButton: TButton
+    Left = 1104
+    Height = 31
+    Top = 208
+    Width = 94
+    Anchors = [akTop, akRight]
+    Caption = 'Loop'
+    TabOrder = 9
+    OnClick = LoopButtonClick
   end
 end

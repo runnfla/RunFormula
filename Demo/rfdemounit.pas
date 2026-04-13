@@ -32,6 +32,8 @@ type
   { TDemoForm }
 
   TDemoForm = class(TForm)
+    LoopButton: TButton;
+    ByteCodeCheckBox: TCheckBox;
     SaveCheckBox: TCheckBox;
     VrtCheckBox: TCheckBox;
     TestsButton: TButton;
@@ -42,6 +44,7 @@ type
     ParseButton: TButton;
     Label1: TLabel;
     FlaSynEdit: TSynEdit;
+    procedure LoopButtonClick(Sender: TObject);
     procedure ParseButtonClick(Sender: TObject);
     procedure ExecButtonClick(Sender: TObject);
     procedure TestsButtonClick(Sender: TObject);
@@ -179,6 +182,34 @@ begin
     ResultMemo.Append('');
     inc(p, sz);
   end;
+end;
+
+procedure TDemoForm.LoopButtonClick(Sender: TObject);
+var Error : TRunFlaError;
+    S, src, cod : string;
+    i : SizeInt;
+    bc : boolean;
+begin
+  RunFlaFuncReg('appendresult', @AppendResult);
+  src:=FlaSynEdit.Text;
+  S:=RunFlaExecStr(RunFlaParse(src, Error), Error);
+  with Error do if Code<>OK then begin
+    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code];
+    FlaSynEdit.SelStart:=Position+1;
+    FlaSynEdit.SelEnd:=Position+2;
+    exit;
+  end;
+  try
+    i:=StrToInt(InputBox('', 'Loop count:', ''));
+  except
+    exit;
+  end;
+  ResultMemo.Clear;
+  ResultMemo.Append(S);
+  cod:=RunFlaParse(src);
+  bc:=ByteCodeCheckBox.Checked;
+  for i:=0 to i do if bc then RunFlaExecStr(cod) else RunFlaExecStr(RunFlaParse(src));
+  ShowMessage('Done.');
 end;
 
 procedure TDemoForm.ExecButtonClick(Sender: TObject);

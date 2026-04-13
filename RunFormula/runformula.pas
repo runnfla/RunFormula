@@ -347,7 +347,7 @@ begin
   RestoreStatus(Status, Context);
   with Context do begin
     i:=0;
-    repeat
+    if VarPool.ListLng>0 then repeat
       with PMemList(MemListGet(VarPool, i))^ do MemListFree(PMemList(@List)^);
       if MemListIsTaken(VarPool, i) then break;
       inc(i);
