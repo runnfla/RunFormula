@@ -12,7 +12,7 @@ Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod 
 Variables and runtime initialization of variables via external function.\
 A set of built-in functions and the ability to register and use additional user-defined functions.\
 Control flow functions: if() repeat() exit() result() continue() break()\
-Ability to use inline function definitions directly within the formula.\
+Ability to use inline function definitions directly within the formula (subroutines).\
 Support for the define directive.\
 Compiling the source formula into bytecode for multiple execution.\
 Minimal dependencies (only SysUtils in the base configuration).
