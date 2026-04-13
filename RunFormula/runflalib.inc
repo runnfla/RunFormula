@@ -628,11 +628,13 @@ begin
   Result^.VAlloc:=LV;
 end;
 
-procedure NewVarList(var Context:TContext); inline;           //DONE -oLib -cRev.2026.03.29: Proc NewVarList
+procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.03.29: Proc NewVarList
 begin
   with Context, VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
-    MemListInit(PMemList(MemListAdd(PMemList(@List)^))^, SizeOf(TVariable), VarGrow);
+    if (VarPool.ListLng=0) or MemListIsTaken(VarPool, VarPool.Count-1)
+      then MemListInit(PMemList(MemListAdd(PMemList(@List)^))^, SizeOf(TVariable), VarGrow)
+      else inc(VarPool.Count);
   end;
 end;
 
@@ -652,7 +654,7 @@ begin
   with Status, Context do begin
     for i:=VarPool.Count-1 downto CntVarPool do with PMemList(MemListGet(VarPool, i))^ do begin
       for j:=Count-1 downto 0 do FreeValue(@PVariable(MemListGet(PMemList(@List)^, j))^.Value);
-      MemListFree(PMemList(@List)^);
+      MemListClear(PMemList(@List)^);
     end;
     VarPool.Count:=CntVarPool;
     for i:=LVStack.Count-1 downto CntLVStack do FreeValue(MemListGet(LVStack, i));

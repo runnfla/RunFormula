@@ -346,6 +346,12 @@ begin
   end;
   RestoreStatus(Status, Context);
   with Context do begin
+    i:=0;
+    repeat
+      with PMemList(MemListGet(VarPool, i))^ do MemListFree(PMemList(@List)^);
+      if MemListIsTaken(VarPool, i) then break;
+      inc(i);
+    until false;
     MemListFree(FuncArg);
     MemListFree(SubrParam);
     MemListFree(LVStack);
