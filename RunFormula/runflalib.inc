@@ -496,11 +496,33 @@ begin
     FreeMem(List);
     p:=Head;
     L:=Size*Grow;
-    repeat
-      n:=PPointer(p+L)^;
-      FreeMem(p);
-      p:=n;
-    until p=nil;
+  end;
+  repeat
+    n:=PPointer(p+L)^;
+    FreeMem(p);
+    p:=n;
+  until p=nil;
+end;
+
+procedure MemListClear(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.13: Proc MemListClear
+var p, n : PByte;                      // clear sorted list
+    L : SizeInt;
+begin
+  with MemList do begin
+    if ListLng=0 then exit;
+    Count:=0;
+    L:=Size*Grow;
+    ListLng:=L;
+    p:=Head;
+    Taken:=p-Size;
+    Tail:=PPointer(p+L);
+    p:=Tail^;
+    Tail^:=nil;
+  end;
+  while p<>nil do begin
+    n:=PPointer(p+L)^;
+    FreeMem(p);
+    p:=n;
   end;
 end;
 
@@ -563,7 +585,7 @@ end;
 function MemListInsert(var MemList:TMemList; Index:SizeInt):pointer;
 var p : PPointer;                                       //DONE -oLib -cRev.2026.04.13: Func MemListInsert
     cnt : SizeInt;
-begin                                       // insert item in Index position of list
+begin                                       // insert item in Index position of sorted list
   with MemList do begin
     cnt:=Count;
     if cnt<ListLng then begin
