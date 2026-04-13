@@ -12,9 +12,10 @@ Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod 
 Variables and runtime initialization of variables via external function.\
 A set of built-in functions and the ability to register and use additional user-defined functions.\
 Control flow functions: if() repeat() exit() result() continue() break()\
-Ability to use inline function definitions directly within the formula.\
+Ability to use inline function definitions directly within the formula (subroutines).\
 Support for the define directive.\
-Compiling the source formula into bytecode for multiple execution.
+Compiling the source formula into bytecode for multiple execution.\
+Minimal dependencies (only SysUtils in the base configuration).
 
 #### Integrating RunFormula into your project
 - Copy all files from the `RunFormula` directory (`runformula.pas` and all .inc files) to your project or a separate directory.
@@ -33,7 +34,7 @@ uses RunFormula in 'RunFormula/runformula.pas';
 ```
 
 #### How to use RunFormula
-The simplest way is to call `RunFlaParse` and then pass its output to the `RunFlaExecStr` or `RunFlaExecVrt` functions.\
+The simplest way is to call `RunFlaParse` function and then pass its output to the `RunFlaExecStr` or `RunFlaExecVrt` functions.\
 For example:
 ```
 ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );      // displays 27
