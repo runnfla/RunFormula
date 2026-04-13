@@ -34,7 +34,7 @@ uses RunFormula in 'RunFormula/runformula.pas';
 ```
 
 #### How to use RunFormula
-The simplest way is to call `RunFlaParse` and then pass its output to the `RunFlaExecStr` or `RunFlaExecVrt` functions.\
+The simplest way is to call `RunFlaParse` function and then pass its output to the `RunFlaExecStr` or `RunFlaExecVrt` functions.\
 For example:
 ```
 ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );      // displays 27
