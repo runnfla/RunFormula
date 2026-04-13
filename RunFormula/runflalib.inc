@@ -504,34 +504,37 @@ begin
   end;
 end;
 
-function MemListFind(var MemList:TMemList; P, Fin:pointer):SizeInt;    //DONE -oLib -cRev.2026.04.08: Func MemListFind
-var L : SizeInt = 0;         // DiffSize = 4
-    R, d, diff : SizeInt;                       // if find, return index in List
-    px, py : PByte;                             // if not, inverted index in Sort
-begin
+function MemListFind(var MemList:TMemList; P, Fin:pointer):SizeInt;
+var L : SizeInt = 0;                                //DONE -oLib -cRev.2026.04.13: Func MemListFind
+    R, d, diff : SizeInt;                       // find index in sorted list
+    px, py : PByte;                             // if not found, return inverted index
+begin                          // DiffSize = 4
   d:=Fin-P;
   R:=MemList.Count-1;
   while L<=R do begin
     Result:=L+((R-L) shr 1);
-    with PFlaRec(MemListGet(MemList, Result))^  do begin
+    with PFlaRec(MemListGet(MemList, Result))^ do begin
       diff:=d-Lng;
       if diff=0 then begin
-        px:=P;
         py:=ID;
-        dec(Fin, Sint);
-        while px<=Fin do begin
-          if ((PInteger(px)^ xor PInteger(py)^) and $DFDFDFDF)<>0 then break;
-          inc(py, Sint);
-          inc(px, Sint);
-        end;
-        inc(Fin, Sint);
-        while px<Fin do begin
-          if ((px^ xor py^) and $DF)<>0 then break;
-          inc(py);
-          inc(px);
-        end;
-        if px=Fin then exit;
+        px:=P;
         diff:=(px^ and $DF)-(py^ and $DF);
+        if diff=0 then begin
+          dec(Fin, Sint);
+          while px<=Fin do begin
+            if ((PInteger(px)^ xor PInteger(py)^) and $DFDFDFDF)<>0 then break;
+            inc(py, Sint);
+            inc(px, Sint);
+          end;
+          inc(Fin, Sint);
+          while px<Fin do begin
+            if ((px^ xor py^) and $DF)<>0 then break;
+            inc(py);
+            inc(px);
+          end;
+          if px=Fin then exit;
+          diff:=(px^ and $DF)-(py^ and $DF);
+        end;
       end;
     end;
     if diff>0 then L:=Result+1 else R:=Result-1;
