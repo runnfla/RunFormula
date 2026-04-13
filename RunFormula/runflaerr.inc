@@ -23,7 +23,6 @@ type
     Unknown,
     Malloc,
     Overflow,
-    MaxList,
     FuncExists,
     InvalidChar,
     UnexpectedEnd,

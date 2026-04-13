@@ -23,7 +23,6 @@ const
     'Unknown Error',
     'Memory Allocation Error',
     'Overflow Error',
-    'Maximum list size has been exceeded',
     'Function already exists',
     'Invalid character',
     'Unexpected End',

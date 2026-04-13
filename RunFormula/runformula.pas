@@ -23,6 +23,7 @@ unit RunFormula;
 
 {$mode ObjFPC}{$H+}
 {$B-}                           // do not complete boolean evaluation
+{$POINTERMATH ON}               // allow use of pointer math
 {$inline on}
 
 interface
@@ -88,9 +89,9 @@ begin
   try
     PByte(Result):=nil;
     MemListInit(ClsList, SizeOf(TCls), ClsGrow);
-    MemListInit(SubrList, SFlaRec, SubrGrow, true);
-    MemListInit(DefList, SFlaRec, DefGrow, true);
-    MemListInit(VarList, PtrUInt(@TFlaRec(nil^).IsUser), VarIDGrow, true);
+    MemListInit(SubrList, SFlaRec, SubrGrow);
+    MemListInit(DefList, SFlaRec, DefGrow);
+    MemListInit(VarList, SFlaRec, VarIDGrow);
     Pnt:=pointer(Fla);
     if Pnt=nil then raise EError.Create(OK);
     TextCodePage:=PAnsiRec(Pnt-SAnsiRec)^.CodePage;
@@ -298,8 +299,8 @@ begin
     MemListInit(SubrParam, SPtr, ParamGrow);
     MemListInit(FuncArg, SPtr, ParamGrow);
     RunFlaVar:=FlaVar;
-    MaxVarPool:=0;
     ProcToken:=@InitProc;
+    Break:=NO;
   end;
   SaveStatus(Status, Context);
   try
@@ -331,7 +332,6 @@ begin
   end;
   RestoreStatus(Status, Context);
   with Context do begin
-    for i:=MaxVarPool-1 downto 0 do with PMemList(MemListGet(VarPool, i))^ do MemListFree(PMemList(@List)^);
     MemListFree(FuncArg);
     MemListFree(SubrParam);
     MemListFree(LVStack);
@@ -413,7 +413,7 @@ end;
 
 initialization
 
-  MemListInit(FuncList, SFlaRec, FuncGrow, true);
+  MemListInit(FuncList, SFlaRec, FuncGrow);
   FuncRegister;
 
 finalization

@@ -70,13 +70,14 @@ type
   PAnsiRec = ^TAnsiRec;
 
   TMemList = record
-    List : pointer;                 // must be first !!!
-    ListLng : SizeInt;              // List length in items
-    Count : SizeInt;                // items Count
-    Grow : SizeInt;                 // in items
-    Sort : pointer;                 // list of item index
-    SizeShift : integer;            // in shifts
-    Sorted : boolean;               // use Sort list or not
+    List : PPointer;          // list of pointers, must be first !!!
+    Tail : PPointer;          // tail of last block
+    Taken : PByte;            // point to last taken item in chain
+    Head : PByte;             // point to first block
+    Count : SizeInt;          // in items
+    ListLng : SizeInt;        // in items
+    Size : SizeInt;           // size of item in bytes
+    Grow : SizeInt;           // in items
   end;
 
   PMemList = ^TMemList;
@@ -85,7 +86,7 @@ type
 
   TValRec = record
     VType : TVType;
-    VAlloc : (CD, VR, LV);
+    VAlloc : (CD, VP, LV);
     case byte of
       0 : (Int, IGap : SizeInt);
       1 : (Flo, Img : TRFloat);
@@ -108,7 +109,7 @@ const
   SI = SizeOf(SizeInt);
   LI = Low(SizeInt);
   Sint = SizeOf(integer);
-  SPtr = SizeOf(PByte);
+  SPtr = SizeOf(pointer);
 
   SAnsiRec = SizeOf(TAnsiRec);
   SValRec = SizeOf(TValRec);
@@ -145,6 +146,8 @@ type
 
   PToken = ^TToken;
 
+  TBreak = (NO, RSL, EXT, BRK, CON);
+
   TContext = record
     VarPool    : TMemList;           // list of TMemList
     LVStack    : TMemList;           // list of TValRec
@@ -153,8 +156,8 @@ type
     RunFlaVar  : TRunFlaVar;
     ProcToken  : PByte;
     TermExit   : PValRec;
-    MaxVarPool : SizeInt;
     VarTable   : PByte;
+    Break      : TBreak;
   end;
 
   TStatus = record

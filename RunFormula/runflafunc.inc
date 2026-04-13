@@ -17,38 +17,38 @@
 
 // TODO - Expand Str2Val
 
-procedure BreakParam(ParamCount:SizeInt; var Context:TContext);        //DONE -oFunc -cRev.2026.04.08: Proc BreakParam
-begin
+procedure BreakParam(ParamCount:SizeInt; var Context:TContext; Br:TBreak);
+begin                               //DONE -oFunc -cRev.2026.04.08: Proc BreakParam
   case ParamCount of
     0 : Context.TermExit:=@CVNone;
     1 : Param(0-ParamCount, Context);
     else raise EError.Create(ParamNumber);
   end;
-end;
-
-function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.08: Func Fla_EXIT
-begin
-  BreakParam(ParamCount, Context);
-  raise EFlaExit.Create('');
+  Context.Break:=Br;
 end;
 
 function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_RESULT
 begin
-  BreakParam(ParamCount, Context);
+  BreakParam(ParamCount, Context, RSL);
   raise EFlaResult.Create('');
+end;
+
+function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.08: Func Fla_EXIT
+begin
+  BreakParam(ParamCount, Context, EXT);
+  raise EFlaExit.Create('');
 end;
 
 function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.08: Func Fla_BREAK
 begin
-  BreakParam(ParamCount, Context);
+  BreakParam(ParamCount, Context, BRK);
   raise EFlaBreak.Create('');
 end;
 
 function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_CONTINUE
 begin
-  if ParamCount>0 then raise EError.Create(ParamNumber);
-  Context.TermExit:=@CVNone;
-  raise EFlaContinue.Create('');
+  BreakParam(ParamCount, Context, CON);
+  raise EFlaBreak.Create('');
 end;
 
 function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_IF
@@ -62,20 +62,20 @@ begin
     else if ParamCount=3 then Result:=Param(2-ParamCount, Context);
 end;
 
-function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_REPEAT
+function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.11: Func Fla_REPEAT
 var Status : TStatus;
     flg : boolean;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=@CVNone;
-  Context.TermExit:=@CVNone;
   SaveStatus(Status, Context);
   try
     repeat
-      PostParam(Context);
       flg:=AsBool(Param(0-ParamCount, Context));
       PostParam(Context);
       if not flg then break;
+      Context.TermExit:=Result;
+      PostParam(Context);
       try
         Result:=Param(1-ParamCount, Context);
       except
@@ -583,8 +583,8 @@ end;
 
 procedure FuncRegister;
 begin
-  FuncReg('exit', @Fla_EXIT);
   FuncReg('result', @Fla_RESULT);
+  FuncReg('exit', @Fla_EXIT);
   FuncReg('break', @Fla_BREAK);
   FuncReg('continue', @Fla_CONTINUE);
   FuncReg('if', @Fla_IF);

@@ -247,13 +247,13 @@ var TextFin : PChar;
     if i<0 then with PFlaRec(MemListInsert(VarList, not i))^ do begin
       ID:=PByte(P);
       Lng:=TextFin-P;
-      i:=VarList.Count-1;
+      Index:=VarList.Count-1;
     end;
     with PToken(BufP)^ do begin
       Tag:=TagVar;
       Source:=FlaPos;
       Size:=VarTokenSize;
-      Index:=i;
+      if i>=0 then Index:=PFlaRec(MemListGet(VarList, i))^.Index else Index:=VarList.Count-1;
     end;
     inc(BufP, VarTokenSize);
     P:=TextFin;
@@ -428,13 +428,13 @@ begin
                 with PFlaRec(MemListInsert(DefList, not I))^ do begin
                   ID:=PByte(P);
                   Lng:=TextFin-P;
+                  P:=FirstChar([#$22, #$27])+1;
+                  TextFin:=FindTextFin(P, (P-1)^);
+                  I:=TextFin-P;
+                  SetLength(S, I);
+                  DataCopy(P, PByte(S), I);
+                  PText:=Str2Ptr(S);
                 end;
-                P:=FirstChar([#$22, #$27])+1;
-                TextFin:=FindTextFin(P, (P-1)^);
-                I:=TextFin-P;
-                SetLength(S, I);
-                DataCopy(P, PByte(S), I);
-                PFlaRec(MemListGetLast(DefList))^.PText:=Str2Ptr(S);
                 SetLength(S, 0);
                 P:=TextFin+1;
                 continue;

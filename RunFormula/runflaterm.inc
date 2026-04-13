@@ -186,7 +186,7 @@ begin
       Context.ProcToken:=tkn;
       case tag of
         TagAssign     : begin                                                  // =
-                          if L^.VAlloc<>VR then raise EError.Create(VarExpected);
+                          if L^.VAlloc<>VP then raise EError.Create(VarExpected);
                           FreeValue(L);
                           ValCopy(R, L);
                           FreeTerm(R);
@@ -278,19 +278,16 @@ begin
   Result:=L;
 end;
 
-function VarListFind(PList:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.08: Func VarListFind
+function VarListFind(PLst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.11: Func VarListFind
 var L : SizeInt = 0;
-    R, I, diff : SizeInt;
+    R, diff : SizeInt;
 begin
-  R:=PList^.Count-1;
+  R:=PLst^.Count-1;
   while L<=R do begin
-    I:=L+((R-L) shr 1);
-    with PList^ do begin
-      Result:=PWord(Sort+(I shl 1))^;
-      diff:=ID-PVariable(List+(Result shl SizeShift))^.VarID;
-    end;
+    Result:=L+((R-L) shr 1);
+    diff:=ID-PVariable(MemListGet(PLst^, Result))^.VarID;
     if diff=0 then exit;
-    if diff>0 then L:=I+1 else R:=I-1;
+    if diff>0 then L:=Result+1 else R:=Result-1;
   end;
   Result:=not L;
 end;
@@ -307,7 +304,7 @@ begin
     with PVariable(MemListInsert(lst^, not i))^ do begin
       VarID:=Index;
       Value.VType:=VInt;
-      Value.VAlloc:=VR;
+      Value.VAlloc:=VP;
       Result:=@Value;
     end;
   end;

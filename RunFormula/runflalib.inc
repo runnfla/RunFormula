@@ -429,52 +429,91 @@ end;
 
 // ----- MemList routines ------
 
-function StretchList(var Lst:pointer; Lng, NewLng, Gap:SizeInt; Shift:integer):pointer;
-var old : pointer;                  // Lng, NewLng, Gap in items     //DONE -oLib -cRev.2026.03.31: Func StretchList
-begin                               // result point to new gap
-  old:=Lst;
-  Lst:=GetMem(NewLng shl Shift);
-  if Lst=nil then raise EError.Create(Malloc);
-  Gap:=Gap shl Shift;
-  Result:=Lst+Gap;
-  if Lng=0 then exit;               // avoid error in FreeMem
-  DataCopy(old, Lst, Gap);
-  DataCopy(old+Gap, Result+(1 shl Shift), (Lng shl Shift)-Gap);
-  FreeMem(old);
+function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;
+begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListGet
+  with MemList do Result:=(List+Index)^;
 end;
 
-procedure MemListInit(var MemList:TMemList; ItemSize:integer; Grow:SizeInt; Sort:boolean=false);
-var i : integer = 1;                                                 //DONE -oLib -cRev.2026.03.31: Proc MemListInit
+function MemListGetLast(var MemList:TMemList):pointer; inline;
+begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListGetLast
+  with MemList do Result:=(List+(Count-1))^;
+end;
+
+function MemListIsTaken(var MemList:TMemList; Index:SizeInt):boolean; inline;
+begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListIsTaken
+  with MemList do Result:=(List+Index)^=Taken;
+end;
+
+function StretchList(var MemList:TMemList; Index:SizeInt):pointer;
+var p, lst, old : PPointer;                             //DONE -oLib -cRev.2026.04.13: Func StretchList
+    L : SizeInt;
 begin
-  MemList.Count:=0;
-  MemList.ListLng:=0;
-  MemList.SizeShift:=0;
-  while i<ItemSize do begin
-    i:=i shl 1;
-    inc(MemList.SizeShift);
+  with MemList do begin
+    L:=Size*Grow;
+    Result:=GetMem(L+SPtr);
+    if Result=nil then raise EError.Create(Malloc);
+    Taken:=Result;
+    Tail^:=Result;
+    Tail:=Result+L;
+    Tail^:=nil;
+    L:=ListLng+Grow;
+    lst:=GetMem(L*SPtr);
+    if lst=nil then begin
+      FreeMem(Result);
+      raise EError.Create(Malloc);
+    end;
+    p:=lst+Index;
+    if ListLng>0 then begin
+      old:=List;
+      DataCopy(old, lst, Index*SPtr);
+      DataCopy(old+Index, p+1, (ListLng-Index)*SPtr);
+      FreeMem(old);
+    end;
+    p^:=Result;
+    List:=lst;
+    ListLng:=L;
+    inc(Count);
   end;
-  MemList.Grow:=Grow;
-  MemList.Sorted:=Sort;
 end;
 
-procedure MemListFree(var MemList:TMemList);                         //DONE -oLib -cRev.2026.03.31: Proc MemListFree
+procedure MemListInit(var MemList:TMemList; ListSize, ListGrow:SizeInt);
+begin                                               //DONE -oLib -cRev.2026.04.13: Proc MemListInit
+  with MemList do begin
+    Tail:=@Head;
+    Count:=0;
+    ListLng:=0;
+    Size:=ListSize;
+    Grow:=ListGrow;
+  end;
+end;
+
+procedure MemListFree(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.13: Proc MemListFree
+var p, n : PByte;
+    L : SizeInt;
 begin
-  if MemList.ListLng=0 then exit;
-  FreeMem(MemList.List);
-  if MemList.Sorted then FreeMem(MemList.Sort);
+  with MemList do begin
+    if ListLng=0 then exit;
+    FreeMem(List);
+    p:=Head;
+    L:=Size*Grow;
+    repeat
+      n:=PPointer(p+L)^;
+      FreeMem(p);
+      p:=n;
+    until p=nil;
+  end;
 end;
 
 function MemListFind(var MemList:TMemList; P, Fin:pointer):SizeInt;    //DONE -oLib -cRev.2026.04.08: Func MemListFind
 var L : SizeInt = 0;         // DiffSize = 4
-    R, I, d, diff : SizeInt;                       // if find, return index in List
-    px, py : PByte;                                // if not, inverted index in Sort
+    R, d, diff : SizeInt;                       // if find, return index in List
+    px, py : PByte;                             // if not, inverted index in Sort
 begin
   d:=Fin-P;
   R:=MemList.Count-1;
   while L<=R do begin
-    I:=L+((R-L) shr 1);
-    Result:=PWord(MemList.Sort+(I shl 1))^;
-    with PFlaRec(MemList.List+(Result shl MemList.SizeShift))^ do begin
+    Result:=L+((R-L) shr 1);
+    with PFlaRec(MemListGet(MemList, Result))^  do begin
       diff:=d-Lng;
       if diff=0 then begin
         px:=P;
@@ -495,55 +534,44 @@ begin
         diff:=(px^ and $DF)-(py^ and $DF);
       end;
     end;
-    if diff>0 then L:=I+1 else R:=I-1;
+    if diff>0 then L:=Result+1 else R:=Result-1;
   end;
   Result:=not L;
 end;
 
-function MemListAdd(var MemList:TMemList):pointer;                    //DONE -oLib -cRev.2026.03.31: Func MemListAdd
-begin                         // add item on top of unsorted List
-  with MemList do if Count=ListLng then begin
-    inc(ListLng, Grow);
-    Result:=StretchList(List, Count, ListLng, Count, SizeShift);
-  end else Result:=List+(Count shl SizeShift);
-  inc(MemList.Count);
-end;
-
-function MemListInsert(var MemList:TMemList; Index:SizeInt):pointer;  //DONE -oLib -cRev.2026.03.31: Func MemListInsert
-var p : pointer;                     // insert item in Index position
-begin                                // max items in sorted list = 65536
-  with MemList do if Sorted then begin
-    if Count=ListLng then begin
-      if Count>high(word) then raise EError.Create(MaxList);
-      inc(ListLng, Grow);
-      PWord(StretchList(Sort, Count, ListLng, Index, 1))^:=Count;
-      Result:=StretchList(List, Count, ListLng, Count, SizeShift);
-    end else begin
-      p:=Sort+(Index shl 1);
-      DataCopy(p, p+2, (Count-Index) shl 1);
-      PWord(p)^:=Count;
-      Result:=List+(Count shl SizeShift);
-    end;
-  end else begin
-    if Count=ListLng then begin
-      inc(ListLng, Grow);
-      Result:=StretchList(List, Count, ListLng, Index, SizeShift);
-    end else begin
-      Result:=List+(Index shl SizeShift);
-      DataCopy(Result, Result+(1 shl SizeShift), (Count-Index) shl SizeShift);
-    end;
+function MemListAdd(var MemList:TMemList):pointer;      //DONE -oLib -cRev.2026.04.13: Func MemListAdd
+var p : PPointer;
+    cnt : SizeInt;
+begin                         // add item on top of unsorted list
+  with MemList do begin
+    cnt:=Count;
+    if cnt<ListLng then begin
+      p:=List+cnt;
+      if (cnt>0) and ((p-1)^=Taken) then begin
+        inc(Taken, Size);
+        p^:=Taken;
+      end;
+      Result:=p^;
+      Count:=cnt+1;
+    end else Result:=StretchList(MemList, cnt);
   end;
-  inc(MemList.Count);
 end;
 
-function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;  //DONE -oLib -cRev.2026.03.31: Func MemListGet
-begin
-  with MemList do Result:=List+(Index shl SizeShift);
-end;
-
-function MemListGetLast(var MemList:TMemList):pointer; inline;             //DONE -oLib -cRev.2026.03.31: Func MemListGetLast
-begin
-  with MemList do Result:=List+((Count-1) shl SizeShift);
+function MemListInsert(var MemList:TMemList; Index:SizeInt):pointer;
+var p : PPointer;                                       //DONE -oLib -cRev.2026.04.13: Func MemListInsert
+    cnt : SizeInt;
+begin                                       // insert item in Index position of list
+  with MemList do begin
+    cnt:=Count;
+    if cnt<ListLng then begin
+      p:=List+Index;
+      DataCopy(p, p+1, (cnt-Index)*SPtr);
+      inc(Taken, Size);
+      Result:=Taken;
+      p^:=Result;
+      Count:=cnt+1;
+    end else Result:=StretchList(MemList, Index);
+  end;
 end;
 
 // ----- Context routines -----
@@ -575,14 +603,11 @@ begin
   Result^.VAlloc:=LV;
 end;
 
-procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.03.29: Proc NewVarList
+procedure NewVarList(var Context:TContext); inline;           //DONE -oLib -cRev.2026.03.29: Proc NewVarList
 begin
   with Context, VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
-    if Count=MaxVarPool then begin
-      MemListInit(PMemList(MemListAdd(PMemList(@List)^))^, SizeOf(TVariable), VarGrow, true);
-      inc(MaxVarPool);
-    end else inc(Count);
+    MemListInit(PMemList(MemListAdd(PMemList(@List)^))^, SizeOf(TVariable), VarGrow);
   end;
 end;
 
@@ -602,7 +627,7 @@ begin
   with Status, Context do begin
     for i:=VarPool.Count-1 downto CntVarPool do with PMemList(MemListGet(VarPool, i))^ do begin
       for j:=Count-1 downto 0 do FreeValue(@PVariable(MemListGet(PMemList(@List)^, j))^.Value);
-      Count:=0;
+      MemListFree(PMemList(@List)^);
     end;
     VarPool.Count:=CntVarPool;
     for i:=LVStack.Count-1 downto CntLVStack do FreeValue(MemListGet(LVStack, i));
