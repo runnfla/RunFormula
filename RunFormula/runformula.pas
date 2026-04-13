@@ -75,7 +75,7 @@ var Buf : array of string;
     BufP : PByte = PByte(BufSize);
     BufSum : SizeInt = 0;                          // sum of closed Bufs
     ClsList, SubrList, DefList, VarList : TMemList;
-    PreTag : TTag = TagNone;
+    PreTag : TTag = TagLess;
     TextCodePage : TSystemCodePage;
     InDef : integer = 0;
     Comment : char = #0;
@@ -96,11 +96,12 @@ begin
     if Pnt=nil then raise EError.Create(OK);
     TextCodePage:=PAnsiRec(Pnt-SAnsiRec)^.CodePage;
     ExprToken(TagCode, TagCode);
+    ExprToken(TagExpr, TagExpr);
     DoParse(Pnt);
-    if ClsList.Count>1 then raise EError.Create(MissingBracket);
-    if PreTag=TagCode then NoneToken;              // insert none if empty fla
+    if ClsList.Count>2 then raise EError.Create(MissingBracket);
+    CloseExpr;
     CloseToken(TagCode);
-    OpToken(TagNone);                              // insert stub
+    OpToken(TagGreater);                           // insert stub
     RequestBuf(VarList.Count*SI);                  // writing Var Name Table
     ofs:=VarList.Count*SI+SAnsiRec;
     for i:=0 to VarList.Count-1 do begin
@@ -174,7 +175,16 @@ begin
                    end else Result:=@PVariable(MemListGet(lst^, idx))^.Value;
                  end;
       TagArray   : raise EError.Create(Unsupported);
-      TagBracket : Result:=DoBracket(Pnt+ExprTokenSize, Pnt+Size);
+      TagBracket, TagCode : begin
+                              p:=Pnt+ExprTokenSize;
+                              fin:=Pnt+Size;
+                              Result:=@CVNone;
+                              while p<fin do begin
+                                FreeTerm(Result);
+                                Result:=Term(p, Context);
+                                inc(p, PToken(p)^.Size);
+                              end;
+                            end;
       TagFunc : begin
                   p:=Pnt+(ExprTokenSize+SI);
                   fin:=Pnt+Size;
@@ -217,7 +227,12 @@ begin
                   RestoreStatus(Status, Context);      // restoring w/o new varlist
                   dec(Status.CntVarPool);
                   try
-                    Result:=DoBracket(p, fin);
+                    Result:=@CVNone;
+                    while p<fin do begin
+                      FreeTerm(Result);
+                      Result:=Term(p, Context);
+                      inc(p, PToken(p)^.Size);
+                    end;
                   except
                     on E:EFlaExit do Result:=Context.TermExit;
                   end;
@@ -240,10 +255,10 @@ begin
                    Result:=@CVNone;
                  end;
       TagSubr, TagNone : Result:=@CVNone;
-      TagExpr, TagCode : begin
-                           p:=Pnt+ExprTokenSize;
-                           Result:=Expr(p, Pnt+Size, 0);
-                         end;
+      TagExpr : begin
+                  p:=Pnt+ExprTokenSize;
+                  Result:=Expr(p, Pnt+Size, 0);
+                end;
     end;
   end;
   Context.TermExit:=Result;
@@ -300,7 +315,6 @@ begin
     MemListInit(FuncArg, SPtr, ParamGrow);
     RunFlaVar:=FlaVar;
     ProcToken:=@InitProc;
-    Break:=NO;
   end;
   SaveStatus(Status, Context);
   try

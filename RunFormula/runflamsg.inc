@@ -36,6 +36,7 @@ const
     'Incompatible operand type: got Complex but expected Interval',
     'Incompatible operand type: got String but expected Interval',
     'Invalid string operand',
+    'Invalid array operand',
     'Division by Zero',
     'One or more closing brackets are missing',
     'Illegal closing bracket or comma',

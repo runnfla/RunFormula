@@ -17,37 +17,36 @@
 
 // TODO - Expand Str2Val
 
-procedure BreakParam(ParamCount:SizeInt; var Context:TContext; Br:TBreak);
+procedure BreakParam(ParamCount:SizeInt; var Context:TContext);
 begin                               //DONE -oFunc -cRev.2026.04.08: Proc BreakParam
   case ParamCount of
     0 : Context.TermExit:=@CVNone;
     1 : Param(0-ParamCount, Context);
     else raise EError.Create(ParamNumber);
   end;
-  Context.Break:=Br;
 end;
 
 function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_RESULT
 begin
-  BreakParam(ParamCount, Context, RSL);
+  BreakParam(ParamCount, Context);
   raise EFlaResult.Create('');
 end;
 
 function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.08: Func Fla_EXIT
 begin
-  BreakParam(ParamCount, Context, EXT);
+  BreakParam(ParamCount, Context);
   raise EFlaExit.Create('');
 end;
 
 function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.08: Func Fla_BREAK
 begin
-  BreakParam(ParamCount, Context, BRK);
+  BreakParam(ParamCount, Context);
   raise EFlaBreak.Create('');
 end;
 
 function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_CONTINUE
 begin
-  BreakParam(ParamCount, Context, CON);
+  BreakParam(ParamCount, Context);
   raise EFlaBreak.Create('');
 end;
 

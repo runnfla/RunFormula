@@ -36,6 +36,7 @@ type
     IncompType_CG,
     IncompType_SG,
     InvalidStrVal,
+    InvalidArrVal,
     DivZero,
     MissingBracket,
     IllegalBracket,

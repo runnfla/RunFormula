@@ -445,7 +445,7 @@ begin                                                    //DONE -oLib -cRev.2026
 end;
 
 function StretchList(var MemList:TMemList; Index:SizeInt):pointer;
-var p, lst, old : PPointer;                             //DONE -oLib -cRev.2026.04.13: Func StretchList
+var p, lst, old : PPointer;                              //DONE -oLib -cRev.2026.04.13: Func StretchList
     L : SizeInt;
 begin
   with MemList do begin

@@ -332,14 +332,3 @@ begin
   end;
 end;
 
-function DoBracket(P, Fin:PByte):PValRec; inline;                 //DONE -oTerm -cRev.2026.03.30: Func DoBracket
-begin
-  Result:=@CVNone;
-  if P<Fin then repeat
-    Result:=Term(P, Context);
-    inc(P, PToken(P)^.Size);
-    if P>=Fin then exit;
-    FreeTerm(Result);
-  until false;
-end;
-

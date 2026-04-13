@@ -23,6 +23,7 @@ type
     TagVar,
     TagArray,
     TagBracket,
+    TagCode,
     TagFunc,              // call build-in function
     TagCall,              // call function in Fla
     TagText,
@@ -31,7 +32,6 @@ type
     TagNone,
 
     TagExpr,              // <--  anchor,
-    TagCode,
     TagAssign,            // =    all Operators Tokens should be greater
 
     TagEqual,             // ==
@@ -146,8 +146,6 @@ type
 
   PToken = ^TToken;
 
-  TBreak = (NO, RSL, EXT, BRK, CON);
-
   TContext = record
     VarPool    : TMemList;           // list of TMemList
     LVStack    : TMemList;           // list of TValRec
@@ -157,7 +155,6 @@ type
     ProcToken  : PByte;
     TermExit   : PValRec;
     VarTable   : PByte;
-    Break      : TBreak;
   end;
 
   TStatus = record
@@ -211,6 +208,7 @@ const
     0,      // TagVar
     0,      // TagArray
     0,      // TagBracket
+    0,      // TagCode
     0,      // TagFunc
     0,      // TagCall
     0,      // TagString
@@ -219,7 +217,6 @@ const
     0,      // TagNone
 
     0,      // TagExpr
-    0,      // TagCode
     10,     // TagAssign     =
 
     20,     // TagEqual      ==

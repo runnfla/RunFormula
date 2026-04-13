@@ -73,6 +73,7 @@ const TagName : array[TTag] of string = (
   'Var',
   'Array',
   'Bracket',
+  'Code',
   'Func',
   'Call',
   'Text',
@@ -80,7 +81,6 @@ const TagName : array[TTag] of string = (
   'Subr',
   'None',
   'Expr',
-  'Code',
   'Assign',
   'Equal',
   'NotEqual',
@@ -138,7 +138,7 @@ begin
     case Tag of
       TagValue, TagText : sz:=Size;
       TagVar, TagFunc, TagCall : sz:=VarTokenSize;
-      TagArray, TagBracket, TagLocal, TagSubr, TagNone, TagExpr, TagCode : sz:=ExprTokenSize;
+      TagArray, TagBracket, TagCode, TagLocal, TagSubr, TagNone, TagExpr : sz:=ExprTokenSize;
       else sz:=OpTokenSize
     end;
     SetLength(S, sz*3);

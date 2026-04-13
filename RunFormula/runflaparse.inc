@@ -140,6 +140,14 @@ begin
   dec(ClsList.Count);
 end;
 
+procedure CloseExpr;                                  //DONE -oParse -cRev.2026.04.07: Proc CloseExpr
+begin
+  if PreTag=TagExpr then begin
+    dec(BufP, ExprTokenSize);       // undo ExprToken, allow ()
+    dec(ClsList.Count);
+  end else CloseToken(TagExpr);
+end;
+
 procedure DoParse(P:PChar);                           //DONE -oParse -cRev.2026.04.07: Proc DoParse
 var TextFin : PChar;
     S : string;
@@ -290,14 +298,6 @@ var TextFin : PChar;
     if (pf<TextFin) and ((PByte(pf)^ or $20)<>PKey^) then exit;
     P:=TextFin;
     Result:=true;
-  end;
-
-  procedure CloseExpr; inline;                        //DONE -oParse -cRev.2026.04.07: Proc CloseExpr
-  begin
-    if PreTag=TagExpr then begin
-      dec(BufP, ExprTokenSize);       // undo ExprToken, allow ()
-      dec(ClsList.Count);
-    end else CloseToken(TagExpr);
   end;
 
 begin
