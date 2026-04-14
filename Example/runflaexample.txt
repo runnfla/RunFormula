@@ -67,4 +67,35 @@ endfunc;
 
 funcA(11)
 
+5. Demo Test
+
+globalSum = 0; // Global counter
+
+func DoRecursive(level, isSecondPhase);
+  local(localVar);
+  localVar = level * 100;
+  globalSum = globalSum + 1; // Increment global variable
+
+  appendresult("ENTER: " & level & " [L=" & localVar & "] [Global=" & globalSum & "]");
+
+  if( isSecondPhase,
+    // SECOND PHASE: 5 to 15
+    if(level < 15,
+       DoRecursive(level + 1, True)
+    ),
+    // FIRST PHASE: 1 to 10
+    if(level < 10,
+       DoRecursive(level + 1, False),
+       DoRecursive(5, True) // Jump to 5
+    )
+  );
+
+  // LOCALITY CHECK ON EXIT
+  appendresult("EXIT: " & level & " [L=" & localVar & "] [Global=" & globalSum & "]");
+endfunc;
+
+// Initial call
+DoRecursive(1, False);
+appendresult("FINAL globalSum: " & globalSum);
+
 

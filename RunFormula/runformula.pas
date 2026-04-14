@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Version 0.0.a
-//  Released at 8.04.2026
+//  Released at 14.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com

@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Library include file
-//  Rev. 31.03.2026
+//  Rev. 14.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
