@@ -1,21 +1,23 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
-//  RunFormula Help File
-//  Rev. 9.04.2026
+// RunFormula Expression Parser and Evaluator
+// RunFormula Help File
+// Rev. 14.04.2026
 
-//  Author: Alexander Torubarov
-//  Contact: runfla@yandex.com
+// Author: Alexander Torubarov
+// Contact: runfla@yandex.com
 
-//  Copyright (C) 2026 Alexander Torubarov
-//  Licensed under the MIT License.
-//  See the LICENSE file in the project root
-//  or a copy available at https://opensource.org
-//  for full license information.
+// Copyright (C) 2026 Alexander Torubarov
+// Licensed under the MIT License.
+// See the LICENSE file in the project root
+// or a copy available at https://opensource.org
+// for full license information.
 //*****************************************************
+
+// TODO -
 
 1.a. Brief description.
 
-The RunFormula unit is designed to calculate mathematical expressions presented
+The RunFormula module is designed to calculate mathematical expressions presented
 in text form, using, if necessary, program logic.
 
 Supported data types:
@@ -31,10 +33,11 @@ Variables and runtime variable initialization are supported via
 external function.
 There is a set of built-in functions and the ability to register and use
 additional user functions.
-Flow control functions: if() repeat() exit() result() continue() break()
-The ability to define and use functions directly in a formula.
+Control flow functions: if() repeat() exit() result() continue() break()
+The ability to define and use functions directly in a formula (subroutine).
 Support for the define directive.
 Compiling the source formula into bytecode for multiple execution.
+Minimum dependencies (only SysUtils in the basic configuration).
 
 1.b. Integration of RunFormula into the project.
 - Copy all files from the RunFormula directory (runformula.pas and all .inc files)
@@ -79,7 +82,7 @@ X = 10101b // integer in binary form
 
 Characters are not case-sensitive, except for the 0x prefix.
 On overflow, the decimal number is converted to a real number, but for hexadecimal
-and binary numbers overflow is not checked.
+and binary numbers are not overflow checked.
 When specifying negative numbers, it is recommended not to separate the minus from the number:
 
 X = -999 // this is recommended
@@ -107,7 +110,7 @@ When specifying negative numbers, it is also recommended not to separate the min
 The text string can be specified in quotes or apostrophes. If the string is specified in
 If it's in quotation marks, it can contain apostrophes and vice versa. For example:
 
-X = '"A"' & "'s'" // result is "A"'s'
+X = '"A"' & "'s'" // result "A"'s'
 
 An empty string can be specified as "", '', or the constant None.
 
@@ -152,8 +155,6 @@ and the result of the "brackets" is the value of the last expression. For exampl
 
 Parentheses can be nested within each other. Before the closing parenthesis, a comma or
 Using a semicolon is allowed, but not recommended.
-If a formula must contain multiple expressions, it must be enclosed in
-parentheses.
 
 3.a. Mathematical operations.
 The table lists the supported mathematical operations for different value types.
@@ -239,7 +240,8 @@ by the user of strings.
 
 Note: The Name parameter only has a valid value during function execution.
 RunFlaExecStr/RunFlaExecVrt. If the Name value is needed after, it should be
-copy to a new line, for example like this: MyName:=StrPas(PChar(Name));
+copy to a new line, for example like this: UniqueString(Name) or
+MyName:=StrPas(PChar(Name));
 
 5. Error handling.
 5.a. Structure TRunFlaError.
@@ -290,6 +292,8 @@ ShowMessage( RunFlaErrorMsg[Error.Code] + ' at: ' + IntToStr( Error.Position ));
 end;
 
 This list and file can be replaced by the user.
+
+5.f. It is recommended to disable exception generation in MemGet
 
 6. Functions.
 6.a. Predefined functions.
@@ -412,4 +416,3 @@ which was before the RunFlaParse call
 - to get information about the error, the TRunFlaError.Code field and the global variable
 RunFlaErrCode must be initialized to OK.
 - if the source code of RunFormula has changed, then RunFlaParse must be executed again.
-                                      
