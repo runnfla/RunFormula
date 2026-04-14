@@ -72,8 +72,8 @@ type
   TMemList = record
     List : PPointer;          // list of pointers, must be first !!!
     Tail : PPointer;          // tail of last block
-    Taken : PByte;            // point to last taken item in chain
     Head : PByte;             // point to first block
+    Legs : PByte;             // point to last taken item in chain
     Count : SizeInt;          // in items
     ListLng : SizeInt;        // in items
     Size : SizeInt;           // size of item in bytes

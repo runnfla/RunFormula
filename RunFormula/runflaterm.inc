@@ -278,14 +278,14 @@ begin
   Result:=L;
 end;
 
-function VarListFind(PLst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.11: Func VarListFind
+function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.14: Func VarListFind
 var L : SizeInt = 0;
     R, diff : SizeInt;
 begin
-  R:=PLst^.Count-1;
+  R:=Lst^.Count-1;
   while L<=R do begin
     Result:=L+((R-L) shr 1);
-    diff:=ID-PVariable(MemListGet(PLst^, Result))^.VarID;
+    diff:=ID-PVariable(MemListGet(Lst^, Result))^.VarID;
     if diff=0 then exit;
     if diff>0 then L:=Result+1 else R:=Result-1;
   end;

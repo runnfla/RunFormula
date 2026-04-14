@@ -439,9 +439,9 @@ begin                                                    //DONE -oLib -cRev.2026
   with MemList do Result:=(List+(Count-1))^;
 end;
 
-function MemListIsTaken(var MemList:TMemList; Index:SizeInt):boolean; inline;
+function MemListIsLegs(var MemList:TMemList; Index:SizeInt):boolean; inline;
 begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListIsTaken
-  with MemList do Result:=(List+Index)^=Taken;
+  with MemList do Result:=(List+Index)^=Legs;
 end;
 
 function StretchList(var MemList:TMemList; Index:SizeInt):pointer;
@@ -452,7 +452,7 @@ begin
     L:=Size*Grow;
     Result:=GetMem(L+SPtr);
     if Result=nil then raise EError.Create(Malloc);
-    Taken:=Result;
+    Legs:=Result;
     Tail^:=Result;
     Tail:=Result+L;
     Tail^:=nil;
@@ -488,41 +488,41 @@ begin                                               //DONE -oLib -cRev.2026.04.1
 end;
 
 procedure MemListFree(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.13: Proc MemListFree
-var p, n : PByte;
+var p, q : PByte;
     L : SizeInt;
 begin
   with MemList do begin
     if ListLng=0 then exit;
     FreeMem(List);
-    p:=Head;
     L:=Size*Grow;
+    p:=Head;
   end;
   repeat
-    n:=PPointer(p+L)^;
+    q:=PPointer(p+L)^;
     FreeMem(p);
-    p:=n;
+    p:=q;
   until p=nil;
 end;
 
-procedure MemListClear(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.13: Proc MemListClear
-var p, n : PByte;                      // clear sorted list
+procedure MemListClear(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.14: Proc MemListClear
+var p, q : PByte;                      // clear sorted list
     L : SizeInt;
 begin
   with MemList do begin
-    if ListLng=0 then exit;
     Count:=0;
-    L:=Size*Grow;
+    L:=Size;
+    q:=Head;
+    Legs:=q-L;
+    L:=L*Grow;
     ListLng:=L;
-    p:=Head;
-    Taken:=p-Size;
-    Tail:=PPointer(p+L);
-    p:=Tail^;
-    Tail^:=nil;
+    inc(q, L);                  // q --> tail of first block
+    p:=PPointer(q)^;
+    PPointer(q)^:=nil;
   end;
   while p<>nil do begin
-    n:=PPointer(p+L)^;
+    q:=PPointer(p+L)^;
     FreeMem(p);
-    p:=n;
+    p:=q;
   end;
 end;
 
@@ -572,9 +572,9 @@ begin                         // add item on top of unsorted list
     cnt:=Count;
     if cnt<ListLng then begin
       p:=List+cnt;
-      if (cnt>0) and ((p-1)^=Taken) then begin
-        inc(Taken, Size);
-        p^:=Taken;
+      if (cnt>0) and ((p-1)^=Legs) then begin
+        inc(Legs, Size);
+        p^:=Legs;
       end;
       Result:=p^;
       Count:=cnt+1;
@@ -591,8 +591,8 @@ begin                                       // insert item in Index position of 
     if cnt<ListLng then begin
       p:=List+Index;
       DataCopy(p, p+1, (cnt-Index)*SPtr);
-      inc(Taken, Size);
-      Result:=Taken;
+      inc(Legs, Size);
+      Result:=Legs;
       p^:=Result;
       Count:=cnt+1;
     end else Result:=StretchList(MemList, Index);
@@ -628,13 +628,13 @@ begin
   Result^.VAlloc:=LV;
 end;
 
-procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.03.29: Proc NewVarList
+procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.04.14: Proc NewVarList
 begin
   with Context, VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
-    if (VarPool.ListLng=0) or MemListIsTaken(VarPool, VarPool.Count-1)
+    if (ListLng=0) or MemListIsLegs(VarPool, Count-1)
       then MemListInit(PMemList(MemListAdd(PMemList(@List)^))^, SizeOf(TVariable), VarGrow)
-      else inc(VarPool.Count);
+      else inc(Count);
   end;
 end;
 
@@ -649,7 +649,7 @@ begin                                                         //DONE -oLib -cRev
 end;
 
 procedure RestoreStatus(var Status:TStatus; var Context:TContext);
-var i, j : SizeInt;                                           //DONE -oLib -cRev.2026.03.29: Proc RestoreStatus
+var i, j : SizeInt;                                           //DONE -oLib -cRev.2026.04.14: Proc RestoreStatus
 begin
   with Status, Context do begin
     for i:=VarPool.Count-1 downto CntVarPool do with PMemList(MemListGet(VarPool, i))^ do begin
