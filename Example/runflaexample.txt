@@ -51,20 +51,20 @@ endfunc;
 
 f(A)
 
-4. Double call
+4. Double recursion
 
 func funcA(n);
+    
+     func funcB(n);
+       local(val);
+       val = n,
+       if(val < 1, 0, val + funcA(val - 1))
+     endfunc;
 
-        func funcB(n);
-          temp = n + 10,
-          temp / 5
-        endfunc;
-
-  temp = n * 2,
-  res = temp + funcB(n),
-  res / 2
+  val = n,
+  if(val < 1, 0, val + funcB(val - 1))
 endfunc;
 
-temp = 5; funcA(temp)
+funcA(11)
 
 

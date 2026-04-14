@@ -509,6 +509,7 @@ var p, q : PByte;                      // clear sorted list
     L : SizeInt;
 begin
   with MemList do begin
+    if ListLng=0 then exit;
     Count:=0;
     L:=Size;
     q:=Head;

@@ -337,6 +337,7 @@ begin
     on E:EDivByZero do FillError(DivZero);
     on E:EZeroDivide do FillError(DivZero);
     on E:EInvalidOp do FillError(InvalidValue);
+    on E:EStackOverflow do FillError(StackOver);
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;

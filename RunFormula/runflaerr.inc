@@ -22,6 +22,7 @@ type
     OK = 0,
     Unknown,
     Malloc,
+    StackOver,
     Overflow,
     FuncExists,
     InvalidChar,

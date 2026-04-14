@@ -116,17 +116,17 @@ const
 
   BufSize = $10000;
   DefDepth = 32;
-  VarDepth = 256;
+  VarDepth = 5000;
 
   ClsGrow = 32;
   SubrGrow = 32;
   DefGrow = 32;
-  VarIDGrow = 128;
-  FuncGrow = 128;
+  VarIDGrow = 32;
+  FuncGrow = 32;
   VarPoolGrow = 32;
-  VarGrow = 128;
+  VarGrow = 32;
   LVStackGrow = 32;
-  ParamGrow = 16;
+  ParamGrow = 32;
 
 type
   TToken = packed record
