@@ -1,0 +1,70 @@
+//*****************************************************
+//  RunFormula Expression Parser and Evaluator
+//  Examples
+//  Rev. 14.04.2026
+
+//  Author: Alexander Torubarov
+//  Contact: runfla@yandex.com
+
+//  Copyright (C) 2026 Alexander Torubarov
+//  Licensed under the MIT License.
+//  See the LICENSE file in the project root
+//  or a copy available at https://opensource.org
+//  for full license information.
+//*****************************************************
+
+// TODO - Множество Мандельброт
+
+1. Long formula
+
+x = 10.1, y = 14.3, z = 3.4;
+
+Ctrl_D = "^M", Ctrl_A = "^J";
+
+func tan(x);
+  sin(x)/cos(x)
+endfunc;
+
+A = ((x + 1.234) * cos(y - 5.678) / sqrt(z**2 + 1)) + (sin(x * pi) / tan(y / e)) *
+    ln(abs(z) + 0.0001)**2 - (sqrt(x**2 + y**2 + z**2) / (1 + exp(-x))) * (1 / (1 +
+    (1 / (1 + (1 / x)))));
+
+"  -11.841755077030165 = " & Ctrl_D & Ctrl_A & "  " & A
+
+2. Factorial with recursion
+
+A = 10;
+
+func fact(n);
+  if(n < 2, 1, n * fact(n - 1))
+endfunc;
+
+fact(A)
+
+3. Fibonacci with recursion
+
+A = 10;
+
+func f(n);
+  if(n < 2, n, f(n-1) + f(n-2))
+endfunc;
+
+f(A)
+
+4. Double call
+
+func funcA(n);
+
+        func funcB(n);
+          temp = n + 10,
+          temp / 5
+        endfunc;
+
+  temp = n * 2,
+  res = temp + funcB(n),
+  res / 2
+endfunc;
+
+temp = 5; funcA(temp)
+
+
