@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  RunFormula Demo and Test
-//  Rev. 8.04.2026
+//  Rev. 14.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
