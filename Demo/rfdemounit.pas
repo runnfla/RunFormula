@@ -109,7 +109,7 @@ const TagName : array[TTag] of string = (
 
 function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
 begin
-  Result:=InputBox('', 'Get value for variable <'+Name+'>', '');
+  Result:=StrToFloat(InputBox('', 'Get value for variable <'+Name+'>', ''));
   Save:=false;
 end;
 
