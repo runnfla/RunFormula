@@ -179,7 +179,7 @@ begin
                               p:=Pnt+ExprTokenSize;
                               fin:=Pnt+Size;
                               Result:=@CVNone;
-                              while p<fin do begin
+                              while (p<fin) and (Context.Break=NML) do begin
                                 FreeTerm(Result);
                                 Result:=Term(p, Context);
                                 inc(p, PToken(p)^.Size);
@@ -226,19 +226,16 @@ begin
                   inc(Status.CntVarPool);
                   RestoreStatus(Status, Context);      // restoring w/o new varlist
                   dec(Status.CntVarPool);
-                  try
-                    Result:=@CVNone;
-                    while p<fin do begin
-                      FreeTerm(Result);
-                      Result:=Term(p, Context);
-                      inc(p, PToken(p)^.Size);
-                    end;
-                  except
-                    on E:EFlaExit do Result:=Context.TermExit;
+                  Result:=@CVNone;
+                  while (p<fin) and (Context.Break=NML) do begin
+                    FreeTerm(Result);
+                    Result:=Term(p, Context);
+                    inc(p, PToken(p)^.Size);
                   end;
-                  if Result^.VAlloc<>CD
-                    then RestoreStatusKeep(Status, Context, Result)
-                    else RestoreStatus(Status, Context);
+                  if Context.Break=EXT then Context.Break:=NML;
+                  if Result^.VAlloc<>CD                                 //
+                    then RestoreStatusKeep(Status, Context, Result)     //
+                    else RestoreStatus(Status, Context);                //
                 end;
       TagText : begin
                   Result:=NewLV(Context);
@@ -261,7 +258,7 @@ begin
                 end;
     end;
   end;
-  Context.TermExit:=Result;
+  Context.TermResult:=Result;
 end;
 
 function Param(Offset:SizeInt; var Context:TContext):PValRec;   //DONE -oMain -cRev.2026.03.28: Func Param
@@ -315,6 +312,7 @@ begin
     MemListInit(FuncArg, SPtr, ParamGrow);
     RunFlaVar:=FlaVar;
     ProcToken:=@InitProc;
+    Break:=NML;
   end;
   SaveStatus(Status, Context);
   try
@@ -327,12 +325,9 @@ begin
   except
     on E:EError do FillError(E.FCode, E.FPnt);
     on E:EFlaResult do begin
-      Result:=Context.TermExit;
+      Result:=Context.TermResult;
       FillError(OK);
     end;
-    on E:EFlaExit do FillError(IllegalOp);
-    on E:EFlaBreak do FillError(IllegalOp);
-    on E:EFlaContinue do FillError(IllegalOp);
     on E:EOverflow do FillError(Overflow);
     on E:EDivByZero do FillError(DivZero);
     on E:EZeroDivide do FillError(DivZero);

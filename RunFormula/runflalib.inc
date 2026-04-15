@@ -617,8 +617,8 @@ end;
 
 procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.03.29: Proc PostParam
 begin
-  with Context do if TermExit^.VAlloc=LV then begin
-    FreeValue(TermExit);
+  with Context do if TermResult^.VAlloc=LV then begin
+    FreeValue(TermResult);
     dec(LVStack.Count);
   end;
 end;

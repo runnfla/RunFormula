@@ -17,37 +17,38 @@
 
 // TODO - Expand Str2Val
 
-procedure BreakParam(ParamCount:SizeInt; var Context:TContext);
-begin                               //DONE -oFunc -cRev.2026.04.08: Proc BreakParam
+function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TBreak):PValRec;
+begin                               //DONE -oFunc -cRev.2026.00.00: Func BreakParam
   case ParamCount of
-    0 : Context.TermExit:=@CVNone;
-    1 : Param(0-ParamCount, Context);
+    0 : begin
+          Result:=@CVNone;
+          Context.TermResult:=@CVNone;
+        end;
+    1 : Result:=Param(0-ParamCount, Context);
     else raise EError.Create(ParamNumber);
   end;
+  Context.Break:=F;
 end;
 
 function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_RESULT
 begin
-  BreakParam(ParamCount, Context);
+  BreakParam(ParamCount, Context, RSL);
   raise EFlaResult.Create('');
 end;
 
 function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.08: Func Fla_EXIT
 begin
-  BreakParam(ParamCount, Context);
-  raise EFlaExit.Create('');
+  Result:=BreakParam(ParamCount, Context, EXT);
 end;
 
 function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.08: Func Fla_BREAK
 begin
-  BreakParam(ParamCount, Context);
-  raise EFlaBreak.Create('');
+  Result:=BreakParam(ParamCount, Context, BRK);
 end;
 
 function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_CONTINUE
 begin
-  BreakParam(ParamCount, Context);
-  raise EFlaBreak.Create('');
+  Result:=BreakParam(ParamCount, Context, CON);
 end;
 
 function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_IF
@@ -62,36 +63,26 @@ begin
 end;
 
 function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.11: Func Fla_REPEAT
-var Status : TStatus;
-    flg : boolean;
+var flg : boolean;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=@CVNone;
-  SaveStatus(Status, Context);
-  try
-    repeat
-      flg:=AsBool(Param(0-ParamCount, Context));
-      PostParam(Context);
-      if not flg then break;
-      Context.TermExit:=Result;
-      PostParam(Context);
-      try
-        Result:=Param(1-ParamCount, Context);
-      except
-        on E:EFlaContinue do begin
-          RestoreStatus(Status, Context);
-          Result:=@CVNone;
-        end;
-      end;
-    until false;
-  except
-    on E:EFlaBreak do begin
-      Result:=Context.TermExit;
-      if Result^.VAlloc=LV
-        then RestoreStatusKeep(Status, Context, Result)
-        else RestoreStatus(Status, Context);
-      end;
-  end;
+  repeat
+    flg:=AsBool(Param(0-ParamCount, Context));
+    PostParam(Context);
+    if not flg then break;
+    Context.TermResult:=Result;
+    PostParam(Context);
+    Result:=Param(1-ParamCount, Context);
+    case Context.Break of
+      EXT : break;
+      BRK : begin
+              Context.Break:=NML;
+              break;
+            end;
+      CON : Context.Break:=NML;
+    end;
+  until false;
 end;
 
 function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_TYPE
@@ -181,7 +172,7 @@ begin
     if Img<Flo then raise EError.Create(InvalidRange);
   end;
   PostParam(Context);
-  Context.TermExit:=Lpv;
+  Context.TermResult:=Lpv;
   PostParam(Context);
 end;
 
@@ -277,7 +268,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_VAL2STR(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.04.05: Func Fla_VAL2STR
+function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.04.05: Func Fla_STRING
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -600,7 +591,7 @@ begin
   FuncReg('trunc', @Fla_TRUNC);
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
-  FuncReg('val2str', @Fla_VAL2STR);
+  FuncReg('string', @Fla_STRING);
   FuncReg('str2val', @Fla_STR2VAL);
   FuncReg('exp', @Fla_EXP);
   FuncReg('ln', @Fla_LN);

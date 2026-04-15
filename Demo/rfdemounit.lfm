@@ -512,7 +512,7 @@ object DemoForm: TDemoForm
       '  endfunc;'
       ''
       '  func PrintFloat(F);'
-      '    S = Val2Str(F);'
+      '    S = string(F);'
       '    S & SPCCount(8-length(S))'
       '  endfunc;'
       ''

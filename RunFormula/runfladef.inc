@@ -146,6 +146,8 @@ type
 
   PToken = ^TToken;
 
+  TBreak = (NML, RSL, EXT, BRK, CON);
+
   TContext = record
     VarPool    : TMemList;           // list of TMemList
     LVStack    : TMemList;           // list of TValRec
@@ -153,8 +155,9 @@ type
     FuncArg    : TMemList;           // list of PByte
     RunFlaVar  : TRunFlaVar;
     ProcToken  : PByte;
-    TermExit   : PValRec;
+    TermResult : PValRec;
     VarTable   : PByte;
+    Break      : TBreak;
   end;
 
   TStatus = record
@@ -183,10 +186,7 @@ type
     constructor Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
   end;
 
-  EFlaExit = class(Exception);
   EFlaResult = class(Exception);
-  EFlaBreak = class(Exception);
-  EFlaContinue = class(Exception);
 
   TCharSet = set of char;
 
