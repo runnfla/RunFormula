@@ -311,25 +311,25 @@ begin
   end;
 end;
 
-procedure InitVar(EP:PByte; PV:PValRec; ForcePV:boolean);     //DONE -oTerm -cRev.2026.03.30: Proc InitVar
-var p, fin : PByte;                // EP --> ExprToken
+procedure InitVar(Pexp:PByte; PV:PValRec; ForcePV:boolean);  //DONE -oTerm -cRev.2026.14.16: Proc InitVar
+var p, fin : PByte;                // Pexp --> ExprToken
 begin
-  fin:=EP+PToken(EP)^.Size;
-  inc(EP, ExprTokenSize);
-  with PToken(EP)^ do begin
-    if Tag<>TagVar then raise EError.Create(VarExpected, EP);
-    p:=EP+Size;
+  fin:=Pexp+PToken(Pexp)^.Size;
+  inc(Pexp, ExprTokenSize);
+  with PToken(Pexp)^ do begin
+    if Tag<>TagVar then raise EError.Create(VarExpected, Pexp);
+    p:=Pexp+Size;
     if p<fin then begin
       if PToken(p)^.Tag<>TagAssign then raise EError.Create(DefaultExpected, p);
       if ((PV<>nil) xor ForcePV) then begin
         inc(p, OpTokenSize);
         PV:=Expr(p, fin, 0);
-        ValCopy(PV, CreateNewVar(EP));
+        ValCopy(PV, CreateNewVar(Pexp));
         FreeTerm(PV);
         exit;
       end;
     end else if PV=nil then raise EError.Create(ParamNumber, Pnt);
-    ValCopy(PV, CreateNewVar(EP))
+    ValCopy(PV, CreateNewVar(Pexp));
   end;
 end;
 
