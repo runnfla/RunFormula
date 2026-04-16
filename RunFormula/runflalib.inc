@@ -639,42 +639,6 @@ begin
   end;
 end;
 
-procedure SaveStatus(var Status:TStatus; var Context:TContext); inline;
-begin                                                         //DONE -oLib -cRev.2026.03.29: Proc SaveStatus
-  with Status, Context do begin
-    CntVarPool:=VarPool.Count;
-    CntLVStack:=LVStack.Count;
-    CntSubrParam:=SubrParam.Count;
-    CntFuncArg:=FuncArg.Count;
-  end;
-end;
-
-procedure RestoreStatus(var Status:TStatus; var Context:TContext);
-var i, j : SizeInt;                                           //DONE -oLib -cRev.2026.04.14: Proc RestoreStatus
-begin
-  with Status, Context do begin
-    for i:=VarPool.Count-1 downto CntVarPool do with PMemList(MemListGet(VarPool, i))^ do begin
-      for j:=Count-1 downto 0 do FreeValue(@PVariable(MemListGet(PMemList(@List)^, j))^.Value);
-      MemListClear(PMemList(@List)^);
-    end;
-    VarPool.Count:=CntVarPool;
-    for i:=LVStack.Count-1 downto CntLVStack do FreeValue(MemListGet(LVStack, i));
-    LVStack.Count:=CntLVStack;
-    SubrParam.Count:=CntSubrParam;
-    FuncArg.Count:=CntFuncArg;
-  end;
-end;
-
-procedure RestoreStatusKeep(var Status:TStatus; var Context:TContext; var Keep:PValRec);
-var buf : TValRec;                                            //DONE -oLib -cRev.2026.03.31: Proc RestoreStatusKeep
-begin
-  ValCopy(Keep, @buf);
-  RestoreStatus(Status, Context);
-  Keep:=NewLV(Context);
-  ValCopy(@buf, Keep);
-  FreeValue(@buf);
-end;
-
 // ----- Exceptions -----
 
 constructor EError.Create(Code:TRunFlaErrCode; Pnt:pointer=nil);

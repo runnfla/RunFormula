@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Error codes include file
-//  Rev. 4.04.2026
+//  Rev. 15.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -46,7 +46,6 @@ type
     VariantError,
     UnknownVar,
     ParamNumber,
-    IllegalOp,
     DefExists,
     MaxDepth,
     Unsupported,
@@ -55,7 +54,8 @@ type
     NotOpExpected,
     DefaultExpected,
     InvalidValue,
-    InvalidRange
+    InvalidRange,
+    IllegalBreak
   );
 
   TRunFlaError = packed record

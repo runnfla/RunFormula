@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Definitions include file
-//  Rev. 14.04.2026
+//  Rev. 16.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -146,22 +146,18 @@ type
 
   PToken = ^TToken;
 
-  TBreak = (NML, RSL, EXT, BRK, CON);
+  TFlow = (NML, RSL, EXT, BRK, CON);
 
   TContext = record
-    VarPool    : TMemList;           // list of TMemList
     LVStack    : TMemList;           // list of TValRec
-    SubrParam  : TMemList;           // list of PValRec
+    VarPool    : TMemList;           // list of TMemList
     FuncArg    : TMemList;           // list of PByte
     RunFlaVar  : TRunFlaVar;
-    ProcToken  : PByte;
     TermResult : PValRec;
     VarTable   : PByte;
-    Break      : TBreak;
-  end;
-
-  TStatus = record
-    CntVarPool, CntLVStack, CntSubrParam, CntFuncArg : SizeInt;
+    ProcToken  : PByte;
+    PoolIndex  : SizeInt;            // index in VarPool
+    Flow       : TFlow;
   end;
 
   TFlaFunc = function(ParamCount:SizeInt; var Context:TContext):PValRec;
@@ -186,7 +182,7 @@ type
     constructor Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
   end;
 
-  EFlaResult = class(Exception);
+  EResult = class(Exception);
 
   TCharSet = set of char;
 
@@ -241,6 +237,18 @@ const
     80,     // TagNOT        not
     80      // TagNegative   - unary
     );
+
+  TCaseType : array[TVType, TVType] of TVType = (
+//            VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
+{ VInt   } (  VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VGap,   VArr  ),
+{ VFloat } (  VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
+{ VRsvd  } (  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
+{ VCplex } (  VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
+{ VChar  } (  VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VGap,   VArr  ),
+{ VStr   } (  VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VGap   } (  VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VIGap  } (  VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VArr   } (  VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
 
 var
   FuncList : TMemList;      // list of TFlaRec

@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Error messages include file
-//  Rev. 4.04.2026
+//  Rev. 15.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -22,7 +22,7 @@ const
     'OK',
     'Unknown Error',
     'Memory Allocation Error',
-    'Stack Overflow',
+    'Stack overflow',
     'Float Overflow Error',
     'Function already exists',
     'Invalid character',
@@ -46,7 +46,6 @@ const
     'Variant Conversion Error',
     'Variable is not found',
     'Incorrect number of parameters',
-    'Illegal Operation',
     'Define already exists',
     'Maximum depth has been exceeded',
     'Unsupported Feature',
@@ -54,7 +53,8 @@ const
     'Operator, comma or close bracket expected',
     'Value, variable, function or open bracket expected',
     'Assignment, comma or close bracket expected',
-    'Invalid Operand Value',
-    'Incorrect borders of range'
+    'Invalid operand value',
+    'Incorrect borders of range',
+    'Illegal Break or Continue operation'
   );
 

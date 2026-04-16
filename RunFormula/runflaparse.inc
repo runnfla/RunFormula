@@ -392,7 +392,7 @@ begin
                  end;
       '<' : OpToken(TagLess);
       '=' : begin
-              if not (PreTag in [TagVar, TagArray]) then raise EError.Create(IllegalOp);
+              if not (PreTag in [TagVar, TagArray]) then raise EError.Create(VarExpected);
               OpToken(TagAssign);
             end;
       '>' : OpToken(TagGreater);

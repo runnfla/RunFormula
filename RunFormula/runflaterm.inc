@@ -292,16 +292,17 @@ begin
   Result:=not L;
 end;
 
-function CreateNewVar(P:PByte; Local:boolean=true):PValRec;       //DONE -oTerm -cRev.2026.04.08: Func CreateNewVar
-var lst : PMemList;         // P to VarToken
-    i : SizeInt;
+function CreateNewVar(P:PByte; LIdx:SizeInt=0; InLocal:boolean=true):PValRec;
+var lst : PMemList;               //DONE -oTerm -cRev.2026.04.16: Func CreateNewVar
+    i : SizeInt = 0;      // P --> VarToken
 begin
-  if Local then lst:=MemListGetLast(Context.VarPool)
-    else lst:=PMemList(Context.VarPool.List);
+  if InLocal then i:=Context.VarPool.Count-1;
+  Context.PoolIndex:=i;
+  lst:=MemListGet(Context.VarPool, i);
   with PToken(P)^ do begin
-    i:=VarListFind(lst, Index);
-    if i>=0 then raise EError.Create(VarExists, P);
-    with PVariable(MemListInsert(lst^, not i))^ do begin
+    if LIdx=0 then LIdx:=VarListFind(lst, Index);
+    if LIdx>=0 then raise EError.Create(VarExists, P);
+    with PVariable(MemListInsert(lst^, not LIdx))^ do begin
       VarID:=Index;
       Value.VType:=VInt;
       Value.VAlloc:=VP;
@@ -310,8 +311,8 @@ begin
   end;
 end;
 
-procedure InitVar(EP:PByte; PV:PValRec; ForcePV:boolean);         //DONE -oTerm -cRev.2026.03.30: Proc InitVar
-var p, fin : PByte;                // EP to ExprToken
+procedure InitVar(EP:PByte; PV:PValRec; ForcePV:boolean);     //DONE -oTerm -cRev.2026.03.30: Proc InitVar
+var p, fin : PByte;                // EP --> ExprToken
 begin
   fin:=EP+PToken(EP)^.Size;
   inc(EP, ExprTokenSize);

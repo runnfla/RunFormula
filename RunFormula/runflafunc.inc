@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Essential functions include file
-//  Rev. 8.04.2026
+//  Rev. 15.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -17,36 +17,33 @@
 
 // TODO - Expand Str2Val
 
-function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TBreak):PValRec;
-begin                               //DONE -oFunc -cRev.2026.00.00: Func BreakParam
+function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec;
+begin                               //DONE -oFunc -cRev.2026.04.15: Func BreakParam
   case ParamCount of
-    0 : begin
-          Result:=@CVNone;
-          Context.TermResult:=@CVNone;
-        end;
+    0 : Result:=@CVNone;
     1 : Result:=Param(0-ParamCount, Context);
     else raise EError.Create(ParamNumber);
   end;
-  Context.Break:=F;
+  Context.Flow:=F;
 end;
 
-function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_RESULT
+function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.15: Func Fla_RESULT
 begin
-  BreakParam(ParamCount, Context, RSL);
-  raise EFlaResult.Create('');
+  Context.TermResult:=BreakParam(ParamCount, Context, RSL);
+  raise EResult.Create('');
 end;
 
-function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.08: Func Fla_EXIT
+function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.15: Func Fla_EXIT
 begin
   Result:=BreakParam(ParamCount, Context, EXT);
 end;
 
-function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.08: Func Fla_BREAK
+function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.15: Func Fla_BREAK
 begin
   Result:=BreakParam(ParamCount, Context, BRK);
 end;
 
-function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_CONTINUE
+function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.04.15: Func Fla_CONTINUE
 begin
   Result:=BreakParam(ParamCount, Context, CON);
 end;
@@ -62,7 +59,7 @@ begin
     else if ParamCount=3 then Result:=Param(2-ParamCount, Context);
 end;
 
-function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.11: Func Fla_REPEAT
+function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.15: Func Fla_REPEAT
 var flg : boolean;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
@@ -74,13 +71,13 @@ begin
     Context.TermResult:=Result;
     PostParam(Context);
     Result:=Param(1-ParamCount, Context);
-    case Context.Break of
+    with Context do case Flow of
       EXT : break;
       BRK : begin
-              Context.Break:=NML;
+              Flow:=NML;
               break;
             end;
-      CON : Context.Break:=NML;
+      CON : Flow:=NML;
     end;
   until false;
 end;
@@ -567,6 +564,27 @@ begin
   PostParam(Context);
 end;
 
+function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.15: Func Fla_CHAR
+var pv : PValRec;
+    i : SizeUInt;
+begin
+  if ParamCount<>1 then raise EError.Create(ParamNumber);
+  Result:=NewLV(Context);
+  pv:=Param(0-ParamCount, Context);
+  with Result^ do begin
+    VType:=VChar;
+    if pv^.VType=VStr then begin
+      if (Str=nil) or (PSizeInt(Str-SI)^<>1) then raise EError.Create(InvalidValue);
+      Chr:=Str^;
+    end else begin
+      i:=AsInt(pv);
+      if i>$FF then raise EError.Create(InvalidValue);
+      Chr:=byte(i);
+    end;
+  end;
+  PostParam(Context);
+end;
+
 {$define runfla_optfunc}
 {$include runflaopt.inc}
 {$undef runfla_optfunc}
@@ -601,6 +619,7 @@ begin
   FuncReg('arctan', @Fla_ARCTAN);
   FuncReg('round', @Fla_ROUND);
   FuncReg('abs', @Fla_ABS);
+  FuncReg('char', @Fla_CHAR);
 
 {$define runfla_optreg}
 {$include runflaopt.inc}
