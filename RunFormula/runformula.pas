@@ -161,13 +161,14 @@ begin
     case Tag of
       TagValue : Result:=@ValRec;
       TagVar   : begin
-                   i:=VarPool.Count;
+                   i:=VarPool.Count-1;
                    repeat
-                     dec(i);
                      lst:=MemListGet(VarPool, i);
                      idx:=VarListFind(lst, Index);
+                     if idx>=0 then break;
                      if loc=0 then loc:=idx;
-                   until (idx>=0) or (i<=0);
+                     dec(i);
+                   until i<0;
                    if idx<0 then begin
                      if PToken(Pnt+VarTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);

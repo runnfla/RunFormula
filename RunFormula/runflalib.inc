@@ -615,7 +615,7 @@ begin
   end;
 end;
 
-procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.03.29: Proc PostParam
+procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.04.00: Proc PostParam
 begin
   with Context do if TermResult^.VAlloc=LV then begin
     FreeValue(TermResult);
@@ -623,13 +623,13 @@ begin
   end;
 end;
 
-function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.03.29: Func NewLV
+function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.00: Func NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
   Result^.VAlloc:=LV;
 end;
 
-procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.04.14: Proc NewVarList
+procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.04.00: Proc NewVarList
 begin
   with Context, VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
@@ -642,7 +642,7 @@ end;
 // ----- Exceptions -----
 
 constructor EError.Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
-begin                                          //DONE -oLib -cRev.2026.03.29: Cstr EError.Create
+begin                                          //DONE -oLib -cRev.2026.04.16: Cstr EError.Create
   inherited Create('');
   FCode:=Code;
   FPnt:=Pnt;

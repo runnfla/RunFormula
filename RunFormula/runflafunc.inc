@@ -17,11 +17,11 @@
 
 // TODO - Expand Str2Val
 
-function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec;
+function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
 begin                               //DONE -oFunc -cRev.2026.04.15: Func BreakParam
   case ParamCount of
     0 : Result:=@CVNone;
-    1 : Result:=Param(0-ParamCount, Context);
+    1 : Result:=Param(-1, Context);
     else raise EError.Create(ParamNumber);
   end;
   Context.Flow:=F;
@@ -48,7 +48,7 @@ begin
   Result:=BreakParam(ParamCount, Context, CON);
 end;
 
-function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.08: Func Fla_IF
+function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.16: Func Fla_IF
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then raise EError.Create(ParamNumber);
@@ -56,7 +56,7 @@ begin
   PostParam(Context);
   Result:=@CVNone;
   if b then Result:=Param(1-ParamCount, Context)
-    else if ParamCount=3 then Result:=Param(2-ParamCount, Context);
+    else if ParamCount=3 then Result:=Param(-1, Context);
 end;
 
 function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.15: Func Fla_REPEAT
@@ -65,12 +65,12 @@ begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=@CVNone;
   repeat
-    flg:=AsBool(Param(0-ParamCount, Context));
+    flg:=AsBool(Param(-2, Context));
     PostParam(Context);
     if not flg then break;
     Context.TermResult:=Result;
     PostParam(Context);
-    Result:=Param(1-ParamCount, Context);
+    Result:=Param(-1, Context);
     with Context do case Flow of
       EXT : break;
       BRK : begin
@@ -566,20 +566,20 @@ end;
 
 function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.15: Func Fla_CHAR
 var pv : PValRec;
-    i : SizeUInt;
+    I : SizeUInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
   with Result^ do begin
     VType:=VChar;
     if pv^.VType=VStr then begin
-      if (Str=nil) or (PSizeInt(Str-SI)^<>1) then raise EError.Create(InvalidValue);
-      Chr:=Str^;
+      if (pv^.Str=nil) or (PSizeInt(pv^.Str-SI)^<>1) then raise EError.Create(InvalidValue);
+      Chr:=pv^.Str^;
     end else begin
-      i:=AsInt(pv);
-      if i>$FF then raise EError.Create(InvalidValue);
-      Chr:=byte(i);
+      I:=AsInt(pv);
+      if I>$FF then raise EError.Create(InvalidValue);
+      Chr:=byte(I);
     end;
   end;
   PostParam(Context);

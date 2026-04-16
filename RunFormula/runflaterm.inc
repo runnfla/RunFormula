@@ -45,8 +45,8 @@ begin
   end;
 end;
 
-procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.03.30: Proc FreeTerm
-begin                              // like FreeParam
+procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.00: Proc FreeTerm
+begin                              // like PostParam
   if PV^.VAlloc=LV then begin
     FreeValue(PV);
     dec(Context.LVStack.Count);
@@ -278,7 +278,7 @@ begin
   Result:=L;
 end;
 
-function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.14: Func VarListFind
+function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.00: Func VarListFind
 var L : SizeInt = 0;
     R, diff : SizeInt;
 begin
@@ -293,7 +293,7 @@ begin
 end;
 
 function CreateNewVar(P:PByte; LIdx:SizeInt=0; InLocal:boolean=true):PValRec;
-var lst : PMemList;               //DONE -oTerm -cRev.2026.04.16: Func CreateNewVar
+var lst : PMemList;               //DONE -oTerm -cRev.2026.04.00: Func CreateNewVar
     i : SizeInt = 0;      // P --> VarToken
 begin
   if InLocal then i:=Context.VarPool.Count-1;
@@ -311,7 +311,7 @@ begin
   end;
 end;
 
-procedure InitVar(Pexp:PByte; PV:PValRec; ForcePV:boolean);  //DONE -oTerm -cRev.2026.14.16: Proc InitVar
+procedure InitVar(Pexp:PByte; PV:PValRec; ForcePV:boolean);  //DONE -oTerm -cRev.2026.04.00: Proc InitVar
 var p, fin : PByte;                // Pexp --> ExprToken
 begin
   fin:=Pexp+PToken(Pexp)^.Size;
