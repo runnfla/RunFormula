@@ -62,89 +62,6 @@ uses SysUtils
 {$include runfladef.inc}
 {$include runflalib.inc}
 
-function RunFlaParse(constref Fla:string; var Error:TRunFlaError):string;
-const TagOp = TagExpr;                     //DONE -oMain -cRev.2026.04.08: Func RunFlaParse
-type TCls = record
-       ClsTag : TTag;
-       SizeP : PSizeInt;                      // to Token.Size
-       Offs : SizeInt;
-     end;
-     PCls = ^TCls;
-var Buf : array of string;
-    SBuf : PByte = nil;
-    BufP : PByte = PByte(BufSize);
-    BufSum : SizeInt = 0;                          // sum of closed Bufs
-    ClsList, SubrList, DefList, VarList : TMemList;
-    PreTag : TTag = TagLess;
-    TextCodePage : TSystemCodePage;
-    InDef : integer = 0;
-    Comment : char = #0;
-    FlaPos : integer = 0;                    // position in Fla
-    Pnt : PChar;
-    ofs, i : SizeInt;
-
-{$include runflaparse.inc}
-
-begin
-  try
-    PByte(Result):=nil;
-    MemListInit(ClsList, SizeOf(TCls), ClsGrow);
-    MemListInit(SubrList, SFlaRec, SubrGrow);
-    MemListInit(DefList, SFlaRec, DefGrow);
-    MemListInit(VarList, SFlaRec, VarIDGrow);
-    Pnt:=pointer(Fla);
-    if Pnt=nil then raise EError.Create(OK);
-    TextCodePage:=PAnsiRec(Pnt-SAnsiRec)^.CodePage;
-    ExprToken(TagCode, TagCode);
-    ExprToken(TagExpr, TagExpr);
-    DoParse(Pnt);
-    if ClsList.Count>2 then raise EError.Create(MissingBracket);
-    CloseExpr;
-    CloseToken(TagCode);
-    OpToken(TagGreater);                           // insert stub
-    RequestBuf(VarList.Count*SI);                  // writing Var Name Table
-    ofs:=VarList.Count*SI+SAnsiRec;
-    for i:=0 to VarList.Count-1 do begin
-      PSizeInt(BufP)^:=ofs;
-      inc(BufP, SI);
-      inc(ofs, AlignStringLng(PFlaRec(MemListGet(VarList, i))^.Lng));
-    end;
-    for i:=0 to VarList.Count-1 do with PFlaRec(MemListGet(VarList, i))^ do
-      WriteStringRec(ID, Lng, AlignStringLng(Lng));
-    i:=length(Buf)-1;
-    SetLength(Buf[i], BufP-SBuf);
-    if i>0 then begin
-      inc(BufSum, BufP-SBuf);
-      SetLength(Result, BufSum);
-      BufP:=PByte(Result);
-      for i:=0 to i do begin
-        ofs:=length(Buf[i]);
-        DataCopy(PByte(Buf[i]), BufP, ofs);
-        inc(BufP, ofs);
-      end;
-    end else Result:=Buf[0];
-    FillError(OK);
-  except
-    on E:EError do FillError(E.FCode, E.FPnt);
-    on E:EOverflow do FillError(Overflow);
-    on E:EHeapException do FillError(Malloc);
-    else FillError(Unknown);
-  end;
-  for i:=0 to DefList.Count-1 do DecStrRef(PFlaRec(MemListGet(DefList, i))^.PText);
-  MemListFree(VarList);
-  MemListFree(DefList);
-  MemListFree(SubrList);
-  MemListFree(ClsList);
-  for i:=0 to length(Buf)-1 do SetLength(Buf[i], 0);
-  SetLength(Buf, 0);
-end;
-
-function RunFlaParse(constref Fla:string):string;               //DONE -oMain -cRev.2026.03.31: Func RunFlaParse
-var Error : TRunFlaError;
-begin
-  Result:=RunFlaParse(Fla, Error);
-end;
-
 function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.16: Func Term
 var lst : PMemList;
     pv : PValRec;
@@ -398,6 +315,89 @@ end;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oMain -cRev.2026.03.28: Proc RunFlaRaise
 begin
   raise EError.Create(ErrCode);
+end;
+
+function RunFlaParse(constref Fla:string; var Error:TRunFlaError):string;
+const TagOp = TagExpr;                     //DONE -oMain -cRev.2026.04.08: Func RunFlaParse
+type TCls = record
+       ClsTag : TTag;
+       SizeP : PSizeInt;                      // to Token.Size
+       Offs : SizeInt;
+     end;
+     PCls = ^TCls;
+var Buf : array of string;
+    SBuf : PByte = nil;
+    BufP : PByte = PByte(BufSize);
+    BufSum : SizeInt = 0;                          // sum of closed Bufs
+    ClsList, SubrList, DefList, VarList : TMemList;
+    PreTag : TTag = TagLess;
+    TextCodePage : TSystemCodePage;
+    InDef : integer = 0;
+    Comment : char = #0;
+    FlaPos : integer = 0;                    // position in Fla
+    Pnt : PChar;
+    ofs, i : SizeInt;
+
+{$include runflaparse.inc}
+
+begin
+  try
+    PByte(Result):=nil;
+    MemListInit(ClsList, SizeOf(TCls), ClsGrow);
+    MemListInit(SubrList, SFlaRec, SubrGrow);
+    MemListInit(DefList, SFlaRec, DefGrow);
+    MemListInit(VarList, SFlaRec, VarIDGrow);
+    Pnt:=pointer(Fla);
+    if Pnt=nil then raise EError.Create(OK);
+    TextCodePage:=PAnsiRec(Pnt-SAnsiRec)^.CodePage;
+    ExprToken(TagCode, TagCode);
+    ExprToken(TagExpr, TagExpr);
+    DoParse(Pnt);
+    if ClsList.Count>2 then raise EError.Create(MissingBracket);
+    CloseExpr;
+    CloseToken(TagCode);
+    OpToken(TagGreater);                           // insert stub
+    RequestBuf(VarList.Count*SI);                  // writing Var Name Table
+    ofs:=VarList.Count*SI+SAnsiRec;
+    for i:=0 to VarList.Count-1 do begin
+      PSizeInt(BufP)^:=ofs;
+      inc(BufP, SI);
+      inc(ofs, AlignStringLng(PFlaRec(MemListGet(VarList, i))^.Lng));
+    end;
+    for i:=0 to VarList.Count-1 do with PFlaRec(MemListGet(VarList, i))^ do
+      WriteStringRec(ID, Lng, AlignStringLng(Lng));
+    i:=length(Buf)-1;
+    SetLength(Buf[i], BufP-SBuf);
+    if i>0 then begin
+      inc(BufSum, BufP-SBuf);
+      SetLength(Result, BufSum);
+      BufP:=PByte(Result);
+      for i:=0 to i do begin
+        ofs:=length(Buf[i]);
+        DataCopy(PByte(Buf[i]), BufP, ofs);
+        inc(BufP, ofs);
+      end;
+    end else Result:=Buf[0];
+    FillError(OK);
+  except
+    on E:EError do FillError(E.FCode, E.FPnt);
+    on E:EOverflow do FillError(Overflow);
+    on E:EHeapException do FillError(Malloc);
+    else FillError(Unknown);
+  end;
+  for i:=0 to DefList.Count-1 do DecStrRef(PFlaRec(MemListGet(DefList, i))^.PText);
+  MemListFree(VarList);
+  MemListFree(DefList);
+  MemListFree(SubrList);
+  MemListFree(ClsList);
+  for i:=0 to length(Buf)-1 do SetLength(Buf[i], 0);
+  SetLength(Buf, 0);
+end;
+
+function RunFlaParse(constref Fla:string):string;               //DONE -oMain -cRev.2026.03.31: Func RunFlaParse
+var Error : TRunFlaError;
+begin
+  Result:=RunFlaParse(Fla, Error);
 end;
 
 function FuncReg(constref Name:string; FlaFunc:TFlaFunc; User:boolean=false):TRunFlaErrCode;
