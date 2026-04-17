@@ -114,19 +114,19 @@ const
   SAnsiRec = SizeOf(TAnsiRec);
   SValRec = SizeOf(TValRec);
 
-  BufSize = $10000;
-  DefDepth = 32;
-  VarDepth = 5000;
+  BufSize = $8000;        // bytecode buffer increment
+  DefDepth = 64;          // maximum define nesting level
+  VarDepth = 5000;        // maximum number of variable lists
 
-  ClsGrow = 32;
-  SubrGrow = 32;
-  DefGrow = 32;
-  VarIDGrow = 32;
-  FuncGrow = 32;
-  VarPoolGrow = 32;
-  VarGrow = 32;
-  LVStackGrow = 32;
-  ParamGrow = 32;
+  ClsGrow = 32;           // nesting depth step * 2
+  SubrGrow = 16;          // subroutine count increment
+  DefGrow = 16;           // define count increment
+  VarIDGrow = 64;         // unique variable names increment
+  FuncGrow = 64;          // function count increment
+  VarPoolGrow = 16;       // variable list pool size increment
+  VarGrow = 16;           // variables per list increment
+  LVStackGrow = 64;       // stack depth increment
+  ParamGrow = 32;         // parameter buffer increment (total for nested calls)
 
 type
   TToken = packed record
@@ -154,9 +154,9 @@ type
     FuncArg    : TMemList;           // list of PByte
     RunFlaVar  : TRunFlaVar;
     TermResult : PValRec;
-    VarTable   : PByte;
+    VarTable   : PByte;              // point to offset table in bytecode
     ProcToken  : PByte;
-    PoolIndex  : SizeInt;            // index in VarPool
+    PoolIndex  : SizeInt;            // variable list index in VarPool
     Flow       : TFlow;
   end;
 
