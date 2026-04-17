@@ -278,14 +278,16 @@ begin
   Result:=L;
 end;
 
-function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.00: Func VarListFind
+function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.16: Func VarListFind
 var L : SizeInt = 0;
     R, diff : SizeInt;
+    vl : PPointer;
 begin
+  vl:=Lst^.List;
   R:=Lst^.Count-1;
   while L<=R do begin
     Result:=L+((R-L) shr 1);
-    diff:=ID-PVariable(MemListGet(Lst^, Result))^.VarID;
+    diff:=ID-PVariable(vl[Result])^.VarID;
     if diff=0 then exit;
     if diff>0 then L:=Result+1 else R:=Result-1;
   end;
@@ -298,7 +300,7 @@ var lst : PMemList;               //DONE -oTerm -cRev.2026.04.00: Func CreateNew
 begin
   if InLocal then i:=Context.VarPool.Count-1;
   Context.PoolIndex:=i;
-  lst:=MemListGet(Context.VarPool, i);
+  lst:=Context.VarPool.List[i];
   with PToken(P)^ do begin
     if LIdx=0 then LIdx:=VarListFind(lst, Index);
     if LIdx>=0 then raise EError.Create(VarExists, P);
