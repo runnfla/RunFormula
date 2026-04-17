@@ -45,7 +45,7 @@ begin
   end;
 end;
 
-procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.00: Proc FreeTerm
+procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.17: Proc FreeTerm
 begin                              // like PostParam
   if PV^.VAlloc=LV then begin
     FreeValue(PV);
@@ -294,22 +294,22 @@ begin
   Result:=not L;
 end;
 
-function CreateNewVar(P:PByte; LIdx:SizeInt=0; InLocal:boolean=true):PValRec;
-var lst : PMemList;               //DONE -oTerm -cRev.2026.04.00: Func CreateNewVar
+function NewVar(P:PByte; LIdx:SizeInt=0; InLocal:boolean=true):PValRec;
+var lst : PMemList;               //DONE -oTerm -cRev.2026.04.17: Func NewVar
     i : SizeInt = 0;      // P --> VarToken
 begin
-  if InLocal then i:=Context.VarPool.Count-1;
-  Context.PoolIndex:=i;
-  lst:=Context.VarPool.List[i];
-  with PToken(P)^ do begin
-    if LIdx=0 then LIdx:=VarListFind(lst, Index);
-    if LIdx>=0 then raise EError.Create(VarExists, P);
-    with PVariable(MemListInsert(lst^, not LIdx))^ do begin
-      VarID:=Index;
-      Value.VType:=VInt;
-      Value.VAlloc:=VP;
-      Result:=@Value;
-    end;
+  with Context do begin
+    if InLocal then i:=VarPool.Count-1;
+    PoolIndex:=i;
+    lst:=VarPool.List[i];
+  end;
+  if LIdx=0 then LIdx:=VarListFind(lst, PToken(P)^.Index);
+  if LIdx>=0 then raise EError.Create(VarExists, P);
+  with PVariable(MemListInsert(lst^, not LIdx))^ do begin
+    VarID:=PToken(P)^.Index;
+    Value.VType:=VInt;
+    Value.VAlloc:=VP;
+    Result:=@Value;
   end;
 end;
 
@@ -326,12 +326,12 @@ begin
       if ((PV<>nil) xor ForcePV) then begin
         inc(p, OpTokenSize);
         PV:=Expr(p, fin, 0);
-        ValCopy(PV, CreateNewVar(Pexp));
+        ValCopy(PV, NewVar(Pexp));
         FreeTerm(PV);
         exit;
       end;
     end else if PV=nil then raise EError.Create(ParamNumber, Pnt);
-    ValCopy(PV, CreateNewVar(Pexp));
+    ValCopy(PV, NewVar(Pexp));
   end;
 end;
 

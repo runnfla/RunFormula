@@ -615,7 +615,7 @@ begin
   end;
 end;
 
-procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.04.00: Proc PostParam
+procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.04.17: Proc PostParam
 begin
   with Context do if TermResult^.VAlloc=LV then begin
     FreeValue(TermResult);
@@ -623,7 +623,7 @@ begin
   end;
 end;
 
-function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.00: Func NewLV
+function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.17: Func NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
   Result^.VAlloc:=LV;

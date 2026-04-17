@@ -173,8 +173,8 @@ begin
                      if PToken(Pnt+VarTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);
                        Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable+Index*SI)^), flg));
-                       if flg then ValCopy(Result, CreateNewVar(Pnt, idx, false));
-                     end else Result:=CreateNewVar(Pnt, loc);
+                       if flg then ValCopy(Result, NewVar(Pnt, idx, false));
+                     end else Result:=NewVar(Pnt, loc);
                    end else begin
                      Result:=@PVariable(lst^.List[idx])^.Value;
                      PoolIndex:=i;
