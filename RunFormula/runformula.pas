@@ -163,7 +163,7 @@ begin
       TagVar   : begin
                    i:=VarPool.Count-1;
                    repeat
-                     lst:=MemListGet(VarPool, i);
+                     lst:=VarPool.List[i];
                      idx:=VarListFind(lst, Index);
                      if idx>=0 then break;
                      if loc=0 then loc:=idx;
@@ -176,7 +176,7 @@ begin
                        if flg then ValCopy(Result, CreateNewVar(Pnt, idx, false));
                      end else Result:=CreateNewVar(Pnt, loc);
                    end else begin
-                     Result:=@PVariable(MemListGet(lst^, idx))^.Value;
+                     Result:=@PVariable(lst^.List[idx])^.Value;
                      PoolIndex:=i;
                    end;
                  end;
@@ -199,7 +199,7 @@ begin
                      PPByte(MemListAdd(FuncArg))^:=p;
                      inc(p, PToken(p)^.Size);
                    end;
-                   with PFlaRec(MemListGet(FuncList, Index))^ do if IsUser
+                   with PFlaRec(FuncList.List[Index])^ do if IsUser
                      then Result:=Vrt2Val(UserFunc(FuncArg.Count-idx, @Context))
                      else Result:=Func(FuncArg.Count-idx, Context);
                    FuncArg.Count:=idx;
@@ -218,17 +218,17 @@ begin
                    fn:=p+PToken(p)^.Size;
                    inc(p, ExprTokenSize);
                    loc:=VarPool.Count;           // index of last varlist
-                   NewVarList(Context);
+                   CreateVarList(Context);
                    i:=idx;
                    while p<fn do begin
                      pv:=nil;
-                     if i<FuncArg.Count then pv:=PPValRec(MemListGet(FuncArg, i))^;
+                     if i<FuncArg.Count then pv:=PPValRec(FuncArg.List[i])^;
                      InitVar(p, pv, true);
                      inc(p, PToken(p)^.Size);
                      inc(i);
                    end;
                    if i<FuncArg.Count then raise EError.Create(ParamNumber, Pnt);
-                   for i:=FuncArg.Count-1 downto idx do FreeTerm(PPValRec(MemListGet(FuncArg, i))^);
+                   for i:=FuncArg.Count-1 downto idx do FreeTerm(PPValRec(FuncArg.List[i])^);
                    FuncArg.Count:=idx;
                    Result:=@CVNone;
                    while (p<fin) and (Flow=NML) do begin
@@ -242,10 +242,9 @@ begin
                      ValCopy(Result, pv);
                      Result:=pv;
                    end;
-                   with PMemList(MemListGet(VarPool, loc))^ do begin
-                     for i:=Count-1 downto 0 do FreeValue(@PVariable(MemListGet(PMemList(@List)^, i))^.Value);
-                     MemListClear(PMemList(@List)^);
-                   end;
+                   lst:=VarPool.List[loc];
+                   for i:=lst^.Count-1 downto 0 do FreeValue(@PVariable(lst^.List[i])^.Value);
+                   MemListClear(lst^);
                    dec(VarPool.Count);
                  end;
       TagText  : begin
@@ -328,7 +327,7 @@ begin
     p:=PByte(Fla);
     if p=nil then raise EError.Create(OK);
     Context.VarTable:=p+PToken(p)^.Size+OpTokenSize;
-    NewVarList(Context);
+    CreateVarList(Context);
     Result:=Term(p, Context);
     if Context.Flow in [BRK, CON] then raise EError.Create(IllegalBreak);
     FillError(OK);
