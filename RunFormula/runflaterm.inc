@@ -313,7 +313,7 @@ begin
   end;
 end;
 
-procedure InitVar(Pexp:PByte; PV:PValRec; ForcePV:boolean);  //DONE -oTerm -cRev.2026.04.00: Proc InitVar
+procedure InitVar(Pexp:PByte; PV:PValRec; ForcePV:boolean);  //DONE -oTerm -cRev.2026.04.17: Proc InitVar
 var p, fin : PByte;                // Pexp --> ExprToken
 begin
   fin:=Pexp+PToken(Pexp)^.Size;
