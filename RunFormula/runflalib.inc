@@ -431,17 +431,17 @@ end;
 
 function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;
 begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListGet
-  with MemList do Result:=(List+Index)^;
+  with MemList do Result:=List[Index];
 end;
 
 function MemListGetLast(var MemList:TMemList):pointer; inline;
 begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListGetLast
-  with MemList do Result:=(List+(Count-1))^;
+  with MemList do Result:=List[Count-1];
 end;
 
 function MemListIsLegs(var MemList:TMemList; Index:SizeInt):boolean; inline;
 begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListIsTaken
-  with MemList do Result:=(List+Index)^=Legs;
+  with MemList do Result:=List[Index]=Legs;
 end;
 
 function StretchList(var MemList:TMemList; Index:SizeInt):pointer;
@@ -536,7 +536,7 @@ begin                          // DiffSize = 4
   R:=MemList.Count-1;
   while L<=R do begin
     Result:=L+((R-L) shr 1);
-    with PFlaRec(MemListGet(MemList, Result))^ do begin
+    with PFlaRec(MemList.List[Result])^ do begin
       diff:=d-Lng;
       if diff=0 then begin
         py:=ID;
@@ -629,11 +629,11 @@ begin
   Result^.VAlloc:=LV;
 end;
 
-procedure NewVarList(var Context:TContext);                   //DONE -oLib -cRev.2026.04.00: Proc NewVarList
+procedure CreateVarList(var Context:TContext);                //DONE -oLib -cRev.2026.04.17: Proc CreateVarList
 begin
-  with Context, VarPool do begin
+  with Context.VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
-    if (ListLng=0) or MemListIsLegs(VarPool, Count-1)
+    if (ListLng=0) or MemListIsLegs(PMemList(@List)^, Count-1)
       then MemListInit(PMemList(MemListAdd(PMemList(@List)^))^, SizeOf(TVariable), VarGrow)
       else inc(Count);
   end;
