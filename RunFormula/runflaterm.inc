@@ -119,7 +119,7 @@ var L : PValRec = @CVNone;        // init VMode
       I:=IntR+IntL;
       if (((I xor IntL) and LI)=0) or (((IntL xor IntR) and LI)<>0) then begin
         LVal(I);
-        exit;
+        exit;                              //  ( (IntL xor I) and (IntR xor I) and LI ) <> 0
       end;
     end;
     LVal(TRFloat(IntL)+TRFloat(IntR));
@@ -198,23 +198,25 @@ begin
         TagNotLess    : LVal(Compare(L, R)<>-1);                               // >=
         TagNotGreater : LVal(Compare(L, R)<>1);                                // <=
         TagConcat     : LVal(AsStr(L)+AsStr(R));                               // &
-        TagPlus       : case CaseType(L, R) of                                 // +
+        TagPlus       : case CaseType[L^.VType, R^.VType] of                   // +
                           VInt   : OverPlus(AsInt(L), AsInt(R));
                           VFloat : LVal(AsFloat(L)+AsFloat(R));
                           VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
                           VStr   : raise EError.Create(InvalidStrVal);
-                          VGap, VIGap : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
+                          VGap   : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
+                          VArr   : raise EError.Create(InvalidArrVal);
                         end;
-        TagMinus      : case CaseType(L, R) of                                 // -
+        TagMinus      : case CaseType[L^.VType, R^.VType] of                   // -
                           VInt   : OverPlus(AsInt(L), -AsInt(R));
                           VFloat : LVal(AsFloat(L)-AsFloat(R));
                           VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
                           VStr   : raise EError.Create(InvalidStrVal);
-                          VGap, VIGap : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
+                          VGap   : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
+                          VArr   : raise EError.Create(InvalidArrVal);
                         end;
         TagOR         : LVal(AsInt(L) or AsInt(R));                            // or
         TagXOR        : LVal(AsInt(L) xor AsInt(R));                           // xor
-        TagMult       : case CaseType(L, R) of                                 // *
+        TagMult       : case CaseType[L^.VType, R^.VType] of                   // *
                           VInt   : OverMult;
                           VFloat : LVal(AsFloat(L)*AsFloat(R));
                           VCplex : begin
@@ -222,12 +224,13 @@ begin
                                      LVal(fa*fc-fb*fd, fa*fd+fb*fc);
                                    end;
                           VStr   : raise EError.Create(InvalidStrVal);
-                          VGap, VIGap : begin
-                                          fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
-                                          LGap(Min4(fa*fc, fa*fd, fb*fc, fb*fd), Max4(fa*fc, fa*fd, fb*fc, fb*fd));
-                                        end;
+                          VGap   : begin
+                                     fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
+                                     LGap(Min4(fa*fc, fa*fd, fb*fc, fb*fd), Max4(fa*fc, fa*fd, fb*fc, fb*fd));
+                                   end;
+                          VArr   : raise EError.Create(InvalidArrVal);
                         end;
-        TagSlash      : case CaseType(L, R) of                                 // /
+        TagSlash      : case CaseType[L^.VType, R^.VType] of                   // /
                           VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                           VCplex : begin
                                      fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
@@ -235,11 +238,12 @@ begin
                                      LVal((fa*fc+fb*fd)/f, (fb*fc-fa*fd)/f);
                                    end;
                           VStr   : raise EError.Create(InvalidStrVal);
-                          VGap, VIGap : begin
-                                          fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
-                                          if (fc<=0) and (fd>=0) then raise EError.Create(DivZero);
-                                          LGap(Min4(fa/fc, fa/fd, fb/fc, fb/fd), Max4(fa/fc, fa/fd, fb/fc, fb/fd));
-                                        end;
+                          VGap   : begin
+                                     fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
+                                     if (fc<=0) and (fd>=0) then raise EError.Create(DivZero);
+                                     LGap(Min4(fa/fc, fa/fd, fb/fc, fb/fd), Max4(fa/fc, fa/fd, fb/fc, fb/fd));
+                                   end;
+                          VArr   : raise EError.Create(InvalidArrVal);
                         end;
         TagAND        : LVal(AsInt(L) and AsInt(R));                           // and
         TagSHL        : LVal(AsInt(L) shl AsInt(R));                           // shl <<
@@ -257,8 +261,9 @@ begin
                                             if I<0 then raise EError.Create(DivZero);
                                             if (I and 1)=0 then LGap(0, Max4(fc, fd, 0, 0))
                                               else LGap(fc, fd);
-                                          end else LGap(Min4(fc, fc, fd, fd), Max4(fc, fc, fd, fd));                                         FC:=Scale(FA, I)
-                                        end;
+                                            end else LGap(Min4(fc, fc, fd, fd), Max4(fc, fc, fd, fd));                                         FC:=Scale(FA, I)
+                                          end;
+                          VArr : raise EError.Create(InvalidArrVal);
                         end;
         TagNOT        : LVal(not AsInt(R));                                    // not unary
         TagNegative   : with R^ do case VType of                               // - unary
@@ -268,6 +273,7 @@ begin
                           VChar  : LVal(-SizeInt(Chr));
                           VStr   : raise EError.Create(InvalidStrVal);
                           VGap, VIGap : LGap(-AsRGap(R), -AsLGap(R));
+                          VArr   : raise EError.Create(InvalidArrVal);
                         end;
       end;
     end else begin

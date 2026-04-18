@@ -8,7 +8,7 @@
 
 //  Filename: runformula.pas
 //  Source Code: Object Pascal / FreePascal
-//  Compatible: Lazarus 4.2 x64
+//  Compatible: Lazarus 4.2 x64 win10
 
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
@@ -62,7 +62,7 @@ uses SysUtils
 {$include runfladef.inc}
 {$include runflalib.inc}
 
-function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.16: Func Term
+function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.00: Func Term
 var lst : PMemList;
     pv : PValRec;
     p, fin, fn : PByte;

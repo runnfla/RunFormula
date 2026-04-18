@@ -7,7 +7,6 @@ object DemoForm: TDemoForm
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120
-  LCLVersion = '4.2.0.0'
   object Label1: TLabel
     Left = 16
     Height = 20
@@ -656,12 +655,12 @@ object DemoForm: TDemoForm
     TabOrder = 7
   end
   object ByteCodeCheckBox: TCheckBox
-    Left = 1080
+    Left = 1074
     Height = 24
     Top = 344
-    Width = 115
+    Width = 121
     Anchors = [akTop, akRight]
-    Caption = 'Bytecode only'
+    Caption = 'Bytecode Loop'
     TabOrder = 8
   end
   object LoopButton: TButton

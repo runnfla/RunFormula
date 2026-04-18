@@ -455,6 +455,8 @@ begin
               if IsKey('global') then raise EError.Create(Unsupported);
               if IsKey('array') then raise EError.Create(Unsupported);
               if IsKey('dim') then raise EError.Create(Unsupported);
+              if IsKey('include') then raise EError.Create(Unsupported);
+              if IsKey('inline') then raise EError.Create(Unsupported);
               case TextFin^ of
                 '(' : begin
                         I:=MemListFind(SubrList, P, TextFin);

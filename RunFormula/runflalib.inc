@@ -352,21 +352,12 @@ begin
   Result:=Result*Scale(10, scl-frac);
 end;
 
-function CaseType(L, R:PValRec):TVType;                   //DONE -oLib -cRev.2026.03.30: Func CaseType
-begin
-  if (L^.VType=VStr) or (R^.VType=VStr) then Exit(VStr);
-  if (L^.VType=VCplex) or (R^.VType=VCplex) then Exit(VCplex);
-  if (L^.VType in [VGap, VIGap]) or (R^.VType in [VGap, VIGap]) then Exit(VGap);
-  if (L^.VType=VFloat) or (R^.VType=VFloat) then Exit(VFloat);
-  Result:=VInt;
-end;
-
 function Compare(L, R:PValRec):integer;                   //DONE -oLib -cRev.2026.03.30: Func Compare
 var IntL, IntR, GapL, GapR : SizeInt;
     FloL, FloR, ImL, ImR : TRFloat;
 begin
   Result:=0;
-  case CaseType(L, R) of
+  case CaseType[L^.VType, R^.VType] of
     VInt   : begin
                IntL:=AsInt(L); IntR:=AsInt(R);
                if IntR=IntL then exit;
@@ -407,6 +398,7 @@ begin
                if IntL=0 then exit;
                if IntL>0 then Result:=1;
              end;
+    VArr   : raise EError.Create(InvalidArrVal);
   end;
   if Result=0 then Result:=-1;
 end;

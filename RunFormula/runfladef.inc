@@ -235,10 +235,9 @@ const
     60,     // TagMOD        mod
     70,     // TagScale      **
     80,     // TagNOT        not
-    80      // TagNegative   - unary
-    );
+    80);    // TagNegative   - unary
 
-  TCaseType : array[TVType, TVType] of TVType = (
+  CaseType : array[TVType, TVType] of TVType = (
 //            VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
 { VInt   } (  VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VGap,   VArr  ),
 { VFloat } (  VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
