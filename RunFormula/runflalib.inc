@@ -358,7 +358,6 @@ var IntL, IntR, GapL, GapR : SizeInt;
 begin
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
-    VNone  : ; //////////////////////////////////////////////////////////////
     VInt   : begin
                IntL:=AsInt(L); IntR:=AsInt(R);
                if IntR=IntL then exit;
@@ -594,20 +593,20 @@ end;
 
 // ----- Context routines -----
 
-procedure FreeValue(PV:PValRec);                              //DONE -oLib -cRev.2026.03.29: Proc FreeValue
+procedure FreeValue(PV:PValRec);                              //DONE -oLib -cRev.2026.04.18: Proc FreeValue
 var i : SizeInt;
 begin
   with PV^ do case VType of
     VStr : DecStrRef(Str);
     VArr : begin
-             for i:=Arr^.Count-1 downto 0 do FreeValue(PValRec(MemListGet(Arr^, i)));
+             for i:=Arr^.Count-1 downto 0 do FreeValue(PValRec(Arr^.List[i]));
              MemListFree(Arr^);
              FreeMem(Arr);
            end;
   end;
 end;
 
-procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.04.17: Proc PostParam
+procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.04.18: Proc PostParam
 begin
   with Context do if TermResult^.VAlloc=LV then begin
     FreeValue(TermResult);
@@ -615,13 +614,13 @@ begin
   end;
 end;
 
-function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.17: Func NewLV
+function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.18: Func NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
   Result^.VAlloc:=LV;
 end;
 
-procedure CreateVarList(var Context:TContext);                //DONE -oLib -cRev.2026.04.17: Proc CreateVarList
+procedure CreateVarList(var Context:TContext);                //DONE -oLib -cRev.2026.04.18: Proc CreateVarList
 begin
   with Context.VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
@@ -634,7 +633,7 @@ end;
 // ----- Exceptions -----
 
 constructor EError.Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
-begin                                          //DONE -oLib -cRev.2026.04.16: Cstr EError.Create
+begin                                          //DONE -oLib -cRev.2026.04.18: Cstr EError.Create
   inherited Create('');
   FCode:=Code;
   FPnt:=Pnt;

@@ -238,9 +238,9 @@ const
     80,     // TagNOT        not
     80);    // TagNegative   - unary
 
-  CaseType : array[TVType, TVType] of TVType = (
+  CaseType : array[TVType, TVType] of TVType = (     // return VInt VFloat VCplex VStr VGap VArr
 //           VNone   VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
-{ VNone  } ( VNone,  VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VNone  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
 { VInt   } ( VInt,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VGap,   VArr  ),
 { VFloat } ( VFloat, VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
 { VRsvd  } ( VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
