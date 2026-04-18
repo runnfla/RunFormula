@@ -262,7 +262,7 @@ begin
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;
-  if Result^.VAlloc<>CD then begin
+  if Result^.VAlloc<>BC then begin
     ValCopy(Result, Buf);
     Result:=Buf;
   end;

@@ -86,7 +86,7 @@ type
 
   TValRec = record
     VType : TVType;
-    VAlloc : (CD, VP, LV);
+    VAlloc : (BC, VP, LV);
     case byte of
       0 : (Int, IGap : SizeInt);
       1 : (Flo, Img : TRFloat);
@@ -188,7 +188,7 @@ type
   TCharSet = set of char;
 
 const
-  CVNone : TValRec = (VType : VNone; VAlloc : CD);
+  CVNone : TValRec = (VType : VNone; VAlloc : BC);
   TextChars = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   NameChars = ['A'..'Z', '_', 'a'..'z'];
   Cpi = 3.14159265358979323846;

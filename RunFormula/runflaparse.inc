@@ -174,7 +174,7 @@ var TextFin : PChar;
       Source:=FlaPos;
       Size:=L;
       ValRec.VType:=V.VType;
-      ValRec.VAlloc:=CD;
+      ValRec.VAlloc:=BC;
       case V.VType of
         VNone  : ;
         VInt   : ValRec.Int:=V.Int;
