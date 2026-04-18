@@ -160,6 +160,7 @@ var TextFin : PChar;
   begin
     Sequence(TagValue);
     case V.VType of
+      VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str);
       VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SizeOf(TValRec.Int);
       VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SizeOf(TValRec.Flo);
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SizeOf(TValRec.Img);
@@ -175,6 +176,7 @@ var TextFin : PChar;
       ValRec.VType:=V.VType;
       ValRec.VAlloc:=CD;
       case V.VType of
+        VNone  : ;
         VInt   : ValRec.Int:=V.Int;
         VFloat : ValRec.Flo:=V.Flo;
         VCplex, VGap : begin ValRec.Flo:=V.Flo; ValRec.Img:=V.Img; end;

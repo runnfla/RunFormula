@@ -358,6 +358,7 @@ var IntL, IntR, GapL, GapR : SizeInt;
 begin
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
+    VNone  : ; //////////////////////////////////////////////////////////////
     VInt   : begin
                IntL:=AsInt(L); IntR:=AsInt(R);
                if IntR=IntL then exit;
@@ -565,7 +566,7 @@ begin                         // add item on top of unsorted list
     cnt:=Count;
     if cnt<ListLng then begin
       p:=List+cnt;
-      if (cnt>0) and ((p-1)^=Legs) then begin
+      if (cnt>0) and (p[-1]=Legs) then begin
         inc(Legs, Size);
         p^:=Legs;
       end;

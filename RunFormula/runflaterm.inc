@@ -100,7 +100,7 @@ var L : PValRec = @CVNone;        // init VMode
   procedure LVal(constref S:string);                         //DONE -oTerm -cRev.2026.03.30: Proc LVal Str
   begin
     FreeLR;
-    L^.VType:=VStr;
+    L^.VType:=VStr;    //if nil -->VNone
     L^.Str:=Str2Ptr(S);
   end;
 
@@ -313,7 +313,7 @@ begin
   if LIdx>=0 then raise EError.Create(VarExists, P);
   with PVariable(MemListInsert(lst^, not LIdx))^ do begin
     VarID:=PToken(P)^.Index;
-    Value.VType:=VInt;
+    Value.VType:=VNone;
     Value.VAlloc:=VP;
     Result:=@Value;
   end;

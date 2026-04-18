@@ -82,7 +82,7 @@ type
 
   PMemList = ^TMemList;
 
-  TVType = (VInt = 0, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
+  TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
 
   TValRec = record
     VType : TVType;
@@ -92,7 +92,8 @@ type
       1 : (Flo, Img : TRFloat);
       2 : (Chr : byte);
       3 : (Str : PByte);
-      4 : (Arr : PMemList);
+      4 : (StrL : PSizeInt);
+      5 : (Arr : PMemList);
   end;
 
   PValRec = ^TValRec;
@@ -187,7 +188,7 @@ type
   TCharSet = set of char;
 
 const
-  CVNone : TValRec = (VType : VStr; VAlloc : CD; Str : nil);
+  CVNone : TValRec = (VType : VNone; VAlloc : CD);
   TextChars = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   NameChars = ['A'..'Z', '_', 'a'..'z'];
   Cpi = 3.14159265358979323846;
@@ -238,16 +239,17 @@ const
     80);    // TagNegative   - unary
 
   CaseType : array[TVType, TVType] of TVType = (
-//            VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
-{ VInt   } (  VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VGap,   VArr  ),
-{ VFloat } (  VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
-{ VRsvd  } (  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
-{ VCplex } (  VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
-{ VChar  } (  VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VGap,   VArr  ),
-{ VStr   } (  VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
-{ VGap   } (  VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
-{ VIGap  } (  VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
-{ VArr   } (  VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
+//           VNone   VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
+{ VNone  } ( VNone,  VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VInt   } ( VInt,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VGap,   VArr  ),
+{ VFloat } ( VFloat, VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
+{ VRsvd  } ( VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
+{ VCplex } ( VCplex, VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
+{ VChar  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VGap,   VArr  ),
+{ VStr   } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VGap   } ( VGap,   VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VIGap  } ( VGap,   VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VArr   } ( VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
 
 var
   FuncList : TMemList;      // list of TFlaRec
