@@ -423,22 +423,22 @@ end;
 // ----- MemList routines ------
 
 function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListGet
+begin                                                    //DONE -oLib -cRev.2026.04.18: Func MemListGet
   with MemList do Result:=List[Index];
 end;
 
 function MemListGetLast(var MemList:TMemList):pointer; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListGetLast
+begin                                                    //DONE -oLib -cRev.2026.04.18: Func MemListGetLast
   with MemList do Result:=List[Count-1];
 end;
 
 function MemListIsLegs(var MemList:TMemList; Index:SizeInt):boolean; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.13: Func MemListIsTaken
+begin                                                    //DONE -oLib -cRev.2026.04.18: Func MemListIsLegs
   with MemList do Result:=List[Index]=Legs;
 end;
 
 function StretchList(var MemList:TMemList; Index:SizeInt):pointer;
-var p, lst, old : PPointer;                              //DONE -oLib -cRev.2026.04.13: Func StretchList
+var p, lst, old : PPointer;                              //DONE -oLib -cRev.2026.04.18: Func StretchList
     L : SizeInt;
 begin
   with MemList do begin
@@ -465,12 +465,11 @@ begin
     p^:=Result;
     List:=lst;
     ListLng:=L;
-    inc(Count);
   end;
 end;
 
 procedure MemListInit(var MemList:TMemList; ListSize, ListGrow:SizeInt);
-begin                                               //DONE -oLib -cRev.2026.04.13: Proc MemListInit
+begin                                               //DONE -oLib -cRev.2026.04.18: Proc MemListInit
   with MemList do begin
     Tail:=@Head;
     Count:=0;
@@ -480,7 +479,7 @@ begin                                               //DONE -oLib -cRev.2026.04.1
   end;
 end;
 
-procedure MemListFree(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.13: Proc MemListFree
+procedure MemListFree(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.18: Proc MemListFree
 var p, q : PByte;
     L : SizeInt;
 begin
@@ -497,7 +496,7 @@ begin
   until p=nil;
 end;
 
-procedure MemListClear(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.14: Proc MemListClear
+procedure MemListClear(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.18: Proc MemListClear
 var p, q : PByte;                      // clear sorted list
     L : SizeInt;
 begin
@@ -507,8 +506,8 @@ begin
     L:=Size;
     q:=Head;
     Legs:=q-L;
-    L:=L*Grow;
-    ListLng:=L;
+    ListLng:=Grow;              // 1 block
+    L:=ListLng*L;               // Size*Grow = size of block in bytes
     inc(q, L);                  // q --> tail of first block
     p:=PPointer(q)^;
     PPointer(q)^:=nil;
@@ -521,7 +520,7 @@ begin
 end;
 
 function MemListFind(var MemList:TMemList; P, Fin:pointer):SizeInt;
-var L : SizeInt = 0;                                //DONE -oLib -cRev.2026.04.13: Func MemListFind
+var L : SizeInt = 0;                                //DONE -oLib -cRev.2026.04.18: Func MemListFind
     R, d, diff : SizeInt;                       // find index in sorted list
     px, py : PByte;                             // if not found, return inverted index
 begin                          // DiffSize = 4
@@ -558,7 +557,7 @@ begin                          // DiffSize = 4
   Result:=not L;
 end;
 
-function MemListAdd(var MemList:TMemList):pointer;      //DONE -oLib -cRev.2026.04.13: Func MemListAdd
+function MemListAdd(var MemList:TMemList):pointer;      //DONE -oLib -cRev.2026.04.18: Func MemListAdd
 var p : PPointer;
     cnt : SizeInt;
 begin                         // add item on top of unsorted list
@@ -568,16 +567,16 @@ begin                         // add item on top of unsorted list
       p:=List+cnt;
       if (cnt>0) and (p[-1]=Legs) then begin
         inc(Legs, Size);
-        p^:=Legs;
-      end;
-      Result:=p^;
-      Count:=cnt+1;
+        Result:=Legs;
+        p^:=Result;
+      end else Result:=p^;
     end else Result:=StretchList(MemList, cnt);
+    inc(Count);
   end;
 end;
 
 function MemListInsert(var MemList:TMemList; Index:SizeInt):pointer;
-var p : PPointer;                                       //DONE -oLib -cRev.2026.04.13: Func MemListInsert
+var p : PPointer;                                       //DONE -oLib -cRev.2026.04.18: Func MemListInsert
     cnt : SizeInt;
 begin                                       // insert item in Index position of sorted list
   with MemList do begin
@@ -588,8 +587,8 @@ begin                                       // insert item in Index position of 
       inc(Legs, Size);
       Result:=Legs;
       p^:=Result;
-      Count:=cnt+1;
     end else Result:=StretchList(MemList, Index);
+    inc(Count);
   end;
 end;
 
