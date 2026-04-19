@@ -128,6 +128,7 @@ end;
 function AsInt(PV:PValRec):SizeInt;                       //DONE -oLib -cRev.2026.03.30: Func AsInt
 begin
   with PV^ do case VType of
+    VNone  : raise EError.Create(IncompType_NI);
     VInt   : Result:=Int;
     VFloat : raise EError.Create(IncompType_FI);
     VCplex : raise EError.Create(IncompType_CI);
@@ -140,6 +141,7 @@ end;
 function AsFloat(PV:PValRec):TRFloat;                     //DONE -oLib -cRev.2026.03.30: Func AsFloat
 begin
   with PV^ do case VType of
+    VNone : raise EError.Create(IncompType_NF);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CF);
@@ -152,6 +154,7 @@ end;
 function AsRe(PV:PValRec):TRFloat;                        //DONE -oLib -cRev.2026.03.30: Func AsRe
 begin
   with PV^ do case VType of
+    VNone : raise EError.Create(IncompType_NC);
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
     VChar, VStr : raise EError.Create(IncompType_SC);
@@ -163,6 +166,7 @@ end;
 function AsIm(PV:PValRec):TRFloat;                        //DONE -oLib -cRev.2026.03.30: Func AsIm
 begin
   with PV^ do case VType of
+    VNone : raise EError.Create(IncompType_NC);
     VInt, VFloat, VGap, VIGap : Result:=0;
     VCplex : Result:=Img;
     VChar, VStr : raise EError.Create(IncompType_SC);
@@ -172,6 +176,7 @@ end;
 function AsBool(PV:PValRec):boolean;                      //DONE -oLib -cRev.2026.03.30: Func AsBool
 begin
   with PV^ do case VType of
+    VNone  : Result:=false;
     VInt   : Result:=Int<>0;
     VFloat : Result:=Flo<>0;
     VCplex, VGap : Result:=(Flo<>0) or (Img<>0);
@@ -184,6 +189,7 @@ end;
 function AsStr(PV:PValRec):string;                        //DONE -oLib -cRev.2026.03.30: Func AsStr
 begin
   with PV^ do case VType of
+    VNone  : PByte(Result):=nil;
     VInt   : Result:=IntToStr(Int);
     VFloat : Result:=FloatToStr(Flo);
     VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
@@ -197,6 +203,7 @@ end;
 function AsLGap(PV:PValRec):TRFloat;                      //DONE -oLib -cRev.2026.03.30: Func AsLGap
 begin
   with PV^ do case VType of
+    VNone : raise EError.Create(IncompType_NG);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CG);
@@ -210,6 +217,7 @@ end;
 function AsRGap(PV:PValRec):TRFloat;                      //DONE -oLib -cRev.2026.03.30: Func AsRGap
 begin
   with PV^ do case VType of
+    VNone : raise EError.Create(IncompType_NG);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CG);
@@ -223,6 +231,7 @@ end;
 function AsVrt(PV:PValRec):Variant;                       //DONE -oLib -cRev.2026.03.30: Func AsVrt
 begin
   with PV^ do case VType of
+    VNone : Result:=nil;  //////////////////////
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
     VChar : Result:=char(Chr);

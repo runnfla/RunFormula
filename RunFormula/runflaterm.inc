@@ -45,7 +45,7 @@ begin
   end;
 end;
 
-procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.17: Proc FreeTerm
+procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.18: Proc FreeTerm
 begin                              // like PostParam
   if PV^.VAlloc=LV then begin
     FreeValue(PV);
@@ -100,8 +100,10 @@ var L : PValRec = @CVNone;        // init VMode
   procedure LVal(constref S:string);                         //DONE -oTerm -cRev.2026.03.30: Proc LVal Str
   begin
     FreeLR;
-    L^.VType:=VStr;    //if nil -->VNone
-    L^.Str:=Str2Ptr(S);
+    if PByte(S)<>nil then begin
+      L^.VType:=VStr;
+      L^.Str:=Str2Ptr(S);
+    end else L^.VType:=VNone;
   end;
 
   procedure LGap(const LG, RG:TRFloat);                      //DONE -oTerm -cRev.2026.03.30: Proc LGap
@@ -284,7 +286,7 @@ begin
   Result:=L;
 end;
 
-function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.16: Func VarListFind
+function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.19: Func VarListFind
 var L : SizeInt = 0;
     R, diff : SizeInt;
     vl : PPointer;
@@ -300,8 +302,8 @@ begin
   Result:=not L;
 end;
 
-function NewVar(P:PByte; LIdx:SizeInt=0; InLocal:boolean=true):PValRec;
-var lst : PMemList;               //DONE -oTerm -cRev.2026.04.17: Func NewVar
+function NewVar(P:PByte; Vidx:SizeInt=0; InLocal:boolean=true):PValRec;
+var lst : PMemList;               //DONE -oTerm -cRev.2026.04.19: Func NewVar
     i : SizeInt = 0;      // P --> VarToken
 begin
   with Context do begin
@@ -309,9 +311,9 @@ begin
     PoolIndex:=i;
     lst:=VarPool.List[i];
   end;
-  if LIdx=0 then LIdx:=VarListFind(lst, PToken(P)^.Index);
-  if LIdx>=0 then raise EError.Create(VarExists, P);
-  with PVariable(MemListInsert(lst^, not LIdx))^ do begin
+  if Vidx=0 then Vidx:=VarListFind(lst, PToken(P)^.Index);
+  if Vidx>=0 then raise EError.Create(VarExists, P);
+  with PVariable(MemListInsert(lst^, not Vidx))^ do begin
     VarID:=PToken(P)^.Index;
     Value.VType:=VNone;
     Value.VAlloc:=VP;
