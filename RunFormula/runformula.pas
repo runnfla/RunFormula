@@ -22,9 +22,6 @@
 unit RunFormula;
 
 {$mode ObjFPC}{$H+}
-{$B-}                           // do not complete boolean evaluation
-{$POINTERMATH ON}               // allow use of pointer math
-{$inline on}
 
 interface
 
@@ -50,6 +47,11 @@ function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
 var RunFlaErrCode : TRunFlaErrCode = OK;
 
 implementation
+
+{$B-}                           // do not complete boolean evaluation
+{$POINTERMATH ON}               // allow use of pointer math
+{$T-}                           // untyped address operator
+{$inline on}
 
 {$define runfla_optuses}
 
@@ -90,7 +92,7 @@ begin
                      if PToken(Pnt+VarTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);
                        Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable+Index*SI)^), flg));
-                       if flg then ValCopy(Result, NewVar(Pnt, idx, false));
+                       if flg then ValCopy(Result, NewVar(Pnt, idx, true));
                      end else Result:=NewVar(Pnt, loc);
                    end else begin
                      Result:=@PVariable(lst^.List[idx])^.Value;
@@ -173,7 +175,7 @@ begin
                    p:=Pnt+ExprTokenSize;
                    fin:=Pnt+Size;
                    while p<fin do begin
-                     InitVar(p, @CVNone, false);
+                     InitVar(p, nil, false);
                      inc(p, PToken(p)^.Size);
                    end;
                    Result:=@CVNone;

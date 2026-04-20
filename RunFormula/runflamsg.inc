@@ -56,7 +56,7 @@ const
     'Variable already exists',
     'Operator, comma or close bracket expected',
     'Value, variable, function or open bracket expected',
-    'Assignment, comma or close bracket expected',
+    'Assignment expected',
     'Invalid operand value',
     'Incorrect borders of range',
     'Illegal Break or Continue operation'

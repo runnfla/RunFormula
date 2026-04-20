@@ -56,7 +56,7 @@ type
     VarExists,
     OpExpected,
     NotOpExpected,
-    DefaultExpected,
+    AssignExpected,
     InvalidValue,
     InvalidRange,
     IllegalBreak

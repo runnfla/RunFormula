@@ -163,15 +163,17 @@ var L : PValRec = @CVNone;        // init VMode
     end
   end;
 
-  procedure OverMult;                                        //DONE -oTerm -cRev.2026.03.30: Proc OverMult
+  procedure OverMult; //inline;                                //DONE -oTerm -cRev.2026.03.30: Proc OverMult
+  const Safe = trunc(sqrt(high(SizeInt)));
   var IntL, IntR, I : SizeInt;
   begin
     IntR:=AsInt(R);
     IntL:=AsInt(L);
     I:=IntL*IntR;
-    if (IntR<>0) and ((I div IntR)<>IntL) then begin
-      LVal(TRFloat(IntL)*TRFloat(IntR));
-      exit;
+    if ((abs(IntL)>Safe) or (abs(IntR)>Safe)) and (IntR<>0)
+      and ((I div IntR)<>IntL) then begin
+        LVal(TRFloat(IntL)*TRFloat(IntR));
+        exit;
     end;
     LVal(I);
   end;
@@ -321,25 +323,24 @@ begin
   end;
 end;
 
-procedure InitVar(Pexp:PByte; PV:PValRec; ForcePV:boolean);  //DONE -oTerm -cRev.2026.04.17: Proc InitVar
-var p, fin : PByte;                // Pexp --> ExprToken
+procedure InitVar(Exp:PByte; Pini:PValRec; Eflag:boolean);  //DONE -oTerm -cRev.2026.04.20: Proc InitVar
+var p, fin : PByte;                // Exp --> ExprToken
+    pv, t : PValRec;
 begin
-  fin:=Pexp+PToken(Pexp)^.Size;
-  inc(Pexp, ExprTokenSize);
-  with PToken(Pexp)^ do begin
-    if Tag<>TagVar then raise EError.Create(VarExpected, Pexp);
-    p:=Pexp+Size;
-    if p<fin then begin
-      if PToken(p)^.Tag<>TagAssign then raise EError.Create(DefaultExpected, p);
-      if ((PV<>nil) xor ForcePV) then begin
-        inc(p, OpTokenSize);
-        PV:=Expr(p, fin, 0);
-        ValCopy(PV, NewVar(Pexp));
-        FreeTerm(PV);
-        exit;
-      end;
-    end else if PV=nil then raise EError.Create(ParamNumber, Pnt);
-    ValCopy(PV, NewVar(Pexp));
+  fin:=Exp+PToken(Exp)^.Size;
+  with PToken(Exp+ExprTokenSize)^ do begin
+    if Tag<>TagVar then raise EError.Create(VarExpected, @Tag);
+    p:=PByte(@Tag)+Size;
+    pv:=NewVar(@Tag);
   end;
+  if Pini=nil then begin
+    if p<fin then begin
+      if PToken(p)^.Tag<>TagAssign then raise EError.Create(AssignExpected, p);
+      inc(p, OpTokenSize);
+      t:=Expr(p, fin, 0);
+      ValCopy(t, pv);
+      FreeTerm(t);
+    end else if Eflag then raise EError.Create(ParamNumber, Pnt);
+  end else ValCopy(Pini, pv);
 end;
 
