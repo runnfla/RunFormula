@@ -328,11 +328,10 @@ var p, fin : PByte;                // Exp --> ExprToken
     pv, t : PValRec;
 begin
   fin:=Exp+PToken(Exp)^.Size;
-  with PToken(Exp+ExprTokenSize)^ do begin
-    if Tag<>TagVar then raise EError.Create(VarExpected, @Tag);
-    p:=PByte(@Tag)+Size;
-    pv:=NewVar(@Tag);
-  end;
+  p:=Exp+ExprTokenSize;
+  if PToken(p)^.Tag<>TagVar then raise EError.Create(VarExpected, p);
+  pv:=NewVar(p);
+  inc(p, VarTokenSize);
   if Pini=nil then begin
     if p<fin then begin
       if PToken(p)^.Tag<>TagAssign then raise EError.Create(AssignExpected, p);

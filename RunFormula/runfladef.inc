@@ -131,7 +131,7 @@ const
 
 type
   TToken = packed record
-    Tag : TTag;                         // must be first !!!
+    Tag : TTag;
 {$if (SizeOf(TTag) and (Sint-1))>0}
     Dummy : array[0..(SizeOf(TTag) or (Sint-1))] of byte;
 {$endif}

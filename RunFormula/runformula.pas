@@ -64,7 +64,7 @@ uses SysUtils
 {$include runfladef.inc}
 {$include runflalib.inc}
 
-function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.00: Func Term
+function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.20: Func Term
 var lst : PMemList;
     pv : PValRec;
     p, fin, fn : PByte;
@@ -91,8 +91,8 @@ begin
                    if idx<0 then begin
                      if PToken(Pnt+VarTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);
-                       Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable+Index*SI)^), flg));
-                       if flg then ValCopy(Result, NewVar(Pnt, idx, true));
+                       Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[Index]), flg));
+                       if flg then ValCopy(Result, NewVar(Pnt, idx, false));
                      end else Result:=NewVar(Pnt, loc);
                    end else begin
                      Result:=@PVariable(lst^.List[idx])^.Value;
@@ -161,9 +161,10 @@ begin
                      ValCopy(Result, pv);
                      Result:=pv;
                    end;
-                   lst:=VarPool.List[loc];
-                   for i:=lst^.Count-1 downto 0 do FreeValue(@PVariable(lst^.List[i])^.Value);
-                   MemListClear(lst^);
+                   with PMemList(VarPool.List[loc])^ do begin
+                     for i:=Count-1 downto 0 do FreeValue(@PVariable(List[i])^.Value);
+                     MemListClear(PMemList(@List)^);
+                   end;
                    dec(VarPool.Count);
                  end;
       TagText  : begin
