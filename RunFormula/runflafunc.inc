@@ -18,7 +18,7 @@
 // TODO - Expand Str2Val
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
-begin                               //DONE -oFunc -cRev.2026.04.18: Func BreakParam
+begin                               //DONE -oFunc -cRev.2026.04.18: Inline BreakParam
   case ParamCount of
     0 : Result:=@CVNone;
     1 : Result:=Param(-1, Context);

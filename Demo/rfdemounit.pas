@@ -266,6 +266,8 @@ begin                                 // show all struc size
 
                       // !!! TEST Str2Ptr, DecStrRef
 
+                      // if p as PPointer or psizeint; check correct p[-1], p[-2]  and p^ == p[0]
+
   ResultMemo.Clear;
   S:='Size of Char='+IntToStr(SizeOf(char))+', Integer='+IntToStr(SizeOf(integer))
     +', SizeInt='+IntToStr(SizeOf(SizeInt));

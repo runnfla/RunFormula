@@ -64,7 +64,7 @@ uses SysUtils
 {$include runfladef.inc}
 {$include runflalib.inc}
 
-function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.20: Func Term
+function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.21: Func Term
 var lst : PMemList;
     pv : PValRec;
     p, fin, fn : PByte;
@@ -106,8 +106,9 @@ begin
                               Result:=@CVNone;
                               while (p<fin) and (Flow=NML) do begin
                                 FreeTerm(Result);
-                                Result:=Term(p, Context);
-                                inc(p, PToken(p)^.Size);
+                                fn:=p+PToken(p)^.Size;
+                                inc(p, ExprTokenSize);
+                                Result:=Expr(p, fn, 0);
                               end;
                             end;
       TagFunc  : begin
@@ -152,8 +153,9 @@ begin
                    Result:=@CVNone;
                    while (p<fin) and (Flow=NML) do begin
                      FreeTerm(Result);
-                     Result:=Term(p, Context);
-                     inc(p, PToken(p)^.Size);
+                     fn:=p+PToken(p)^.Size;
+                     inc(p, ExprTokenSize);
+                     Result:=Expr(p, fn, 0);
                    end;
                    if Flow=EXT then Flow:=NML;
                    if (Result^.VAlloc=VP) and (PoolIndex=loc) then begin
@@ -188,30 +190,23 @@ begin
                  end;
     end;
     TermResult:=Result;
+    ProcToken:=Pnt;
   end;
 end;
 
-function Param(Offset:SizeInt; var Context:TContext):PValRec;   //DONE -oMain -cRev.2026.03.28: Func Param
-var tkn : PByte;
+function Param(Offset:SizeInt; var Context:TContext):PValRec;   //DONE -oMain -cRev.2026.04.21: Func Param
 begin
-  with Context do begin
-    tkn:=ProcToken;
-    Result:=Term(PPByte(MemListGet(FuncArg, FuncArg.Count+Offset))^, Context);
-    ProcToken:=tkn;
-  end;
+  with Context.FuncArg do Result:=Term(PPByte(List[Count+Offset])^, Context);
 end;
 
-function RunFlaParam(Offset:SizeInt; Context:pointer):Variant;  //DONE -oMain -cRev.2026.03.28: Func RunFlaParam
+function RunFlaParam(Offset:SizeInt; Context:pointer):Variant;  //DONE -oMain -cRev.2026.04.21: Func RunFlaParam
 type PContext = ^TContext;
-var tkn : PByte;
 begin
-  if Offset>=0 then raise EError.Create(ParamNumber);
-  with PContext(Context)^ do begin
-    tkn:=ProcToken;
-    Result:=AsVrt(Term(PPByte(MemListGet(FuncArg, FuncArg.Count+Offset))^, PContext(Context)^));
-    PostParam(PContext(Context)^);
-    ProcToken:=tkn;
+  with PContext(Context)^.FuncArg do begin
+    if (Offset>=0) or (Offset<(-Count)) then raise EError.Create(ParamNumber);
+    Result:=AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^));
   end;
+  PostParam(PContext(Context)^);
 end;
 
 function Exec(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar; Buf:PValRec):PValRec;

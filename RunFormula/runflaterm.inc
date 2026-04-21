@@ -45,7 +45,7 @@ begin
   end;
 end;
 
-procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.18: Proc FreeTerm
+procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.18: Inline FreeTerm
 begin                              // like PostParam
   if PV^.VAlloc=LV then begin
     FreeValue(PV);

@@ -117,7 +117,7 @@ const
 
   BufSize = $8000;        // bytecode buffer increment
   DefDepth = 64;          // maximum define nesting level
-  VarDepth = 5000;        // maximum number of variable lists
+  VarDepth = 4096;        // maximum number of variable lists
 
   ClsGrow = 32;           // nesting depth step * 2
   SubrGrow = 16;          // subroutine count increment
@@ -138,9 +138,8 @@ type
     Source : integer;                   //aligning to Size of Integer
     Size : SizeInt;
     case byte of
-      0 : (ValRec : TValRec);
-      1 : (Index : SizeInt;
-           Anch : byte);
+      0 : (Index : SizeInt);
+      1 : (ValRec : TValRec);
       2 : (AnsiRec : TAnsiRec;
            Text : char);
   end;
@@ -196,7 +195,7 @@ const
 
   OpTokenSize = PtrUInt(@TToken(nil^).Size);
   ExprTokenSize = PtrUInt(@TToken(nil^).Index);
-  VarTokenSize = PtrUInt(@TToken(nil^).Anch);
+  VarTokenSize = ExprTokenSize+SI;
 
   SFlaRec = SizeOf(TFlaRec);
 

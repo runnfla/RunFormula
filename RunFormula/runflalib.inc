@@ -431,17 +431,17 @@ end;
 // ----- MemList routines ------
 
 function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.18: Func MemListGet
+begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListGet
   with MemList do Result:=List[Index];
 end;
 
 function MemListGetLast(var MemList:TMemList):pointer; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.18: Func MemListGetLast
+begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListGetLast
   with MemList do Result:=List[Count-1];
 end;
 
 function MemListIsLegs(var MemList:TMemList; Index:SizeInt):boolean; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.18: Func MemListIsLegs
+begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListIsLegs
   with MemList do Result:=List[Index]=Legs;
 end;
 
@@ -517,7 +517,7 @@ begin
     ListLng:=Grow;              // 1 block
     L:=ListLng*L;               // Size*Grow = size of block in bytes
     inc(q, L);                  // q --> tail of first block
-    p:=PPointer(q)^;
+    p:=PPointer(q)^;            // p --> head of second block
     PPointer(q)^:=nil;
   end;
   while p<>nil do begin
@@ -608,7 +608,7 @@ begin
   with PV^ do case VType of
     VStr : DecStrRef(Str);
     VArr : begin
-             for i:=Arr^.Count-1 downto 0 do FreeValue(PValRec(Arr^.List[i]));
+             for i:=Arr^.Count-1 downto 0 do FreeValue(Arr^.List[i]);
              MemListFree(Arr^);
              FreeMem(Arr);
            end;
@@ -623,7 +623,7 @@ begin
   end;
 end;
 
-function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.18: Func NewLV
+function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.18: Inline NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
   Result^.VAlloc:=LV;
