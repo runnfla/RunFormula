@@ -98,4 +98,65 @@ endfunc;
 DoRecursive(1, False);
 appendresult("FINAL globalSum: " & globalSum);
 
+6. Testing EXIT
+
+func TestExit(level);
+  local(localVar, received);
+  localVar = level * 10;
+
+  appendresult("ENTER [" & level & "] L=" & localVar);
+
+  if(level == 3,
+    (
+      appendresult("--- Вызываем exit(777) на уровне 3 ---");
+      exit(777)
+    ),
+    0 // Пустой else
+  );
+
+  received = TestExit(level + 1);
+
+  appendresult("BACK  [" & level & "] получил: " & received & " | Моя локальная L=" & localVar);
+
+  exit(received + 1);
+endfunc;
+
+finalRes = TestExit(1);
+appendresult("ИТОГ: " & finalRes);
+
+7. Test REPEAT CONTINUE
+
+func TestLoop(level);
+  local(i, log);
+  i = 0;
+  log = "";
+
+  appendresult("ENTER [" & level & "]");
+
+  repeat(i < 5, (
+    i = i + 1;
+
+    // 1. Тест continue: пропускаем цифру 2
+    if(i == 2, continue(), 0);
+
+    // 2. Тест рекурсии: на i=3 заходим глубже
+    if(level < 2,
+      if(i == 3, TestLoop(level + 1), 0),
+      0
+    );
+
+    // 3. Тест break: на i=4 выходим из цикла
+    if(i == 4, break(), 0);
+
+    // Накапливаем лог, если не сработал continue или break
+    log = log & i & " ";
+  ));
+
+  appendresult("EXIT [" & level & "] i=" & i & " Log=[" & log & "]");
+  log
+endfunc;
+
+appendresult("FINAL: " & TestLoop(1));
+
+
 

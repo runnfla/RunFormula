@@ -500,7 +500,6 @@ object DemoForm: TDemoForm
       'define end ")"'
       'define endrepeat ")"'
       ''
-      'begin'
       '  func SPCCount(Spc);'
       '    Cnt = "";'
       '    repeat( Spc>0;'
@@ -547,7 +546,6 @@ object DemoForm: TDemoForm
       ''
       '  None'
       ''
-      'end'
       ''
     )
     VisibleSpecialChars = [vscSpace, vscTabAtLast]
