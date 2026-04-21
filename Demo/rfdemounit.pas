@@ -268,6 +268,13 @@ begin                                 // show all struc size
 
                       // if p as PPointer or psizeint; check correct p[-1], p[-2]  and p^ == p[0]
 
+
+                      {
+                      with PVarData(@Result)^ do begin
+              vtype:=varString;
+              vstring:=nil;
+            end;  }
+
   ResultMemo.Clear;
   S:='Size of Char='+IntToStr(SizeOf(char))+', Integer='+IntToStr(SizeOf(integer))
     +', SizeInt='+IntToStr(SizeOf(SizeInt));

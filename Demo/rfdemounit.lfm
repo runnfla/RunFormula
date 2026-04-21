@@ -7,7 +7,6 @@ object DemoForm: TDemoForm
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120
-  LCLVersion = '4.2.0.0'
   object Label1: TLabel
     Left = 16
     Height = 20
@@ -656,7 +655,7 @@ object DemoForm: TDemoForm
     TabOrder = 7
   end
   object ByteCodeCheckBox: TCheckBox
-    Left = 1074
+    Left = 1080
     Height = 24
     Top = 344
     Width = 121
