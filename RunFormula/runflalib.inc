@@ -63,7 +63,7 @@ end;
 
 // ----- Strings -----
 
-function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.03.29: Func Str2Ptr
+function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.03.29: Inline Str2Ptr
 begin
   Result:=PByte(S);
   if Result=nil then exit;
@@ -77,7 +77,7 @@ begin
   end;
 end;
 
-procedure DecStrRef(PS:PByte); inline;                    //DONE -oLib -cRev.2026.03.29: Proc DecStrRef
+procedure DecStrRef(PS:PByte); inline;                    //DONE -oLib -cRev.2026.03.29: Inline DecStrRef
 begin
   if PS=nil then exit;
   with PAnsiRec(PS-SAnsiRec)^ do begin

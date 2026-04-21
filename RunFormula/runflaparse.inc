@@ -69,7 +69,7 @@ begin
   inc(BufP, ExprTokenSize);
 end;
 
-function AlignStringLng(Lng:SizeInt):SizeInt; inline;     //DONE -oParse -cRev.2026.04.06: Func AlignStringLng
+function AlignStringLng(Lng:SizeInt):SizeInt; inline;     //DONE -oParse -cRev.2026.04.06: Inline AlignStringLng
 begin
   Result:=Lng+(SAnsiRec+1);                                      // with trailing null
   if (Result and (SI-1))>0 then Result:=(Result or (SI-1))+1;    // aligning to SizeInt
