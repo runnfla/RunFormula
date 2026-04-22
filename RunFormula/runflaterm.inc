@@ -161,21 +161,16 @@ var L : PValRec = @CVNone;        // init VMode
     end
   end;
 
-  function OverMult:boolean;                                 //DONE -oTerm -cRev.2026.04.00: Func OverMult
+  function OverMult:boolean;                                 //DONE -oTerm -cRev.2026.04.22: Func OverMult
   const safe = trunc(sqrt(high(SizeInt)));
   var IntL, IntR, al, ar : SizeInt;
   begin
     Result:=true;
-    IntL:=AsInt(L);
-    if IntL<>0 then begin
-      if IntL=LI then exit;
-      al:=abs(IntL);
-      IntR:=AsInt(R);
-      if IntR=LI then exit;
-      ar:=abs(IntR);
-      if (al>safe) or (ar>safe) then begin
-        if ar>(high(SizeInt) div al) then exit;
-      end;
+    IntL:=AsInt(L); IntR:=AsInt(R);
+    if (IntL<>0) and (IntR<>0) then begin
+      if (IntL=LI) or (IntR=LI) then exit;
+      al:=abs(IntL); ar:=abs(IntR);
+      if ((al>safe) or (ar>safe)) and ((high(SizeInt) div al)<ar) then exit;
     end;
     LVal(IntL*IntR);
     Result:=false;
