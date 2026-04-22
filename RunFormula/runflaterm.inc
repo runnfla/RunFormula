@@ -62,56 +62,66 @@ var L : PValRec = @CVNone;        // init VMode
     f, fa, fb, fc, fd : TRFloat;
     I : SizeInt;
 
-  procedure FreeLR;                                          //DONE -oTerm -cRev.2026.03.30: Proc FreeLR
+  procedure FreeLR;                                          //DONE -oTerm -cRev.2026.04.22: Proc FreeLR
   begin                                            // LVal should be called singly
     FreeTerm(R);
     if L^.VAlloc=LV then FreeValue(L) else L:=NewLV(Context);
   end;
 
-  procedure LVal(I:SizeInt);                                 //DONE -oTerm -cRev.2026.03.30: Proc LVal Int
+  procedure LVal(I:SizeInt);                                 //DONE -oTerm -cRev.2026.04.22: Proc LVal Int
   begin
     FreeLR;
-    L^.VType:=VInt;
-    L^.Int:=I;
+    with L^ do begin
+      VType:=VInt;
+      Int:=I;
+    end;
   end;
 
-  procedure LVal(const F:TRFloat);                           //DONE -oTerm -cRev.2026.03.30: Proc LVal Float
+  procedure LVal(const F:TRFloat);                           //DONE -oTerm -cRev.2026.04.22: Proc LVal Float
   begin
     FreeLR;
-    L^.VType:=VFloat;
-    L^.Flo:=F;
+    with L^ do begin
+      VType:=VFloat;
+      Flo:=F;
+    end;
   end;
 
-  procedure LVal(const Re, Im:TRFloat);                      //DONE -oTerm -cRev.2026.03.30: Proc LVal Cplex
+  procedure LVal(const Re, Im:TRFloat);                      //DONE -oTerm -cRev.2026.04.22: Proc LVal Cplex
   begin
     FreeLR;
-    L^.VType:=VCplex;
-    L^.Flo:=Re;
-    L^.Img:=Im;
+    with L^ do begin
+      VType:=VCplex;
+      Flo:=Re;
+      Img:=Im;
+    end;
   end;
 
-  procedure LVal(B:boolean);                                 //DONE -oTerm -cRev.2026.03.30: Proc LVal Bool
+  procedure LVal(B:boolean);                                 //DONE -oTerm -cRev.2026.04.22: Proc LVal Bool
   begin
     FreeLR;
-    L^.VType:=VInt;
-    if B then L^.Int:=1 else L^.Int:=0;
+    with L^ do begin
+      VType:=VInt;
+      if B then Int:=1 else Int:=0;
+    end;
   end;
 
-  procedure LVal(constref S:string);                         //DONE -oTerm -cRev.2026.03.30: Proc LVal Str
+  procedure LVal(constref S:string);                         //DONE -oTerm -cRev.2026.04.22: Proc LVal Str
   begin
     FreeLR;
-    if PByte(S)<>nil then begin
-      L^.VType:=VStr;
-      L^.Str:=Str2Ptr(S);
-    end else L^.VType:=VNone;
+    with L^ do if PByte(S)<>nil then begin
+      VType:=VStr;
+      Str:=Str2Ptr(S);
+    end else VType:=VNone;
   end;
 
-  procedure LGap(const LG, RG:TRFloat);                      //DONE -oTerm -cRev.2026.03.30: Proc LGap
+  procedure LGap(const GL, GR:TRFloat);                      //DONE -oTerm -cRev.2026.04.22: Proc LGap
   begin
     FreeLR;
-    L^.VType:=VGap;
-    L^.Flo:=LG;
-    L^.Img:=RG;
+    with L^ do begin
+      VType:=VGap;
+      Flo:=GL;
+      Img:=GR;
+    end;
   end;
 
   function OverPlus(IntL, IntR:SizeInt):boolean;             //DONE -oTerm -cRev.2026.04.22: Func OverPlus

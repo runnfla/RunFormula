@@ -133,7 +133,7 @@ begin
     VFloat : raise EError.Create(IncompType_FI);
     VCplex : raise EError.Create(IncompType_CI);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(IncompType_SI);
+    VStr   : raise EError.Create(InvalidStrVal);
     VGap, VIGap : raise EError.Create(IncompType_GI);
     VArr   : raise EError.Create(InvalidArrVal);
   end;
@@ -147,7 +147,7 @@ begin
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CF);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(IncompType_SF);
+    VStr   : raise EError.Create(InvalidStrVal);
     VGap   : Result:=(Flo+Img)/2;
     VIGap  : Result:=(Int+IGap)/2;
     VArr   : raise EError.Create(InvalidArrVal);
@@ -160,7 +160,7 @@ begin
     VNone : raise EError.Create(IncompType_NC);
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
-    VChar, VStr : raise EError.Create(IncompType_SC);
+    VChar, VStr : raise EError.Create(InvalidStrVal);
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;
     VArr  : raise EError.Create(InvalidArrVal);
@@ -173,7 +173,7 @@ begin
     VNone : raise EError.Create(IncompType_NC);
     VInt, VFloat, VGap, VIGap : Result:=0;
     VCplex : Result:=Img;
-    VChar, VStr : raise EError.Create(IncompType_SC);
+    VChar, VStr : raise EError.Create(InvalidStrVal);
     VArr : raise EError.Create(InvalidArrVal);
   end;
 end;
@@ -215,7 +215,7 @@ begin
     VFloat, VGap : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CG);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(IncompType_SG);
+    VStr   : raise EError.Create(InvalidStrVal);
     VArr   : raise EError.Create(InvalidArrVal);
   end;
 end;
@@ -228,7 +228,7 @@ begin
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CG);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(IncompType_SG);
+    VStr   : raise EError.Create(InvalidStrVal);
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
     VArr   : raise EError.Create(InvalidArrVal);
