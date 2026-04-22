@@ -50,6 +50,8 @@ implementation
 
 {$B-}                           // do not complete boolean evaluation
 {$POINTERMATH ON}               // allow use of pointer math
+{$R-}                           // switch off range checking
+{$Q-}                           // switch off overflow checking
 {$T-}                           // untyped address operator
 {$inline on}
 

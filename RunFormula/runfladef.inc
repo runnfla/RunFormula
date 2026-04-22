@@ -146,7 +146,7 @@ type
 
   PToken = ^TToken;
 
-  TFlow = (NML, RSL, EXT, BRK, CON);
+  TFlow = (NML = 0, RSL, EXT, BRK, CON);
 
   TContext = record
     LVStack    : TMemList;           // list of TValRec

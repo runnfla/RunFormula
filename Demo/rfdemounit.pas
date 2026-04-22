@@ -244,14 +244,47 @@ type
 
 var T : TTag;
     Token : TToken;
-    Info, S : string;
+    Info, s : string;
     flg : boolean;
-    I : SizeInt;                P : pointer; C : char;
+    i : SizeInt;                p : pointer; C : char;
     VT : TVType;                VVV : Variant;
+    MemList : TMemList;
 
+
+    function YN(b:boolean):string;
+    begin
+      if b then Result:=': yes' else Result:=': NO';
+    end;
 
 begin                                 // show all struc size
   ResultMemo.Clear;
+  s:='0123456789';
+  p:=@s[10];
+  ResultMemo.Append('Is PSizeInt[-1] = (PSizeInt-1)^'+YN(PSizeInt(p)[-1]=(PSizeInt(p)-1)^));
+  ResultMemo.Append('Is PSizeInt[-1] = (pointer-SI)^'+YN(PSizeInt(p)[-1]=PSizeInt(PByte(p)-SI)^));
+  ResultMemo.Append('Is PByte(string) = @string[1]'+YN(PByte(s)=@s[1]));
+  with MemList do p:=@List;
+  ResultMemo.Append('Is PMemList = @TMemList.List'+YN(p=@MemList));
+  flg:=true;
+  SetLength(s, 12);
+  with PAnsiRec(PByte(s)-SAnsiRec)^ do begin
+    flg:=flg and (Len=12);
+    flg:=flg and (Ref=1);
+    flg:=flg and (ElementSize=1);
+  end;
+  ResultMemo.Append('Is TAnsiRec valid'+YN(flg));
+  s:='0123456789';
+  ResultMemo.Append('Is PSizeInt(string)[-1] = length(stirng)'+YN(PSizeInt(s)[-1]=10));
+  ResultMemo.Append('Is PSizeInt(string)[-2] = stirng ref'+YN(PSizeInt(s)[-2]=-1));
+  ResultMemo.Append('Size of TAnsiRec: '+IntToStr(SAnsiRec));
+  ResultMemo.Append('Is SAnsiRec aligned'+YN((SAnsiRec and (SI-1))=0));
+
+  exit;
+
+
+
+
+
   Info:='Tag Name Check: ';
   flg:=true;
   for T in TTag do begin

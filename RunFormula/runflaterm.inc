@@ -114,13 +114,13 @@ var L : PValRec = @CVNone;        // init VMode
     L^.Img:=RG;
   end;
 
-  function OverPlus(IntL, IntR:SizeInt):boolean;             //DONE -oTerm -cRev.2026.03.30: Func OverPlus
+  function OverPlus(IntL, IntR:SizeInt):boolean;             //DONE -oTerm -cRev.2026.04.22: Func OverPlus
   var I : SizeInt;
   begin
     Result:=true;
-    if IntR=LI then exit;
-    I:=IntR+IntL;
-    if ((I xor IntL) and (not (IntL xor IntR)))<0 then exit;
+    if (IntL=LI) or (IntR=LI) then exit;
+    I:=IntL+IntR;
+    if ((I xor IntL) and (I xor IntR))<0 then exit;
     LVal(I);
     Result:=false;
   end;
@@ -161,18 +161,23 @@ var L : PValRec = @CVNone;        // init VMode
     end
   end;
 
-  function OverMult:boolean;                                 //DONE -oTerm -cRev.2026.03.30: Func OverMult
-  const Safe = trunc(sqrt(high(SizeInt)));
-  var IntL, IntR, I : SizeInt;
+  function OverMult:boolean;                                 //DONE -oTerm -cRev.2026.04.00: Func OverMult
+  const safe = trunc(sqrt(high(SizeInt)));
+  var IntL, IntR, al, ar : SizeInt;
   begin
     Result:=true;
     IntL:=AsInt(L);
-    if IntL>Safe then exit;
-    IntR:=AsInt(R);
-    if IntR>Safe then exit;
-    I:=IntL*IntR;
-    if (IntR<>0) and ((I div IntR)<>IntL) then exit;
-    LVal(I);
+    if IntL<>0 then begin
+      if IntL=LI then exit;
+      al:=abs(IntL);
+      IntR:=AsInt(R);
+      if IntR=LI then exit;
+      ar:=abs(IntR);
+      if (al>safe) or (ar>safe) then begin
+        if ar>(high(SizeInt) div al) then exit;
+      end;
+    end;
+    LVal(IntL*IntR);
     Result:=false;
   end;
 
@@ -198,7 +203,7 @@ begin
         TagGreater  : LVal(Compare(L, R)=1);                                 // >
         TagLess     : LVal(Compare(L, R)=-1);                                // <
         TagNotLess  : LVal(Compare(L, R)<>-1);                               // >=
-        TagNotGreater : LVal(Compare(L, R)<>1);                                // <=
+        TagNotGreater : LVal(Compare(L, R)<>1);                              // <=
         TagConcat   : LVal(AsStr(L)+AsStr(R));                               // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
                         VInt   : if OverPlus(AsInt(L), AsInt(R)) then LVal(AsFloat(L)+AsFloat(R));

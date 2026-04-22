@@ -82,6 +82,7 @@
     </Parsing>
     <Linking>
       <Debugging>
+        <RunWithoutDebug Value="True"/>
         <DebugInfoType Value="dsDwarf3"/>
       </Debugging>
       <Options>
