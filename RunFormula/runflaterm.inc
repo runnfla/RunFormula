@@ -68,12 +68,12 @@ var L : PValRec = @CVNone;        // init VMode
     if L^.VAlloc=LV then FreeValue(L) else L:=NewLV(Context);
   end;
 
-  procedure LVal(I:SizeInt);                                 //DONE -oTerm -cRev.2026.04.22: Proc LVal Int
+  procedure LVal(N:SizeInt);                                 //DONE -oTerm -cRev.2026.04.22: Proc LVal Int
   begin
     FreeLR;
     with L^ do begin
       VType:=VInt;
-      Int:=I;
+      Int:=N;
     end;
   end;
 
@@ -125,14 +125,33 @@ var L : PValRec = @CVNone;        // init VMode
   end;
 
   function OverPlus(IntL, IntR:SizeInt):boolean;             //DONE -oTerm -cRev.2026.04.22: Func OverPlus
-  var I : SizeInt;
+  var n : SizeInt;
   begin
     Result:=true;
     if (IntL=LI) or (IntR=LI) then exit;
-    I:=IntL+IntR;
-    if ((I xor IntL) and (I xor IntR))<0 then exit;
-    LVal(I);
+    n:=IntL+IntR;
+    if ((n xor IntL) and (n xor IntR))<0 then exit;
+    LVal(n);
     Result:=false;
+  end;
+
+  function OverMult(IntL, IntR:SizeInt):boolean;             //DONE -oTerm -cRev.2026.04.22: Func OverMult
+  const safe = trunc(sqrt(high(SizeInt)));
+  var al, ar : SizeInt;
+  begin
+    Result:=true;
+    if (IntL<>0) and (IntR<>0) then begin
+      if (IntL=LI) or (IntR=LI) then exit;
+      al:=abs(IntL); ar:=abs(IntR);
+      if ((al>safe) or (ar>safe)) and ((high(SizeInt) div al)<ar) then exit;
+    end;
+    I:=IntL*IntR;
+    Result:=false;
+  end;
+
+  function OverScale:boolean;                                //DONE -oTerm -cRev.2026.00.00: Proto OverScale
+  begin
+    ////
   end;
 
   procedure ScaleComplex;                                    //DONE -oTerm -cRev.2026.03.30: Proc ScaleComplex
@@ -169,21 +188,6 @@ var L : PValRec = @CVNone;        // init VMode
       Flo:=Re;
       Img:=Im;
     end
-  end;
-
-  function OverMult:boolean;                                 //DONE -oTerm -cRev.2026.04.22: Func OverMult
-  const safe = trunc(sqrt(high(SizeInt)));
-  var IntL, IntR, al, ar : SizeInt;
-  begin
-    Result:=true;
-    IntL:=AsInt(L); IntR:=AsInt(R);
-    if (IntL<>0) and (IntR<>0) then begin
-      if (IntL=LI) or (IntR=LI) then exit;
-      al:=abs(IntL); ar:=abs(IntR);
-      if ((al>safe) or (ar>safe)) and ((high(SizeInt) div al)<ar) then exit;
-    end;
-    LVal(IntL*IntR);
-    Result:=false;
   end;
 
 begin
@@ -229,7 +233,8 @@ begin
         TagOR       : LVal(AsInt(L) or AsInt(R));                            // or
         TagXOR      : LVal(AsInt(L) xor AsInt(R));                           // xor
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
-                        VInt   : if OverMult then LVal(AsFloat(L)*AsFloat(R));
+                        VInt   : if OverMult(AsInt(L), AsInt(R))
+                                   then LVal(AsFloat(L)*AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
                         VCplex : begin
                                    fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);

@@ -459,6 +459,7 @@ begin
               if IsKey('dim') then raise EError.Create(Unsupported);
               if IsKey('include') then raise EError.Create(Unsupported);
               if IsKey('inline') then raise EError.Create(Unsupported);
+              if IsKey('branch') then raise EError.Create(Unsupported);
               case TextFin^ of
                 '(' : begin
                         I:=MemListFind(SubrList, P, TextFin);
