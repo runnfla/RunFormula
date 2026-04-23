@@ -267,12 +267,11 @@ begin
   end;
 end;
 
-function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oLib -cRev.2026.03.30: Func Scale
+function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oLib -cRev.2026.04.23: Func Scale
 var i : SizeInt;            // Base^Scl
 begin
   Result:=1;
-  i:=Scl;
-  if i<0 then i:=-i;
+  i:=abs(Scl);
   repeat
     if (i and 1)<>0 then Result:=Result*Base;
     i:=i shr 1;

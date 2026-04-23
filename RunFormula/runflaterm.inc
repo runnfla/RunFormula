@@ -154,39 +154,38 @@ var L : PValRec = @CVNone;        // init VMode
     ////
   end;
 
-  procedure ScaleComplex;                                    //DONE -oTerm -cRev.2026.03.30: Proc ScaleComplex
-  var Re : TRFloat = 1;
-      Im : TRFloat = 0;
-      BaseRe, BaseIm, f : TRFloat;
+  procedure ScaleComplex;                                    //DONE -oTerm -cRev.2026.04.23: Proc ScaleComplex
+  var re : TRFloat = 1;
+      im : TRFloat = 0;
+      bre, bim, t : TRFloat;
       scl, i : SizeInt;
   begin
-    BaseRe:=AsRe(L);
-    BaseIm:=AsIm(L);
+    bre:=AsRe(L);
+    bim:=AsIm(L);
     scl:=AsInt(R);
-    i:=scl;
-    if i<0 then i:=-i;
+    i:=abs(scl);
     repeat
       if (i and 1)<>0 then begin
-        f:=Re*BaseRe-Im*BaseIm;
-        Im:=Re*BaseIm+Im*BaseRe;
-        Re:=f;
+        t:=re*bre-im*bim;
+        im:=re*bim+im*bre;
+        re:=t;
       end;
       i:=i shr 1;
       if i=0 then break;
-      f:=BaseRe*BaseRe-BaseIm*BaseIm;
-      BaseIm:=BaseRe*BaseIm*2;
-      BaseRe:=f;
+      t:=bre*bre-bim*bim;
+      bim:=bre*bim*2;
+      bre:=t;
     until false;
     if scl<0 then begin
-      f:=Re*Re+Im*Im;
-      Re:=Re/f;
-      Im:=-Im/f;
+      t:=re*re+im*im;
+      re:=re/t;
+      im:=-im/t;
     end;
     FreeLR;
     with L^ do begin
       VType:=VCplex;
-      Flo:=Re;
-      Img:=Im;
+      Flo:=re;
+      Img:=im;
     end
   end;
 
