@@ -162,14 +162,17 @@ begin
     if Tag<TagAssign then info:=info+', Next '+IntToStr(p-PByte(cod)+Size);
     case Tag of
       TagValue : with ValRec do case VType of
-                   VInt   : S:=': Int = '+IntToStr(Int);
+                   VNone  : S:=': None';
+                   VInt   : S:=': Int = '+IntToStr(Int)+' [0x'+IntToHex(Int)+']';
                    VFloat : S:=': Float = '+FloatToStr(Flo);
                    VCplex : S:=': Complex = ('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
                    VChar  : begin
                               S:=': Char = ';
                               if (Chr>$20) and (Chr<$7F) then S:=S+'"'+char(Chr)+'" ';
-                              S:=S+'['+IntToStr(Chr)+']';
+                              S:=S+'[0x'+IntToHex(Chr)+']';
                             end;
+                   VGap   : S:=': Range = ['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
+                   VIGap  : S:=': Integer Range = ['+IntToStr(Int)+':'+IntToStr(IGap)+']';
                  end;
       TagVar : S:=': ID '+IntToStr(Index)+' <'+
                  string(fin+PSizeInt(fin+Index*SI+OpTokenSize)^+OpTokenSize)+'>';
@@ -231,17 +234,6 @@ begin
 end;
 
 procedure TDemoForm.TestsButtonClick(Sender: TObject);
-type
-    TFuncRec = record
-    ID : PByte;
-    IsUser : boolean;
-    case byte of
-      0 : (Func : TFlaFunc);
-      1 : (UserFunc : TRunFlaFunc);
-  end;
-  PFuncRec = ^TFuncRec;       bbb = type string;
-
-
 var T : TTag;
     Token : TToken;
     Info, s : string;
@@ -251,12 +243,12 @@ var T : TTag;
     MemList : TMemList;
 
 
-    function YN(b:boolean):string;
-    begin
-      if b then Result:=': yes' else Result:=': NO';
-    end;
+  function YN(b:boolean):string;
+  begin
+    if b then Result:=': yes' else Result:=': NO';
+  end;
 
-begin                                 // show all struc size
+begin
   ResultMemo.Clear;
   s:='0123456789';
   p:=@s[10];
@@ -276,9 +268,25 @@ begin                                 // show all struc size
   s:='0123456789';
   ResultMemo.Append('Is PSizeInt(string)[-1] = length(stirng)'+YN(PSizeInt(s)[-1]=10));
   ResultMemo.Append('Is PSizeInt(string)[-2] = stirng ref'+YN(PSizeInt(s)[-2]=-1));
-  ResultMemo.Append('Size of TAnsiRec: '+IntToStr(SAnsiRec));
-  ResultMemo.Append('Is SAnsiRec aligned'+YN((SAnsiRec and (SI-1))=0));
+  ResultMemo.Append('Is SAnsiRec = SizeInt * 3'+YN(SAnsiRec=SI*3));
+  SetLength(s, 0);
+  ResultMemo.Append('Is SetLength(S, 0) = nil'+YN(PByte(s)=nil));
+  SetLength(info, 0);
+  s:=s+info;
+  ResultMemo.Append('Is "" + "" = nil'+YN(PByte(s)=nil));
 
+  ResultMemo.Append('Size of SizeInt = '+IntToStr(SI));
+  ResultMemo.Append('Size of integer = '+IntToStr(Sint));
+  ResultMemo.Append('Size of pointer = '+IntToStr(SPtr));
+  ResultMemo.Append('Size of TRFloat = '+IntToStr(SizeOf(TRFloat)));
+  ResultMemo.Append('Size of TTag = '+IntToStr(SizeOf(TTag)));
+  ResultMemo.Append('Size of TAnsiRec = '+IntToStr(SAnsiRec));
+  ResultMemo.Append('Size of TValRec = '+IntToStr(SValRec));
+  ResultMemo.Append('Size of OpToken = '+IntToStr(OpTokenSize));
+  ResultMemo.Append('Size of ExprToken = '+IntToStr(ExprTokenSize));
+  ResultMemo.Append('Size of VarToken = '+IntToStr(VarTokenSize));
+
+  ResultMemo.Append('Done.');
   exit;
 
 
@@ -299,7 +307,6 @@ begin                                 // show all struc size
 
                       // !!! TEST Str2Ptr, DecStrRef
 
-                      // if p as PPointer or psizeint; check correct p[-1], p[-2]  and p^ == p[0]
 
 
                       {
@@ -308,32 +315,7 @@ begin                                 // show all struc size
               vstring:=nil;
             end;  }
 
-  ResultMemo.Clear;
-  S:='Size of Char='+IntToStr(SizeOf(char))+', Integer='+IntToStr(SizeOf(integer))
-    +', SizeInt='+IntToStr(SizeOf(SizeInt));
-  ResultMemo.Append(S);
-  ResultMemo.Append('Size of TFloat: '+IntToStr(SizeOf(TRFloat)));
-  ResultMemo.Append('Size of AnsiRec (should be SizeInt*3): '+IntToStr(SizeOf(TAnsiRec)));
-  ResultMemo.Append('Size of TTag: '+IntToStr(SizeOf(TTag)));
 
-  SetLength(S, 1);                                       // test SetLength(S, 0)=nil
-  if Pointer(S)<>nil then begin
-    SetLength(S, 0);
-    flg:=Pointer(S)=nil;
-  end;
-  if flg then S:='OK' else S:='ERROR';
-  ResultMemo.Append('Test SetLength(S, 0) = nil: '+S);
-
-  SetLength(S, 2);                                       // test Pointer(S)=@S[1]
-  if @S[2]=(Pointer(S)+1) then S:='OK' else S:='ERROR';
-  ResultMemo.Append('Test Pointer(S) = @S[1]: '+S);
-
-  I:=PByte(@Token.Size)-PByte(@Token);                     // test OpToken Size
-  if I=OpTokenSize then S:='OK' else S:='ERROR';
-  ResultMemo.Append('Size of OpToken: '+IntToStr(I)+'; OpTokenSize: '+IntToStr(OpTokenSize));
-  ResultMemo.Append('Real OpToken size = OpTokenSize: '+S);
-
-  ResultMemo.Append('Done.');
 end;
 
 procedure TDemoForm.CloseButtonClick(Sender: TObject);

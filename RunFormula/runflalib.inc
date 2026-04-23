@@ -257,6 +257,7 @@ begin
   with Dst^ do begin
     VType:=Src^.VType;
     case VType of
+      VNone  : Str:=nil;
       VInt   : Int:=Src^.Int;
       VFloat : Flo:=Src^.Flo;
       VCplex, VGap : begin Flo:=Src^.Flo; Img:=Src^.Img; end;

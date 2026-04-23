@@ -165,7 +165,7 @@ type
   TFlaRec = record
   ID : PByte;
   Lng : SizeInt;
-  IsUser : boolean;               // anchor
+  IsUser : boolean;
   case byte of
     0 : (Func : TFlaFunc);
     1 : (UserFunc : TRunFlaFunc);
