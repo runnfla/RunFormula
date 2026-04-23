@@ -149,9 +149,30 @@ var L : PValRec = @CVNone;        // init VMode
     Result:=false;
   end;
 
-  function OverScale:boolean;                                //DONE -oTerm -cRev.2026.00.00: Proto OverScale
+  function OverScale:boolean;                                //DONE -oTerm -cRev.2026.04.23: Func OverScale
+  var res : SizeInt = 1;
+      bs, scl : SizeInt;
   begin
-    ////
+    Result:=true;
+    scl:=AsInt(R);
+    if scl<0 then exit;
+    bs:=AsInt(L);
+    repeat
+      if (scl and 1)<>0 then begin
+        if OverMult(res, bs) then exit;
+        res:=I;
+      end;
+      scl:=scl shr 1;
+      if scl=0 then break;
+      if OverMult(bs, bs) then exit;
+      bs:=I;
+    until false;
+    FreeLR;
+    with L^ do begin
+      VType:=VInt;
+      Int:=res;
+    end;
+    Result:=false;
   end;
 
   procedure ScaleComplex;                                    //DONE -oTerm -cRev.2026.04.23: Proc ScaleComplex
@@ -245,7 +266,7 @@ begin
                                    LGap(Min4(fa*fc, fa*fd, fb*fc, fb*fd), Max4(fa*fc, fa*fd, fb*fc, fb*fd));
                                  end;
                         VArr   : raise EError.Create(InvalidArrVal);
-                        end;
+                      end;
         TagSlash    : case CaseType[L^.VType, R^.VType] of                   // /
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                         VCplex : begin
@@ -267,9 +288,10 @@ begin
         TagDIV      : LVal(AsInt(L) div AsInt(R));                           // div
         TagMOD      : LVal(AsInt(L) mod AsInt(R));                           // mod
         TagScale    : with L^ do case VType of                               // **
-                        VInt, VFloat : LVal(Scale(AsFloat(L), AsInt(R)));
+                        VInt, VChar : if OverScale then LVal(Scale(AsFloat(L), AsInt(R)));
+                        VFloat : LVal(Scale(AsFloat(L), AsInt(R)));
                         VCplex : ScaleComplex;
-                        VChar, VStr : raise EError.Create(InvalidStrVal);
+                        VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); I:=AsInt(R);
                                         fc:=Scale(fa, I); fd:=Scale(fb, I);
