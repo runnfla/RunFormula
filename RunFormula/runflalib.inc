@@ -160,7 +160,8 @@ begin
     VNone : raise EError.Create(IncompType_NC);
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
-    VChar, VStr : raise EError.Create(InvalidStrVal);
+    VChar : Result:=Chr;
+    VStr  : raise EError.Create(InvalidStrVal);
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;
     VArr  : raise EError.Create(InvalidArrVal);
@@ -170,11 +171,11 @@ end;
 function AsIm(PV:PValRec):TRFloat;                        //DONE -oLib -cRev.2026.04.21: Func AsIm
 begin
   with PV^ do case VType of
-    VNone : raise EError.Create(IncompType_NC);
-    VInt, VFloat, VGap, VIGap : Result:=0;
+    VNone  : raise EError.Create(IncompType_NC);
+    VInt, VFloat, VChar, VGap, VIGap : Result:=0;
     VCplex : Result:=Img;
-    VChar, VStr : raise EError.Create(InvalidStrVal);
-    VArr : raise EError.Create(InvalidArrVal);
+    VStr   : raise EError.Create(InvalidStrVal);
+    VArr   : raise EError.Create(InvalidArrVal);
   end;
 end;
 
@@ -195,12 +196,11 @@ end;
 function AsStr(PV:PValRec):string;                        //DONE -oLib -cRev.2026.04.21: Func AsStr
 begin
   with PV^ do case VType of
-    VNone  : PByte(Result):=nil;
+    VNone, VStr : Result:=string(Str);
     VInt   : Result:=IntToStr(Int);
     VFloat : Result:=FloatToStr(Flo);
     VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
     VChar  : Result:=char(Chr);
-    VStr   : Result:=string(Str);
     VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
     VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
     VArr   : raise EError.Create(InvalidArrVal);

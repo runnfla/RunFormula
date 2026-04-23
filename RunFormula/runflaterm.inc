@@ -108,10 +108,11 @@ var L : PValRec = @CVNone;        // init VMode
   procedure LVal(constref S:string);                         //DONE -oTerm -cRev.2026.04.22: Proc LVal Str
   begin
     FreeLR;
-    with L^ do if PByte(S)<>nil then begin
+    with L^ do begin
       VType:=VStr;
       Str:=Str2Ptr(S);
-    end else VType:=VNone;
+      if PByte(S)=nil then VType:=VNone;
+    end;
   end;
 
   procedure LGap(const GL, GR:TRFloat);                      //DONE -oTerm -cRev.2026.04.22: Proc LGap
@@ -353,6 +354,7 @@ begin
     VarID:=PToken(P)^.Index;
     Value.VType:=VNone;
     Value.VAlloc:=VP;
+    Value.Str:=nil;
     Result:=@Value;
   end;
 end;

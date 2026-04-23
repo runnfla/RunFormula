@@ -187,7 +187,7 @@ type
   TCharSet = set of char;
 
 const
-  CVNone : TValRec = (VType : VNone; VAlloc : BC);
+  CVNone : TValRec = (VType : VNone; VAlloc : BC; Str : nil);
   TextChars = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   NameChars = ['A'..'Z', '_', 'a'..'z'];
   Cpi = 3.14159265358979323846;
