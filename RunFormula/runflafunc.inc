@@ -67,15 +67,15 @@ begin
   repeat
     flg:=AsBool(Param(-2, Context));
     PostParam(Context);
-    if not flg then break;
+    if not flg then exit;
     Context.TermResult:=Result;
     PostParam(Context);
     Result:=Param(-1, Context);
     with Context do case Flow of
-      EXT : break;
+      EXT : exit;
       BRK : begin
               Flow:=NML;
-              break;
+              exit;
             end;
       CON : Flow:=NML;
     end;
@@ -93,7 +93,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_REAL(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_REAL
+function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.02: Func Fla_REAL
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -104,7 +104,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_IMAGE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_IMAGE
+function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.02: Func Fla_IMAGE
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -585,6 +585,21 @@ begin
   PostParam(Context);
 end;
 
+function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.00: Func Fla_COMPARE
+var pv : PValRec;
+begin
+  if ParamCount<>2 then raise EError.Create(ParamNumber);
+  Result:=NewLV(Context);
+  pv:=Param(-2, Context);
+  with Result^ do begin
+    VType:=VInt;
+    Int:=Compare(pv, Param(-1, Context));
+  end;
+  PostParam(Context);
+  Context.TermResult:=pv;
+  PostParam(Context);
+end;
+
 {$define runfla_optfunc}
 {$include runflaopt.inc}
 {$undef runfla_optfunc}
@@ -598,8 +613,8 @@ begin
   FuncReg('if', @Fla_IF);
   FuncReg('repeat', @Fla_REPEAT);
   FuncReg('type', @Fla_TYPE);
-  FuncReg('real', @Fla_REAL);
-  FuncReg('image', @Fla_IMAGE);
+  FuncReg('re', @Fla_RE);
+  FuncReg('im', @Fla_IM);
   FuncReg('cplex', @Fla_CPLEX);
   FuncReg('left', @Fla_LEFT);
   FuncReg('right', @Fla_RIGHT);
@@ -620,6 +635,7 @@ begin
   FuncReg('round', @Fla_ROUND);
   FuncReg('abs', @Fla_ABS);
   FuncReg('char', @Fla_CHAR);
+  FuncReg('compare', @Fla_COMPARE);
 
 {$define runfla_optreg}
 {$include runflaopt.inc}

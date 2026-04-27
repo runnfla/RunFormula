@@ -160,7 +160,7 @@ var TextFin : PChar;
   begin
     Sequence(TagValue);
     case V.VType of
-      VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
+//      VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
       VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SizeOf(TValRec.Int);
       VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SizeOf(TValRec.Flo);
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SizeOf(TValRec.Img);
@@ -176,7 +176,7 @@ var TextFin : PChar;
       ValRec.VType:=V.VType;
       ValRec.VAlloc:=BC;
       case V.VType of
-        VNone  : ValRec.Str:=nil;
+//        VNone  : ValRec.Str:=nil;
         VInt   : ValRec.Int:=V.Int;
         VFloat : ValRec.Flo:=V.Flo;
         VCplex, VGap : begin ValRec.Flo:=V.Flo; ValRec.Img:=V.Img; end;
@@ -370,18 +370,7 @@ begin
                   PreTag:=TagNone;
                   ExprToken(TagExpr, TagExpr);
                 end;
-      '-' : if PreTag>=TagOp then begin
-              inc(P);
-              if P^ in ['0'..'9'] then begin
-                TextFin:=FindTextFin(P);
-                I:=IntCapture(P, TextFin, flg);
-                if flg then begin
-                  IntToken(-I);
-                  P:=TextFin;
-                end else FloatToken(-FloatCapture(P));
-              end else OpToken(TagNegative, true);
-              continue;
-            end else OpToken(TagMinus);
+      '-' : if PreTag<TagOp then OpToken(TagMinus) else OpToken(TagNegative, true);
       '/' : OpToken(TagSlash);
       '0'..'9' : begin
                    TextFin:=FindTextFin(P);
@@ -441,16 +430,16 @@ begin
                 P:=TextFin+1;
                 continue;
               end;
+              if IsKey('true') then begin IntToken(-1); continue; end;
+              if IsKey('false') then begin IntToken(0); continue; end;
+              if IsKey('shl') then begin OpToken(TagSHL); continue; end;
+              if IsKey('shr') then begin OpToken(TagSHR); continue; end;
               if IsKey('div') then begin OpToken(TagDIV); continue; end;
               if IsKey('mod') then begin OpToken(TagMOD); continue; end;
               if IsKey('xor') then begin OpToken(TagXOR); continue; end;
-              if IsKey('shl') then begin OpToken(TagSHL); continue; end;
-              if IsKey('shr') then begin OpToken(TagSHR); continue; end;
-              if IsKey('j') then begin CplexToken(0, 1); continue; end;
               if IsKey('pi') then begin FloatToken(Cpi); continue; end;
               if IsKey('e') then begin FloatToken(CElr); continue; end;
-              if IsKey('true') then begin IntToken(1); continue; end;
-              if IsKey('false') then begin IntToken(0); continue; end;
+              if IsKey('j') then begin CplexToken(0, 1); continue; end;
               if IsKey('none') then begin NoneToken; continue; end;
               if IsKey('error') then raise EError.Create(Unsupported);
               if IsKey('const') then raise EError.Create(Unsupported);
@@ -460,6 +449,7 @@ begin
               if IsKey('include') then raise EError.Create(Unsupported);
               if IsKey('inline') then raise EError.Create(Unsupported);
               if IsKey('branch') then raise EError.Create(Unsupported);
+              if IsKey('debug') then raise EError.Create(Unsupported);
               case TextFin^ of
                 '(' : begin
                         I:=MemListFind(SubrList, P, TextFin);

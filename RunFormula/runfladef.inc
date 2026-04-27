@@ -31,9 +31,12 @@ type
     TagSubr,
     TagNone,
 
-    TagExpr,              // <--  anchor,
+    TagExpr,              //      <--  anchor,
     TagAssign,            // =    all Operators Tokens should be greater
 
+    TagOR,                // or
+    TagXOR,               // xor
+    TagAND,               // and
     TagEqual,             // ==
     TagNotEqual,          // <>
     TagGreater,           // >
@@ -43,18 +46,15 @@ type
     TagConcat,            // &
     TagPlus,              // +
     TagMinus,             // -
-    TagOR,                // or
-    TagXOR,               // xor
     TagMult,              // *
     TagSlash,             // /
-    TagAND,               // and
     TagSHL,               // shl <<
     TagSHR,               // shr >>
     TagDIV,               // div
     TagMOD,               // mod
-    TagScale,             // **
+    TagNegative,          // - unary
     TagNOT,               // not unary
-    TagNegative);         // - unary
+    TagScale);            // **
 
   TAnsiRec = packed record                         // from astrings.inc
     CodePage : TSystemCodePage;                    // but packed just in case
@@ -156,6 +156,7 @@ type
     TermResult : PValRec;
     VarTable   : PByte;              // point to offset table in bytecode
     ProcToken  : PByte;
+    ByteCode   : PByte;
     PoolIndex  : SizeInt;            // variable list index in VarPool
     Flow       : TFlow;
   end;
@@ -200,54 +201,55 @@ const
   SFlaRec = SizeOf(TFlaRec);
 
   OpTokenLevel : array[TTag] of integer = (
-    0,      // TagValue
-    0,      // TagVar
-    0,      // TagArray
-    0,      // TagBracket
-    0,      // TagCode
-    0,      // TagFunc
-    0,      // TagCall
-    0,      // TagString
-    0,      // TagLocal
-    0,      // TagSubr
-    0,      // TagNone
+    0,       // TagValue
+    0,       // TagVar
+    0,       // TagArray
+    0,       // TagBracket
+    0,       // TagCode
+    0,       // TagFunc
+    0,       // TagCall
+    0,       // TagText
+    0,       // TagLocal
+    0,       // TagSubr
+    0,       // TagNone
 
-    0,      // TagExpr
-    10,     // TagAssign     =
+    0,       // TagExpr
+    101,     // TagAssign     =    right-associative, enable A = B = 10
 
-    20,     // TagEqual      ==
-    20,     // TagNotEqual   <>
-    20,     // TagGreater    >
-    20,     // TagLess       <
-    20,     // TagNotLess    >=
-    20,     // TagNotGreater <=
-    30,     // TagConcat     &
-    40,     // TagPlus       +
-    40,     // TagMinus      -
-    40,     // TagOR         or
-    40,     // TagXOR        xor
-    50,     // TagMult       *
-    50,     // TagSlash      /
-    50,     // TagAND        and
-    60,     // TagSHL        shl <<
-    60,     // TagSHR        shr >>
-    60,     // TagDIV        div
-    60,     // TagMOD        mod
-    70,     // TagScale      **
-    80,     // TagNOT        not
-    80);    // TagNegative   - unary
+    200,     // TagOR         or
+    200,     // TagXOR        xor
+    300,     // TagAND        and
+    400,     // TagEqual      ==
+    400,     // TagNotEqual   <>
+    400,     // TagGreater    >
+    400,     // TagLess       <
+    400,     // TagNotLess    >=
+    400,     // TagNotGreater <=
+    500,     // TagConcat     &
+    600,     // TagPlus       +
+    600,     // TagMinus      -         10-5-2 = 3, not 7
+    700,     // TagMult       *
+    700,     // TagSlash      /
+    700,     // TagSHL        shl <<
+    700,     // TagSHR        shr >>
+    700,     // TagDIV        div
+    700,     // TagMOD        mod
+    800,     // TagNegative   - unary
+    800,     // TagNOT        not
+    901);    // TagScale      **   right-associative, 4**3**2 = 4**9
 
-  CaseType : array[TVType, TVType] of TVType = (     // return VInt VFloat VCplex VStr VGap VArr
+  CaseType : array[TVType, TVType] of TVType = (
+// ret. VInt VFloat VCplex VStr VGap VIGap VArr
 //           VNone   VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
 { VNone  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
-{ VInt   } ( VInt,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VGap,   VArr  ),
+{ VInt   } ( VInt,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
 { VFloat } ( VFloat, VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
 { VRsvd  } ( VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
 { VCplex } ( VCplex, VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
-{ VChar  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VGap,   VArr  ),
+{ VChar  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
 { VStr   } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
 { VGap   } ( VGap,   VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
-{ VIGap  } ( VGap,   VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VIGap  } ( VGap,   VIGap,  VGap,   VRsvd,  VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
 { VArr   } ( VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
 
 var

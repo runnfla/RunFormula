@@ -37,30 +37,6 @@ begin
   end;
 end;
 
-function DiffStr(PX, PY:PByte):SizeInt;                   //DONE -oLib -cRev.2026.03.29: Func DiffStr
-var lng : SizeInt = 0;                   // DiffSize = 4
-    fin : PByte;
-begin                                    // should be ansistrings, null terminator is used
-  if PX<>nil then lng:=PSizeInt(PX-SI)^;
-  Result:=lng;
-  if PY=nil then exit;
-  dec(Result, PSizeInt(PY-SI)^);
-  if Result<>0 then exit;
-  fin:=PX+lng-Sint;
-  while PX<=fin do begin
-    if PInteger(PX)^<>PInteger(PY)^ then break;
-    inc(PY, Sint);
-    inc(PX, Sint);
-  end;
-  inc(fin, Sint);
-  while PX<fin do begin
-    if PX^<>PY^ then break;
-    inc(PY);
-    inc(PX);
-  end;
-  Result:=PX^-PY^;
-end;
-
 // ----- Strings -----
 
 function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.03.29: Inline Str2Ptr
@@ -172,10 +148,10 @@ function AsIm(PV:PValRec):TRFloat;                        //DONE -oLib -cRev.202
 begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NC);
-    VInt, VFloat, VChar, VGap, VIGap : Result:=0;
     VCplex : Result:=Img;
     VStr   : raise EError.Create(InvalidStrVal);
     VArr   : raise EError.Create(InvalidArrVal);
+    else Result:=0;
   end;
 end;
 
@@ -196,11 +172,12 @@ end;
 function AsStr(PV:PValRec):string;                        //DONE -oLib -cRev.2026.04.21: Func AsStr
 begin
   with PV^ do case VType of
-    VNone, VStr : Result:=string(Str);
+    VNone  : PByte(Result):=nil;
     VInt   : Result:=IntToStr(Int);
     VFloat : Result:=FloatToStr(Flo);
     VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
     VChar  : Result:=char(Chr);
+    VStr   : Result:=string(Str);
     VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
     VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
     VArr   : raise EError.Create(InvalidArrVal);
@@ -232,6 +209,20 @@ begin
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
     VArr   : raise EError.Create(InvalidArrVal);
+  end;
+end;
+
+function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oLib -cRev.2026.04.25: Func AsIGapL
+begin
+  with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
+end;
+
+function AsIGapR(PV:PValRec):SizeInt;                     //DONE -oLib -cRev.2026.04.25: Func AsIGapR
+begin
+  with PV^ do case VType of
+    VInt  : Result:=Int;
+    VChar : Result:=Chr;
+    VIGap : Result:=IGap;
   end;
 end;
 
@@ -372,55 +363,76 @@ begin
   Result:=Result*Scale(10, scl-frac);
 end;
 
-function Compare(L, R:PValRec):integer;                   //DONE -oLib -cRev.2026.03.30: Func Compare
-var IntL, IntR, GapL, GapR : SizeInt;
-    FloL, FloR, ImL, ImR : TRFloat;
+function Compare(L, R:PValRec):SizeInt;                   //DONE -oLib -cRev.2026.04.26: Func Compare
+var IL, IR, GL, GR : SizeInt;
+    FL, FR, ML, MR : TRFloat;
+
+  function DiffStr:SizeInt;                               //DONE -oLib -cRev.2026.04.26: Func DiffStr
+  var lng : SizeInt = 0;                   // not inline, diffsize = 8
+      px, py, fin : PByte;
+  begin                                    // should be ansistrings, null terminator is used
+    px:=PByte(AsStr(L));
+    if px<>nil then lng:=PSizeInt(px)[-1];
+    py:=PByte(AsStr(R));
+    if py=nil then Exit(lng);
+    Result:=lng-PSizeInt(py)[-1];
+    if Result<>0 then exit;
+    Result:=px^-py^;
+    if Result<>0 then exit;
+    fin:=px+lng-SI;
+    while px<=fin do begin
+      if PSizeInt(px)^<>PSizeInt(py)^ then break;
+      inc(py, SI);
+      inc(px, SI);
+    end;
+    inc(fin, SI);
+    while px<fin do begin
+      if px^<>py^ then break;
+      inc(py);
+      inc(px);
+    end;
+    Result:=px^-py^;
+  end;
+
 begin
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
     VInt   : begin
-               IntL:=AsInt(L); IntR:=AsInt(R);
-               if IntR=IntL then exit;
-               if IntL>IntR then Result:=1;
+               IL:=AsInt(L); IR:=AsInt(R);
+               if IR=IL then exit;
+               if IL>IR then Exit(1);
              end;
     VFloat : begin
-               FloL:=AsFloat(L); FloR:=AsFloat(R);
-               if FloR=FloL then exit;
-               if FloL>FloR then Result:=1;
+               FL:=AsFloat(L); FR:=AsFloat(R);
+               if FR=FL then exit;
+               if FL>FR then Exit(1);
              end;
     VCplex : begin
-               FloL:=AsRe(L); ImL:=AsIm(L);
-               FloR:=AsRe(R); ImR:=AsIm(R);
-               if (FloL=FloR) and (ImL=ImR) then exit;
-               if (FloL*FloL+ImL*ImL)>(FloR*FloR+ImR*ImR) then Result:=1;
-             end;
-    VGap   : if (L^.VType in [VInt, VChar, VIGap]) and ((R^.VType in [VInt, VChar, VIGap])) then begin
-               with L^ do case VType of
-                 VInt  : begin IntL:=Int; GapL:=Int; end;
-                 VChar : begin IntL:=Chr; GapL:=Chr; end;
-                 VIGap : begin IntL:=Int; GapL:=IGap; end;
-               end;
-               with R^ do case VType of
-                 VInt  : begin IntR:=Int; GapR:=Int; end;
-                 VChar : begin IntR:=Chr; GapR:=Chr; end;
-                 VIGap : begin IntR:=Int; GapR:=IGap; end;
-               end;
-               if (IntL>=IntR) and (GapL<=GapR) then exit;
-               if (IntL+GapL)>(IntR+GapR) then Result:=1;
-             end else begin
-               FloL:=AsLGap(L); ImL:=AsRGap(L);
-               FloR:=AsLGap(R); ImR:=AsRGap(R);
-               if (FloL>=FloR) and (ImL<=ImR) then exit;
-               if (FloL+ImL)>(FloR+ImR) then Result:=1;
+               FL:=AsRe(L); ML:=AsIm(L);
+               FR:=AsRe(R); MR:=AsIm(R);
+               if (FL=FR) and (ML=MR) then exit;
+               if (FL*FL+ML*ML)>=(FR*FR+MR*MR) then Exit(1);
              end;
     VStr   : begin
-               IntL:=DiffStr(PByte(AsStr(L)), PByte(AsStr(R)));
-               if IntL=0 then exit;
-               if IntL>0 then Result:=1;
+               IL:=DiffStr;
+               if IL=0 then exit;
+               if IL>0 then Exit(1);
+             end;
+    VGap   : begin
+               FL:=AsLGap(L); ML:=AsRGap(L);
+               FR:=AsLGap(R); MR:=AsRGap(R);
+               if (FL>=FR) and (ML<=MR) then exit;
+               if (FL+ML)>=(FR+MR) then Exit(1);
+             end;
+    VIGap  : begin
+               IL:=AsIGapL(L); GL:=AsIGapR(L);
+               IR:=AsIGapL(R); GR:=AsIGapR(R);
+               if (IL>=IR) and (GL<=GR) then exit;
+               if (IL+GL)>=(IR+GR) then Exit(1);
              end;
     VArr   : raise EError.Create(InvalidArrVal);
   end;
-  if Result=0 then Result:=-1;
+  Result:=-1;
 end;
 
 function Max4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.03.30: Func Max4
@@ -527,10 +539,10 @@ begin
     Legs:=q-L;
     ListLng:=Grow;              // 1 block
     L:=ListLng*L;               // Size*Grow = size of block in bytes
-    inc(q, L);                  // q --> tail of first block
-    p:=PPointer(q)^;            // p --> head of second block
-    PPointer(q)^:=nil;
   end;
+  inc(q, L);                    // q --> tail of first block
+  p:=PPointer(q)^;              // p --> head of second block
+  PPointer(q)^:=nil;
   while p<>nil do begin
     q:=PPointer(p+L)^;
     FreeMem(p);
@@ -618,10 +630,10 @@ var i : SizeInt;
 begin
   with PV^ do case VType of
     VStr : DecStrRef(Str);
-    VArr : begin
-             for i:=Arr^.Count-1 downto 0 do FreeValue(Arr^.List[i]);
-             MemListFree(Arr^);
-             FreeMem(Arr);
+    VArr : with Arr^ do begin
+             for i:=Count-1 downto 0 do FreeValue(List[i]);
+             MemListFree(PMemList(@List)^);
+             FreeMem(@List);
            end;
   end;
 end;

@@ -85,6 +85,9 @@ const TagName : array[TTag] of string = (
   'None',
   'Expr',
   'Assign',
+  'OR',
+  'XOR',
+  'AND',
   'Equal',
   'NotEqual',
   'Greater',
@@ -94,18 +97,15 @@ const TagName : array[TTag] of string = (
   'Concat',
   'Plus',
   'Minus',
-  'OR',
-  'XOR',
   'Mult',
   'Slash',
-  'AND',
   'SHL',
   'SHR',
   'DIV',
   'MOD',
-  'Scale',
+  'Negative',
   'NOT',
-  'Negative' );
+  'Scale');
 
 function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
 begin
@@ -207,12 +207,12 @@ begin
   except
     exit;
   end;
-  ResultMemo.Clear;
-  ResultMemo.Append(S);
   cod:=RunFlaParse(src);
   bc:=ByteCodeCheckBox.Checked;
   for i:=0 to i do if bc then RunFlaExecStr(cod) else RunFlaExecStr(RunFlaParse(src));
   ShowMessage('Done.');
+  ResultMemo.Clear;
+  ResultMemo.Append(S);
 end;
 
 procedure TDemoForm.ExecButtonClick(Sender: TObject);
@@ -273,7 +273,7 @@ begin
   ResultMemo.Append('Is SetLength(S, 0) = nil'+YN(PByte(s)=nil));
   SetLength(info, 0);
   s:=s+info;
-  ResultMemo.Append('Is "" + "" = nil'+YN(PByte(s)=nil));
+  ResultMemo.Append('Is nil & nil = nil'+YN(PByte(s)=nil));
 
   ResultMemo.Append('Size of SizeInt = '+IntToStr(SI));
   ResultMemo.Append('Size of integer = '+IntToStr(Sint));

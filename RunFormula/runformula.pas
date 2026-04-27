@@ -93,7 +93,7 @@ begin
                    if idx<0 then begin
                      if PToken(Pnt+VarTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);
-                       Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[Index]), flg));
+                       Result:=DoRunFlaVar(Context, Index);
                        if flg then ValCopy(Result, NewVar(Pnt, idx, false));
                      end else Result:=NewVar(Pnt, loc);
                    end else begin
@@ -122,7 +122,7 @@ begin
                      inc(p, PToken(p)^.Size);
                    end;
                    with PFlaRec(FuncList.List[Index])^ do if IsUser
-                     then Result:=Vrt2Val(UserFunc(FuncArg.Count-idx, @Context))
+                     then Result:=DoUserFunc(UserFunc, FuncArg.Count-idx, @Context)
                      else Result:=Func(FuncArg.Count-idx, Context);
                    FuncArg.Count:=idx;
                  end;
@@ -173,8 +173,10 @@ begin
                  end;
       TagText  : begin
                    Result:=NewLV(Context);
-                   Result^.VType:=VStr;
-                   Result^.Str:=@Text;
+                   with Result^ do begin
+                     VType:=VStr;
+                     Str:=@Text;
+                   end;
                  end;
       TagLocal : begin
                    p:=Pnt+ExprTokenSize;
@@ -232,16 +234,17 @@ var Context : TContext;
 
 begin
   Result:=@CVNone;
+  p:=PByte(Fla);
   with Context do begin
     MemListInit(VarPool, SizeOf(TMemList), VarPoolGrow);
     MemListInit(LVStack, SValRec, LVStackGrow);
     MemListInit(FuncArg, SPtr, ParamGrow);
     RunFlaVar:=FlaVar;
     ProcToken:=@InitProc;
+    ByteCode:=p;
     Flow:=NML;
   end;
   try
-    p:=PByte(Fla);
     if p=nil then raise EError.Create(OK);
     Context.VarTable:=p+PToken(p)^.Size+OpTokenSize;
     CreateVarList(Context);
