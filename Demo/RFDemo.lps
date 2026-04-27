@@ -494,7 +494,6 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflamsg.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <CursorPos X="47" Y="5"/>
         <UsageCount Value="91"/>
@@ -516,22 +515,24 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="44" Y="6"/>
+        <TopLine Value="91"/>
+        <CursorPos X="43" Y="7"/>
         <UsageCount Value="91"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="38" Y="5"/>
+        <CursorPos X="36" Y="4"/>
         <UsageCount Value="91"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="56" Y="9"/>
+        <CursorPos X="43" Y="6"/>
         <UsageCount Value="91"/>
         <Loaded Value="True"/>
       </Unit>
@@ -606,14 +607,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="40" Column="64" TopLine="27"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="104" Column="21" TopLine="92"/>
-      </Position>
       <Position>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
         <Caret Line="84" Column="17" TopLine="71"/>
@@ -725,6 +718,14 @@
       <Position>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <Caret Line="324" Column="7" TopLine="312"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="302" Column="44" TopLine="293"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="155" Column="62" TopLine="134"/>
       </Position>
     </JumpHistory>
     <RunParams>

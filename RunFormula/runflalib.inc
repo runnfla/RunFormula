@@ -88,6 +88,31 @@ end;
 
 // ===== Math =====
 
+function OverPlus(IntL, IntR:SizeInt; out RI:SizeInt):boolean;
+var n : SizeInt;                           //DONE -oLib -cRev.2026.04.22: Func OverPlus
+begin
+  Result:=true;
+  if (IntL=LI) or (IntR=LI) then exit;
+  n:=IntL+IntR;
+  if ((n xor IntL) and (n xor IntR))<0 then exit;
+  RI:=n;
+  Result:=false;
+end;
+
+function OverMult(IntL, IntR:SizeInt; out RI:SizeInt):boolean;
+const safe = trunc(sqrt(high(SizeInt)));    //DONE -oLib -cRev.2026.04.22: Func OverMult
+var al, ar : SizeInt;
+begin
+  Result:=true;
+  if (IntL<>0) and (IntR<>0) then begin
+    if (IntL=LI) or (IntR=LI) then exit;
+    al:=abs(IntL); ar:=abs(IntR);
+    if ((al>safe) or (ar>safe)) and ((high(SizeInt) div al)<ar) then exit;
+  end;
+  RI:=IntL*IntR;
+  Result:=false;
+end;
+
 function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oLib -cRev.2026.04.23: Func Scale
 var i : SizeInt;            // Base^Scl
 begin

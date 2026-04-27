@@ -450,6 +450,7 @@ begin
               if IsKey('inline') then raise EError.Create(Unsupported);
               if IsKey('branch') then raise EError.Create(Unsupported);
               if IsKey('debug') then raise EError.Create(Unsupported);
+              if IsKey('value') then raise EError.Create(Unsupported);
               case TextFin^ of
                 '(' : begin
                         I:=MemListFind(SubrList, P, TextFin);

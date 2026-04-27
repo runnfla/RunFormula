@@ -1,7 +1,7 @@
 //*****************************************************
 // RunFormula Expression Parser and Evaluator
 // RunFormula Help File
-// Rev. 14.04.2026
+// Rev. 27.04.2026
 
 // Author: Alexander Torubarov
 // Contact: runfla@yandex.com
@@ -83,16 +83,6 @@ X = 10101b // integer in binary form
 Characters are not case-sensitive, except for the 0x prefix.
 On overflow, the decimal number is converted to a real number, but for hexadecimal
 and binary numbers are not overflow checked.
-When specifying negative numbers, it is recommended not to separate the minus from the number:
-
-X = -999 // this is recommended
-X = - 999 // this is not recommended, but allowed
-
-Care should be taken when specifying a large negative hexadecimal or
-binary number. For example:
-
-X = -0x8000000000000000 // result -9223372036854775808, integer
-X = - 0x80000000000000000 // result -9.22337203685478E+18, real
 
 2.c. Real numbers.
 A real number can be given as a decimal number with a point or as
@@ -114,7 +104,7 @@ X = '"A"' & "'s'" // result "A"'s'
 
 An empty string can be specified as "", '', or the constant None.
 
-2.e. ASCII symbols.
+2.e. ASCII characters.
 An ASCII character can be specified as a string containing that character. Unlike a string,
 an ASCII character can participate in arithmetic operations as an integer corresponding to
 its code. A control character can also be specified using the "^" prefix. For example:
@@ -125,8 +115,8 @@ X = "One" & "^M" & "^J" & "Two" // output One and Two in 2 lines
 
 2.f. Constants.
 There are predefined constants:
+True // -1 integer
 False // 0 integer
-True // 1 integer
 None // empty string
 Pi // 3.14159265358979323846
 E // 2.71828182845904523536
@@ -176,14 +166,17 @@ When integer overflow occurs in + - * operations, the result is converted to a f
 
 3.b. Operation priority.
 In an expression, mathematical operations are performed according to the following precedence:
-maximum: - not // unary
-**
-shl (<<) shr (>>) div mod
-* / and
-+ - or xor
-&
+maximum: ** // raising to an integer power
+- not // unary
+* / shl (<<) shr (>>) div mod
++ -
+& // concatenate strings
 == <> < > <= >=
+and
+or xor
 minimum: = // assignment
+
+assignment (=) and power (**) are performed from right to left, and everything else is performed from left to right.
 
 3.c. Type conversion.
 The value type can be converted according to the following table. It also
@@ -416,3 +409,4 @@ which was before the RunFlaParse call
 - to get information about the error, the TRunFlaError.Code field and the global variable
 RunFlaErrCode must be initialized to OK.
 - if the source code of RunFormula has changed, then RunFlaParse must be executed again.
+
