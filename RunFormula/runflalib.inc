@@ -37,7 +37,7 @@ begin
   end;
 end;
 
-// ----- Strings -----
+// ===== Strings =====
 
 function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.03.29: Inline Str2Ptr
 begin
@@ -86,6 +86,40 @@ begin
   end;
 end;
 
+// ===== Math =====
+
+function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oLib -cRev.2026.04.23: Func Scale
+var i : SizeInt;            // Base^Scl
+begin
+  Result:=1;
+  i:=abs(Scl);
+  repeat
+    if (i and 1)<>0 then Result:=Result*Base;
+    i:=i shr 1;
+    if i=0 then break;
+    Base:=Base*Base;
+  until false;
+  if Scl<0 then Result:=1/Result;
+end;
+
+function Max4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.04.27: Func Max4
+var m1, m2 : TRFloat;
+begin
+  if F1>F2 then m1:=F1 else m1:=F2;
+  if F3>F4 then m2:=F3 else m2:=F4;
+  if m1>m2 then Result:=m1 else Result:=m2;
+end;
+
+function Min4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.04.27: Func Min4
+var m1, m2 : TRFloat;
+begin
+  if F1<F2 then m1:=F1 else m1:=F2;
+  if F3<F4 then m2:=F3 else m2:=F4;
+  if m1<m2 then Result:=m1 else Result:=m2;
+end;
+
+// ===== Parsing =====
+
 function FindTextFin(P:PChar; QSymb:char=#0):PChar;       //DONE -oLib -cRev.2026.03.30: Func FindTextFin
 var c : char;
 begin
@@ -99,7 +133,97 @@ begin
   raise EError.Create(UnexpectedEnd, Result);
 end;
 
-// ----- Data -----
+function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oLib -cRev.2026.03.30: Func IntCapture
+var Base : (DecI, HexI, BinI) = HexI;
+    c : char;
+begin
+  Result:=0;
+  Done:=false;
+  if PWord(P)^<> {$ifdef ENDIAN_LITTLE} $7830 {$else} $3078 {$endif}   //0x
+    then case (Fin-1)^ of
+      '0'..'9' : Base:=DecI;
+      'B', 'b' : begin Base:=BinI; dec(Fin); end;
+      'E', 'e' : exit;
+      'H', 'h' : dec(Fin);
+      else raise EError.Create(InvalidChar, Fin-1);
+    end else inc(P, 2);
+  while P<Fin do begin
+    c:=P^;
+    case c of
+           '.' : begin
+                   if Base=DecI then exit;
+                   raise EError.Create(InvalidChar, P);
+                 end;
+      '0'..'9' : dec(c, $30);
+      'A'..'F' : dec(c, $37);
+      'a'..'f' : dec(c, $57);
+      else raise EError.Create(InvalidChar, P);
+    end;
+    case Base of
+      DecI : begin
+               if c>#9 then begin
+                 if c=#$E then exit;
+                 raise EError.Create(InvalidChar, P);
+               end;
+               if Result>(high(SizeInt) div 10) then exit;
+               Result:=Result*10+byte(c);
+               if Result<0 then exit;
+             end;
+      HexI : Result:=(Result shl 4) or byte(c);
+      BinI : begin
+               if c>#1 then raise EError.Create(InvalidChar, P);
+               Result:=(Result shl 1) or byte(c);
+             end;
+    end;
+    inc(P);
+  end;
+  Done:=true;
+end;
+
+function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.2026.03.30: Func FloatCapture
+var part : boolean = false;
+    frac : SizeInt = 0;
+    scl : SizeInt = 0;
+    Z, c : char;
+begin
+  Result:=0;
+  repeat
+    c:=P^;
+    case c of
+           '.' : begin
+                   if part then raise EError.Create(InvalidChar, P);
+                   part:=true;
+                 end;
+      '0'..'9' : begin
+                   Result:=Result*10+(byte(c)-$30);
+                   if part then inc(frac);
+                 end;
+      'E', 'e' : begin
+                   inc(P);
+                   Z:=P^;
+                   if Z in ['+', '-'] then inc(P);
+                   repeat
+                     c:=P^;
+                     if not (c in ['0'..'9']) then begin
+                       if c in TextChars then raise EError.Create(InvalidChar, P);
+                       break;
+                     end;
+                     scl:=scl*10+(byte(c)-$30);
+                     inc(P);
+                   until false;
+                   if Z='-' then scl:=-scl;
+                   break;
+                 end;
+      else
+        if c in TextChars then raise EError.Create(InvalidChar, P);
+        break;
+    end;
+    inc(P);
+  until false;
+  Result:=Result*Scale(10, scl-frac);
+end;
+
+// ===== Data =====
 
 function AsInt(PV:PValRec):SizeInt;                       //DONE -oLib -cRev.2026.04.21: Func AsInt
 begin
@@ -259,110 +383,6 @@ begin
   end;
 end;
 
-function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oLib -cRev.2026.04.23: Func Scale
-var i : SizeInt;            // Base^Scl
-begin
-  Result:=1;
-  i:=abs(Scl);
-  repeat
-    if (i and 1)<>0 then Result:=Result*Base;
-    i:=i shr 1;
-    if i=0 then break;
-    Base:=Base*Base;
-  until false;
-  if Scl<0 then Result:=1/Result;
-end;
-
-function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oLib -cRev.2026.03.30: Func IntCapture
-var Base : (DecI, HexI, BinI) = HexI;
-    c : char;
-begin
-  Result:=0;
-  Done:=false;
-  if PWord(P)^<> {$ifdef ENDIAN_LITTLE} $7830 {$else} $3078 {$endif}   //0x
-    then case (Fin-1)^ of
-      '0'..'9' : Base:=DecI;
-      'B', 'b' : begin Base:=BinI; dec(Fin); end;
-      'E', 'e' : exit;
-      'H', 'h' : dec(Fin);
-      else raise EError.Create(InvalidChar, Fin-1);
-    end else inc(P, 2);
-  while P<Fin do begin
-    c:=P^;
-    case c of
-           '.' : begin
-                   if Base=DecI then exit;
-                   raise EError.Create(InvalidChar, P);
-                 end;
-      '0'..'9' : dec(c, $30);
-      'A'..'F' : dec(c, $37);
-      'a'..'f' : dec(c, $57);
-      else raise EError.Create(InvalidChar, P);
-    end;
-    case Base of
-      DecI : begin
-               if c>#9 then begin
-                 if c=#$E then exit;
-                 raise EError.Create(InvalidChar, P);
-               end;
-               if Result>(high(SizeInt) div 10) then exit;
-               Result:=Result*10+byte(c);
-               if Result<0 then exit;
-             end;
-      HexI : Result:=(Result shl 4) or byte(c);
-      BinI : begin
-               if c>#1 then raise EError.Create(InvalidChar, P);
-               Result:=(Result shl 1) or byte(c);
-             end;
-    end;
-    inc(P);
-  end;
-  Done:=true;
-end;
-
-function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.2026.03.30: Func FloatCapture
-var part : boolean = false;
-    frac : SizeInt = 0;
-    scl : SizeInt = 0;
-    Z, c : char;
-begin
-  Result:=0;
-  repeat
-    c:=P^;
-    case c of
-           '.' : begin
-                   if part then raise EError.Create(InvalidChar, P);
-                   part:=true;
-                 end;
-      '0'..'9' : begin
-                   Result:=Result*10+(byte(c)-$30);
-                   if part then inc(frac);
-                 end;
-      'E', 'e' : begin
-                   inc(P);
-                   Z:=P^;
-                   if Z in ['+', '-'] then inc(P);
-                   repeat
-                     c:=P^;
-                     if not (c in ['0'..'9']) then begin
-                       if c in TextChars then raise EError.Create(InvalidChar, P);
-                       break;
-                     end;
-                     scl:=scl*10+(byte(c)-$30);
-                     inc(P);
-                   until false;
-                   if Z='-' then scl:=-scl;
-                   break;
-                 end;
-      else
-        if c in TextChars then raise EError.Create(InvalidChar, P);
-        break;
-    end;
-    inc(P);
-  until false;
-  Result:=Result*Scale(10, scl-frac);
-end;
-
 function Compare(L, R:PValRec):SizeInt;                   //DONE -oLib -cRev.2026.04.26: Func Compare
 var IL, IR, GL, GR : SizeInt;
     FL, FR, ML, MR : TRFloat;
@@ -435,23 +455,7 @@ begin
   Result:=-1;
 end;
 
-function Max4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.03.30: Func Max4
-begin
-  Result:=F1;
-  if F2>Result then Result:=F2;
-  if F3>Result then Result:=F3;
-  if F4>Result then Result:=F4;
-end;
-
-function Min4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.03.30: Func Min4
-begin
-  Result:=F1;
-  if F2<Result then Result:=F2;
-  if F3<Result then Result:=F3;
-  if F4<Result then Result:=F4;
-end;
-
-// ----- MemList routines ------
+// ===== MemList routines =====
 
 function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;
 begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListGet
@@ -623,7 +627,7 @@ begin                                       // insert item in Index position of 
   end;
 end;
 
-// ----- Context routines -----
+// ===== Context routines =====
 
 procedure FreeValue(PV:PValRec);                              //DONE -oLib -cRev.2026.04.18: Proc FreeValue
 var i : SizeInt;
@@ -662,7 +666,7 @@ begin
   end;
 end;
 
-// ----- Exceptions -----
+// ===== Exceptions =====
 
 constructor EError.Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
 begin                                          //DONE -oLib -cRev.2026.04.18: Cstr EError.Create
