@@ -481,6 +481,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="40" Y="5"/>
         <UsageCount Value="91"/>
         <Loaded Value="True"/>
@@ -515,7 +516,6 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="91"/>
         <CursorPos X="43" Y="7"/>
