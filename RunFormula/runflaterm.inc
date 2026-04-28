@@ -62,7 +62,7 @@ var L : PValRec = @CVNone;        // init VMode
     f, fa, fb, fc, fd : TRFloat;
     I, J : SizeInt;
 
-  procedure FreeLR;                                          //DONE -oTerm -cRev.2026.04.22: Proc FreeLR
+  procedure FreeLR; inline;                                         //DONE -oTerm -cRev.2026.04.22: Inline FreeLR
   begin                                            // LVal should be called singly
     FreeTerm(R);
     if L^.VAlloc=LV then FreeValue(L) else L:=NewLV(Context);

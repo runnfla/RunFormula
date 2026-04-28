@@ -66,7 +66,7 @@ uses SysUtils
 {$include runfladef.inc}
 {$include runflalib.inc}
 
-function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.21: Func Term
+function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.28: Func Term
 var lst : PMemList;
     pv : PValRec;
     p, fin, fn : PByte;
@@ -77,7 +77,7 @@ var lst : PMemList;
 {$include runflaterm.inc}
 
 begin
-  with PToken(Pnt)^, Context do begin
+  with Context, PToken(Pnt)^ do begin
     ProcToken:=Pnt;
     case Tag of
       TagValue : Result:=@ValRec;
@@ -103,8 +103,8 @@ begin
                  end;
       TagArray : raise EError.Create(Unsupported);
       TagBracket, TagCode : begin
-                              p:=Pnt+ExprTokenSize;
                               fin:=Pnt+Size;
+                              p:=Pnt+ExprTokenSize;
                               Result:=@CVNone;
                               while (p<fin) and (Flow=NML) do begin
                                 FreeTerm(Result);
@@ -114,9 +114,9 @@ begin
                               end;
                             end;
       TagFunc  : begin
-                   p:=Pnt+VarTokenSize;
-                   fin:=Pnt+Size;
                    idx:=FuncArg.Count;
+                   fin:=Pnt+Size;
+                   p:=Pnt+VarTokenSize;
                    while p<fin do begin
                      PPByte(MemListAdd(FuncArg))^:=p;
                      inc(p, PToken(p)^.Size);
@@ -127,9 +127,9 @@ begin
                    FuncArg.Count:=idx;
                  end;
       TagCall  : begin
-                   p:=Pnt+VarTokenSize;
-                   fin:=Pnt+Size;
                    idx:=FuncArg.Count;
+                   fin:=Pnt+Size;
+                   p:=Pnt+VarTokenSize;
                    while p<fin do begin
                      PPValRec(MemListAdd(FuncArg))^:=Term(p, Context);
                      inc(p, PToken(p)^.Size);
@@ -179,8 +179,8 @@ begin
                    end;
                  end;
       TagLocal : begin
-                   p:=Pnt+ExprTokenSize;
                    fin:=Pnt+Size;
+                   p:=Pnt+ExprTokenSize;
                    while p<fin do begin
                      InitVar(p, nil, false);
                      inc(p, PToken(p)^.Size);

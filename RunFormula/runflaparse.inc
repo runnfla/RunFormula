@@ -354,6 +354,7 @@ begin
                     end;
                     P:=TextFin;
                   end;
+      '%' : OpToken(TagMOD);
       '&' : OpToken(TagConcat);
       '(' : begin
               ExprToken(TagBracket, TagBracket);
