@@ -17,7 +17,7 @@
 
 // TODO -
 
-procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);        //DONE -oLib -cRev.2026.03.29: Proc DataCopy
+procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);        //DONE -oLib -cRev.2026.04.28: Proc DataCopy
 var ps, pd : PByte;
 begin
   if Lng<=0 then exit;        // avoid illegal Lng
@@ -28,8 +28,8 @@ begin
     dec(pd, SI);
     dec(ps, SI);
   end;
-  inc(ps, SI-1);
   inc(pd, SI-1);
+  inc(ps, SI-1);
   while ps>=Src do begin
     pd^:=ps^;
     dec(pd);
@@ -392,7 +392,7 @@ begin
   end;
 end;
 
-procedure ValCopy(Src, Dst:PValRec);                      //DONE -oLib -cRev.2026.03.30: Proc ValCopy
+procedure ValCopy(Src, Dst:PValRec);                      //DONE -oLib -cRev.2026.04.28: Proc ValCopy
 begin
   with Dst^ do begin
     VType:=Src^.VType;
@@ -402,7 +402,15 @@ begin
       VFloat : Flo:=Src^.Flo;
       VCplex, VGap : begin Flo:=Src^.Flo; Img:=Src^.Img; end;
       VChar  : Chr:=Src^.Chr;
-      VStr   : Str:=Str2Ptr(string(Src^.Str));
+      VStr   : begin
+                 Str:=Src^.Str;
+                 if Ansi[-2]>0 then
+{$if SizeOf(SizeInt)=8}
+                   InterlockedIncrement64(Ansi[-2]);
+{$else}
+                   InterlockedIncrement(Ansi[-2]);
+{$endif}
+               end;
       VIGap  : begin Int:=Src^.Int; IGap:=Src^.IGap; end;
     end;
   end;
