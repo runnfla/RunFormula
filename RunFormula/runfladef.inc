@@ -189,8 +189,8 @@ type
 
 const
   CVNone : TValRec = (VType : VNone; VAlloc : BC; Str : nil);
-  TextChars = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
-  NameChars = ['A'..'Z', '_', 'a'..'z'];
+  TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
+  FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
   Cpi = 3.14159265358979323846;
   CElr = 2.71828182845904523536;
 

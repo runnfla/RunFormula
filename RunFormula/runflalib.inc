@@ -145,15 +145,28 @@ end;
 
 // ===== Parsing =====
 
-function FindTextFin(P:PChar; QSymb:char=#0):PChar;       //DONE -oLib -cRev.2026.03.30: Func FindTextFin
+function FirstChar(P:PChar; const CharSet:TCharSet):PChar;
+var c : char;                                        //DONE -oLib -cRev.2026.04.06: Func FirstChar
+begin
+  Result:=P;
+  repeat
+    c:=Result^;
+    if c>#$20 then break;
+    if c=#0 then raise EError.Create(UnexpectedEnd, Result);
+    inc(Result);
+  until false;
+  if not (c in CharSet) then raise EError.Create(InvalidChar, Result);
+end;
+
+function FindTextFin(P:PChar; QSymb:char=#0):PChar;       //DONE -oLib -cRev.2026.04.29: Func FindTextFin
 var c : char;
 begin
   Result:=P-1;
   repeat
     inc(Result);
     c:=Result^;
-    if c in TextChars then continue;
-    if (QSymb=#0) or (QSymb=c) then exit;
+    if c=QSymb then exit;
+    if (QSymb=#0) and (not (c in TextChars)) then exit;
   until c=#0;
   raise EError.Create(UnexpectedEnd, Result);
 end;

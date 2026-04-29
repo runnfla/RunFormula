@@ -269,19 +269,6 @@ var TextFin : PChar;
     P:=TextFin;
   end;
 
-  function FirstChar(const CharSet:TCharSet):PChar;   //DONE -oParse -cRev.2026.04.06: Func FirstChar
-  var c : char;
-  begin
-    Result:=TextFin;
-    repeat
-      c:=Result^;
-      if c>#$20 then break;
-      if c=#0 then raise EError.Create(UnexpectedEnd, Result);
-      inc(Result);
-    until false;
-    if not (c in CharSet) then raise EError.Create(InvalidChar, Result);
-  end;
-
   function IsKey(constref Key:ShortString):boolean;   //DONE -oParse -cRev.2026.04.06: Func IsKey
   var PKey, KeyFin : PByte;
       pf : PChar;
@@ -395,7 +382,7 @@ begin
               if IsKey('or') then begin OpToken(TagOR); continue; end;
               if IsKey('not') then begin OpToken(TagNOT, true); continue; end;
               if IsKey('func') then begin
-                FirstChar(NameChars);                // check first char
+                FirstChar(TextFin, FirstChars);                // check first char
                 ExprToken(TagSubr, TagSubr);
                 continue;
               end;
@@ -413,14 +400,14 @@ begin
                 continue;
               end;
               if IsKey('define') then begin
-                P:=FirstChar(NameChars);
+                P:=FirstChar(TextFin, FirstChars);
                 TextFin:=FindTextFin(P);
                 I:=MemListFind(DefList, P, TextFin);
                 if I>=0 then raise EError.Create(DefExists, P);
                 with PFlaRec(MemListInsert(DefList, not I))^ do begin
                   ID:=PByte(P);
                   Lng:=TextFin-P;
-                  P:=FirstChar([#$22, #$27])+1;
+                  P:=FirstChar(TextFin, [#$22, #$27])+1;
                   TextFin:=FindTextFin(P, (P-1)^);
                   I:=TextFin-P;
                   SetLength(S, I);
