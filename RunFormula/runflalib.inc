@@ -146,15 +146,14 @@ end;
 // ===== Parsing =====
 
 function FirstChar(P:PChar; const CharSet:TCharSet):PChar;
-var c : char;                                        //DONE -oLib -cRev.2026.04.06: Func FirstChar
+var c : char;                                        //DONE -oLib -cRev.2026.04.29: Func FirstChar
 begin
-  Result:=P;
+  Result:=P-1;
   repeat
-    c:=Result^;
-    if c>#$20 then break;
-    if c=#0 then raise EError.Create(UnexpectedEnd, Result);
     inc(Result);
-  until false;
+    c:=Result^;
+    if c=#0 then raise EError.Create(UnexpectedEnd, Result);
+  until c>#$20;
   if not (c in CharSet) then raise EError.Create(InvalidChar, Result);
 end;
 

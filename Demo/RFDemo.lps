@@ -520,18 +520,18 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="155"/>
-        <CursorPos X="81" Y="160"/>
+        <TopLine Value="145"/>
+        <CursorPos Y="155"/>
         <UsageCount Value="94"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="130"/>
-        <CursorPos X="25" Y="473"/>
+        <TopLine Value="308"/>
+        <CursorPos X="48" Y="449"/>
         <UsageCount Value="94"/>
         <Loaded Value="True"/>
       </Unit>
