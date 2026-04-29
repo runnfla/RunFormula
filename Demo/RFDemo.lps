@@ -482,7 +482,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <TopLine Value="432"/>
+        <TopLine Value="426"/>
         <CursorPos X="3" Y="450"/>
         <UsageCount Value="92"/>
         <Loaded Value="True"/>
@@ -518,7 +518,6 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="127"/>
         <CursorPos Y="155"/>
@@ -527,9 +526,10 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="283"/>
-        <CursorPos X="5" Y="295"/>
+        <TopLine Value="443"/>
+        <CursorPos Y="459"/>
         <UsageCount Value="92"/>
         <Loaded Value="True"/>
       </Unit>

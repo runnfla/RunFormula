@@ -452,6 +452,10 @@ begin
               if IsKey('branch') then raise EError.Create(Unsupported);
               if IsKey('debug') then raise EError.Create(Unsupported);
               if IsKey('value') then raise EError.Create(Unsupported);
+              if IsKey('do') then raise EError.Create(Unsupported);
+              if IsKey('end') then raise EError.Create(Unsupported);
+              if IsKey('is') then raise EError.Create(Unsupported);
+              if IsKey('ref') then raise EError.Create(Unsupported);
               case TextFin^ of
                 '(' : begin
                         I:=MemListFind(SubrList, P, TextFin);

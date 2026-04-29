@@ -7,7 +7,6 @@ object DemoForm: TDemoForm
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120
-  LCLVersion = '4.2.0.0'
   object Label1: TLabel
     Left = 16
     Height = 20
@@ -498,7 +497,7 @@ object DemoForm: TDemoForm
     MouseSelActions = <>
     Lines.Strings = (
       'define begin "("'
-      'define end ")"'
+      'define _end ")"'
       'define endrepeat ")"'
       ''
       '  func SPCCount(Spc);'
@@ -507,7 +506,7 @@ object DemoForm: TDemoForm
       '      begin'
       '        Spc = Spc - 1;'
       '        Cnt = Cnt & " "'
-      '      end'
+      '      _end'
       '    endrepeat'
       '  endfunc;'
       ''
@@ -523,7 +522,7 @@ object DemoForm: TDemoForm
       '        i = i - 1;'
       '        AppendResult(PrintFloat(F*c));'
       '        c = c + 1.1'
-      '      end'
+      '      _end'
       '    endrepeat'
       '  endfunc;'
       ''
@@ -542,12 +541,10 @@ object DemoForm: TDemoForm
       '    PrintLine(K);'
       '    AppendResult("^M" & "^J");'
       '    K = K + 1.1'
-      '   end'
+      '   _end'
       '  endrepeat;'
       ''
       '  None'
-      ''
-      ''
     )
     VisibleSpecialChars = [vscSpace, vscTabAtLast]
     ScrollBars = ssAutoBoth
