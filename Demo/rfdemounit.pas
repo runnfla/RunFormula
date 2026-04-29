@@ -287,6 +287,7 @@ begin
   ResultMemo.Append('Size of VarToken = '+IntToStr(VarTokenSize));
 
   ResultMemo.Append('Done.');
+
   exit;
 
 

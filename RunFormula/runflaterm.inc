@@ -23,7 +23,7 @@ begin
   Result:=NewLV(Context);
   try
     with Result^ do case PVarData(@V)^.vtype of
-      varEmpty, varNull     : begin VType:=VStr; Str:=nil; end;
+      varEmpty, varNull     : begin VType:=VNone; Str:=nil; end;
       varSmallInt, varInteger, varShortInt, varByte, varWord, varLongWord,
         varInt64, varQWord  : begin VType:=VInt; Int:=V; end;
       varSingle, varDouble  : begin VType:=VFloat; Flo:=V; end;
@@ -32,6 +32,7 @@ begin
                                 if length(S)<>1 then begin
                                   VType:=VStr;
                                   Str:=Str2Ptr(S);
+                                  if Str=nil then VType:=VNone;
                                 end else begin
                                   VType:=VChar;
                                   Chr:=PByte(S)^;

@@ -170,7 +170,7 @@ begin
   raise EError.Create(UnexpectedEnd, Result);
 end;
 
-function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oLib -cRev.2026.03.30: Func IntCapture
+function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oLib -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;
 begin
@@ -217,7 +217,7 @@ begin
   Done:=true;
 end;
 
-function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.2026.03.30: Func FloatCapture
+function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.0000.00.00: Func FloatCapture
 var part : boolean = false;
     frac : SizeInt = 0;
     scl : SizeInt = 0;

@@ -272,6 +272,7 @@ begin
   with Result^ do begin
     VType:=VStr;
     Str:=Str2Ptr(AsStr(Param(0-ParamCount, Context)));
+    if Str=nil then VType:=VNone;
   end;
   PostParam(Context);
 end;
