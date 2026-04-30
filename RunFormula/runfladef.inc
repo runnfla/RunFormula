@@ -111,6 +111,7 @@ const
   LI = Low(SizeInt);
   Sint = SizeOf(integer);
   SPtr = SizeOf(pointer);
+  SRFloat = SizeOf(TRFloat);
 
   SAnsiRec = SizeOf(TAnsiRec);
   SValRec = SizeOf(TValRec);
@@ -132,7 +133,7 @@ const
 type
   TToken = packed record
     Tag : TTag;
-{$if (SizeOf(TTag) and (Sint-1))>0}
+{$if (SizeOf(TTag) and (Sint-1)) > 0}
     Dummy : array[0..(SizeOf(TTag) or (Sint-1))] of byte;
 {$endif}
     Source : integer;                   //aligning to Size of Integer

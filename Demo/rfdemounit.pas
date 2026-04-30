@@ -278,7 +278,7 @@ begin
   ResultMemo.Append('Size of SizeInt = '+IntToStr(SI));
   ResultMemo.Append('Size of integer = '+IntToStr(Sint));
   ResultMemo.Append('Size of pointer = '+IntToStr(SPtr));
-  ResultMemo.Append('Size of TRFloat = '+IntToStr(SizeOf(TRFloat)));
+  ResultMemo.Append('Size of TRFloat = '+IntToStr(SRFloat));
   ResultMemo.Append('Size of TTag = '+IntToStr(SizeOf(TTag)));
   ResultMemo.Append('Size of TAnsiRec = '+IntToStr(SAnsiRec));
   ResultMemo.Append('Size of TValRec = '+IntToStr(SValRec));

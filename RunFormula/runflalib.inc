@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Library include file
-//  Rev. 14.04.2026
+//  Rev. 30.04.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -45,7 +45,7 @@ begin
   if Result=nil then exit;
   with PAnsiRec(Result-SAnsiRec)^ do begin
     if Ref<0 then exit;
-{$if SizeOf(SizeInt)=8}
+{$if SizeOf(SizeInt) = 8}
     InterlockedIncrement64(Ref);
 {$else}
     InterlockedIncrement(Ref);
@@ -59,7 +59,7 @@ begin
   with PAnsiRec(PS-SAnsiRec)^ do begin
     if Ref<0 then exit;
     if Ref>1 then
-{$if SizeOf(SizeInt)=8}
+{$if SizeOf(SizeInt) = 8}
       InterlockedDecrement64(Ref)
 {$else}
       InterlockedDecrement(Ref)
@@ -217,7 +217,11 @@ begin
   Done:=true;
 end;
 
-function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.0000.00.00: Func FloatCapture
+function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.2026.04.30: Func FloatCapture
+const
+{$if SRFloat = 4} mex = -38; mf = 1E-38; {$endif}
+{$if SRFloat = 8} mex = -308; mf = 1E-308; {$endif}
+{$if SRFloat = 10} mex = -4932; mf = 1E-4932; {$endif}
 var part : boolean = false;
     frac : SizeInt = 0;
     scl : SizeInt = 0;
@@ -257,7 +261,9 @@ begin
     end;
     inc(P);
   until false;
-  Result:=Result*Scale(10, scl-frac);
+  dec(scl, frac);
+  if scl>mex then Result:=Result*Scale(10, scl)
+    else Result:=Result*Scale(10, scl-mex)*mf;
 end;
 
 // ===== Data =====
@@ -417,7 +423,7 @@ begin
       VStr   : begin
                  Str:=Src^.Str;
                  if Ansi[-2]>0 then
-{$if SizeOf(SizeInt)=8}
+{$if SizeOf(SizeInt) = 8}
                    InterlockedIncrement64(Ansi[-2]);
 {$else}
                    InterlockedIncrement(Ansi[-2]);
