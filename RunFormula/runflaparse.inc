@@ -102,7 +102,7 @@ begin
   inc(BufP, Size);
 end;
 
-procedure OpToken(T:TTag; Unary:boolean=false);       //DONE -oParse -cRev.2026.04.06: Proc OpToken
+procedure OpToken(T:TTag; Unary:boolean=false);       //DONE -oParse -cRev.2026.04.30: Proc OpToken
 begin
   Sequence(T, Unary);
   RequestBuf(OpTokenSize);
@@ -113,24 +113,28 @@ begin
   inc(BufP, OpTokenSize);
 end;
 
-procedure ExprToken(Expr, Cls:TTag; Idx:SizeInt=-1);  //DONE -oParse -cRev.2026.04.06: Proc ExprToken
+procedure ExprToken(Expr, Cls:TTag; Idx:SizeInt=-1);  //DONE -oParse -cRev.2026.04.30: Proc ExprToken
 var L : SizeInt = ExprTokenSize;
+    ps : PSizeInt;
 begin
   Sequence(Expr);
   if Idx>=0 then L:=VarTokenSize;
   RequestBuf(L);
-  with PToken(BufP)^, PCls(MemListAdd(ClsList))^ do begin
+  with PToken(BufP)^ do begin
     Tag:=Expr;
     Source:=FlaPos;
+    ps:=@Size;
     if Idx>=0 then Index:=Idx;
+  end;
+  with PCls(MemListAdd(ClsList))^ do begin
     ClsTag:=Cls;
-    SizeP:=@Size;
+    SizeP:=ps;
     Offs:=BufP-SBuf+BufSum;
   end;
   inc(BufP, L);
 end;
 
-procedure CloseToken(T:TTag);                         //DONE -oParse -cRev.2026.04.06: Proc CloseToken
+procedure CloseToken(T:TTag);                         //DONE -oParse -cRev.2026.04.30: Proc CloseToken
 begin
   Sequence(T);
   with PCls(MemListGetLast(ClsList))^ do begin
@@ -140,7 +144,7 @@ begin
   dec(ClsList.Count);
 end;
 
-procedure CloseExpr;                                  //DONE -oParse -cRev.2026.04.07: Proc CloseExpr
+procedure CloseExpr; inline;                          //DONE -oParse -cRev.2026.04.30: Inline CloseExpr
 begin
   if PreTag=TagExpr then begin
     dec(BufP, ExprTokenSize);       // undo ExprToken, allow ()
@@ -155,17 +159,17 @@ var TextFin : PChar;
     C : char;
     flg : boolean;
 
-  procedure ValueToken(var V:TValRec);                      //DONE -oParse -cRev.2026.04.06: Proc ValueToken
+  procedure ValueToken(constref V:TValRec);           //DONE -oParse -cRev.2026.04.30: Proc ValueToken
   var L : SizeInt;
   begin
     Sequence(TagValue);
     case V.VType of
-//      VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
-      VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SizeOf(TValRec.Int);
-      VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SizeOf(TValRec.Flo);
-      VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SizeOf(TValRec.Img);
+      VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
+      VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
+      VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
+      VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
       VChar  : L:=PtrUint(@TToken(nil^).ValRec.Chr)+SizeOf(TValRec.Chr);
-      VIGap  : L:=PtrUint(@TToken(nil^).ValRec.IGap)+SizeOf(TValRec.IGap);
+      VIGap  : L:=PtrUint(@TToken(nil^).ValRec.IGap)+SI;
     end;
     if (L and (SI-1))>0 then L:=(L or (SI-1))+1;         // aligning to SizeInt
     RequestBuf(L);
@@ -176,7 +180,7 @@ var TextFin : PChar;
       ValRec.VType:=V.VType;
       ValRec.VAlloc:=BC;
       case V.VType of
-//        VNone  : ValRec.Str:=nil;
+        VNone  : ValRec.Str:=nil;
         VInt   : ValRec.Int:=V.Int;
         VFloat : ValRec.Flo:=V.Flo;
         VCplex, VGap : begin ValRec.Flo:=V.Flo; ValRec.Img:=V.Img; end;
@@ -187,21 +191,21 @@ var TextFin : PChar;
     inc(BufP, L);
   end;
 
-  procedure IntToken(I:SizeInt);                      //DONE -oParse -cRev.2026.04.06: Proc IntToken
+  procedure IntToken(I:SizeInt); inline;              //DONE -oParse -cRev.2026.04.30: Inline IntToken
   var V : TValRec = (VType : VInt);
   begin
     V.Int:=I;
     ValueToken(V);
   end;
 
-  procedure FloatToken(const F:TRFloat);              //DONE -oParse -cRev.2026.04.06: Proc FloatToken
+  procedure FloatToken(const F:TRFloat); inline;      //DONE -oParse -cRev.2026.04.30: Inline FloatToken
   var V : TValRec = (VType : VFloat);
   begin
     V.Flo:=F;
     ValueToken(V);
   end;
 
-  procedure CplexToken(const Re, Im:TRFloat);         //DONE -oParse -cRev.2026.04.06: Proc CplexToken
+  procedure CplexToken(const Re, Im:TRFloat); inline; //DONE -oParse -cRev.2026.04.30: Inline CplexToken
   var V : TValRec = (VType : VCplex);
   begin
     V.Flo:=Re;
@@ -209,14 +213,14 @@ var TextFin : PChar;
     ValueToken(V);
   end;
 
-  procedure ChrToken(Chr:byte);                       //DONE -oParse -cRev.2026.04.06: Proc ChrToken
+  procedure CharToken(Chr:byte); inline;              //DONE -oParse -cRev.2026.04.30: Inline CharToken
   var V : TValRec = (VType : VChar);
   begin
     V.Chr:=Chr;
     ValueToken(V);
   end;
 {
-  procedure GapToken(const L, R:TRFloat);             //DONE -oParse -cRev.2026.04.06: Proc GapToken
+  procedure GapToken(const L, R:TRFloat); inline;     //DONE -oParse -cRev.2026.04.30: Inline GapToken
   var V : TValRec = (VType : VGap);
   begin
     V.Flo:=L;
@@ -224,7 +228,7 @@ var TextFin : PChar;
     ValueToken(V);
   end;
 
-  procedure IGapToken(L, R:SizeInt);                  //DONE -oParse -cRev.2026.04.06: Proc IGapToken
+  procedure IGapToken(L, R:SizeInt);                  //DONE -oParse -cRev.2026.04.30: Inline IGapToken
   var V : TValRec = (VType : VIGap);
   begin
     V.Int:=L;
@@ -335,8 +339,8 @@ begin
                     inc(P);
                     TextFin:=FindTextFin(P, C);
                     case TextFin-P of
-                      1 : ChrToken(PByte(P)^);
-                      2 : if P^='^' then ChrToken(PByte(P+1)^-$40) else TextToken;
+                      1 : CharToken(PByte(P)^);
+                      2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken;
                       else TextToken;
                     end;
                     P:=TextFin;
