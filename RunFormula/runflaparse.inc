@@ -17,18 +17,17 @@
 
 // TODO - move Buf to MemList
 
-procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);   //DONE -oParse -cRev.2026.04.06: Proc FillError
+procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);   //DONE -oParse -cRev.2026.05.01: Proc FillError
 begin
   if (Err<>OK) and (RunFlaErrCode=OK) then RunFlaErrCode:=Err;
   with Error do begin
     Position:=0;
     Code:=Err;
-    if Err=OK then exit;
+    if Code=OK then exit;
     Position:=FlaPos;
-    if (P<>nil) and (InDef=0) then begin
-      Position:=P-pointer(Fla);
-      if PByte(P)^=0 then dec(Position);
-    end;
+    if (P=nil) or (InDef>0) then exit;
+    Position:=P-pointer(Fla);
+    if PByte(P)^=0 then dec(Position);
   end;
 end;
 
@@ -75,8 +74,8 @@ begin
   if (Result and (SI-1))>0 then Result:=(Result or (SI-1))+1;    // aligning to SizeInt
 end;
 
-procedure WriteStringRec(P:PByte; Lng, Size:SizeInt; Mask:integer=$20202020);
-var fin, dst : PByte;                                 //DONE -oParse -cRev.2026.04.06: Proc WriteStringRec
+procedure WriteString(P:PByte; Lng, Size:SizeInt; Mask:integer=$20202020);
+var fin, dst : PByte;                                 //DONE -oParse -cRev.2026.05.01: Proc WriteString
 begin
   RequestBuf(Size);
   with PAnsiRec(BufP)^ do begin
@@ -179,6 +178,7 @@ var TextFin : PChar;
       Size:=L;
       ValRec.VType:=V.VType;
       ValRec.VAlloc:=BC;
+      ValRec.PhyQuan:=0;
       case V.VType of
         VNone  : ValRec.Str:=nil;
         VInt   : ValRec.Int:=V.Int;
@@ -236,7 +236,7 @@ var TextFin : PChar;
     ValueToken(V);
   end;
 }
-  procedure TextToken;                                //DONE -oParse -cRev.2026.04.06: Proc TextToken
+  procedure TextToken;                                //DONE -oParse -cRev.2026.05.01: Proc TextToken
   var sz, lng : SizeInt;
   begin
     Sequence(TagText);
@@ -249,31 +249,34 @@ var TextFin : PChar;
       Size:=sz+ExprTokenSize;
     end;
     inc(BufP, ExprTokenSize);
-    WriteStringRec(PByte(P), lng, sz, 0);
+    WriteString(PByte(P), lng, sz, 0);
   end;
 
-  procedure VarToken;                                 //DONE -oParse -cRev.2026.04.06: Proc VarToken
+  procedure VarToken;                                 //DONE -oParse -cRev.2026.05.01: Proc VarToken
   var i : SizeInt;
   begin
     Sequence(TagVar);
     RequestBuf(VarTokenSize);
     i:=MemListFind(VarList, P, TextFin);
-    if i<0 then with PFlaRec(MemListInsert(VarList, not i))^ do begin
-      ID:=PByte(P);
-      Lng:=TextFin-P;
-      Index:=VarList.Count-1;
+    if i<0 then begin
+      i:=not i;
+      with PFlaRec(MemListInsert(VarList, i))^ do begin
+        ID:=PByte(P);
+        Lng:=TextFin-P;
+        Index:=VarList.Count-1;
+      end;
     end;
     with PToken(BufP)^ do begin
       Tag:=TagVar;
       Source:=FlaPos;
       Size:=VarTokenSize;
-      if i>=0 then Index:=PFlaRec(MemListGet(VarList, i))^.Index else Index:=VarList.Count-1;
+      Index:=PFlaRec(VarList.List[i])^.Index;
     end;
     inc(BufP, VarTokenSize);
     P:=TextFin;
   end;
 
-  function IsKey(constref Key:ShortString):boolean;   //DONE -oParse -cRev.2026.04.06: Func IsKey
+  function IsKey(constref Key:ShortString):boolean;   //DONE -oParse -cRev.2026.05.01: Func IsKey
   var PKey, KeyFin : PByte;
       pf : PChar;
   begin

@@ -175,6 +175,7 @@ begin
                    Result:=NewLV(Context);
                    with Result^ do begin
                      VType:=VStr;
+                     PhyQuan:=0;
                      Str:=@Text;
                    end;
                  end;
@@ -368,7 +369,7 @@ begin
       inc(ofs, AlignString(PFlaRec(MemListGet(VarList, i))^.Lng));
     end;
     for i:=0 to VarList.Count-1 do with PFlaRec(MemListGet(VarList, i))^ do
-      WriteStringRec(ID, Lng, AlignString(Lng));
+      WriteString(ID, Lng, AlignString(Lng));
     i:=length(Buf)-1;
     SetLength(Buf[i], BufP-SBuf);
     if i>0 then begin
