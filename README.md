@@ -1,5 +1,5 @@
 # RunFormula
-The RunFormula unit is intended to evaluate mathematical expressions provided as text using programmed logic if necessary.
+RunFormula is a scripting engine designed to evaluate mathematical expressions provided as text.
 
 Supported data types:
 - integers in decimal, hexadecimal and binary formats;
