@@ -705,7 +705,10 @@ end;
 function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.18: Inline NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
-  Result^.VAlloc:=LV;
+  with Result^ do begin
+    VAlloc:=LV;
+    PhyQuan:=0;
+  end;
 end;
 
 procedure CreateVarList(var Context:TContext);                //DONE -oLib -cRev.2026.04.18: Proc CreateVarList

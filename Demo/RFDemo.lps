@@ -482,8 +482,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="45" Y="7"/>
+        <TopLine Value="166"/>
+        <CursorPos X="22" Y="178"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -511,28 +511,33 @@
       <Unit>
         <Filename Value="..\RunFormula\runfladef.inc"/>
         <EditorIndex Value="6"/>
-        <CursorPos X="42" Y="8"/>
+        <TopLine Value="85"/>
+        <CursorPos X="13" Y="91"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="44" Y="6"/>
+        <TopLine Value="697"/>
+        <CursorPos X="5" Y="710"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="48" Y="8"/>
+        <TopLine Value="170"/>
+        <CursorPos X="14" Y="181"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="38" Y="8"/>
+        <TopLine Value="347"/>
+        <CursorPos X="11" Y="360"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -620,30 +625,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="115" Column="30" TopLine="103"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="197" Column="30" TopLine="185"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="287" Column="25" TopLine="275"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="300" Column="25" TopLine="288"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflaterm.inc"/>
-        <Caret Line="358" Column="18" TopLine="346"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="274" Column="5" TopLine="261"/>
-      </Position>
       <Position>
         <Filename Value="..\RunFormula\runflalib.inc"/>
         <Caret Line="288" Column="5" TopLine="275"/>
@@ -734,11 +715,35 @@
       </Position>
       <Position>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
-        <Caret Line="78" Column="11" TopLine="251"/>
+        <Caret Line="274" Column="41" TopLine="259"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="708" Column="19" TopLine="694"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="359" Column="11" TopLine="347"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="360" Column="18" TopLine="347"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runformula.pas"/>
+        <Caret Line="178" Column="22" TopLine="166"/>
       </Position>
       <Position>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
-        <Caret Line="274" Column="41" TopLine="259"/>
+        <Caret Line="181" Column="14" TopLine="170"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="360" Column="11" TopLine="347"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="417" Column="5" TopLine="404"/>
       </Position>
     </JumpHistory>
     <RunParams>

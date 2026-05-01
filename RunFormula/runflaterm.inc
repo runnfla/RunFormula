@@ -357,6 +357,7 @@ begin
     VarID:=i;
     Value.VType:=VNone;
     Value.VAlloc:=VP;
+    Value.PhyQuan:=0;
     Value.Str:=nil;
     Result:=@Value;
   end;
