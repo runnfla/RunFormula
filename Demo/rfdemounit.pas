@@ -83,6 +83,7 @@ const TagName : array[TTag] of string = (
   'Local',
   'Subr',
   'None',
+  'Do',
   'Expr',
   'Assign',
   'OR',

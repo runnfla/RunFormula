@@ -7,7 +7,6 @@ object DemoForm: TDemoForm
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120
-  LCLVersion = '4.2.0.0'
   object Label1: TLabel
     Left = 16
     Height = 20
@@ -497,8 +496,7 @@ object DemoForm: TDemoForm
     MouseTextActions = <>
     MouseSelActions = <>
     Lines.Strings = (
-      'define begin "("'
-      'define _end ")"'
+      'define begin "do"'
       'define endrepeat ")"'
       ''
       '  func SPCCount(Spc);'
@@ -507,7 +505,7 @@ object DemoForm: TDemoForm
       '      begin'
       '        Spc = Spc - 1;'
       '        Cnt = Cnt & " "'
-      '      _end'
+      '      end'
       '    endrepeat'
       '  endfunc;'
       ''
@@ -523,7 +521,7 @@ object DemoForm: TDemoForm
       '        i = i - 1;'
       '        AppendResult(PrintFloat(F*c));'
       '        c = c + 1.1'
-      '      _end'
+      '      end'
       '    endrepeat'
       '  endfunc;'
       ''
@@ -536,13 +534,13 @@ object DemoForm: TDemoForm
       ''
       '  T = 9;  K = 1.1;'
       '  repeat(T>0;'
-      '   begin'
+      '   do'
       '    T = T - 1;'
       '    AppendResult(K & ":  ");'
       '    PrintLine(K);'
       '    AppendResult("^M" & "^J");'
       '    K = K + 1.1'
-      '   _end'
+      '   end'
       '  endrepeat;'
       ''
       '  None'

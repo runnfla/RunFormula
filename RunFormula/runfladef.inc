@@ -30,6 +30,7 @@ type
     TagLocal,
     TagSubr,
     TagNone,
+    TagDo,                // pseudo
 
     TagExpr,              //      <--  anchor,
     TagAssign,            // =    all Operators Tokens should be greater
@@ -87,6 +88,7 @@ type
   TValRec = record
     VType : TVType;
     VAlloc : (BC, VP, LV);
+    PhyQuan : SizeInt;
     case byte of
       0 : (Int, IGap : SizeInt);
       1 : (Flo, Img : TRFloat);
@@ -189,7 +191,7 @@ type
   TCharSet = set of char;
 
 const
-  CVNone : TValRec = (VType : VNone; VAlloc : BC; Str : nil);
+  CVNone : TValRec = (VType : VNone; VAlloc : BC; PhyQuan : 0; Str : nil);
   TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
   Cpi = 3.14159265358979323846;
@@ -213,6 +215,7 @@ const
     0,       // TagLocal
     0,       // TagSubr
     0,       // TagNone
+    0,       // TagDo
 
     0,       // TagExpr
     101,     // TagAssign     =    right-associative, enable A = B = 10

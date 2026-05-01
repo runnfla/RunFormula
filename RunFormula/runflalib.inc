@@ -414,6 +414,7 @@ procedure ValCopy(Src, Dst:PValRec);                      //DONE -oLib -cRev.202
 begin
   with Dst^ do begin
     VType:=Src^.VType;
+    PhyQuan:=Src^.PhyQuan;
     case VType of
       VNone  : Str:=nil;
       VInt   : Int:=Src^.Int;
