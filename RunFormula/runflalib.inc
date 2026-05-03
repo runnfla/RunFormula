@@ -39,33 +39,27 @@ end;
 
 // ===== Strings =====
 
-function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.03.29: Inline Str2Ptr
+function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.05.03: Inline Str2Ptr
 begin
   Result:=PByte(S);
-  if Result=nil then exit;
-  with PAnsiRec(Result-SAnsiRec)^ do begin
-    if Ref<0 then exit;
-{$if SizeOf(SizeInt) = 8}
-    InterlockedIncrement64(Ref);
+  if (Result=nil) or (PSizeInt(Result)[-2]<0) then exit;
+{$if SI = 8}
+  InterlockedIncrement64(PSizeInt(Result)[-2]);
 {$else}
-    InterlockedIncrement(Ref);
+  InterlockedIncrement(PSizeInt(Result)[-2]);
 {$endif}
-  end;
 end;
 
-procedure DecStrRef(PS:PByte); inline;                    //DONE -oLib -cRev.2026.03.29: Inline DecStrRef
+procedure DecStrRef(PS:PByte); inline;                    //DONE -oLib -cRev.2026.05.03: Inline DecStrRef
 begin
-  if PS=nil then exit;
-  with PAnsiRec(PS-SAnsiRec)^ do begin
-    if Ref<0 then exit;
-    if Ref>1 then
-{$if SizeOf(SizeInt) = 8}
-      InterlockedDecrement64(Ref)
+  if (PS=nil) or (PSizeInt(PS)[-2]<0) then exit;
+  if PSizeInt(PS)[-2]>1 then
+{$if SI = 8}
+    InterlockedDecrement64(PSizeInt(PS)[-2])
 {$else}
-      InterlockedDecrement(Ref)
+    InterlockedDecrement(PSizeInt(PS)[-2])
 {$endif}
-      else FreeMem(PS-SAnsiRec);
-  end;
+    else FreeMem(PS-SAnsiRec);
 end;
 
 function Str2Str(constref S:string):string;               //DONE -oLib -cRev.2026.03.29: Func Str2Str
