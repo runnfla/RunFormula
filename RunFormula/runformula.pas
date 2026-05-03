@@ -65,6 +65,7 @@ uses SysUtils
 
 {$include runfladef.inc}
 {$include runflalib.inc}
+{$include runflatext.inc}
 
 function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.28: Func Term
 var lst : PMemList;
@@ -175,7 +176,6 @@ begin
                    Result:=NewLV(Context);
                    with Result^ do begin
                      VType:=VStr;
-                     PhyQuan:=0;
                      Str:=@Text;
                    end;
                  end;

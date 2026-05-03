@@ -61,7 +61,7 @@ var L : PValRec = @CVNone;        // init VMode
     tkn : PByte;
     lvl : integer;
     f, fa, fb, fc, fd : TRFloat;
-    I, J : SizeInt;
+    LPhy, RPhy, I, J : SizeInt;
 
   procedure FreeLR; inline;                                         //DONE -oTerm -cRev.2026.04.22: Inline FreeLR
   begin                                            // LVal should be called singly
@@ -208,6 +208,8 @@ begin
       inc(P, OpTokenSize);
       R:=Expr(P, Fin, lvl);                      // R should be free on exit
       Context.ProcToken:=tkn;
+      LPhy:=L^.VPhy;
+      RPhy:=R^.VPhy;
       case tag of
         TagAssign   : begin                                                  // =
                         if L^.VAlloc<>VP then raise EError.Create(VarExpected);
@@ -317,6 +319,17 @@ begin
                         VArr : raise EError.Create(InvalidArrVal);
                       end;
       end;
+      if (LPhy or RPhy)<>0 then case tag of
+        TagOR, TagXOR, TagAND, TagSHL, TagSHR, TagMOD, TagNOT : raise EError.Create(IllegalPhy);
+        TagPlus, TagMinus : begin
+                              if (LPhy<>RPhy) then raise EError.Create(PhyMismatch);
+                              L^.VPhy:=LPhy;
+                            end;
+        TagNegative : L^.VPhy:=LPhy;
+        TagMult : L^.VPhy:=PhyOp(LPhy, RPhy, PhyPlus);
+        TagSlash, TagDIV : L^.VPhy:=PhyOp(LPhy, RPhy, PhyMinus);
+        TagScale : L^.VPhy:=PhyOp(LPhy, AsInt(R), PhyMult);
+      end;
     end else begin
       L:=Term(P, Context);
       inc(P, PToken(P)^.Size);
@@ -357,7 +370,7 @@ begin
     VarID:=i;
     Value.VType:=VNone;
     Value.VAlloc:=VP;
-    Value.PhyQuan:=0;
+    Value.VPhy:=0;
     Value.Str:=nil;
     Result:=@Value;
   end;

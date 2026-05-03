@@ -55,7 +55,9 @@ type
     AssignExpected,
     InvalidValue,
     InvalidRange,
-    IllegalBreak
+    IllegalBreak,
+    PhyMismatch,
+    IllegalPhy
   );
 
   TRunFlaError = packed record

@@ -83,12 +83,20 @@ type
 
   PMemList = ^TMemList;
 
+const
+  SI = SizeOf(SizeInt);
+  LI = Low(SizeInt);
+  Sint = SizeOf(integer);
+  SPtr = SizeOf(pointer);
+  SRFloat = SizeOf(TRFloat);
+
+type
   TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
 
   TValRec = record
     VType : TVType;
     VAlloc : (BC, VP, LV);
-    PhyQuan : SizeInt;
+    VPhy : SizeInt;
     case byte of
       0 : (Int, IGap : SizeInt);
       1 : (Flo, Img : TRFloat);
@@ -109,12 +117,6 @@ type
   PVariable = ^TVariable;
 
 const
-  SI = SizeOf(SizeInt);
-  LI = Low(SizeInt);
-  Sint = SizeOf(integer);
-  SPtr = SizeOf(pointer);
-  SRFloat = SizeOf(TRFloat);
-
   SAnsiRec = SizeOf(TAnsiRec);
   SValRec = SizeOf(TValRec);
 
@@ -170,15 +172,23 @@ type
   ID : PByte;
   Lng : SizeInt;
   IsUser : boolean;
-  case byte of
-    0 : (Func : TFlaFunc);
-    1 : (UserFunc : TRunFlaFunc);
-    2 : (Index : SizeInt);
-    3 : (PText : PByte);
-    4 : (PChr : PChar);
+    case byte of
+      0 : (Func : TFlaFunc);
+      1 : (UserFunc : TRunFlaFunc);
+      2 : (Index : SizeInt);
+      3 : (PText : PByte);
+      4 : (PChr : PChar);
   end;
 
   PFlaRec = ^TFlaRec;
+
+  TQPhy = packed record
+    case byte of
+      0 : (QI : SizeInt);
+      1 : (QA : array[0..SI-1] of ShortInt);
+  end;
+
+  TPhyOp = (PhyPlus, PhyMinus, PhyMult);
 
   EError = class(Exception)
     FCode : TRunFlaErrCode;
@@ -191,9 +201,9 @@ type
   TCharSet = set of char;
 
 const
-  CVNone : TValRec = (VType : VNone; VAlloc : BC; PhyQuan : 0; Str : nil);
-  TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
-  FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
+  CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0; Str : nil);
+  TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z', #$80..#$FF];
+  FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z', #$80..#$FF];
   Cpi = 3.14159265358979323846;
   CElr = 2.71828182845904523536;
 

@@ -178,7 +178,7 @@ var TextFin : PChar;
       Size:=L;
       ValRec.VType:=V.VType;
       ValRec.VAlloc:=BC;
-      ValRec.PhyQuan:=0;
+      ValRec.VPhy:=0;
       case V.VType of
         VNone  : ValRec.Str:=nil;
         VInt   : ValRec.Int:=V.Int;

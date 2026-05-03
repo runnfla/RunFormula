@@ -55,6 +55,8 @@ const
     'Assignment expected',
     'Invalid operand value',
     'Incorrect borders of range',
-    'Illegal Break or Continue operation'
+    'Illegal Break or Continue operation',
+    'Dimensioned quantities mismatch',
+    'Operation not allowed on dimensioned quantities'
   );
 
