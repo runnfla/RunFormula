@@ -387,11 +387,6 @@ end;
 
 // ===== MemList routines =====
 
-function MemListGet(var MemList:TMemList; Index:SizeInt):pointer; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListGet
-  with MemList do Result:=List[Index];
-end;
-
 function MemListGetLast(var MemList:TMemList):pointer; inline;
 begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListGetLast
   with MemList do Result:=List[Count-1];

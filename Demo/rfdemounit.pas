@@ -210,7 +210,13 @@ begin
   end;
   cod:=RunFlaParse(src);
   bc:=ByteCodeCheckBox.Checked;
-  for i:=0 to i do if bc then RunFlaExecStr(cod) else RunFlaExecStr(RunFlaParse(src));
+  for i:=0 to i do if bc then begin
+    S:=RunFlaExecStr(cod);
+    SetLength(S, 0);
+  end else begin
+    S:=RunFlaExecStr(RunFlaParse(src));
+    SetLength(S, 0);
+  end;
   ShowMessage('Done.');
   ResultMemo.Clear;
   ResultMemo.Append(S);

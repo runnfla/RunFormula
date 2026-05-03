@@ -66,6 +66,7 @@ uses SysUtils
 {$include runfladef.inc}
 {$include runflalib.inc}
 {$include runflatext.inc}
+{$include runflaphy.inc}
 
 function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.28: Func Term
 var lst : PMemList;
@@ -273,13 +274,13 @@ begin
   with Context do begin
     if VarPool.ListLng>0 then repeat
       inc(j);
-      with PMemList(MemListGet(VarPool, j))^ do begin
+      with PMemList(VarPool.List[j])^ do begin
         if j<VarPool.Count then
-          for i:=Count-1 downto 0 do FreeValue(@PVariable(MemListGet(PMemList(@List)^, i))^.Value);
+          for i:=Count-1 downto 0 do FreeValue(@PVariable(PMemList(@List)^.List[i])^.Value);
         MemListFree(PMemList(@List)^);
       end;
     until MemListIsLegs(VarPool, j);
-    for i:=LVStack.Count-1 downto 0 do FreeValue(MemListGet(LVStack, i));
+    for i:=LVStack.Count-1 downto 0 do FreeValue(LVStack.List[i]);
     MemListFree(VarPool);
     MemListFree(LVStack);
     MemListFree(FuncArg);
@@ -287,14 +288,14 @@ begin
 end;
 
 function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):string;
-var R : TValRec;                                          //DONE -oMain -cRev.2026.03.28: Func RunFlaExecStr
+var R : TValRec;                                          //DONE -oMain -cRev.2026.05.03: Func RunFlaExecStr
 begin
   Result:=Str2Str(AsStr(Exec(Fla, Error, FlaVar, @R)));
   FreeValue(@R);
 end;
 
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
-var Error : TRunFlaError = (Code : Unknown);              //DONE -oMain -cRev.2026.03.28: Func RunFlaExecStr
+var Error : TRunFlaError = (Code : Unknown);              //DONE -oMain -cRev.2026.05.03: Func RunFlaExecStr
     R : TValRec;             // prevent filling
 begin
   Result:=Str2Str(AsStr(Exec(Fla, Error, FlaVar, @R)));
@@ -302,27 +303,27 @@ begin
 end;
 
 function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
-var R : TValRec;                                          //DONE -oMain -cRev.2026.03.28: Func RunFlaExecVrt
+var R : TValRec;                                          //DONE -oMain -cRev.2026.05.03: Func RunFlaExecVrt
 begin
   Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
   FreeValue(@R);
 end;
 
 function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
-var Error : TRunFlaError = (Code : Unknown);              //DONE -oMain -cRev.2026.03.28: Func RunFlaExecVrt
+var Error : TRunFlaError = (Code : Unknown);              //DONE -oMain -cRev.2026.05.03: Func RunFlaExecVrt
     R : TValRec;             // prevent filling
 begin
   Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
   FreeValue(@R);
 end;
 
-procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oMain -cRev.2026.03.28: Proc RunFlaRaise
+procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oMain -cRev.2026.05.03: Proc RunFlaRaise
 begin
   raise EError.Create(ErrCode);
 end;
 
 function RunFlaParse(constref Fla:string; var Error:TRunFlaError):string;
-const TagOp = TagExpr;                     //DONE -oMain -cRev.2026.04.08: Func RunFlaParse
+const TagOp = TagExpr;                     //DONE -oMain -cRev.2026.05.03: Func RunFlaParse
 type TCls = record
        ClsTag : TTag;
        SizeP : PSizeInt;                      // to Token.Size
@@ -366,9 +367,9 @@ begin
     for i:=0 to VarList.Count-1 do begin
       PSizeInt(BufP)^:=ofs;
       inc(BufP, SI);
-      inc(ofs, AlignString(PFlaRec(MemListGet(VarList, i))^.Lng));
+      inc(ofs, AlignString(PFlaRec(VarList.List[i])^.Lng));
     end;
-    for i:=0 to VarList.Count-1 do with PFlaRec(MemListGet(VarList, i))^ do
+    for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do
       WriteString(ID, Lng, AlignString(Lng));
     i:=length(Buf)-1;
     SetLength(Buf[i], BufP-SBuf);
@@ -389,7 +390,7 @@ begin
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;
-  for i:=0 to DefList.Count-1 do DecStrRef(PFlaRec(MemListGet(DefList, i))^.PText);
+  for i:=0 to DefList.Count-1 do DecStrRef(PFlaRec(DefList.List[i])^.PText);
   MemListFree(VarList);
   MemListFree(DefList);
   MemListFree(SubrList);
@@ -398,26 +399,26 @@ begin
   SetLength(Buf, 0);
 end;
 
-function RunFlaParse(constref Fla:string):string;               //DONE -oMain -cRev.2026.03.31: Func RunFlaParse
+function RunFlaParse(constref Fla:string):string;             //DONE -oMain -cRev.2026.05.03: Func RunFlaParse
 var Error : TRunFlaError;
 begin
   Result:=RunFlaParse(Fla, Error);
 end;
 
 function FuncReg(constref Name:string; FlaFunc:TFlaFunc; User:boolean=false):TRunFlaErrCode;
-var fr : PFlaRec;                                         //DONE -oMain -cRev.2026.04.08: Func FuncReg
+var fr : PFlaRec;                                         //DONE -oMain -cRev.2026.05.03: Func FuncReg
     p : PByte;
     L, i : SizeInt;
 begin
   try
     p:=Str2Ptr(Name);
-    L:=PSizeInt(p-SI)^;
+    L:=PSizeInt(p)[-1];
     i:=MemListFind(FuncList, p, p+L);
     if i<0 then begin
       fr:=MemListInsert(FuncList, not i);
       Result:=OK;
     end else begin
-      fr:=MemListGet(FuncList, i);
+      fr:=FuncList.List[i];
       DecStrRef(fr^.ID);
       Result:=FuncExists;
     end;
@@ -435,7 +436,7 @@ begin
 end;
 
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
-begin                                                     //DONE -oMain -cRev.2026.03.28: Func RunFlaFuncReg
+begin                                                     //DONE -oMain -cRev.2026.05.03: Func RunFlaFuncReg
   Result:=FuncReg(Name, TFlaFunc(Func), true);
 end;
 

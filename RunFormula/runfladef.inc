@@ -200,6 +200,11 @@ type
 
   TCharSet = set of char;
 
+  TQauntPrefix = record
+    Mult : TRFloat;
+    Txt : string[10];
+  end;
+
 const
   CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0; Str : nil);
   TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z', #$80..#$FF];

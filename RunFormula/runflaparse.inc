@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Parser include file
-//  Rev. 7.04.2026
+//  Rev. 5.03.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -151,7 +151,7 @@ begin
   end else CloseToken(TagExpr);
 end;
 
-procedure DoParse(P:PChar);                           //DONE -oParse -cRev.2026.04.07: Proc DoParse
+procedure DoParse(P:PChar);                           //DONE -oParse -cRev.2026.05.03: Proc DoParse
 var TextFin : PChar;
     S : string;
     I : SizeInt;
@@ -365,7 +365,7 @@ begin
                   PreTag:=TagNone;
                   ExprToken(TagExpr, TagExpr);
                 end;
-      '-' : if PreTag<TagOp then OpToken(TagMinus) else OpToken(TagNegative, true);
+      '-' : if PreTag>=TagOp then OpToken(TagNegative, true) else OpToken(TagMinus);
       '/' : OpToken(TagSlash);
       '0'..'9' : begin
                    TextFin:=FindTextFin(P);
@@ -401,7 +401,7 @@ begin
           if IsKey('endfunc') then begin
             CloseExpr;
             CloseToken(TagSubr);
-            PreTag:=TagNone;           // prevent possible subr declare after
+            PreTag:=TagNone;           // prevent possible <endfunc X()>
             continue;
           end;
           if IsKey('local') then begin
@@ -482,7 +482,7 @@ begin
                       if I<0 then raise EError.Create(UnknownFunc);
                       ExprToken(TagFunc, TagBracket, I);
                     end else ExprToken(TagCall, TagBracket,
-                      BufP-SBuf+BufSum-PFlaRec(MemListGet(SubrList, I))^.Index);
+                      BufP-SBuf+BufSum-PFlaRec(SubrList.List[I])^.Index);
                     ExprToken(TagExpr, TagExpr);
                     P:=TextFin;
                   end;
@@ -497,7 +497,7 @@ begin
               if I>=0 then begin
                 if InDef>=DefDepth then raise EError.Create(MaxDepth);
                 inc(InDef);
-                DoParse(PFlaRec(MemListGet(DefList, I))^.PChr);
+                DoParse(PFlaRec(DefList.List[I])^.PChr);
                 dec(InDef);
                 P:=TextFin;
                 continue;
