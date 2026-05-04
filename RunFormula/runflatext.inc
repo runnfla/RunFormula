@@ -144,41 +144,114 @@ begin
 end;
 
 procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.00.00: Proc ParseValue
-var tf : PChar;
+var sig : SizeInt = 0;
+    phy : SizeInt = 0;
+    mf : boolean = false;
+    flg : boolean = true;
+    I, IL : SizeInt;
+    F, FL : TRFloat;
+    tf : PChar;
     c : char;
-    flg : boolean;
 begin
-{  while P<Fin do begin
+  PV^.VPhy:=0;
+  while P<Fin do begin
     c:=P^;
     case c of
+      #1..#$20  : ;
       '"', #$27 : begin
                     inc(P);
                     tf:=FindTextFin(P, c);
                     case tf-P of
-                      1 : CharToken(PByte(P)^);
-                      2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken;
-                      else TextToken;
+                      0 : raise EError.Create(InvalidFormat);
+                      1 : I:=PByte(P)^;
+                      2 : if P^='^' then I:=PByte(P+1)^-$40 else c:=#0;
+                      else c:=#0;
                     end;
+                    if c=#0 then with PV^ do begin
+                      VType:=VStr;
+                      Str:=nil;
+                      SetString(string(Str), P, tf-P);
+                      exit;
+                    end;
+                    if mf then I:=-I;
+                    F:=I;
+                    sig:=(sig shl 4) or 2;
                     P:=tf;
                   end;
-            '(' : begin
-                    ExprToken(TagBracket, TagBracket);
-                    ExprToken(TagExpr, TagExpr);
+      '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
+      ',', ':'  : begin
+                    IL:=I; FL:=F;
+                    mf:=false;
+                    sig:=(sig shl 4) or (byte(c) and $F);
                   end;
-            '-' : if PreTag>=TagOp then OpToken(TagNegative, true) else OpToken(TagMinus);
-       '0'..'9' : begin
+      '-'       : mf:=true;
+      '0'..'9'  : begin
                     tf:=FindTextFin(P);
-                    I:=IntCapture(P, tf, flg);
                     if flg then begin
-                      IntToken(I);
-                      P:=TextFin;
-                    end else FloatToken(FloatCapture(P));
+                      I:=IntCapture(P, tf, flg);
+                      if mf then I:=-I;
+                      F:=I;
+                    end;
+                    if not flg then begin
+                      F:=FloatCapture(P);
+                      if mf then F:=-F;
+                    end else P:=tf;
+                    sig:=(sig shl 4) or $F;
                     continue;
                   end;
-       ':' :;
-       '[' : ;
-      end;
+      '`'       : begin
+                    if phy<>0 then raise EError.Create(InvalidFormat);
+                    inc(P);
+                    tf:=FindTextFin(P, '`');
+                    phy:=PhyCapture(P, tf);
+                    P:=tf;
+                  end;
+      else raise EError.Create(InvalidChar, P);
     end;
-    inc(P);
-  end;           }
+    inc(P);                                   // "=2 (=8 )=9 [=B ]=D ,=C :=A 0=F
+  end;
+  with PV^ do begin
+    VPhy:=phy;
+    case sig of
+       2, $B2D : begin                           // "  ["]
+                   VType:=VChar;
+                   Chr:=byte(I);
+                 end;
+      $F, $BFD : if flg then begin               // 0  [0]
+                   VType:=VInt;
+                   Int:=I;
+                 end else begin
+                   VType:=VFloat;
+                   Flo:=F;
+                 end;
+      $82C29,                                    // (0,0) (0,") (",0) (",")
+      $82CF9,                                    // [(0,0)] [(0,")] [(",0)] [(",")]
+      $8FC29,
+      $8FCF9,
+      $B82C29D,
+      $B82CF9D,
+      $B8FC29D,
+      $B8FCF9D : begin
+                   VType:=VCplex;
+                   Flo:=FL;
+                   Img:=F;
+                 end;
+      $B2A2D,                                    // [0:0] [0:"] [":0] [":"]
+      $B2AFD,
+      $BFA2D,
+      $BFAFD   : if flg then begin
+                   if IL>I then raise EError.Create(InvalidRange);
+                   VType:=VIGap;
+                   Int:=IL;
+                   IGap:=I;
+                 end else begin
+                   if FL>F then raise EError.Create(InvalidRange);
+                   VType:=VGap;
+                   Flo:=FL;
+                   Img:=F;
+                 end;
+      else raise EError.Create(InvalidFormat);
+    end;
+  end;
 end;
+

@@ -287,7 +287,7 @@ begin
     VType:=Src^.VType;
     VPhy:=Src^.VPhy;
     case VType of
-      VNone  : Str:=nil;
+    //  VNone  : Str:=nil;
       VInt   : Int:=Src^.Int;
       VFloat : Flo:=Src^.Flo;
       VCplex, VGap : begin Flo:=Src^.Flo; Img:=Src^.Img; end;

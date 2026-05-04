@@ -23,7 +23,7 @@ begin
   Result:=NewLV(Context);
   try
     with Result^ do case PVarData(@V)^.vtype of
-      varEmpty, varNull     : begin VType:=VNone; Str:=nil; end;
+      varEmpty, varNull     : begin VType:=VNone{; Str:=nil; }end;
       varSmallInt, varInteger, varShortInt, varByte, varWord, varLongWord,
         varInt64, varQWord  : begin VType:=VInt; Int:=V; end;
       varSingle, varDouble  : begin VType:=VFloat; Flo:=V; end;
@@ -371,7 +371,7 @@ begin
     Value.VType:=VNone;
     Value.VAlloc:=VP;
     Value.VPhy:=0;
-    Value.Str:=nil;
+   // Value.Str:=nil;
     Result:=@Value;
   end;
 end;

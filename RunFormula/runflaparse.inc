@@ -152,7 +152,8 @@ begin
 end;
 
 procedure DoParse(P:PChar);                           //DONE -oRFla.Parse -cRev.2026.05.03: Proc DoParse
-var TF : PChar;                     // textfin
+var VR : TValRec;
+    TF : PChar;                     // textfin
     S : string;
     I : SizeInt;
     C : char;
@@ -163,7 +164,7 @@ var TF : PChar;                     // textfin
   begin
     Sequence(TagValue);
     case V.VType of
-      VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
+   //   VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
       VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
       VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
@@ -180,7 +181,7 @@ var TF : PChar;                     // textfin
       ValRec.VAlloc:=BC;
       ValRec.VPhy:=0;
       case V.VType of
-        VNone  : ValRec.Str:=nil;
+  //      VNone  : ValRec.Str:=nil;
         VInt   : ValRec.Int:=V.Int;
         VFloat : ValRec.Flo:=V.Flo;
         VCplex, VGap : begin ValRec.Flo:=V.Flo; ValRec.Img:=V.Img; end;
@@ -310,7 +311,6 @@ begin
     flg:=true;
     case PWord(P)^ of
   {$ifdef ENDIAN_LITTLE}
-      $2222, $2727 : NoneToken;                 // ""
       $2A2A : OpToken(TagScale);                // **
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
@@ -320,7 +320,6 @@ begin
       $3E3C : OpToken(TagNotEqual);             // <>
       $3E3E : OpToken(TagSHR);                  // >>
   {$else}
-      $2222, $2727 : NoneToken;                 // ""
       $2A2A : OpToken(TagScale);                // **
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
@@ -342,6 +341,7 @@ begin
                     inc(P);
                     TF:=FindTextFin(P, C);
                     case TF-P of
+                      0 : NoneToken;
                       1 : CharToken(PByte(P)^);
                       2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken;
                       else TextToken;
@@ -382,6 +382,13 @@ begin
               OpToken(TagAssign);
             end;
       '>' : OpToken(TagGreater);
+      '[' : begin
+              tf:=FindTextFin(P+1, ']')+1;
+              ParseValue(P, tf, @VR);
+              ValueToken(VR);
+              P:=tf;
+              continue;
+            end;
       ']' : begin
               CloseToken(TagExpr);
               CloseToken(TagArray);

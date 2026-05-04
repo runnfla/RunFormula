@@ -206,7 +206,7 @@ type
   end;
 
 const
-  CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0; Str : nil);
+  CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
   TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z', #$80..#$FF];
   FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z', #$80..#$FF];
   Cpi = 3.14159265358979323846;
