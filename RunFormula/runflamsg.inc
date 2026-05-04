@@ -26,6 +26,7 @@ const
     'Float Overflow Error',
     'Function already exists',
     'Invalid character',
+    'Invalid format',
     'Unexpected End',
     'Incompatible operand type: got Real but expected Integer',
     'Incompatible operand type: got Complex but expected Integer',
@@ -57,6 +58,6 @@ const
     'Incorrect borders of range',
     'Illegal Break or Continue operation',
     'Dimensioned quantities mismatch',
-    'Operation not allowed on dimensioned quantities'
+    'Operation not allowed on dimensioned quantity'
   );
 

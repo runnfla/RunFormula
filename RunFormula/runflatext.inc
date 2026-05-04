@@ -138,6 +138,11 @@ begin
     else Result:=Result*Scale(10, scl-mex)*mf;
 end;
 
+function PhyCapture(P, Fin:PChar):SizeInt;                //DONE -oRFla.Text -cRev.2026.00.00: Func PhyCapture
+begin
+  Result:=0;
+end;
+
 procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.00.00: Proc ParseValue
 var tf : PChar;
     c : char;

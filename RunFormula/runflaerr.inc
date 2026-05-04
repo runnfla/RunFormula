@@ -26,6 +26,7 @@ type
     Overflow,
     FuncExists,
     InvalidChar,
+    InvalidFormat,
     UnexpectedEnd,
     IncompType_FI,
     IncompType_CI,

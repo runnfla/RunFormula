@@ -386,6 +386,13 @@ begin
               CloseToken(TagExpr);
               CloseToken(TagArray);
             end;
+      '`' : begin
+              if PreTag<>TagValue then raise EError.Create(InvalidChar);
+              inc(P);
+              TF:=FindTextFin(P, '`');
+              PToken(BufP-ExprTokenSize)^.ValRec.VPhy:=PhyCapture(P, TF);
+              P:=TF;
+            end;
       '{' : Comment:='}';
       else
         if C in FirstChars then begin
