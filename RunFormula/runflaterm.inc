@@ -397,12 +397,16 @@ begin
 end;
 
 function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;   //DONE -oTerm -cRev.2026.04.25: Func DoRunFlaVar
+var phy : SizeInt;
 begin                                                   // not inline
-  with Context do Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), flg));
+  with Context do Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), phy, flg));
+  Result^.VPhy:=phy;
 end;
 
 function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;     // not inline
-begin                                                 //DONE -oTerm -cRev.2026.04.25: Func DoUserFunc
-  Result:=Vrt2Val(UFunc(I, P));
+var phy : SizeInt;                                               //DONE -oTerm -cRev.2026.04.25: Func DoUserFunc
+begin
+  Result:=Vrt2Val(UFunc(I, phy, P));
+  Result^.VPhy:=phy;
 end;
 

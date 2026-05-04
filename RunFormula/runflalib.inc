@@ -52,7 +52,7 @@ end;
 
 procedure DecStrRef(PS:PByte); inline;                    //DONE -oLib -cRev.2026.05.03: Inline DecStrRef
 begin
-  if (PS=nil) or (PSizeInt(PS)[-2]<0) then exit;
+  if PSizeInt(PS)[-2]<0 then exit;
   if PSizeInt(PS)[-2]>1 then
 {$if SI = 8}
     InterlockedDecrement64(PSizeInt(PS)[-2])

@@ -18,7 +18,7 @@
 // TODO -
 
 function FirstChar(P:PChar; const CharSet:TCharSet):PChar;
-var c : char;                                        //DONE -oLib -cRev.2026.04.29: Func FirstChar
+var c : char;                                        //DONE -oText -cRev.2026.04.29: Func FirstChar
 begin
   Result:=P-1;
   repeat
@@ -29,7 +29,7 @@ begin
   if not (c in CharSet) then raise EError.Create(InvalidChar, Result);
 end;
 
-function FindTextFin(P:PChar; QSymb:char=#0):PChar;       //DONE -oLib -cRev.2026.04.29: Func FindTextFin
+function FindTextFin(P:PChar; QSymb:char=#0):PChar;       //DONE -oText -cRev.2026.04.29: Func FindTextFin
 var c : char;
 begin
   Result:=P-1;
@@ -42,7 +42,7 @@ begin
   raise EError.Create(UnexpectedEnd, Result);
 end;
 
-function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oLib -cRev.2026.04.29: Func IntCapture
+function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oText -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;
 begin
@@ -89,7 +89,7 @@ begin
   Done:=true;
 end;
 
-function FloatCapture(var P:PChar):TRFloat;               //DONE -oLib -cRev.2026.04.30: Func FloatCapture
+function FloatCapture(var P:PChar):TRFloat;               //DONE -oText -cRev.2026.04.30: Func FloatCapture
 const
 {$if SRFloat = 4} mex = -38; mf = 1E-38; {$endif}
 {$if SRFloat = 8} mex = -308; mf = 1E-308; {$endif}
@@ -138,3 +138,42 @@ begin
     else Result:=Result*Scale(10, scl-mex)*mf;
 end;
 
+procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oText -cRev.2026.00.00: Proc ParseValue
+var tf : PChar;
+    c : char;
+    flg : boolean;
+begin
+{  while P<Fin do begin
+    c:=P^;
+    case c of
+      '"', #$27 : begin
+                    inc(P);
+                    tf:=FindTextFin(P, c);
+                    case tf-P of
+                      1 : CharToken(PByte(P)^);
+                      2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken;
+                      else TextToken;
+                    end;
+                    P:=tf;
+                  end;
+            '(' : begin
+                    ExprToken(TagBracket, TagBracket);
+                    ExprToken(TagExpr, TagExpr);
+                  end;
+            '-' : if PreTag>=TagOp then OpToken(TagNegative, true) else OpToken(TagMinus);
+       '0'..'9' : begin
+                    tf:=FindTextFin(P);
+                    I:=IntCapture(P, tf, flg);
+                    if flg then begin
+                      IntToken(I);
+                      P:=TextFin;
+                    end else FloatToken(FloatCapture(P));
+                    continue;
+                  end;
+       ':' :;
+       '[' : ;
+      end;
+    end;
+    inc(P);
+  end;           }
+end;

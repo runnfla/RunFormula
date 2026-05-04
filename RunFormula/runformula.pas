@@ -28,8 +28,8 @@ interface
 type
   TRFloat = Double;             // or Extended... or Single...
 
-  TRunFlaVar = function(constref Name:string; out Save:boolean):Variant;
-  TRunFlaFunc = function(const ParamCount:SizeInt; Context:pointer):Variant;
+  TRunFlaVar = function(constref Name:string; out Phy:SizeInt; out Save:boolean):Variant;
+  TRunFlaFunc = function(const ParamCount:SizeInt; out Phy:SizeInt; Context:pointer):Variant;
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}
@@ -40,7 +40,7 @@ function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunF
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
 function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
 function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
-function RunFlaParam(Offset:SizeInt; Context:pointer):Variant;
+function RunFlaParam(Offset:SizeInt; out Phy:SizeInt; Context:pointer):Variant;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
 
@@ -205,12 +205,13 @@ begin
   with Context.FuncArg do Result:=Term(PPByte(List[Count+Offset])^, Context);
 end;
 
-function RunFlaParam(Offset:SizeInt; Context:pointer):Variant;  //DONE -oMain -cRev.2026.04.21: Func RunFlaParam
-type PContext = ^TContext;
+function RunFlaParam(Offset:SizeInt; out Phy:SizeInt; Context:pointer):Variant;
+type PContext = ^TContext;                    //DONE -oMain -cRev.2026.04.21: Func RunFlaParam
 begin
   with PContext(Context)^.FuncArg do begin
     if (Offset>=0) or (Offset<(-Count)) then raise EError.Create(ParamNumber);
     Result:=AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^));
+    Phy:=PContext(Context)^.TermResult^.VPhy;
   end;
   PostParam(PContext(Context)^);
 end;

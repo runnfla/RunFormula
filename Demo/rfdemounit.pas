@@ -108,15 +108,16 @@ const TagName : array[TTag] of string = (
   'NOT',
   'Scale');
 
-function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
+function MyRunFlaVar(constref Name:string; out Phy:SizeInt; out Save:boolean):Variant;
 begin
   Result:=StrToFloat(InputBox('', 'Get value for variable <'+Name+'>', ''));
+  Phy:=0;
   Save:=false;
 end;
 
-function AppendResult(const ParamCount:SizeInt; Context:pointer):Variant;
+function AppendResult(const ParamCount:SizeInt; out Phy:SizeInt; Context:pointer):Variant;
 begin
-  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParam(0-ParamCount, Context);
+  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParam(0-ParamCount, Phy, Context);
 end;
 
 procedure TDemoForm.ParseButtonClick(Sender: TObject);
