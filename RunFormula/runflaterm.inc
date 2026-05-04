@@ -15,9 +15,9 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -
+// TODO -oRFla.Term -cRev.2026.04.27:
 
-function Vrt2Val(constref V:Variant):PValRec;                  //DONE -oTerm -cRev.2026.03.30: Func Vrt2Val
+function Vrt2Val(constref V:Variant):PValRec;                  //DONE -oRFla.Term -cRev.2026.03.30: Func Vrt2Val
 var S : string;
 begin
   Result:=NewLV(Context);
@@ -46,7 +46,7 @@ begin
   end;
 end;
 
-procedure FreeTerm(PV:PValRec); inline;                        //DONE -oTerm -cRev.2026.04.18: Inline FreeTerm
+procedure FreeTerm(PV:PValRec); inline;                        //DONE -oRFla.Term -cRev.2026.04.18: Inline FreeTerm
 begin                              // like PostParam
   if PV^.VAlloc=LV then begin
     FreeValue(PV);
@@ -54,7 +54,7 @@ begin                              // like PostParam
   end;
 end;
 
-function Expr(var P:PByte; Fin:PByte; Level:integer):PValRec;  //DONE -oTerm -cRev.2026.04.27: Func Expr
+function Expr(var P:PByte; Fin:PByte; Level:integer):PValRec;  //DONE -oRFla.Term -cRev.2026.04.27: Func Expr
 var L : PValRec = @CVNone;        // init VMode
     R : PValRec;
     tag : TTag;
@@ -63,13 +63,13 @@ var L : PValRec = @CVNone;        // init VMode
     f, fa, fb, fc, fd : TRFloat;
     LPhy, RPhy, I, J : SizeInt;
 
-  procedure FreeLR; inline;                                         //DONE -oTerm -cRev.2026.04.22: Inline FreeLR
+  procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.04.22: Inline FreeLR
   begin                                            // LVal should be called singly
     FreeTerm(R);
     if L^.VAlloc=LV then FreeValue(L) else L:=NewLV(Context);
   end;
 
-  procedure LVal(N:SizeInt);                                 //DONE -oTerm -cRev.2026.04.22: Proc LVal Int
+  procedure LVal(N:SizeInt);                                 //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Int
   begin
     FreeLR;
     with L^ do begin
@@ -78,7 +78,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(const F:TRFloat);                           //DONE -oTerm -cRev.2026.04.22: Proc LVal Float
+  procedure LVal(const F:TRFloat);                           //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Float
   begin
     FreeLR;
     with L^ do begin
@@ -87,7 +87,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(const Re, Im:TRFloat);                      //DONE -oTerm -cRev.2026.04.22: Proc LVal Cplex
+  procedure LVal(const Re, Im:TRFloat);                      //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Cplex
   begin
     FreeLR;
     with L^ do begin
@@ -97,7 +97,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(B:boolean);                                 //DONE -oTerm -cRev.2026.04.22: Proc LVal Bool
+  procedure LVal(B:boolean);                                 //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Bool
   begin
     FreeLR;
     with L^ do begin
@@ -106,7 +106,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-{  procedure LVal(constref S:string);                         //DONE -oTerm -cRev.2026.04.22: Proc LVal Str
+{  procedure LVal(constref S:string);                         //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Str
   begin
     FreeLR;
     with L^ do begin
@@ -116,7 +116,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;          }
 
-  procedure LGap(const GL, GR:TRFloat);                      //DONE -oTerm -cRev.2026.04.22: Proc LGap Float
+  procedure LGap(const GL, GR:TRFloat);                      //DONE -oRFla.Term -cRev.2026.04.22: Proc LGap Float
   begin
     FreeLR;
     with L^ do begin
@@ -126,7 +126,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LGap(GL, GR:SizeInt);                            //DONE -oTerm -cRev.2026.04.25: Proc LGap Int
+  procedure LGap(GL, GR:SizeInt);                            //DONE -oRFla.Term -cRev.2026.04.25: Proc LGap Int
   begin
     FreeLR;
     with L^ do begin
@@ -136,7 +136,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  function OverScale(Base:SizeInt; out RI:SizeInt):boolean;  //DONE -oTerm -cRev.2026.04.25: Func OverScale
+  function OverScale(Base:SizeInt; out RI:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.04.25: Func OverScale
   var res : SizeInt = 1;
       scl : SizeInt;
   begin
@@ -153,7 +153,7 @@ var L : PValRec = @CVNone;        // init VMode
     Result:=false;
   end;
 
-  procedure ScaleComplex(BRE, BIM:TRFloat); inline;          //DONE -oTerm -cRev.2026.04.23: Inline ScaleComplex
+  procedure ScaleComplex(BRE, BIM:TRFloat); inline;          //DONE -oRFla.Term -cRev.2026.04.23: Inline ScaleComplex
   var re : TRFloat = 1;
       im : TRFloat = 0;
       t : TRFloat;
@@ -186,7 +186,7 @@ var L : PValRec = @CVNone;        // init VMode
     end
   end;
 
-  procedure Concat;                                          //DONE -oTerm -cRev.2026.04.26: Proc Concat
+  procedure Concat;                                          //DONE -oRFla.Term -cRev.2026.04.26: Proc Concat
   var p : PByte;                             // not inline
   begin
     p:=Str2Ptr(AsStr(L)+AsStr(R));
@@ -338,7 +338,7 @@ begin
   Result:=L;
 end;
 
-function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oTerm -cRev.2026.04.19: Func VarListFind
+function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oRFla.Term -cRev.2026.04.19: Func VarListFind
 var L : SizeInt = 0;
     R, diff : SizeInt;
     vl : PPointer;
@@ -355,7 +355,7 @@ begin
 end;
 
 function NewVar(P:PByte; Vidx:SizeInt=0; InLocal:boolean=true):PValRec;
-var lst : PMemList;               //DONE -oTerm -cRev.2026.04.19: Func NewVar
+var lst : PMemList;               //DONE -oRFla.Term -cRev.2026.04.19: Func NewVar
     i : SizeInt = 0;      // P --> VarToken
 begin
   with Context do begin
@@ -376,7 +376,7 @@ begin
   end;
 end;
 
-procedure InitVar(Exp:PByte; Pini:PValRec; Eflag:boolean);  //DONE -oTerm -cRev.2026.04.20: Proc InitVar
+procedure InitVar(Exp:PByte; Pini:PValRec; Eflag:boolean);  //DONE -oRFla.Term -cRev.2026.04.20: Proc InitVar
 var p, fin : PByte;                // Exp --> ExprToken
     pv, t : PValRec;
 begin
@@ -396,7 +396,7 @@ begin
   end else ValCopy(Pini, pv);
 end;
 
-function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;   //DONE -oTerm -cRev.2026.04.25: Func DoRunFlaVar
+function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;   //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar
 var phy : SizeInt;
 begin                                                   // not inline
   with Context do Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), phy, flg));
@@ -404,7 +404,7 @@ begin                                                   // not inline
 end;
 
 function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;     // not inline
-var phy : SizeInt;                                               //DONE -oTerm -cRev.2026.04.25: Func DoUserFunc
+var phy : SizeInt;                                               //DONE -oRFla.Term -cRev.2026.04.25: Func DoUserFunc
 begin
   Result:=Vrt2Val(UFunc(I, phy, P));
   Result^.VPhy:=phy;

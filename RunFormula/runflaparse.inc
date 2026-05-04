@@ -15,9 +15,9 @@
 //  for full license information.
 //*****************************************************
 
-// TODO - move Buf to MemList
+// TODO -oRFla.Parse -cRev.2026.05.03:move Buf to MemList
 
-procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);   //DONE -oParse -cRev.2026.05.01: Proc FillError
+procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);   //DONE -oRFla.Parse -cRev.2026.05.01: Proc FillError
 begin
   if (Err<>OK) and (RunFlaErrCode=OK) then RunFlaErrCode:=Err;
   with Error do begin
@@ -31,7 +31,7 @@ begin
   end;
 end;
 
-procedure Sequence(T:TTag; Unary:boolean=false);      //DONE -oParse -cRev.2026.05.01: Proc Sequence
+procedure Sequence(T:TTag; Unary:boolean=false);      //DONE -oRFla.Parse -cRev.2026.05.01: Proc Sequence
 begin
   if (T<TagOp) xor (PreTag>=TagOp) xor Unary then begin
     if T<TagOp then raise EError.Create(OpExpected);
@@ -40,7 +40,7 @@ begin
   PreTag:=T;
 end;
 
-procedure RequestBuf(Size:SizeInt);                   //DONE -oParse -cRev.2026.05.01: Proc RequestBuf
+procedure RequestBuf(Size:SizeInt);                   //DONE -oRFla.Parse -cRev.2026.05.01: Proc RequestBuf
 var lng, i : SizeInt;
 begin
   lng:=BufP-SBuf;
@@ -56,7 +56,7 @@ begin
   BufP:=SBuf;
 end;
 
-procedure NoneToken;                                  //DONE -oParse -cRev.2026.05.01: Proc NoneToken
+procedure NoneToken;                                  //DONE -oRFla.Parse -cRev.2026.05.01: Proc NoneToken
 begin
   Sequence(TagNone);
   RequestBuf(ExprTokenSize);
@@ -68,14 +68,14 @@ begin
   inc(BufP, ExprTokenSize);
 end;
 
-function AlignString(Lng:SizeInt):SizeInt; inline;        //DONE -oParse -cRev.2026.05.01: Inline AlignString
+function AlignString(Lng:SizeInt):SizeInt; inline;        //DONE -oRFla.Parse -cRev.2026.05.01: Inline AlignString
 begin
   Result:=Lng+(SAnsiRec+1);                                      // with trailing null
   if (Result and (SI-1))>0 then Result:=(Result or (SI-1))+1;    // aligning to SizeInt
 end;
 
 procedure WriteString(P:PByte; Lng, Size:SizeInt; Mask:integer=$20202020);
-var fin, dst : PByte;                                 //DONE -oParse -cRev.2026.05.01: Proc WriteString
+var fin, dst : PByte;                                 //DONE -oRFla.Parse -cRev.2026.05.01: Proc WriteString
 begin
   RequestBuf(Size);
   with PAnsiRec(BufP)^ do begin
@@ -101,7 +101,7 @@ begin
   inc(BufP, Size);
 end;
 
-procedure OpToken(T:TTag; Unary:boolean=false);       //DONE -oParse -cRev.2026.04.30: Proc OpToken
+procedure OpToken(T:TTag; Unary:boolean=false);       //DONE -oRFla.Parse -cRev.2026.04.30: Proc OpToken
 begin
   Sequence(T, Unary);
   RequestBuf(OpTokenSize);
@@ -112,7 +112,7 @@ begin
   inc(BufP, OpTokenSize);
 end;
 
-procedure ExprToken(Expr, Cls:TTag; Idx:SizeInt=-1);  //DONE -oParse -cRev.2026.04.30: Proc ExprToken
+procedure ExprToken(Expr, Cls:TTag; Idx:SizeInt=-1);  //DONE -oRFla.Parse -cRev.2026.04.30: Proc ExprToken
 var L : SizeInt = ExprTokenSize;
     ps : PSizeInt;
 begin
@@ -133,7 +133,7 @@ begin
   inc(BufP, L);
 end;
 
-procedure CloseToken(T:TTag);                         //DONE -oParse -cRev.2026.04.30: Proc CloseToken
+procedure CloseToken(T:TTag);                         //DONE -oRFla.Parse -cRev.2026.04.30: Proc CloseToken
 begin
   Sequence(T);
   with PCls(MemListGetLast(ClsList))^ do begin
@@ -143,7 +143,7 @@ begin
   dec(ClsList.Count);
 end;
 
-procedure CloseExpr; inline;                          //DONE -oParse -cRev.2026.04.30: Inline CloseExpr
+procedure CloseExpr; inline;                          //DONE -oRFla.Parse -cRev.2026.04.30: Inline CloseExpr
 begin
   if PreTag=TagExpr then begin
     dec(BufP, ExprTokenSize);       // undo ExprToken, allow ()
@@ -151,14 +151,14 @@ begin
   end else CloseToken(TagExpr);
 end;
 
-procedure DoParse(P:PChar);                           //DONE -oParse -cRev.2026.05.03: Proc DoParse
+procedure DoParse(P:PChar);                           //DONE -oRFla.Parse -cRev.2026.05.03: Proc DoParse
 var TF : PChar;                     // textfin
     S : string;
     I : SizeInt;
     C : char;
     flg : boolean;
 
-  procedure ValueToken(constref V:TValRec);           //DONE -oParse -cRev.2026.04.30: Proc ValueToken
+  procedure ValueToken(constref V:TValRec);           //DONE -oRFla.Parse -cRev.2026.04.30: Proc ValueToken
   var L : SizeInt;
   begin
     Sequence(TagValue);
@@ -191,21 +191,21 @@ var TF : PChar;                     // textfin
     inc(BufP, L);
   end;
 
-  procedure IntToken(I:SizeInt); inline;              //DONE -oParse -cRev.2026.04.30: Inline IntToken
+  procedure IntToken(I:SizeInt); inline;              //DONE -oRFla.Parse -cRev.2026.04.30: Inline IntToken
   var V : TValRec = (VType : VInt);
   begin
     V.Int:=I;
     ValueToken(V);
   end;
 
-  procedure FloatToken(const F:TRFloat); inline;      //DONE -oParse -cRev.2026.04.30: Inline FloatToken
+  procedure FloatToken(const F:TRFloat); inline;      //DONE -oRFla.Parse -cRev.2026.04.30: Inline FloatToken
   var V : TValRec = (VType : VFloat);
   begin
     V.Flo:=F;
     ValueToken(V);
   end;
 
-  procedure CplexToken(const Re, Im:TRFloat); inline; //DONE -oParse -cRev.2026.04.30: Inline CplexToken
+  procedure CplexToken(const Re, Im:TRFloat); inline; //DONE -oRFla.Parse -cRev.2026.04.30: Inline CplexToken
   var V : TValRec = (VType : VCplex);
   begin
     V.Flo:=Re;
@@ -213,14 +213,14 @@ var TF : PChar;                     // textfin
     ValueToken(V);
   end;
 
-  procedure CharToken(Chr:byte); inline;              //DONE -oParse -cRev.2026.04.30: Inline CharToken
+  procedure CharToken(Chr:byte); inline;              //DONE -oRFla.Parse -cRev.2026.04.30: Inline CharToken
   var V : TValRec = (VType : VChar);
   begin
     V.Chr:=Chr;
     ValueToken(V);
   end;
 {
-  procedure GapToken(const L, R:TRFloat); inline;     //DONE -oParse -cRev.2026.04.30: Inline GapToken
+  procedure GapToken(const L, R:TRFloat); inline;     //DONE -oRFla.Parse -cRev.2026.04.30: Inline GapToken
   var V : TValRec = (VType : VGap);
   begin
     V.Flo:=L;
@@ -228,7 +228,7 @@ var TF : PChar;                     // textfin
     ValueToken(V);
   end;
 
-  procedure IGapToken(L, R:SizeInt);                  //DONE -oParse -cRev.2026.04.30: Inline IGapToken
+  procedure IGapToken(L, R:SizeInt);                  //DONE -oRFla.Parse -cRev.2026.04.30: Inline IGapToken
   var V : TValRec = (VType : VIGap);
   begin
     V.Int:=L;
@@ -236,7 +236,7 @@ var TF : PChar;                     // textfin
     ValueToken(V);
   end;
 }
-  procedure TextToken;                                //DONE -oParse -cRev.2026.05.01: Proc TextToken
+  procedure TextToken;                                //DONE -oRFla.Parse -cRev.2026.05.01: Proc TextToken
   var sz, lng : SizeInt;
   begin
     Sequence(TagText);
@@ -252,7 +252,7 @@ var TF : PChar;                     // textfin
     WriteString(PByte(P), lng, sz, 0);
   end;
 
-  procedure VarToken;                                 //DONE -oParse -cRev.2026.05.01: Proc VarToken
+  procedure VarToken;                                 //DONE -oRFla.Parse -cRev.2026.05.01: Proc VarToken
   var i : SizeInt;
   begin
     Sequence(TagVar);
@@ -276,7 +276,7 @@ var TF : PChar;                     // textfin
     P:=TF;
   end;
 
-  function IsKey(constref Key:ShortString):boolean;   //DONE -oParse -cRev.2026.05.01: Func IsKey
+  function IsKey(constref Key:ShortString):boolean;   //DONE -oRFla.Parse -cRev.2026.05.01: Func IsKey
   var PKey, KeyFin : PByte;
       pf : PChar;
   begin

@@ -15,10 +15,10 @@
 //  for full license information.
 //*****************************************************
 
-// TODO - Expand Str2Val
+// TODO -oRFla.Func -cRev.2026.04.15:Expand Str2Val
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
-begin                               //DONE -oFunc -cRev.2026.04.18: Inline BreakParam
+begin                               //DONE -oRFla.Func -cRev.2026.04.18: Inline BreakParam
   case ParamCount of
     0 : Result:=@CVNone;
     1 : Result:=Param(-1, Context);
@@ -27,28 +27,28 @@ begin                               //DONE -oFunc -cRev.2026.04.18: Inline Break
   Context.Flow:=F;
 end;
 
-function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.18: Func Fla_RESULT
+function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_RESULT
 begin
   Context.TermResult:=BreakParam(ParamCount, Context, RSL);
   raise EResult.Create('');
 end;
 
-function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.18: Func Fla_EXIT
+function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_EXIT
 begin
   Result:=BreakParam(ParamCount, Context, EXT);
 end;
 
-function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.18: Func Fla_BREAK
+function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_BREAK
 begin
   Result:=BreakParam(ParamCount, Context, BRK);
 end;
 
-function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.04.18: Func Fla_CONTINUE
+function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_CONTINUE
 begin
   Result:=BreakParam(ParamCount, Context, CON);
 end;
 
-function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.18: Func Fla_IF
+function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_IF
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then raise EError.Create(ParamNumber);
@@ -59,7 +59,7 @@ begin
     else if ParamCount=3 then Result:=Param(-1, Context);
 end;
 
-function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.18: Func Fla_REPEAT
+function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_REPEAT
 var flg : boolean;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
@@ -82,7 +82,7 @@ begin
   until false;
 end;
 
-function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_TYPE
+function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_TYPE
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -93,7 +93,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.02: Func Fla_REAL
+function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_REAL
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -104,7 +104,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oFunc -cRev.2026.04.02: Func Fla_IMAGE
+function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_IMAGE
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -115,7 +115,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_CPLEX
+function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_CPLEX
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -128,7 +128,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_LEFT
+function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_LEFT
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -139,7 +139,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_RIGHT
+function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_RIGHT
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -150,7 +150,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_RANGE
+function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_RANGE
 var Lpv, Rpv : PValRec;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
@@ -173,7 +173,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.03: Func Fla_FRAC
+function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_FRAC
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -184,7 +184,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_INT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.03: Func Fla_INT
+function Fla_INT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_INT
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -195,7 +195,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.03: Func Fla_TRUNC
+function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_TRUNC
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -206,7 +206,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oFunc -cRev.2026.04.04: Func Fla_SIGN
+function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.04: Func Fla_SIGN
 var I : SizeInt = 0;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
@@ -251,7 +251,7 @@ begin
   end;
 end;
 
-function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.04.05: Func Fla_LENGTH
+function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.04.05: Func Fla_LENGTH
 var p : PByte;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
@@ -265,7 +265,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.04.05: Func Fla_STRING
+function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.04.05: Func Fla_STRING
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -277,7 +277,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_STR2VAL(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oFunc -cRev.2026.03.31: Func Fla_STR2VAL
+function Fla_STR2VAL(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.03.31: Func Fla_STR2VAL
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);                // EXPAND
@@ -286,7 +286,7 @@ begin
   PostParam(Context);
 end;
 
-function FlArcTan(const Y, X:TRFloat):TRFloat;       //DONE -oFunc -cRev.2026.04.02: Func FlArcTan
+function FlArcTan(const Y, X:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.04.02: Func FlArcTan
 begin
   if X=0 then begin
     if Y>=0 then Result:=Cpi/2 else Result:=-Cpi/2;
@@ -298,7 +298,7 @@ begin
   end;
 end;
 
-function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_EXP
+function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_EXP
 var pv : PValRec;
     f : TRFloat;
 begin
@@ -324,7 +324,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_LN
+function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_LN
 var pv : PValRec;
     f : TRFloat;
 begin
@@ -354,7 +354,7 @@ begin
   PostParam(Context);
 end;
 
-function Dsincos(const F:TRFloat; cs:integer):integer;                //DONE -oFunc -cRev.2026.04.03: Func Dsincos
+function Dsincos(const F:TRFloat; cs:integer):integer;                //DONE -oRFla.Func -cRev.2026.04.03: Func Dsincos
 var w : TRFloat;
 begin
   Result:=0;
@@ -362,7 +362,7 @@ begin
   if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
 end;
 
-function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.03: Func Fla_SIN
+function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_SIN
 var pv : PValRec;
     fa, fb, d : TRFloat;
     k : integer;
@@ -399,7 +399,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.03: Func Fla_COS
+function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_COS
 var pv : PValRec;
     fa, fb, d : TRFloat;
     k : integer;
@@ -436,7 +436,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_SQRT
+function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_SQRT
 var pv : PValRec;
     f : TRFloat;
 begin
@@ -467,7 +467,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.02: Func Fla_ARCTAN
+function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_ARCTAN
 var pv : PValRec;
     f : TRFloat;
 begin
@@ -494,7 +494,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.04: Func Fla_ROUND
+function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.04: Func Fla_ROUND
 const Grad = 180/Cpi;
 var pv : PValRec;
     f, fa, fb : TRFloat;
@@ -533,7 +533,7 @@ begin
   end;
 end;
 
-function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.04: Func Fla_ABS
+function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.04: Func Fla_ABS
 var pv : PValRec;
     fa, fb : TRFloat;
 begin
@@ -565,7 +565,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.00: Func Fla_CHAR
+function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.00: Func Fla_CHAR
 var pv : PValRec;
     I : SizeUInt;
 begin
@@ -586,7 +586,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oFunc -cRev.2026.04.00: Func Fla_COMPARE
+function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.00: Func Fla_COMPARE
 var pv : PValRec;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);

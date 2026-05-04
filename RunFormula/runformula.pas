@@ -17,7 +17,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -
+// TODO -oRFla.Main -cRev.2026.04.14:
 
 unit RunFormula;
 
@@ -68,7 +68,7 @@ uses SysUtils
 {$include runflatext.inc}
 {$include runflaphy.inc}
 
-function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oMain -cRev.2026.04.28: Func Term
+function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oRFla.Main -cRev.2026.04.28: Func Term
 var lst : PMemList;
     pv : PValRec;
     p, fin, fn : PByte;
@@ -200,13 +200,13 @@ begin
   end;
 end;
 
-function Param(Offset:SizeInt; var Context:TContext):PValRec;   //DONE -oMain -cRev.2026.04.21: Func Param
+function Param(Offset:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Main -cRev.2026.04.21: Func Param
 begin
   with Context.FuncArg do Result:=Term(PPByte(List[Count+Offset])^, Context);
 end;
 
 function RunFlaParam(Offset:SizeInt; out Phy:SizeInt; Context:pointer):Variant;
-type PContext = ^TContext;                    //DONE -oMain -cRev.2026.04.21: Func RunFlaParam
+type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Func RunFlaParam
 begin
   with PContext(Context)^.FuncArg do begin
     if (Offset>=0) or (Offset<(-Count)) then raise EError.Create(ParamNumber);
@@ -217,13 +217,13 @@ begin
 end;
 
 function Exec(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar; Buf:PValRec):PValRec;
-const InitProc : TToken = (Tag : TagCode; Source : 0);     //DONE -oMain -cRev.2026.04.08: Func Exec
+const InitProc : TToken = (Tag : TagCode; Source : 0);     //DONE -oRFla.Main -cRev.2026.04.08: Func Exec
 var Context : TContext;
     p : PByte;
     i : SizeInt;
     j : SizeInt = -1;
 
-  procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);     //DONE -oMain -cRev.2026.04.08: Proc FillError
+  procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);     //DONE -oRFla.Main -cRev.2026.04.08: Proc FillError
   begin
     if Err<>OK then begin
       if RunFlaErrCode=OK then RunFlaErrCode:=Err;
@@ -289,14 +289,14 @@ begin
 end;
 
 function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):string;
-var R : TValRec;                                          //DONE -oMain -cRev.2026.05.03: Func RunFlaExecStr
+var R : TValRec;                                          //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecStr
 begin
   Result:=Str2Str(AsStr(Exec(Fla, Error, FlaVar, @R)));
   FreeValue(@R);
 end;
 
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
-var Error : TRunFlaError = (Code : Unknown);              //DONE -oMain -cRev.2026.05.03: Func RunFlaExecStr
+var Error : TRunFlaError = (Code : Unknown);              //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecStr
     R : TValRec;             // prevent filling
 begin
   Result:=Str2Str(AsStr(Exec(Fla, Error, FlaVar, @R)));
@@ -304,27 +304,27 @@ begin
 end;
 
 function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
-var R : TValRec;                                          //DONE -oMain -cRev.2026.05.03: Func RunFlaExecVrt
+var R : TValRec;                                          //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecVrt
 begin
   Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
   FreeValue(@R);
 end;
 
 function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
-var Error : TRunFlaError = (Code : Unknown);              //DONE -oMain -cRev.2026.05.03: Func RunFlaExecVrt
+var Error : TRunFlaError = (Code : Unknown);              //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecVrt
     R : TValRec;             // prevent filling
 begin
   Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
   FreeValue(@R);
 end;
 
-procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oMain -cRev.2026.05.03: Proc RunFlaRaise
+procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oRFla.Main -cRev.2026.05.03: Proc RunFlaRaise
 begin
   raise EError.Create(ErrCode);
 end;
 
 function RunFlaParse(constref Fla:string; var Error:TRunFlaError):string;
-const TagOp = TagExpr;                     //DONE -oMain -cRev.2026.05.03: Func RunFlaParse
+const TagOp = TagExpr;                     //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaParse
 type TCls = record
        ClsTag : TTag;
        SizeP : PSizeInt;                      // to Token.Size
@@ -400,14 +400,14 @@ begin
   SetLength(Buf, 0);
 end;
 
-function RunFlaParse(constref Fla:string):string;             //DONE -oMain -cRev.2026.05.03: Func RunFlaParse
+function RunFlaParse(constref Fla:string):string;             //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaParse
 var Error : TRunFlaError;
 begin
   Result:=RunFlaParse(Fla, Error);
 end;
 
 function FuncReg(constref Name:string; FlaFunc:TFlaFunc; User:boolean=false):TRunFlaErrCode;
-var fr : PFlaRec;                                         //DONE -oMain -cRev.2026.05.03: Func FuncReg
+var fr : PFlaRec;                                         //DONE -oRFla.Main -cRev.2026.05.03: Func FuncReg
     p : PByte;
     L, i : SizeInt;
 begin
@@ -437,7 +437,7 @@ begin
 end;
 
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
-begin                                                     //DONE -oMain -cRev.2026.05.03: Func RunFlaFuncReg
+begin                                                     //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaFuncReg
   Result:=FuncReg(Name, TFlaFunc(Func), true);
 end;
 

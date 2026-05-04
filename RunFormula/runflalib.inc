@@ -15,9 +15,9 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -
+// TODO -oRFla.Lib -cRev.2026.04.30:
 
-procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);        //DONE -oLib -cRev.2026.04.28: Proc DataCopy
+procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);        //DONE -oRFla.Lib -cRev.2026.04.28: Proc DataCopy
 var ps, pd : PByte;
 begin
   if Lng<=0 then exit;        // avoid illegal Lng
@@ -39,7 +39,7 @@ end;
 
 // ===== Strings =====
 
-function Str2Ptr(constref S:string):PByte; inline;        //DONE -oLib -cRev.2026.05.03: Inline Str2Ptr
+function Str2Ptr(constref S:string):PByte; inline;        //DONE -oRFla.Lib -cRev.2026.05.03: Inline Str2Ptr
 begin
   Result:=PByte(S);
   if (Result=nil) or (PSizeInt(Result)[-2]<0) then exit;
@@ -50,7 +50,7 @@ begin
 {$endif}
 end;
 
-procedure DecStrRef(PS:PByte); inline;                    //DONE -oLib -cRev.2026.05.03: Inline DecStrRef
+procedure DecStrRef(PS:PByte); inline;                    //DONE -oRFla.Lib -cRev.2026.05.03: Inline DecStrRef
 begin
   if PSizeInt(PS)[-2]<0 then exit;
   if PSizeInt(PS)[-2]>1 then
@@ -62,7 +62,7 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function Str2Str(constref S:string):string;               //DONE -oLib -cRev.2026.03.29: Func Str2Str
+function Str2Str(constref S:string):string;               //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str
 var p, d : PByte;
 begin
   PByte(Result):=nil;
@@ -83,7 +83,7 @@ end;
 // ===== Math =====
 
 function OverPlus(IntL, IntR:SizeInt; out RI:SizeInt):boolean;
-var n : SizeInt;                           //DONE -oLib -cRev.2026.04.22: Func OverPlus
+var n : SizeInt;                           //DONE -oRFla.Lib -cRev.2026.04.22: Func OverPlus
 begin
   Result:=true;
   if (IntL=LI) or (IntR=LI) then exit;
@@ -94,7 +94,7 @@ begin
 end;
 
 function OverMult(IntL, IntR:SizeInt; out RI:SizeInt):boolean;
-const safe = trunc(sqrt(high(SizeInt)));    //DONE -oLib -cRev.2026.04.22: Func OverMult
+const safe = trunc(sqrt(high(SizeInt)));    //DONE -oRFla.Lib -cRev.2026.04.22: Func OverMult
 var al, ar : SizeInt;
 begin
   Result:=true;
@@ -107,7 +107,7 @@ begin
   Result:=false;
 end;
 
-function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oLib -cRev.2026.04.23: Func Scale
+function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oRFla.Lib -cRev.2026.04.23: Func Scale
 var i : SizeInt;            // Base^Scl
 begin
   Result:=1;
@@ -121,7 +121,7 @@ begin
   if Scl<0 then Result:=1/Result;
 end;
 
-function Max4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.04.27: Func Max4
+function Max4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oRFla.Lib -cRev.2026.04.27: Func Max4
 var m1, m2 : TRFloat;
 begin
   if F1>F2 then m1:=F1 else m1:=F2;
@@ -129,7 +129,7 @@ begin
   if m1>m2 then Result:=m1 else Result:=m2;
 end;
 
-function Min4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oLib -cRev.2026.04.27: Func Min4
+function Min4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oRFla.Lib -cRev.2026.04.27: Func Min4
 var m1, m2 : TRFloat;
 begin
   if F1<F2 then m1:=F1 else m1:=F2;
@@ -139,7 +139,7 @@ end;
 
 // ===== Data =====
 
-function AsInt(PV:PValRec):SizeInt;                       //DONE -oLib -cRev.2026.04.21: Func AsInt
+function AsInt(PV:PValRec):SizeInt;                       //DONE -oRFla.Lib -cRev.2026.04.21: Func AsInt
 begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NI);
@@ -153,7 +153,7 @@ begin
   end;
 end;
 
-function AsFloat(PV:PValRec):TRFloat;                     //DONE -oLib -cRev.2026.04.21: Func AsFloat
+function AsFloat(PV:PValRec):TRFloat;                     //DONE -oRFla.Lib -cRev.2026.04.21: Func AsFloat
 begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NF);
@@ -168,7 +168,7 @@ begin
   end;
 end;
 
-function AsRe(PV:PValRec):TRFloat;                        //DONE -oLib -cRev.2026.04.21: Func AsRe
+function AsRe(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsRe
 begin
   with PV^ do case VType of
     VNone : raise EError.Create(IncompType_NC);
@@ -182,7 +182,7 @@ begin
   end;
 end;
 
-function AsIm(PV:PValRec):TRFloat;                        //DONE -oLib -cRev.2026.04.21: Func AsIm
+function AsIm(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsIm
 begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NC);
@@ -193,7 +193,7 @@ begin
   end;
 end;
 
-function AsBool(PV:PValRec):boolean;                      //DONE -oLib -cRev.2026.04.21: Func AsBool
+function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsBool
 begin
   with PV^ do case VType of
     VNone  : Result:=false;
@@ -207,7 +207,7 @@ begin
   end;
 end;
 
-function AsStr(PV:PValRec):string;                        //DONE -oLib -cRev.2026.04.21: Func AsStr
+function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsStr
 begin
   with PV^ do case VType of
     VNone  : PByte(Result):=nil;
@@ -222,7 +222,7 @@ begin
   end;
 end;
 
-function AsLGap(PV:PValRec):TRFloat;                      //DONE -oLib -cRev.2026.04.21: Func AsLGap
+function AsLGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsLGap
 begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NG);
@@ -235,7 +235,7 @@ begin
   end;
 end;
 
-function AsRGap(PV:PValRec):TRFloat;                      //DONE -oLib -cRev.2026.04.21: Func AsRGap
+function AsRGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsRGap
 begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NG);
@@ -250,12 +250,12 @@ begin
   end;
 end;
 
-function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oLib -cRev.2026.04.25: Func AsIGapL
+function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.04.25: Func AsIGapL
 begin
   with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
 end;
 
-function AsIGapR(PV:PValRec):SizeInt;                     //DONE -oLib -cRev.2026.04.25: Func AsIGapR
+function AsIGapR(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.04.25: Func AsIGapR
 begin
   with PV^ do case VType of
     VInt  : Result:=Int;
@@ -264,7 +264,7 @@ begin
   end;
 end;
 
-function AsVrt(PV:PValRec):Variant;                       //DONE -oLib -cRev.2026.03.30: Func AsVrt
+function AsVrt(PV:PValRec):Variant;                       //DONE -oRFla.Lib -cRev.2026.03.30: Func AsVrt
 begin
   with PV^ do case VType of
     VNone : with PVarData(@Result)^ do begin
@@ -281,7 +281,7 @@ begin
   end;
 end;
 
-procedure ValCopy(Src, Dst:PValRec);                      //DONE -oLib -cRev.2026.04.28: Proc ValCopy
+procedure ValCopy(Src, Dst:PValRec);                      //DONE -oRFla.Lib -cRev.2026.04.28: Proc ValCopy
 begin
   with Dst^ do begin
     VType:=Src^.VType;
@@ -306,11 +306,11 @@ begin
   end;
 end;
 
-function Compare(L, R:PValRec):SizeInt;                   //DONE -oLib -cRev.2026.04.26: Func Compare
+function Compare(L, R:PValRec):SizeInt;                   //DONE -oRFla.Lib -cRev.2026.04.26: Func Compare
 var IL, IR, GL, GR : SizeInt;
     FL, FR, ML, MR : TRFloat;
 
-  function DiffStr:SizeInt;                               //DONE -oLib -cRev.2026.04.26: Func DiffStr
+  function DiffStr:SizeInt;                               //DONE -oRFla.Lib -cRev.2026.04.26: Func DiffStr
   var lng : SizeInt = 0;                   // not inline, diffsize = 8
       px, py, fin : PByte;
   begin                                    // should be ansistrings, null terminator is used
@@ -382,17 +382,17 @@ end;
 // ===== MemList routines =====
 
 function MemListGetLast(var MemList:TMemList):pointer; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListGetLast
+begin                                                    //DONE -oRFla.Lib -cRev.2026.04.18: Inline MemListGetLast
   with MemList do Result:=List[Count-1];
 end;
 
 function MemListIsLegs(var MemList:TMemList; Index:SizeInt):boolean; inline;
-begin                                                    //DONE -oLib -cRev.2026.04.18: Inline MemListIsLegs
+begin                                                    //DONE -oRFla.Lib -cRev.2026.04.18: Inline MemListIsLegs
   with MemList do Result:=List[Index]=Legs;
 end;
 
 function StretchList(var MemList:TMemList; Index:SizeInt):pointer;
-var p, lst, old : PPointer;                              //DONE -oLib -cRev.2026.04.18: Func StretchList
+var p, lst, old : PPointer;                              //DONE -oRFla.Lib -cRev.2026.04.18: Func StretchList
     L : SizeInt;
 begin
   with MemList do begin
@@ -423,7 +423,7 @@ begin
 end;
 
 procedure MemListInit(var MemList:TMemList; ListSize, ListGrow:SizeInt);
-begin                                               //DONE -oLib -cRev.2026.04.18: Proc MemListInit
+begin                                               //DONE -oRFla.Lib -cRev.2026.04.18: Proc MemListInit
   with MemList do begin
     Tail:=@Head;
     Count:=0;
@@ -433,7 +433,7 @@ begin                                               //DONE -oLib -cRev.2026.04.1
   end;
 end;
 
-procedure MemListFree(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.18: Proc MemListFree
+procedure MemListFree(var MemList:TMemList);        //DONE -oRFla.Lib -cRev.2026.04.18: Proc MemListFree
 var p, q : PByte;
     L : SizeInt;
 begin
@@ -450,7 +450,7 @@ begin
   until p=nil;
 end;
 
-procedure MemListClear(var MemList:TMemList);        //DONE -oLib -cRev.2026.04.18: Proc MemListClear
+procedure MemListClear(var MemList:TMemList);        //DONE -oRFla.Lib -cRev.2026.04.18: Proc MemListClear
 var p, q : PByte;                      // clear sorted list
     L : SizeInt;
 begin
@@ -474,7 +474,7 @@ begin
 end;
 
 function MemListFind(var MemList:TMemList; P, Fin:pointer):SizeInt;
-var L : SizeInt = 0;                                //DONE -oLib -cRev.2026.04.18: Func MemListFind
+var L : SizeInt = 0;                                //DONE -oRFla.Lib -cRev.2026.04.18: Func MemListFind
     R, d, diff : SizeInt;                       // find index in sorted list
     px, py : PByte;                             // if not found, return inverted index
 begin                          // DiffSize = 4
@@ -511,7 +511,7 @@ begin                          // DiffSize = 4
   Result:=not L;
 end;
 
-function MemListAdd(var MemList:TMemList):pointer;      //DONE -oLib -cRev.2026.04.18: Func MemListAdd
+function MemListAdd(var MemList:TMemList):pointer;      //DONE -oRFla.Lib -cRev.2026.04.18: Func MemListAdd
 var p : PPointer;
     cnt : SizeInt;
 begin                         // add item on top of unsorted list
@@ -530,7 +530,7 @@ begin                         // add item on top of unsorted list
 end;
 
 function MemListInsert(var MemList:TMemList; Index:SizeInt):pointer;
-var p : PPointer;                                       //DONE -oLib -cRev.2026.04.18: Func MemListInsert
+var p : PPointer;                                       //DONE -oRFla.Lib -cRev.2026.04.18: Func MemListInsert
     cnt : SizeInt;
 begin                                       // insert item in Index position of sorted list
   with MemList do begin
@@ -548,7 +548,7 @@ end;
 
 // ===== Context routines =====
 
-procedure FreeValue(PV:PValRec);                              //DONE -oLib -cRev.2026.04.18: Proc FreeValue
+procedure FreeValue(PV:PValRec);                              //DONE -oRFla.Lib -cRev.2026.04.18: Proc FreeValue
 var i : SizeInt;
 begin
   with PV^ do case VType of
@@ -561,7 +561,7 @@ begin
   end;
 end;
 
-procedure PostParam(var Context:TContext);                    //DONE -oLib -cRev.2026.04.18: Proc PostParam
+procedure PostParam(var Context:TContext);                    //DONE -oRFla.Lib -cRev.2026.04.18: Proc PostParam
 begin
   with Context do if TermResult^.VAlloc=LV then begin
     FreeValue(TermResult);
@@ -569,7 +569,7 @@ begin
   end;
 end;
 
-function NewLV(var Context:TContext):PValRec; inline;         //DONE -oLib -cRev.2026.04.18: Inline NewLV
+function NewLV(var Context:TContext):PValRec; inline;         //DONE -oRFla.Lib -cRev.2026.04.18: Inline NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
   with Result^ do begin
@@ -578,7 +578,7 @@ begin
   end;
 end;
 
-procedure CreateVarList(var Context:TContext);                //DONE -oLib -cRev.2026.04.18: Proc CreateVarList
+procedure CreateVarList(var Context:TContext);                //DONE -oRFla.Lib -cRev.2026.04.18: Proc CreateVarList
 begin
   with Context.VarPool do begin
     if Count>=VarDepth then raise EError.Create(MaxDepth);
@@ -591,7 +591,7 @@ end;
 // ===== Exceptions =====
 
 constructor EError.Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
-begin                                          //DONE -oLib -cRev.2026.04.18: Cstr EError.Create
+begin                                          //DONE -oRFla.Lib -cRev.2026.04.18: Cstr EError.Create
   inherited Create('');
   FCode:=Code;
   FPnt:=Pnt;
@@ -599,7 +599,7 @@ end;
 
 // ===== Quantities =====
 
-function PhyOp(X, Y : SizeInt; Phy:TPhyOp):SizeInt;  //DONE -oLib -cRev.2026.00.00: Func PhyOp
+function PhyOp(X, Y : SizeInt; Phy:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.00.00: Func PhyOp
 var qx, qy, qr : TQPhy;
     i : integer;
 begin
