@@ -195,15 +195,18 @@ end;
 
 function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsBool
 begin
-  with PV^ do case VType of
-    VNone  : Result:=false;
-    VInt   : Result:=Int<>0;
-    VFloat : Result:=Flo<>0;
-    VCplex, VGap : Result:=(Flo<>0) or (Img<>0);
-    VChar  : Result:=Chr<>0;
-    VStr   : Result:=Ansi[-1]<>0;
-    VIGap  : Result:=(Int<>0) or (IGap<>0);
-    VArr   : raise EError.Create(InvalidArrVal);
+  with PV^ do begin
+    if VPhy<>0 then raise EError.Create(IllegalPhy);
+    case VType of
+      VNone  : Result:=false;
+      VInt   : Result:=Int<>0;
+      VFloat : Result:=Flo<>0;
+      VCplex, VGap : Result:=(Flo<>0) or (Img<>0);
+      VChar  : Result:=Chr<>0;
+      VStr   : Result:=Ansi[-1]<>0;
+      VIGap  : Result:=(Int<>0) or (IGap<>0);
+      VArr   : raise EError.Create(InvalidArrVal);
+    end;
   end;
 end;
 

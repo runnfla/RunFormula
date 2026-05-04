@@ -143,7 +143,7 @@ begin
   Result:=0;
 end;
 
-procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.00.00: Proc ParseValue
+procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.05.04: Proc ParseValue
 var sig : SizeInt = 0;
     phy : SizeInt = 0;
     mf : boolean = false;
@@ -153,7 +153,6 @@ var sig : SizeInt = 0;
     tf : PChar;
     c : char;
 begin
-  PV^.VPhy:=0;
   while P<Fin do begin
     c:=P^;
     case c of

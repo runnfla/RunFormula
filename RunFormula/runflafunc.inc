@@ -277,13 +277,20 @@ begin
   PostParam(Context);
 end;
 
-function Fla_STR2VAL(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.03.31: Func Fla_STR2VAL
+function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.03.31: Func Fla_VALUE
+var s : string;
+    p : PByte;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
-  Result:=NewLV(Context);                // EXPAND
-  Result^.VType:=VFloat;
-  Result^.Flo:=StrToFloat(AsStr(Param(0-ParamCount, Context))); //
+  Result:=NewLV(Context);
+  s:=AsStr(Param(-1, Context));
   PostParam(Context);
+  p:=PByte(s);
+  try
+    ParseValue(PChar(p), PChar(P+PSizeInt(p)[-1]), Result);
+  except
+    Result^.VType:=VNone;
+  end;
 end;
 
 function FlArcTan(const Y, X:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.04.02: Func FlArcTan
@@ -626,7 +633,7 @@ begin
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
   FuncReg('string', @Fla_STRING);
-  FuncReg('str2val', @Fla_STR2VAL);
+  FuncReg('value', @Fla_VALUE);
   FuncReg('exp', @Fla_EXP);
   FuncReg('ln', @Fla_LN);
   FuncReg('sin', @Fla_SIN);

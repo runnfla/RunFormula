@@ -152,26 +152,41 @@ begin
 end;
 
 procedure DoParse(P:PChar);                           //DONE -oRFla.Parse -cRev.2026.05.03: Proc DoParse
-var VR : TValRec;
-    TF : PChar;                     // textfin
+var vr : TValRec;
+    tf : PChar;                     // textfin
     S : string;
     I : SizeInt;
-    C : char;
+    c : char;
     flg : boolean;
+
+  procedure TextToken(P:PChar; Lng:SizeInt);          //DONE -oRFla.Parse -cRev.2026.05.01: Proc TextToken
+  var sz : SizeInt;
+  begin
+    Sequence(TagText);
+    RequestBuf(ExprTokenSize);
+    sz:=AlignString(Lng);
+    with PToken(BufP)^ do begin
+      Tag:=TagText;
+      Source:=FlaPos;
+      Size:=sz+ExprTokenSize;
+    end;
+    inc(BufP, ExprTokenSize);
+    WriteString(PByte(P), Lng, sz, 0);
+  end;
 
   procedure ValueToken(constref V:TValRec);           //DONE -oRFla.Parse -cRev.2026.04.30: Proc ValueToken
   var L : SizeInt;
   begin
-    Sequence(TagValue);
     case V.VType of
-   //   VNone  : L:=PtrUint(@TToken(nil^).ValRec.Str)+SPtr;
       VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
       VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
       VChar  : L:=PtrUint(@TToken(nil^).ValRec.Chr)+SizeOf(TValRec.Chr);
+      VStr   : begin TextToken(PChar(V.Str), V.Ansi[-1]); exit; end;
       VIGap  : L:=PtrUint(@TToken(nil^).ValRec.IGap)+SI;
     end;
     if (L and (SI-1))>0 then L:=(L or (SI-1))+1;         // aligning to SizeInt
+    Sequence(TagValue);
     RequestBuf(L);
     with PToken(BufP)^ do begin
       Tag:=TagValue;
@@ -181,7 +196,6 @@ var VR : TValRec;
       ValRec.VAlloc:=BC;
       ValRec.VPhy:=0;
       case V.VType of
-  //      VNone  : ValRec.Str:=nil;
         VInt   : ValRec.Int:=V.Int;
         VFloat : ValRec.Flo:=V.Flo;
         VCplex, VGap : begin ValRec.Flo:=V.Flo; ValRec.Img:=V.Img; end;
@@ -237,33 +251,18 @@ var VR : TValRec;
     ValueToken(V);
   end;
 }
-  procedure TextToken;                                //DONE -oRFla.Parse -cRev.2026.05.01: Proc TextToken
-  var sz, lng : SizeInt;
-  begin
-    Sequence(TagText);
-    RequestBuf(ExprTokenSize);
-    lng:=TF-P;
-    sz:=AlignString(lng);
-    with PToken(BufP)^ do begin
-      Tag:=TagText;
-      Source:=FlaPos;
-      Size:=sz+ExprTokenSize;
-    end;
-    inc(BufP, ExprTokenSize);
-    WriteString(PByte(P), lng, sz, 0);
-  end;
 
   procedure VarToken;                                 //DONE -oRFla.Parse -cRev.2026.05.01: Proc VarToken
   var i : SizeInt;
   begin
     Sequence(TagVar);
     RequestBuf(VarTokenSize);
-    i:=MemListFind(VarList, P, TF);
+    i:=MemListFind(VarList, P, tf);
     if i<0 then begin
       i:=not i;
       with PFlaRec(MemListInsert(VarList, i))^ do begin
         ID:=PByte(P);
-        Lng:=TF-P;
+        Lng:=tf-P;
         Index:=VarList.Count-1;
       end;
     end;
@@ -274,7 +273,7 @@ var VR : TValRec;
       Index:=PFlaRec(VarList.List[i])^.Index;
     end;
     inc(BufP, VarTokenSize);
-    P:=TF;
+    P:=tf;
   end;
 
   function IsKey(constref Key:ShortString):boolean;   //DONE -oRFla.Parse -cRev.2026.05.01: Func IsKey
@@ -283,7 +282,7 @@ var VR : TValRec;
   begin
     Result:=false;
     PKey:=PByte(@Key);                       // PKey point to ShortString[0]
-    if PKey^<>(TF-P) then exit;
+    if PKey^<>(tf-P) then exit;
     pf:=P;
     KeyFin:=PKey+PKey^;                      // point to last char
     inc(PKey);
@@ -292,18 +291,18 @@ var VR : TValRec;
       inc(PKey, 2);
       inc(pf, 2);
     end;
-    if (pf<TF) and ((PByte(pf)^ or $20)<>PKey^) then exit;
-    P:=TF;
+    if (pf<tf) and ((PByte(pf)^ or $20)<>PKey^) then exit;
+    P:=tf;
     Result:=true;
   end;
 
 begin
   repeat
-    C:=P^;
-    if C=#0 then exit;
+    c:=P^;
+    if c=#0 then exit;
     if Comment<>#0 then begin
-      if C=#$D then C:=#$A;
-      if C=Comment then Comment:=#0;
+      if c=#$D then c:=#$A;
+      if c=Comment then Comment:=#0;
       inc(P);
       continue;
     end;
@@ -335,18 +334,18 @@ begin
       inc(P, 2);
       continue;
     end;
-    case C of
+    case c of
       #0..#$20 : ;
       '"', #$27 : begin
                     inc(P);
-                    TF:=FindTextFin(P, C);
-                    case TF-P of
+                    tf:=FindTextFin(P, c);
+                    case tf-P of
                       0 : NoneToken;
                       1 : CharToken(PByte(P)^);
-                      2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken;
-                      else TextToken;
+                      2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken(P, tf-P);
+                      else TextToken(P, tf-P);
                     end;
-                    P:=TF;
+                    P:=tf;
                   end;
       '%' : OpToken(TagMOD);
       '&' : OpToken(TagConcat);
@@ -368,11 +367,11 @@ begin
       '-' : if PreTag>=TagOp then OpToken(TagNegative, true) else OpToken(TagMinus);
       '/' : OpToken(TagSlash);
       '0'..'9' : begin
-                   TF:=FindTextFin(P);
-                   I:=IntCapture(P, TF, flg);
+                   tf:=FindTextFin(P);
+                   I:=IntCapture(P, tf, flg);
                    if flg then begin
                      IntToken(I);
-                     P:=TF;
+                     P:=tf;
                    end else FloatToken(FloatCapture(P));
                    continue;
                  end;
@@ -384,8 +383,9 @@ begin
       '>' : OpToken(TagGreater);
       '[' : begin
               tf:=FindTextFin(P+1, ']')+1;
-              ParseValue(P, tf, @VR);
-              ValueToken(VR);
+              ParseValue(P, tf, @vr);
+              ValueToken(vr);
+              if vr.VType=VStr then DecStrRef(vr.Str);
               P:=tf;
               continue;
             end;
@@ -396,19 +396,19 @@ begin
       '`' : begin
               if PreTag<>TagValue then raise EError.Create(InvalidChar);
               inc(P);
-              TF:=FindTextFin(P, '`');
-              PToken(BufP-ExprTokenSize)^.ValRec.VPhy:=PhyCapture(P, TF);
-              P:=TF;
+              tf:=FindTextFin(P, '`');
+              PToken(BufP-ExprTokenSize)^.ValRec.VPhy:=PhyCapture(P, tf);
+              P:=tf;
             end;
       '{' : Comment:='}';
       else
-        if C in FirstChars then begin
-          TF:=FindTextFin(P);
+        if c in FirstChars then begin
+          tf:=FindTextFin(P);
           if IsKey('and') then begin OpToken(TagAND); continue; end;
           if IsKey('or') then begin OpToken(TagOR); continue; end;
           if IsKey('not') then begin OpToken(TagNOT, true); continue; end;
           if IsKey('func') then begin
-            FirstChar(TF, FirstChars);                // check first char
+            FirstChar(tf, FirstChars);                // check first char
             ExprToken(TagSubr, TagSubr);
             continue;
           end;
@@ -436,16 +436,16 @@ begin
             continue;
           end;
           if IsKey('define') then begin
-            P:=FirstChar(TF, FirstChars);
-            TF:=FindTextFin(P);
-            I:=MemListFind(DefList, P, TF);
+            P:=FirstChar(tf, FirstChars);
+            tf:=FindTextFin(P);
+            I:=MemListFind(DefList, P, tf);
             if I>=0 then raise EError.Create(DefExists, P);
             with PFlaRec(MemListInsert(DefList, not I))^ do begin
               ID:=PByte(P);
-              Lng:=TF-P;
-              P:=FirstChar(TF, [#$22, #$27])+1;
-              TF:=FindTextFin(P, (P-1)^);
-              I:=TF-P;
+              Lng:=tf-P;
+              P:=FirstChar(tf, [#$22, #$27])+1;
+              tf:=FindTextFin(P, (P-1)^);
+              I:=tf-P;
               if I=0 then begin                         // avoid ""
                 dec(P);
                 I:=2;
@@ -455,7 +455,7 @@ begin
               PText:=Str2Ptr(S);
             end;
             SetLength(S, 0);
-            P:=TF+1;
+            P:=tf+1;
             continue;
           end;
           if IsKey('true') then begin IntToken(-1); continue; end;
@@ -478,31 +478,30 @@ begin
           if IsKey('inline') then raise EError.Create(Unsupported);
           if IsKey('branch') then raise EError.Create(Unsupported);
           if IsKey('debug') then raise EError.Create(Unsupported);
-          if IsKey('value') then raise EError.Create(Unsupported);
           if IsKey('is') then raise EError.Create(Unsupported);
           if IsKey('ref') then raise EError.Create(Unsupported);
-          case TF^ of
+          case tf^ of
             '(' : begin
-                    I:=MemListFind(SubrList, P, TF);
+                    I:=MemListFind(SubrList, P, tf);
                     if PreTag=TagSubr then begin
                       if I>=0 then raise EError.Create(FuncExists);
                       with PFlaRec(MemListInsert(SubrList, not I))^ do begin
                         ID:=PByte(P);
-                        Lng:=TF-P;
+                        Lng:=tf-P;
                         Index:=BufP-SBuf+BufSum-ExprTokenSize;
                       end;
                       ExprToken(TagExpr, TagExpr);
-                      P:=TF;                    // next TagBracket
+                      P:=tf;                    // next TagBracket
                       continue;
                     end;
                     if I<0 then begin
-                      I:=MemListFind(FuncList, P, TF);
+                      I:=MemListFind(FuncList, P, tf);
                       if I<0 then raise EError.Create(UnknownFunc);
                       ExprToken(TagFunc, TagBracket, I);
                     end else ExprToken(TagCall, TagBracket,
                       BufP-SBuf+BufSum-PFlaRec(SubrList.List[I])^.Index);
                     ExprToken(TagExpr, TagExpr);
-                    P:=TF;
+                    P:=tf;
                   end;
             '[' : begin
                     ExprToken(TagArray, TagArray);
@@ -511,13 +510,13 @@ begin
                     ExprToken(TagExpr, TagExpr);
                   end;
             else
-              I:=MemListFind(DefList, P, TF);
+              I:=MemListFind(DefList, P, tf);
               if I>=0 then begin
                 if InDef>=DefDepth then raise EError.Create(MaxDepth);
                 inc(InDef);
                 DoParse(PFlaRec(DefList.List[I])^.PChr);
                 dec(InDef);
-                P:=TF;
+                P:=tf;
                 continue;
               end;
               VarToken;
