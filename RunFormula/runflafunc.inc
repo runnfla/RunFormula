@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Parser and Evaluator
 //  Essential functions include file
-//  Rev. 15.04.2026
+//  Rev. 5.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -15,7 +15,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -oRFla.Func -cRev.2026.04.15:Expand Str2Val
+// TODO -oRFla.Func -cRev.2026.05.05:Smith algoritm in ABS
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
 begin                               //DONE -oRFla.Func -cRev.2026.04.18: Inline BreakParam
@@ -602,6 +602,21 @@ begin
       VCplex : begin
                  VType:=VFloat;
                  Flo:=sqrt(sqr(pv^.Flo)+sqr(pv^.Img));
+                 {x := Abs(z.Flo);
+  y := Abs(z.Img);
+  if x = 0 then Exit(y);
+  if y = 0 then Exit(x);
+
+  if x > y then begin
+    temp := y / x;
+    Exit(x * sqrt(1 + temp * temp));
+  end else begin
+    temp := x / y;
+    Exit(y * sqrt(1 + temp * temp));
+  end;
+end;}
+
+
                end;
       VChar  : Chr:=abs(pv^.Chr);
       VStr   : raise EError.Create(InvalidStrVal);

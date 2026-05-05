@@ -15,7 +15,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -oRFla.Lib -cRev.2026.04.30:
+// TODO -oRFla.Lib -cRev.2026.04.30: Smith algorithm in Compare
 
 procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);        //DONE -oRFla.Lib -cRev.2026.04.28: Proc DataCopy
 var ps, pd : PByte;
