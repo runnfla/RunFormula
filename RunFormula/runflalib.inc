@@ -116,7 +116,7 @@ begin
     if (i and 1)<>0 then Result:=Result*Base;
     i:=i shr 1;
     if i=0 then break;
-    Base:=Base*Base;
+    Base:=sqr(Base);
   until false;
   if Scl<0 then Result:=1/Result;
 end;
@@ -358,7 +358,7 @@ begin
                FL:=AsRe(L); ML:=AsIm(L);
                FR:=AsRe(R); MR:=AsIm(R);
                if (FL=FR) and (ML=MR) then exit;
-               if (FL*FL+ML*ML)>=(FR*FR+MR*MR) then Exit(1);
+               if (sqr(FL)+sqr(ML))>=(sqr(FR)+sqr(MR)) then Exit(1);
              end;
     VStr   : begin
                IL:=DiffStr;

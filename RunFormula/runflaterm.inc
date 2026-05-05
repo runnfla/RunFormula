@@ -169,12 +169,12 @@ var L : PValRec = @CVNone;        // init VMode
       end;
       i:=i shr 1;
       if i=0 then break;
-      t:=BRE*BRE-BIM*BIM;
+      t:=sqr(BRE)-sqr(BIM);
       BIM:=BRE*BIM*2;
       BRE:=t;
     until false;
     if scl<0 then begin
-      t:=re*re+im*im;
+      t:=sqr(re)+sqr(im);
       re:=re/t;
       im:=-im/t;
     end;
@@ -270,9 +270,33 @@ begin
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                         VCplex : begin
                                    fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
-                                   f:=fc*fc+fd*fd;
+                                   f:=sqr(fc)+sqr(fd);
                                    LVal((fa*fc+fb*fd)/f, (fb*fc-fa*fd)/f);
-                                 end;
+
+
+      {
+
+        VDiv: begin
+  c := abs(pv2^.Flo);
+  d := abs(pv2^.Img);
+
+  if c >= d then begin
+    r := pv2^.Img / pv2^.Flo;
+    den := pv2^.Flo + r * pv2^.Img;
+    Flo := (pv1^.Flo + r * pv1^.Img) / den;
+    Img := (pv1^.Img - r * pv1^.Flo) / den;
+  end else begin
+    r := pv2^.Flo / pv2^.Img;
+    den := pv2^.Img + r * pv2^.Flo;
+    Flo := (pv1^.Flo * r + pv1^.Img) / den;
+    Img := (pv1^.Img * r - pv1^.Flo) / den;
+  end;
+end;
+
+
+       }
+
+                        end;
                         VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);

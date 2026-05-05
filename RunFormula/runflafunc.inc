@@ -360,7 +360,7 @@ begin
     VCplex : begin
                if (pv^.Flo=0) and (pv^.Img=0) then raise EError.Create(InvalidValue);
                VType:=VCplex;
-               Flo:=ln(pv^.Flo*pv^.Flo+pv^.Img*pv^.Img)*0.5;
+               Flo:=ln(sqr(pv^.Flo)+sqr(pv^.Img))*0.5;
                Img:=FlArcTan(pv^.Img, pv^.Flo);
              end;
     VGap, VIGap : begin
@@ -469,31 +469,45 @@ end;
 
 function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_SQRT
 var pv : PValRec;
-    f : TRFloat;
+    f, t : TRFloat;
+    phy : SizeInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(0-ParamCount, Context);
-  with Result^ do case pv^.VType of
-    VCplex : begin
-               VType:=VCplex;
-               f:=(sqrt(pv^.Flo*pv^.Flo+pv^.Img*pv^.Img)+pv^.Flo)/2;
-               Flo:=sqrt(f);
-               Img:=sqrt(f-pv^.Flo);
-               if pv^.Img<0 then Img:=-Img;
-             end;
-    VGap, VIGap : begin
-                    f:=AsRGap(pv);
-                    if f>=0 then Img:=sqrt(f) else raise EError.Create(InvalidValue);
-                    f:=AsLGap(pv);
-                    if f>=0 then Flo:=sqrt(f) else Flo:=0;
-                    VType:=VGap;
-                  end;
-    else
-      f:=AsFloat(pv);
-      if f<0 then raise EError.Create(InvalidValue);
-      Flo:=sqrt(f);
-      VType:=VFloat;
+  phy:=pv^.VPhy;
+  if (phy and $0101010101010101)>0 then raise EError.Create(IllegalPhy);
+  with Result^ do begin
+    VPhy:=(phy shr 1) or (phy and $8080808080808080);
+    case pv^.VType of
+      VCplex : begin
+                 VType:=VCplex;
+                 f:=abs(pv^.Flo);
+                 t:=abs(pv^.Img);
+                 if (f<>0) or (t<>0) then begin
+                   if f>t then f:=f*sqrt(sqr(t/f)+1)*0.5 else f:=t*sqrt(sqr(f/t)+1)*0.5;
+                 end;
+                 t:=f+pv^.Flo*0.5;
+                 if t<0 then t:=0;
+                 Flo:=sqrt(t);
+                 t:=f-pv^.Flo*0.5;
+                 if t<0 then t:=0;
+                 Img:=sqrt(t);
+                 if pv^.Img<0 then Img:=-Img;
+               end;
+      VGap, VIGap : begin
+                      f:=AsRGap(pv);
+                      if f>=0 then Img:=sqrt(f) else raise EError.Create(InvalidValue);
+                      f:=AsLGap(pv);
+                      if f>=0 then Flo:=sqrt(f) else Flo:=0;
+                      VType:=VGap;
+                    end;
+      else
+        f:=AsFloat(pv);
+        if f<0 then raise EError.Create(InvalidValue);
+        Flo:=sqrt(f);
+        VType:=VFloat;
+    end;
   end;
   PostParam(Context);
 end;
@@ -510,7 +524,7 @@ begin
     VCplex : begin
                if (pv^.Flo=0) and ((pv^.Img=1) or (pv^.Img=-1)) then raise EError.Create(InvalidValue);
                VType:=VCplex;
-               f:=pv^.Flo*pv^.Flo+pv^.Img*pv^.Img+1;
+               f:=sqr(pv^.Flo)+sqr(pv^.Img)+1;
                Flo:=FlArcTan(pv^.Flo*2, 2-f)/2;
                Img:=ln((f+pv^.Img*2)/(f-pv^.Img*2))/4;
              end;
@@ -555,7 +569,7 @@ begin
                end;
       VCplex : begin
                  VType:=VCplex;
-                 f:=sqrt(fa*fa+fb*fb);
+                 f:=sqrt(sqr(fa)+sqr(fb));
                  if frac(f)>=0.5 then f:=f+1;
                  f:=System.int(f);
                  fa:=round(FlArcTan(fb, fa)*Grad)/Grad;
@@ -586,7 +600,7 @@ begin
       VFloat : Flo:=abs(pv^.Flo);
       VCplex : begin
                  VType:=VFloat;
-                 Flo:=sqrt(pv^.Flo*pv^.Flo+pv^.Img*pv^.Img);
+                 Flo:=sqrt(sqr(pv^.Flo)+sqr(pv^.Img));
                end;
       VChar  : Chr:=abs(pv^.Chr);      //???????
       VStr   : raise EError.Create(InvalidStrVal);
