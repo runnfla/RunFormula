@@ -210,7 +210,6 @@ begin
     inc(P);                                   // 0=1 "=2 (=8 )=9 [=B ]=D ,=C :=A
   end;
   with PV^ do begin
-    VPhy:=phy;
     case sig of
       1       : if flg then begin             // 0
                   VType:=VInt;
@@ -251,6 +250,7 @@ begin
                 end;
       else raise EError.Create(InvalidFormat);
     end;
+    VPhy:=phy;                       // after all raises
   end;
 end;
 

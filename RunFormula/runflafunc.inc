@@ -118,19 +118,21 @@ begin
 end;
 
 function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_CPLEX
-var phy : SizeInt;
+var L, R : PValRec;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
+  L:=Param(-2, Context);
+  R:=Param(-1, Context);
   with Result^ do begin
     VType:=VCplex;
-    Flo:=AsFloat(Param(-2, Context));
-    phy:=Context.TermResult^.VPhy;
-    PostParam(Context);
-    Img:=AsFloat(Param(-1, Context));
-    if Context.TermResult^.VPhy<>phy then raise EError.Create(PhyMismatch);
-    VPhy:=phy;
+    VPhy:=L^.VPhy;
+    if VPhy<>R^.VPhy then raise EError.Create(PhyMismatch);
+    Flo:=AsFloat(L);
+    Img:=AsFloat(R);
   end;
+  PostParam(Context);
+  Context.TermResult:=L;
   PostParam(Context);
 end;
 
@@ -158,99 +160,105 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_RANGE
-var Lpv, Rpv : PValRec;
+function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_RANGE
+var L, R : PValRec;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  Lpv:=Param(0-ParamCount, Context);
-  Rpv:=Param(1-ParamCount, Context);
-  with Result^ do if (Lpv^.VType in [VInt, VChar]) and (Rpv^.VType in [VInt, VChar]) then begin
-    VType:=VIGap;
-    Int:=AsInt(Lpv);
-    IGap:=AsInt(Rpv);
-    if IGap<Int then raise EError.Create(InvalidRange);
-  end else begin
-    VType:=VGap;
-    Flo:=AsFloat(Lpv);
-    Img:=AsFloat(Rpv);
-    if Img<Flo then raise EError.Create(InvalidRange);
+  L:=Param(-2, Context);
+  R:=Param(-1, Context);
+  with Result^ do begin
+    VPhy:=L^.VPhy;
+    if VPhy<>R^.VPhy then raise EError.Create(PhyMismatch);
+    if (L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]) then begin
+      VType:=VIGap;
+      Int:=AsInt(L);
+      IGap:=AsInt(R);
+      if IGap<Int then raise EError.Create(InvalidRange);
+    end else begin
+      VType:=VGap;
+      Flo:=AsFloat(L);
+      Img:=AsFloat(R);
+      if Img<Flo then raise EError.Create(InvalidRange);
+    end;
   end;
   PostParam(Context);
-  Context.TermResult:=Lpv;
+  Context.TermResult:=L;
   PostParam(Context);
 end;
 
-function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_FRAC
+function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_FRAC
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=frac(AsFloat(Param(0-ParamCount, Context)));
+    Flo:=frac(AsFloat(Param(-1, Context)));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_INT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_INT
+function Fla_INT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_INT
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=System.Int(AsFloat(Param(0-ParamCount, Context)));
+    Flo:=System.int(AsFloat(Param(-1, Context)));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_TRUNC
+function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_TRUNC
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VInt;
-    Int:=trunc(AsFloat(Param(0-ParamCount, Context)));
+    Int:=trunc(AsFloat(Param(-1, Context)));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.04: Func Fla_SIGN
-var I : SizeInt = 0;
+function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_SIGN
+var I : SizeInt = -1;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
-  repeat
-    with Param(0-ParamCount, Context)^ do case VType of
-      VInt   : begin
-                 if Int=0 then break;
-                 if Int>0 then I:=1;
-               end;
-      VFloat : begin
-                if Flo=0 then break;
-                if Flo>0 then I:=1;
-               end;
-      VCplex : if Flo=0 then begin
-                 if Img=0 then break;
-                 if Img>0 then I:=1;
-               end else if Flo>0 then I:=1;
-      VChar  : begin
-                 if Chr=0 then break;
-                 I:=1;
-               end;
-      VStr   :  begin
-                  if (Str=nil) or (PSizeInt(Str-SI)^=0) then break;
-                  I:=1;
-                end;
-      VGap   : begin
-                 if (Flo<=0) and (Img>=0) then break;
-                 if Flo>0 then I:=1;
-               end;
-      VIGap  : begin
-                 if (Int<=0) and (IGap>=0) then break;
-                 if Int>0 then I:=1;
-               end;
-    end;
-    if I=0 then I:=-1;
-  until true;
+  with Param(-1, Context)^ do case VType of
+    VNone  : I:=0;
+    VInt   : begin
+               if Int=0 then I:=0;
+               if Int>0 then I:=1;
+             end;
+    VFloat : begin
+              if Flo=0 then I:=0;
+              if Flo>0 then I:=1;
+             end;
+    VCplex : if Flo=0 then begin
+               if Img=0 then I:=0;
+               if Img>0 then I:=1;
+             end else if Flo>0 then I:=1;
+    VChar  : begin
+               if Chr=0 then I:=0;
+               if Chr>0 then I:=1;
+             end;
+    VStr   :  begin
+                if Ansi[-1]=0 then I:=0;
+                I:=1;
+              end;
+    VGap   : begin
+               if (Flo<=0) and (Img>=0) then I:=0;
+               if Flo>0 then I:=1;
+             end;
+    VIGap  : begin
+               if (Int<=0) and (IGap>=0) then I:=0;
+               if Int>0 then I:=1;
+             end;
+    VArr   : raise EError.Create(InvalidArrVal);
+  end;
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
@@ -259,33 +267,33 @@ begin
   end;
 end;
 
-function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.04.05: Func Fla_LENGTH
+function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_LENGTH
 var p : PByte;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  p:=PByte(AsStr(Param(0-ParamCount, Context)));
+  p:=PByte(AsStr(Param(-1, Context)));
   with Result^ do begin
     VType:=VInt;
     Int:=0;
-    if p<>nil then Int:=PSizeInt(p-SI)^;
+    if p<>nil then Int:=PSizeInt(p)[-1];
   end;
   PostParam(Context);
 end;
 
-function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.04.05: Func Fla_STRING
+function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_STRING
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VStr;
-    Str:=Str2Ptr(AsStr(Param(0-ParamCount, Context)));
+    Str:=Str2Ptr(AsStr(Param(-1, Context)));
     if Str=nil then VType:=VNone;
   end;
   PostParam(Context);
 end;
 
-function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.03.31: Func Fla_VALUE
+function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_VALUE
 var s : string;
     p : PByte;
 begin
@@ -294,14 +302,14 @@ begin
   s:=AsStr(Param(-1, Context));
   PostParam(Context);
   p:=PByte(s);
-  try
-    ParseValue(PChar(p), PChar(P+PSizeInt(p)[-1]), Result);
+  try                               // include memory exception
+    ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
   except
     Result^.VType:=VNone;
   end;
 end;
 
-function FlArcTan(const Y, X:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.04.02: Func FlArcTan
+function FlArcTan(const Y, X:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.05.05: Func FlArcTan
 begin
   if X=0 then begin
     if Y>=0 then Result:=Cpi/2 else Result:=-Cpi/2;
@@ -313,13 +321,14 @@ begin
   end;
 end;
 
-function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_EXP
+function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_EXP
 var pv : PValRec;
     f : TRFloat;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
@@ -339,18 +348,19 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_LN
+function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_LN
 var pv : PValRec;
     f : TRFloat;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
   with Result^ do case pv^.VType of
     VCplex : begin
                if (pv^.Flo=0) and (pv^.Img=0) then raise EError.Create(InvalidValue);
                VType:=VCplex;
-               Flo:=ln(sqrt(pv^.Flo*pv^.Flo+pv^.Img*pv^.Img));
+               Flo:=ln(pv^.Flo*pv^.Flo+pv^.Img*pv^.Img)*0.5;
                Img:=FlArcTan(pv^.Img, pv^.Flo);
              end;
     VGap, VIGap : begin
@@ -369,27 +379,30 @@ begin
   PostParam(Context);
 end;
 
-function Dsincos(const F:TRFloat; cs:integer):integer;                //DONE -oRFla.Func -cRev.2026.04.03: Func Dsincos
+function Dsincos(const F, cs:TRFloat):integer;                        //DONE -oRFla.Func -cRev.2026.05.05: Func Dsincos
 var w : TRFloat;
 begin
   Result:=0;
-  w:=frac((F/(Cpi/2)-cs)/4);
+  w:=frac(F/(Cpi*2)-cs);
   if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
 end;
 
-function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_SIN
+function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_SIN
 var pv : PValRec;
     fa, fb, d : TRFloat;
     k : integer;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
-               Flo:=sin(pv^.Flo)*(exp(pv^.Img)+exp(-pv^.Img))/2;
-               Img:=cos(pv^.Flo)*(exp(pv^.Img)-exp(-pv^.Img))/2;
+               fa:=exp(pv^.Img);
+               fb:=1/fa;
+               Flo:=sin(pv^.Flo)*(fa+fb)*0.5;
+               Img:=cos(pv^.Flo)*(fa-fb)*0.5;
              end;
     VGap, VIGap : begin
                     VType:=VGap;
@@ -397,7 +410,7 @@ begin
                     fa:=AsLGap(pv); fb:=AsRGap(pv);
                     d:=fb-fa;
                     if d<(Cpi*2) then begin
-                      k:=(Dsincos(fa, -1) shl 1) or Dsincos(fb, -1);
+                      k:=(Dsincos(fa, -0.25) shl 1) or Dsincos(fb, -0.25);
                       fa:=sin(fa); fb:=sin(fb);
                       case k of
                         0 : if d<Cpi then begin Flo:=fa; Img:=fb; end;
@@ -414,19 +427,22 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.03: Func Fla_COS
+function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_COS
 var pv : PValRec;
     fa, fb, d : TRFloat;
     k : integer;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
-               Flo:=cos(pv^.Flo)*(exp(pv^.Img)+exp(-pv^.Img))/2;
-               Img:=-sin(pv^.Flo)*(exp(pv^.Img)-exp(-pv^.Img))/2;
+               fa:=exp(pv^.Img);
+               fb:=1/fa;
+               Flo:=cos(pv^.Flo)*(fa+fb)*0.5;
+               Img:=-sin(pv^.Flo)*(fa-fb)*0.5;
              end;
     VGap, VIGap : begin
                     VType:=VGap;
@@ -434,7 +450,7 @@ begin
                     fa:=AsLGap(pv); fb:=AsRGap(pv);
                     d:=fb-fa;
                     if d<(Cpi*2) then begin
-                      k:=(Dsincos(fa, 2) shl 1) or Dsincos(fb, 2);
+                      k:=(Dsincos(fa, 0.5) shl 1) or Dsincos(fb, 0.5);
                       fa:=cos(fa); fb:=cos(fb);
                       case k of
                         0 : if d<Cpi then begin Flo:=fa; Img:=fb; end;
