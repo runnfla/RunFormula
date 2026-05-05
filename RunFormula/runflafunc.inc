@@ -498,13 +498,14 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_ARCTAN
+function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ARCTAN
 var pv : PValRec;
     f : TRFloat;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
   with Result^ do case pv^.VType of
     VCplex : begin
                if (pv^.Flo=0) and ((pv^.Img=1) or (pv^.Img=-1)) then raise EError.Create(InvalidValue);
@@ -525,42 +526,48 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.04: Func Fla_ROUND
+function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ROUND
 const Grad = 180/Cpi;
-var pv : PValRec;
-    f, fa, fb : TRFloat;
+var f, fa, fb : TRFloat;
     t : TVType;
+    phy : SizeInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
-  pv:=Param(0-ParamCount, Context);
-  t:=pv^.VType;
-  case t of
-    VInt, VChar, VIGap : Exit(pv);
-    VFloat : fa:=pv^.Flo;
-    VCplex, VGap : begin fa:=pv^.Flo; fb:=pv^.Img; end;
-    VStr : raise EError.Create(InvalidStrVal);
+  with Param(-1, Context)^ do begin
+    phy:=VPhy;
+    t:=VType;
+    case t of
+      VFloat : fa:=Flo;
+      VCplex, VGap : begin fa:=Flo; fb:=Img; end;
+      VStr : raise EError.Create(InvalidStrVal);
+      VArr : raise EError.Create(InvalidArrVal);
+      else Exit(Context.TermResult);
+    end;
   end;
   PostParam(Context);
   Result:=NewLV(Context);
-  with Result^ do case t of
-    VFloat : begin
-               VType:=VInt;
-               Int:=round(fa);
-             end;
-    VCplex : begin
-               VType:=VCplex;
-               f:=sqrt(fa*fa+fb*fb);
-               if frac(f)>=0.5 then f:=f+1;
-               f:=System.Int(f);
-               fa:=round(FlArcTan(fb, fa)*Grad)/Grad;
-               Flo:=f*cos(fa);
-               Img:=f*sin(fa);
-             end;
-    VGap   : begin
-               VType:=VIGap;
-               Int:=round(fa);
-               IGap:=round(fb);
-             end;
+  with Result^ do begin
+    VPhy:=phy;
+    case t of
+      VFloat : begin
+                 VType:=VInt;
+                 Int:=round(fa);
+               end;
+      VCplex : begin
+                 VType:=VCplex;
+                 f:=sqrt(fa*fa+fb*fb);
+                 if frac(f)>=0.5 then f:=f+1;
+                 f:=System.int(f);
+                 fa:=round(FlArcTan(fb, fa)*Grad)/Grad;
+                 Flo:=f*cos(fa);
+                 Img:=f*sin(fa);
+               end;
+      VGap   : begin
+                 VType:=VIGap;
+                 Int:=round(fa);
+                 IGap:=round(fb);
+               end;
+    end;
   end;
 end;
 
@@ -570,9 +577,10 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
   with Result^ do begin
     VType:=pv^.VType;
+    VPhy:=pv^.VPhy;
     case VType of
       VInt   : Int:=abs(pv^.Int);
       VFloat : Flo:=abs(pv^.Flo);
@@ -580,7 +588,7 @@ begin
                  VType:=VFloat;
                  Flo:=sqrt(pv^.Flo*pv^.Flo+pv^.Img*pv^.Img);
                end;
-      VChar  : Chr:=pv^.Chr;
+      VChar  : Chr:=abs(pv^.Chr);      //???????
       VStr   : raise EError.Create(InvalidStrVal);
       VGap, VIGap : begin
                       VType:=VGap;
@@ -591,33 +599,49 @@ begin
                         if fa<fb then Flo:=fa else Flo:=fb;
                       end else Flo:=0;
                     end;
+   {
+
+ VGap, VIGap : begin
+  fa := abs(AsLGap(pv));
+  fb := abs(AsRGap(pv));
+
+  // Максимальный модуль — это правая граница результата
+  if fa > fb then Img := fa else Img := fb;
+
+  // Минимальный модуль (Flo)
+  if (AsLGap(pv) > 0) or (AsRGap(pv) < 0) then begin
+    if fa < fb then Flo := fa else Flo := fb;
+  end else
+    Flo := 0;
+
+  VType := VGap;
+end
+               }
+
+
+
+      VArr   : raise EError.Create(InvalidArrVal);
     end;
   end;
   PostParam(Context);
 end;
 
-function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.00: Func Fla_CHAR
-var pv : PValRec;
-    I : SizeUInt;
+function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_CHAR
+var I : SizeUInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  I:=AsInt(Param(-1, Context));
+  if I>$FF then raise EError.Create(InvalidValue);
   with Result^ do begin
     VType:=VChar;
-    if pv^.VType=VStr then begin
-      if (pv^.Str=nil) or (PSizeInt(pv^.Str-SI)^<>1) then raise EError.Create(InvalidValue);
-      Chr:=pv^.Str^;
-    end else begin
-      I:=AsInt(pv);
-      if I>$FF then raise EError.Create(InvalidValue);
-      Chr:=byte(I);
-    end;
+    Chr:=byte(I);
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.00: Func Fla_COMPARE
+function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_COMPARE
 var pv : PValRec;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
