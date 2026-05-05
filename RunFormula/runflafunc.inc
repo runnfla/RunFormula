@@ -82,70 +82,78 @@ begin
   until false;
 end;
 
-function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_TYPE
+function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_TYPE
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
      VType:=VInt;
-     Int:=SizeInt(Param(0-ParamCount, Context)^.VType);
+     Int:=SizeInt(Param(-1, Context)^.VType);
   end;
   PostParam(Context);
 end;
 
-function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_REAL
+function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_RE
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=AsRe(Param(0-ParamCount, Context));
+    Flo:=AsRe(Param(-1, Context));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_IMAGE
+function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_IM
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=AsIm(Param(0-ParamCount, Context));
+    Flo:=AsIm(Param(-1, Context));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_CPLEX
+function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_CPLEX
+var phy : SizeInt;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VCplex;
-    Flo:=AsFloat(Param(0-ParamCount, Context));
+    Flo:=AsFloat(Param(-2, Context));
+    phy:=Context.TermResult^.VPhy;
     PostParam(Context);
-    Img:=AsFloat(Param(1-ParamCount, Context));
+    Img:=AsFloat(Param(-1, Context));
+    if Context.TermResult^.VPhy<>phy then raise EError.Create(PhyMismatch);
+    VPhy:=phy;
   end;
   PostParam(Context);
 end;
 
-function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_LEFT
+function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_LEFT
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=AsLGap(Param(0-ParamCount, Context));
+    Flo:=AsLGap(Param(-1, Context));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_RIGHT
+function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_RIGHT
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=AsRGap(Param(0-ParamCount, Context));
+    Flo:=AsRGap(Param(-1, Context));
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;

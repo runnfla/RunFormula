@@ -207,51 +207,62 @@ var vr : TValRec;
   end;
 
   procedure IntToken(I:SizeInt); inline;              //DONE -oRFla.Parse -cRev.2026.04.30: Inline IntToken
-  var V : TValRec = (VType : VInt);
   begin
-    V.Int:=I;
-    ValueToken(V);
+    with vr do begin
+      VType:=VInt;
+      Int:=I;
+    end;
+    ValueToken(vr);
   end;
 
   procedure FloatToken(const F:TRFloat); inline;      //DONE -oRFla.Parse -cRev.2026.04.30: Inline FloatToken
-  var V : TValRec = (VType : VFloat);
   begin
-    V.Flo:=F;
-    ValueToken(V);
+    with vr do begin
+      VType:=VFloat;
+      Flo:=F;
+    end;
+    ValueToken(vr);
   end;
 
   procedure CplexToken(const Re, Im:TRFloat); inline; //DONE -oRFla.Parse -cRev.2026.04.30: Inline CplexToken
-  var V : TValRec = (VType : VCplex);
   begin
-    V.Flo:=Re;
-    V.Img:=Im;
-    ValueToken(V);
+    with vr do begin
+      VType:=VCplex;
+      Flo:=Re;
+      Img:=Im;
+    end;
+    ValueToken(vr);
   end;
 
-  procedure CharToken(Chr:byte); inline;              //DONE -oRFla.Parse -cRev.2026.04.30: Inline CharToken
-  var V : TValRec = (VType : VChar);
+  procedure CharToken(Ch:byte); inline;               //DONE -oRFla.Parse -cRev.2026.04.30: Inline CharToken
   begin
-    V.Chr:=Chr;
-    ValueToken(V);
+    with vr do begin
+      VType:=VChar;
+      Chr:=Ch;
+    end;
+    ValueToken(vr);
   end;
 {
   procedure GapToken(const L, R:TRFloat); inline;     //DONE -oRFla.Parse -cRev.2026.04.30: Inline GapToken
-  var V : TValRec = (VType : VGap);
   begin
-    V.Flo:=L;
-    V.Img:=R;
-    ValueToken(V);
+    with vr do begin
+      VType:=VGap;
+      Flo:=L;
+      Img:=R;
+    end;
+    ValueToken(vr);
   end;
 
   procedure IGapToken(L, R:SizeInt);                  //DONE -oRFla.Parse -cRev.2026.04.30: Inline IGapToken
-  var V : TValRec = (VType : VIGap);
   begin
-    V.Int:=L;
-    V.IGap:=R;
-    ValueToken(V);
+    with vr do begin
+      VType:=VIGap;
+      Int:=L;
+      IGap:=R;
+    end;
+    ValueToken(vr);
   end;
 }
-
   procedure VarToken;                                 //DONE -oRFla.Parse -cRev.2026.05.01: Proc VarToken
   var i : SizeInt;
   begin
@@ -382,12 +393,12 @@ begin
             end;
       '>' : OpToken(TagGreater);
       '[' : begin
-              tf:=FindTextFin(P+1, ']')+1;
+              inc(P);
+              tf:=FindTextFin(P, ']');
               ParseValue(P, tf, @vr);
               ValueToken(vr);
               if vr.VType=VStr then DecStrRef(vr.Str);
               P:=tf;
-              continue;
             end;
       ']' : begin
               CloseToken(TagExpr);

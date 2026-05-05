@@ -195,7 +195,7 @@ begin
                       F:=FloatCapture(P);
                       if mf then F:=-F;
                     end else P:=tf;
-                    sig:=(sig shl 4) or $F;
+                    sig:=(sig shl 4) or 1;
                     continue;
                   end;
       '`'       : begin
@@ -207,48 +207,48 @@ begin
                   end;
       else raise EError.Create(InvalidChar, P);
     end;
-    inc(P);                                   // "=2 (=8 )=9 [=B ]=D ,=C :=A 0=F
+    inc(P);                                   // 0=1 "=2 (=8 )=9 [=B ]=D ,=C :=A
   end;
   with PV^ do begin
     VPhy:=phy;
     case sig of
-       2, $B2D : begin                           // "  ["]
-                   VType:=VChar;
-                   Chr:=byte(I);
-                 end;
-      $F, $BFD : if flg then begin               // 0  [0]
-                   VType:=VInt;
-                   Int:=I;
-                 end else begin
-                   VType:=VFloat;
-                   Flo:=F;
-                 end;
-      $82C29,                                    // (0,0) (0,") (",0) (",")
-      $82CF9,                                    // [(0,0)] [(0,")] [(",0)] [(",")]
-      $8FC29,
-      $8FCF9,
-      $B82C29D,
-      $B82CF9D,
-      $B8FC29D,
-      $B8FCF9D : begin
-                   VType:=VCplex;
-                   Flo:=FL;
-                   Img:=F;
-                 end;
-      $B2A2D,                                    // [0:0] [0:"] [":0] [":"]
-      $B2AFD,
-      $BFA2D,
-      $BFAFD   : if flg then begin
-                   if IL>I then raise EError.Create(InvalidRange);
-                   VType:=VIGap;
-                   Int:=IL;
-                   IGap:=I;
-                 end else begin
-                   if FL>F then raise EError.Create(InvalidRange);
-                   VType:=VGap;
-                   Flo:=FL;
-                   Img:=F;
-                 end;
+      1       : if flg then begin             // 0
+                  VType:=VInt;
+                  Int:=I;
+                end else begin
+                  VType:=VFloat;
+                  Flo:=F;
+                end;
+      2       : begin                         // "
+                  VType:=VChar;
+                  Chr:=byte(I);
+                end;
+      $1A1,                                   // 0:0 0:" ":0 ":"
+      $1A2,
+      $2A1,
+      $2A2,
+      $B1A1D,                                 // [0:0] [0:"] [":0] [":"]
+      $B1A2D,
+      $B2A1D,
+      $B2A2D  : if flg then begin
+                  if IL>I then raise EError.Create(InvalidRange);
+                  VType:=VIGap;
+                  Int:=IL;
+                  IGap:=I;
+                end else begin
+                  if FL>F then raise EError.Create(InvalidRange);
+                  VType:=VGap;
+                  Flo:=FL;
+                  Img:=F;
+                end;
+      $81C19,                                 // (0,0) (0,") (",0) (",")
+      $81C29,
+      $82C19,
+      $82C29  : begin
+                  VType:=VCplex;
+                  Flo:=FL;
+                  Img:=F;
+                end;
       else raise EError.Create(InvalidFormat);
     end;
   end;
