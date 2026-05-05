@@ -60,7 +60,7 @@ var L : PValRec = @CVNone;        // init VMode
     tag : TTag;
     tkn : PByte;
     lvl : integer;
-    f, fa, fb, fc, fd : TRFloat;
+    f, fa, fb, fc, fd, t : TRFloat;
     LPhy, RPhy, I, J : SizeInt;
 
   procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.04.22: Inline FreeLR
@@ -270,33 +270,16 @@ begin
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                         VCplex : begin
                                    fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
-                                   f:=sqr(fc)+sqr(fd);
-                                   LVal((fa*fc+fb*fd)/f, (fb*fc-fa*fd)/f);
-
-
-      {
-
-        VDiv: begin
-  c := abs(pv2^.Flo);
-  d := abs(pv2^.Img);
-
-  if c >= d then begin
-    r := pv2^.Img / pv2^.Flo;
-    den := pv2^.Flo + r * pv2^.Img;
-    Flo := (pv1^.Flo + r * pv1^.Img) / den;
-    Img := (pv1^.Img - r * pv1^.Flo) / den;
-  end else begin
-    r := pv2^.Flo / pv2^.Img;
-    den := pv2^.Img + r * pv2^.Flo;
-    Flo := (pv1^.Flo * r + pv1^.Img) / den;
-    Img := (pv1^.Img * r - pv1^.Flo) / den;
-  end;
-end;
-
-
-       }
-
-                        end;
+                                   if abs(fc)>=abs(fd) then begin
+                                     t:=fd/fc;
+                                     f:=fc+fd*t;
+                                     LVal((fa+fb*t)/f, (fb-fa*t)/f);
+                                   end else begin
+                                     t:=fc/fd;
+                                     f:=fd+fc*t;
+                                     LVal((fa*t+fb)/f, (fb*t-fa)/f);
+                                   end;
+                                 end;
                         VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);

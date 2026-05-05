@@ -467,14 +467,14 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.02: Func Fla_SQRT
+function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_SQRT
 var pv : PValRec;
     f, t : TRFloat;
     phy : SizeInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(0-ParamCount, Context);
+  pv:=Param(-1, Context);
   phy:=pv^.VPhy;
   if (phy and $0101010101010101)>0 then raise EError.Create(IllegalPhy);
   with Result^ do begin
@@ -496,17 +496,17 @@ begin
                  if pv^.Img<0 then Img:=-Img;
                end;
       VGap, VIGap : begin
+                      VType:=VGap;
                       f:=AsRGap(pv);
                       if f>=0 then Img:=sqrt(f) else raise EError.Create(InvalidValue);
                       f:=AsLGap(pv);
                       if f>=0 then Flo:=sqrt(f) else Flo:=0;
-                      VType:=VGap;
                     end;
       else
+        VType:=VFloat;
         f:=AsFloat(pv);
         if f<0 then raise EError.Create(InvalidValue);
         Flo:=sqrt(f);
-        VType:=VFloat;
     end;
   end;
   PostParam(Context);
@@ -585,9 +585,10 @@ begin
   end;
 end;
 
-function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.04: Func Fla_ABS
+function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ABS
 var pv : PValRec;
     fa, fb : TRFloat;
+    al, ar : SizeInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
@@ -602,38 +603,24 @@ begin
                  VType:=VFloat;
                  Flo:=sqrt(sqr(pv^.Flo)+sqr(pv^.Img));
                end;
-      VChar  : Chr:=abs(pv^.Chr);      //???????
+      VChar  : Chr:=abs(pv^.Chr);
       VStr   : raise EError.Create(InvalidStrVal);
-      VGap, VIGap : begin
-                      VType:=VGap;
-                      fa:=AsLGap(pv); fb:=AsRGap(pv);
-                      Img:=Max4(fa, fb, -fa, -fb);
-                      if (fa>0) or (fb<0) then begin
-                        fa:=abs(fa); fb:=abs(fb);
-                        if fa<fb then Flo:=fa else Flo:=fb;
-                      end else Flo:=0;
-                    end;
-   {
-
- VGap, VIGap : begin
-  fa := abs(AsLGap(pv));
-  fb := abs(AsRGap(pv));
-
-  // Максимальный модуль — это правая граница результата
-  if fa > fb then Img := fa else Img := fb;
-
-  // Минимальный модуль (Flo)
-  if (AsLGap(pv) > 0) or (AsRGap(pv) < 0) then begin
-    if fa < fb then Flo := fa else Flo := fb;
-  end else
-    Flo := 0;
-
-  VType := VGap;
-end
-               }
-
-
-
+      VGap   : begin
+                 if (pv^.Flo>0) or (pv^.Img<0) then begin
+                   fa:=abs(pv^.Flo);
+                   fb:=abs(pv^.Img);
+                   if fa<fb then Flo:=fa else Flo:=fb;
+                 end else Flo:=0;
+                 Img:=Max4(pv^.Flo, -pv^.Flo, pv^.Img, -pv^.Img);
+               end;
+      VIGap  : begin
+                 al:=abs(pv^.Int);
+                 ar:=abs(pv^.IGap);
+                 if (pv^.Int>0) or (pv^.IGap<0) then begin
+                   if al<ar then Int:=al else Int:=ar;
+                 end else Flo:=0;
+                 if al>ar then IGap:=al else IGap:=ar;
+               end;
       VArr   : raise EError.Create(InvalidArrVal);
     end;
   end;
