@@ -106,7 +106,7 @@ const TagName : array[TTag] of string = (
   'MOD',
   'Negative',
   'NOT',
-  'Scale');
+  'Power');
 
 function MyRunFlaVar(constref Name:string; out Phy:SizeInt; out Save:boolean):Variant;
 begin
@@ -291,9 +291,12 @@ begin
   ResultMemo.Append('Size of TTag = '+IntToStr(SizeOf(TTag)));
   ResultMemo.Append('Size of TAnsiRec = '+IntToStr(SAnsiRec));
   ResultMemo.Append('Size of TValRec = '+IntToStr(SValRec));
+  ResultMemo.Append('Size of TUnitDesc = '+IntToStr(SizeOf(TUnitDesc)));
+  ResultMemo.Append('Size of TAbbrPrefix = '+IntToStr(SizeOf(TAbbrPrefix)));
   ResultMemo.Append('Size of OpToken = '+IntToStr(OpTokenSize));
   ResultMemo.Append('Size of ExprToken = '+IntToStr(ExprTokenSize));
   ResultMemo.Append('Size of VarToken = '+IntToStr(VarTokenSize));
+
 
   ResultMemo.Append('Done.');
 

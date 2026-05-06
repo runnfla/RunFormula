@@ -55,7 +55,7 @@ type
     TagMOD,               // mod
     TagNegative,          // - unary
     TagNOT,               // not unary
-    TagScale);            // **
+    TagPower);            // **
 
   TAnsiRec = packed record                         // from astrings.inc
     CodePage : TSystemCodePage;                    // but packed just in case
@@ -119,6 +119,8 @@ type
 const
   SAnsiRec = SizeOf(TAnsiRec);
   SValRec = SizeOf(TValRec);
+
+  AbbrMaxSize = 15;       // maximum size of unit abbreviation in bytes
 
   BufSize = $8000;        // bytecode buffer increment
   DefDepth = 64;          // maximum define nesting level
@@ -200,10 +202,23 @@ type
 
   TCharSet = set of char;
 
-  TQauntPrefix = record
-    Mult : TRFloat;
-    Txt : string[10];
+  TUnitDesc = record
+    Sig : SizeInt;
+    Flag : SizeInt;
+    Scale : TRFloat;
+    Offset : TRFloat;             // K = (C * 1.0) + 273.15
+    Abbr : string[AbbrMaxSize];
   end;
+
+  PUnitDesc = ^TUnitDesc;
+
+  TAbbrPrefix = record
+    Flag : SizeInt;
+    Scale : TRFloat;
+    Abbr : string[AbbrMaxSize];
+  end;
+
+  PAbbrPrefix = ^TAbbrPrefix;
 
 const
   CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
@@ -255,7 +270,7 @@ const
     700,     // TagMOD        mod
     800,     // TagNegative   - unary
     800,     // TagNOT        not
-    901);    // TagScale      **   right-associative, 4**3**2 = 4**9
+    901);    // TagPower      **   right-associative, 4**3**2 = 4**9
 
   CaseType : array[TVType, TVType] of TVType = (
 // ret. VInt VFloat VCplex VStr VGap VIGap VArr

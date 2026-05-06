@@ -136,7 +136,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  function OverScale(Base:SizeInt; out RI:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.04.25: Func OverScale
+  function OverPower(Base:SizeInt; out RI:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.04.25: Func OverPower
   var res : SizeInt = 1;
       scl : SizeInt;
   begin
@@ -153,7 +153,7 @@ var L : PValRec = @CVNone;        // init VMode
     Result:=false;
   end;
 
-  procedure ScaleComplex(BRE, BIM:TRFloat); inline;          //DONE -oRFla.Term -cRev.2026.04.23: Inline ScaleComplex
+  procedure PowerComplex(BRE, BIM:TRFloat); inline;          //DONE -oRFla.Term -cRev.2026.04.23: Inline PowerComplex
   var re : TRFloat = 1;
       im : TRFloat = 0;
       t : TRFloat;
@@ -305,18 +305,18 @@ begin
                         VArr   : raise EError.Create(InvalidArrVal);
                       end;
         TagNOT      : LVal(not AsInt(R));                                    // not unary
-        TagScale    : with L^ do case VType of                               // **
+        TagPower    : with L^ do case VType of                               // **
                         VNone  : AsFloat(L);
-                        VInt   : if OverScale(Int, I) then LVal(Scale(Int, AsInt(R)))
+                        VInt   : if OverPower(Int, I) then LVal(Power(Int, AsInt(R)))
                                    else LVal(I);
-                        VFloat : LVal(Scale(Flo, AsInt(R)));
-                        VCplex : ScaleComplex(Flo, Img);
-                        VChar  : if OverScale(Chr, I) then LVal(Scale(Chr, AsInt(R)))
+                        VFloat : LVal(Power(Flo, AsInt(R)));
+                        VCplex : PowerComplex(Flo, Img);
+                        VChar  : if OverPower(Chr, I) then LVal(Power(Chr, AsInt(R)))
                                    else LVal(I);
                         VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); I:=AsInt(R);
-                                        fc:=Scale(fa, I); fd:=Scale(fb, I);
+                                        fc:=Power(fa, I); fd:=Power(fb, I);
                                         if (fa<=0) and (fb>=0) then begin
                                           if I<0 then raise EError.Create(DivZero);
                                           if (I and 1)=0 then LGap(0, Max4(fc, fd, 0, 0))
@@ -335,7 +335,7 @@ begin
         TagNegative : L^.VPhy:=LPhy;
         TagMult : L^.VPhy:=PhyOp(LPhy, RPhy, PhyPlus);
         TagSlash, TagDIV : L^.VPhy:=PhyOp(LPhy, RPhy, PhyMinus);
-        TagScale : L^.VPhy:=PhyOp(LPhy, AsInt(R), PhyMult);
+        TagPower : L^.VPhy:=PhyOp(LPhy, AsInt(R), PhyMult);
       end;
     end else begin
       L:=Term(P, Context);

@@ -322,7 +322,7 @@ begin
     flg:=true;
     case PWord(P)^ of
   {$ifdef ENDIAN_LITTLE}
-      $2A2A : OpToken(TagScale);                // **
+      $2A2A : OpToken(TagPower);                // **
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
       $3D3C : OpToken(TagNotGreater);           // <=
@@ -331,7 +331,7 @@ begin
       $3E3C : OpToken(TagNotEqual);             // <>
       $3E3E : OpToken(TagSHR);                  // >>
   {$else}
-      $2A2A : OpToken(TagScale);                // **
+      $2A2A : OpToken(TagPower);                // **
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
       $3C3D : OpToken(TagNotGreater);           // <=

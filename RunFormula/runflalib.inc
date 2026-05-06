@@ -108,7 +108,7 @@ begin
   Result:=false;
 end;
 
-function Scale(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oRFla.Lib -cRev.2026.04.23: Func Scale
+function Power(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oRFla.Lib -cRev.2026.04.23: Func Power
 var i : SizeInt;            // Base^Scl
 begin
   Result:=1;

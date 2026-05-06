@@ -134,8 +134,8 @@ begin
     inc(P);
   until false;
   dec(scl, frac);
-  if scl>mex then Result:=Result*Scale(10, scl)
-    else Result:=Result*Scale(10, scl-mex)*mf;
+  if scl>mex then Result:=Result*Power(10, scl)
+    else Result:=Result*Power(10, scl-mex)*mf;
 end;
 
 function PhyCapture(P, Fin:PChar):SizeInt;                //DONE -oRFla.Text -cRev.2026.00.00: Func PhyCapture
