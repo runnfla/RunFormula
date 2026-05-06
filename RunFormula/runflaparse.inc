@@ -21,7 +21,7 @@ procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);   //DONE -oRFla.Parse -c
 begin
   if (Err<>OK) and (RunFlaErrCode=OK) then RunFlaErrCode:=Err;
   with Error do begin
-    PByte(Data):=nil;
+    PByte(Value):=nil;
     Position:=0;
     Code:=Err;
     if Code=OK then exit;

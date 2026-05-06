@@ -64,6 +64,6 @@ type
   TRunFlaError = packed record
     Code : TRunFlaErrCode;
     Position : integer;
-    Data : string;
+    Value : string;
   end;
 

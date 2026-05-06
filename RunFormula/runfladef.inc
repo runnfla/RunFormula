@@ -135,6 +135,8 @@ const
   VarGrow = 16;           // variables per list increment
   LVStackGrow = 64;       // stack depth increment
   ParamGrow = 32;         // parameter buffer increment (total for nested calls)
+  UnitDescGrow = 32;
+  PrefAbbrGrow = 32;
 
 type
   TToken = packed record
@@ -212,13 +214,13 @@ type
 
   PUnitDesc = ^TUnitDesc;
 
-  TAbbrPrefix = record
+  TPrefAbbr = record
     Flag : SizeInt;
     Scale : TRFloat;
     Abbr : string[AbbrMaxSize];
   end;
 
-  PAbbrPrefix = ^TAbbrPrefix;
+  PPrefAbbr = ^TPrefAbbr;
 
 const
   CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
@@ -288,4 +290,5 @@ const
 
 var
   FuncList : TMemList;      // list of TFlaRec
-
+  UnitList : TMemList;
+  PrefList : TMemList;

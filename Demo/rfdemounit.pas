@@ -234,7 +234,7 @@ begin
   else Exec:=RunFlaExecStr(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar);
   with FlaError do if Code<>OK then begin
     ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code]+
-    ' "'+Data+'"';
+    ' "'+Value+'"';
     FlaSynEdit.SelStart:=Position+1;
     FlaSynEdit.SelEnd:=Position+2;
     exit;
@@ -292,11 +292,10 @@ begin
   ResultMemo.Append('Size of TAnsiRec = '+IntToStr(SAnsiRec));
   ResultMemo.Append('Size of TValRec = '+IntToStr(SValRec));
   ResultMemo.Append('Size of TUnitDesc = '+IntToStr(SizeOf(TUnitDesc)));
-  ResultMemo.Append('Size of TAbbrPrefix = '+IntToStr(SizeOf(TAbbrPrefix)));
+  ResultMemo.Append('Size of TPrefAbbr = '+IntToStr(SizeOf(TPrefAbbr)));
   ResultMemo.Append('Size of OpToken = '+IntToStr(OpTokenSize));
   ResultMemo.Append('Size of ExprToken = '+IntToStr(ExprTokenSize));
   ResultMemo.Append('Size of VarToken = '+IntToStr(VarTokenSize));
-
 
   ResultMemo.Append('Done.');
 

@@ -231,7 +231,7 @@ var Context : TContext;
       with Error do if Code=OK then begin
         Code:=Err;
         Position:=PToken(P)^.Source;
-        Data:=Str2Str(AsStr(Context.TermResult));
+        Value:=Str2Str(AsStr(Context.TermResult));
       end;
     end;
   end;
@@ -448,6 +448,8 @@ end;
 initialization
 
   MemListInit(FuncList, SFlaRec, FuncGrow);
+  MemListInit(UnitList, SizeOf(TUnitDesc), UnitDescGrow);
+  MemListInit(PrefList, SizeOf(TPrefAbbr), PrefAbbrGrow);
   FuncRegister;
 
 finalization
@@ -457,6 +459,8 @@ finalization
     dec(FuncList.Count);
   end;
   MemListFree(FuncList);
+  MemListFree(UnitList);
+  MemListFree(PrefList);
 
 end.
 
