@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  Essential functions include file
 //  Rev. 5.05.2026
 

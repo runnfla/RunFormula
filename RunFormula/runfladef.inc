@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  Definitions include file
 //  Rev. 16.04.2026
 

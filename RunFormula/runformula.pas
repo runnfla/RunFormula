@@ -1,7 +1,7 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
-//  Version 0.0.a
-//  Released at 14.04.2026
+//  RunFormula Expression Scripting Engine
+//  Version 0.0.b
+//  Released at 6.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -17,7 +17,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -oRFla.Main -cRev.2026.04.14:
+// TODO -oRFla.Main -cRev.2026.04.14:RunFormula: A unit-aware math and physics scripting engine.
 
 unit RunFormula;
 
@@ -217,20 +217,21 @@ begin
 end;
 
 function Exec(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar; Buf:PValRec):PValRec;
-const InitProc : TToken = (Tag : TagCode; Source : 0);     //DONE -oRFla.Main -cRev.2026.04.08: Func Exec
+const InitProc : TToken = (Tag : TagCode; Source : 0);     //DONE -oRFla.Main -cRev.2026.05.06: Func Exec
 var Context : TContext;
     p : PByte;
     i : SizeInt;
     j : SizeInt = -1;
 
-  procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);     //DONE -oRFla.Main -cRev.2026.04.08: Proc FillError
+  procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);     //DONE -oRFla.Main -cRev.2026.05.06: Proc FillError
   begin
     if Err<>OK then begin
       if RunFlaErrCode=OK then RunFlaErrCode:=Err;
-      if Error.Code=OK then begin
-        Error.Code:=Err;
-        if P=nil then P:=Context.ProcToken;
-        Error.Position:=PToken(P)^.Source;
+      if P=nil then P:=Context.ProcToken;
+      with Error do if Code=OK then begin
+        Code:=Err;
+        Position:=PToken(P)^.Source;
+        Data:=Str2Str(AsStr(Context.TermResult));
       end;
     end;
   end;
@@ -239,10 +240,11 @@ begin
   Result:=@CVNone;
   p:=PByte(Fla);
   with Context do begin
-    MemListInit(VarPool, SizeOf(TMemList), VarPoolGrow);
     MemListInit(LVStack, SValRec, LVStackGrow);
+    MemListInit(VarPool, SizeOf(TMemList), VarPoolGrow);
     MemListInit(FuncArg, SPtr, ParamGrow);
     RunFlaVar:=FlaVar;
+    TermResult:=@CVNone;
     ProcToken:=@InitProc;
     ByteCode:=p;
     Flow:=NML;

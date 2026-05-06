@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  RunFormula Demo and Test
 //  Rev. 14.04.2026
 
@@ -233,7 +233,8 @@ begin
   then Exec:=RunFlaExecVrt(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar)
   else Exec:=RunFlaExecStr(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar);
   with FlaError do if Code<>OK then begin
-    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code];
+    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code]+
+    ' "'+Data+'"';
     FlaSynEdit.SelStart:=Position+1;
     FlaSynEdit.SelEnd:=Position+2;
     exit;

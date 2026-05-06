@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  Error codes include file
 //  Rev. 15.04.2026
 
@@ -64,5 +64,6 @@ type
   TRunFlaError = packed record
     Code : TRunFlaErrCode;
     Position : integer;
+    Data : string;
   end;
 

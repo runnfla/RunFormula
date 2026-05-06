@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  Evaluator include file
 //  Rev. 27.04.2026
 
@@ -342,6 +342,7 @@ begin
       inc(P, PToken(P)^.Size);
     end;
   end;
+  Context.TermResult:=L;
   Result:=L;
 end;
 

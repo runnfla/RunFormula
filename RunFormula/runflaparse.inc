@@ -1,7 +1,7 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  Parser include file
-//  Rev. 5.03.2026
+//  Rev. 3.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -21,6 +21,7 @@ procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);   //DONE -oRFla.Parse -c
 begin
   if (Err<>OK) and (RunFlaErrCode=OK) then RunFlaErrCode:=Err;
   with Error do begin
+    PByte(Data):=nil;
     Position:=0;
     Code:=Err;
     if Code=OK then exit;

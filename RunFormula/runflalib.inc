@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Parser and Evaluator
+//  RunFormula Expression Scripting Engine
 //  Library include file
 //  Rev. 30.04.2026
 
@@ -100,7 +100,8 @@ begin
   Result:=true;
   if (IntL<>0) and (IntR<>0) then begin
     if (IntL=LI) or (IntR=LI) then exit;
-    al:=abs(IntL); ar:=abs(IntR);
+    al:=abs(IntL);
+    ar:=abs(IntR);
     if ((al>safe) or (ar>safe)) and ((high(SizeInt) div al)<ar) then exit;
   end;
   RI:=IntL*IntR;
