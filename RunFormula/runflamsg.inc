@@ -58,6 +58,7 @@ const
     'Incorrect borders of range',
     'Illegal Break or Continue operation',
     'Dimensioned quantities mismatch',
-    'Operation not allowed on dimensioned quantity'
+    'Operation not allowed on dimensioned quantity',
+    'Dimensional exponent overflow'
   );
 

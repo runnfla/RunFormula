@@ -603,16 +603,21 @@ end;
 
 // ===== Quantities =====
 
-function PhyOp(X, Y : SizeInt; Phy:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.00.00: Func PhyOp
+function PhyOp(X, Y : SizeInt; Op:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.00.00: Func PhyOp
 var qx, qy, qr : TQPhy;
-    i : integer;
+    t, i : integer;
 begin
-  qx.QI:=X; qy.QI:=Y;
+  qx.QI:=X;
+  qy.QI:=Y;
   for i:=0 to SI-1 do begin
-    { ///}
-
+    case Op of
+      PhyPlus  : t:=qx.QA[i]+qy.QA[i];
+      PhyMinus : t:=qx.QA[i]-qy.QA[i];
+      PhyMult  : t:=qx.QA[i]*Y;
+    end;
+    if (t and (-1 xor $FF))<>0 then raise EError.Create(PhyOver);
+    qr.QA[i]:=byte(t);
   end;
   Result:=qr.QI;
-  Result:=0;
 end;
 

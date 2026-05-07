@@ -58,7 +58,8 @@ type
     InvalidRange,
     IllegalBreak,
     PhyMismatch,
-    IllegalPhy
+    IllegalPhy,
+    PhyOver
   );
 
   TRunFlaError = packed record
