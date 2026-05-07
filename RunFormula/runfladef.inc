@@ -206,17 +206,17 @@ type
 
   TUnitDesc = record
     Sig : SizeInt;
-    Flag : SizeInt;
     Scale : TRFloat;
     Offset : TRFloat;             // K = (C * 1.0) + 273.15
+    Flag : integer;
     Abbr : string[AbbrMaxSize];
   end;
 
   PUnitDesc = ^TUnitDesc;
 
   TPrefAbbr = record
-    Flag : SizeInt;
     Scale : TRFloat;
+    Flag : integer;
     Abbr : string[AbbrMaxSize];
   end;
 
@@ -234,6 +234,10 @@ const
   VarTokenSize = ExprTokenSize+SI;
 
   SFlaRec = SizeOf(TFlaRec);
+
+  FOD = 1;                  // output disable      // Units control flags
+  FBU = 2;                  // base unit
+  FPD = 4;                  // prefix disable
 
   OpTokenLevel : array[TTag] of integer = (
     0,       // TagValue

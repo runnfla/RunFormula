@@ -231,7 +231,10 @@ var Context : TContext;
       with Error do if Code=OK then begin
         Code:=Err;
         Position:=PToken(P)^.Source;
-        Value:=Str2Str(AsStr(Context.TermResult));
+        try
+          Value:=Str2Str(AsStr(Context.TermResult));
+        except
+        end;
       end;
     end;
   end;
@@ -445,11 +448,20 @@ end;
 
 {$include runflafunc.inc}
 
-initialization
-
+procedure Init;
+var UnitDesc : TUnitDesc;
+    PrefAbbr : TPrefAbbr;
+begin
   MemListInit(FuncList, SFlaRec, FuncGrow);
   MemListInit(UnitList, SizeOf(TUnitDesc), UnitDescGrow);
+  for UnitDesc in Quantities do PUnitDesc(MemListAdd(UnitList))^:=UnitDesc;
   MemListInit(PrefList, SizeOf(TPrefAbbr), PrefAbbrGrow);
+  for PrefAbbr in UnitPrefixes do PPrefAbbr(MemListAdd(PrefList))^:=PrefAbbr;
+end;
+
+initialization
+
+  Init;
   FuncRegister;
 
 finalization

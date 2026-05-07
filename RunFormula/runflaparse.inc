@@ -179,6 +179,7 @@ var vr : TValRec;
   var L : SizeInt;
   begin
     case V.VType of
+      VNone  : begin NoneToken; exit; end;
       VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
       VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
