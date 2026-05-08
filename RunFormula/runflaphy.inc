@@ -23,7 +23,7 @@ const
     (Sig: $0000000000FD0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'W'),     // Power (Watt)
     (Sig: $0000000001010000; Scale: 1; Offset: 0; Flag: $0; Abbr: 'C'),     // Charge (Coulomb)
     (Sig: $00000000FEFD0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'Ohm'),   // Resistance (Ohm)
-    (Sig: $000000000204FEFE; Scale: 1; Offset: 0; Flag: $0; Abbr: 'F'),     // Capacitance (Farad)
+    (Sig: $000000000204FFFE; Scale: 1; Offset: 0; Flag: $0; Abbr: 'F'),     // Capacitance (Farad)
     (Sig: $00000000FEFE0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'H'),     // Inductance (Henry)
     (Sig: $00000000FFFE0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'Wb'),    // Magnetic Flux (Weber)
     (Sig: $00000000FFFE0100; Scale: 1; Offset: 0; Flag: $0; Abbr: 'T'),     // Magnetic Induction (Tesla)

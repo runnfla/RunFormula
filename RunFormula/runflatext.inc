@@ -217,6 +217,7 @@ begin
                        break;              // check for not found
                      end;
                      P:=tf;
+                     continue;
                    end
       else raise EError.Create(InvalidFormat);
     end;
@@ -348,4 +349,67 @@ begin
     ApplyPhy(P, FindTextFin(P, '`'), PV);
   end;
 end;
+
+function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat):string;
+var qx, qy : TQPhy;
+    buf : PSizeInt;
+    t, exp, emns, L, i : SizeInt;
+    b : integer;
+begin
+  L:=UnitList.Count-1;
+  for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do
+    if (Sig=Phy) and ((Flag and USG)<>0) and ((Flag and UOD)=0) then begin
+      Scl:=Scale;
+      Offs:=Offset;
+      Result:=Abbr;
+      exit;
+  end;
+  buf:=GetMem((L+1)*SI);
+  Scl:=1;
+  Offs:=0;
+  PByte(Result):=nil;
+  for i:=0 to L do buf[i]:=0;
+  qx.QI:=Phy;
+  for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do if ((Flag and (USG or UOD))=0) then begin
+    qy.QI:=Sig;
+    exp:=high(ShortInt);
+    emns:=exp;
+    for b:=0 to SI-1 do if qy.QA[b]<>0 then begin
+      if qx.QA[b]=0 then begin
+        exp:=0;
+        emns:=0;
+        break;
+      end;
+      t:=abs(qx.QA[b]) div abs(qy.QA[b]);
+      if ((qx.QA[b] xor qy.QA[b]) and $80)=0 then begin
+        if t<exp then exp:=t;
+        emns:=0;
+      end else begin
+        if t<emns then emns:=t;
+        exp:=0;
+      end;
+      if (exp=0) and (emns=0) then break;
+    end;
+    if (exp=0) and (emns=0) then continue;
+    if emns<>0 then exp:=-emns;
+    buf[i]:=exp;
+    if Scale<>1 then Scl:=Scl*Power(Scale, exp);
+    qx.QI:=PhyOp(qx.QI, PhyOp(Sig, exp, PhyMult), PhyMinus);
+  end;
+
+
+
+
+  for i:=0 to L do begin
+    exp:=buf[i];
+    if exp<>0 then Result:=Result+' '+PUnitDesc(UnitList.List[i])^.Abbr+IntToStr(exp);
+  end;
+
+
+
+
+  FreeMem(buf);
+end;
+
+
 

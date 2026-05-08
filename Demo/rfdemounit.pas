@@ -248,7 +248,7 @@ var T : TTag;
     Info, s : string;
     flg : boolean;
     i : SizeInt;                p : pointer; C : char;
-    VT : TVType;                VVV : Variant;
+    VT : TVType;                VVV : Variant;       b : byte;
     MemList : TMemList;
 
 

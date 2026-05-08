@@ -57,7 +57,7 @@ implementation
 
 {$define runfla_optuses}
 
-uses SysUtils                  , Dialogs
+uses SysUtils                   , Dialogs
 
 {$include runflaopt.inc}
 
@@ -65,7 +65,6 @@ uses SysUtils                  , Dialogs
 
 {$include runfladef.inc}
 {$include runflalib.inc}
-{$include runflatext.inc}
 {$include runflaphy.inc}
 
 function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oRFla.Main -cRev.2026.04.28: Func Term

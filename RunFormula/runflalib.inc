@@ -211,21 +211,6 @@ begin
   end;
 end;
 
-function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsStr
-begin
-  with PV^ do case VType of
-    VNone  : PByte(Result):=nil;
-    VInt   : Result:=IntToStr(Int);
-    VFloat : Result:=FloatToStr(Flo);
-    VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
-    VChar  : Result:=char(Chr);
-    VStr   : Result:=string(Str);
-    VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
-    VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
-    VArr   : raise EError.Create(InvalidArrVal);
-  end;
-end;
-
 function AsLGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsLGap
 begin
   with PV^ do case VType of
@@ -265,6 +250,39 @@ begin
     VInt  : Result:=Int;
     VChar : Result:=Chr;
     VIGap : Result:=IGap;
+  end;
+end;
+
+function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat):string; forward;
+
+function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsStr
+var S : string;
+    Scl, Offs, F, Im : TRFloat;
+begin
+  with PV^ do begin
+    if VPhy<>0 then begin
+      S:=DecodePhy(VPhy, Scl, Offs);
+      case VType of
+        VInt, VChar, VIGap : if (Scl<>1) or (Offs<>0) then raise EError.Create(DimlessInt);
+        VFloat : F:=(Flo-Offs)/Scl;
+        VCplex, VGap : begin F:=(Flo-Offs)/Scl; Im:=(Img-Offs)/Scl; end;
+      end;
+    end else case VType of
+      VFloat : F:=Flo;
+      VCplex, VGap : begin F:=Flo; Im:=Img; end;
+    end;
+    case VType of
+      VNone  : PByte(Result):=nil;
+      VInt   : Result:=IntToStr(Int);
+      VFloat : Result:=FloatToStr(F);
+      VCplex : Result:='('+FloatToStr(F)+','+FloatToStr(Im)+')';
+      VChar  : Result:=char(Chr);
+      VStr   : Result:=string(Str);
+      VGap   : Result:='['+FloatToStr(F)+':'+FloatToStr(Im)+']';
+      VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
+      VArr   : raise EError.Create(InvalidArrVal);
+    end;
+    if VPhy<>0 then Result:=Result+'`'+S+'`';
   end;
 end;
 
@@ -603,21 +621,32 @@ end;
 
 // ===== Quantities =====
 
-function PhyOp(X, Y : SizeInt; Op:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.05.07: Func PhyOp
+function PhyOp(X, Y : SizeInt; Op:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.05.08: Func PhyOp
 var qx, qy, qr : TQPhy;
     t, i : integer;
 begin
   qx.QI:=X;
   qy.QI:=Y;
-  for i:=0 to SI-1 do begin
-    case Op of
-      PhyPlus  : t:=qx.QA[i]+qy.QA[i];
-      PhyMinus : t:=qx.QA[i]-qy.QA[i];
-      PhyMult  : t:=qx.QA[i]*Y;
-    end;
-    if (abs(t) and (-1 xor $FF))<>0 then raise EError.Create(PhyOver);   /// ?????
-    qr.QA[i]:=byte(t);
+  case Op of
+    PhyPlus  : for i:=0 to SI-1 do begin
+                 t:=qx.QA[i]+qy.QA[i];
+                 if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+                 qr.QA[i]:=ShortInt(t);
+               end;
+    PhyMinus : for i:=0 to SI-1 do begin
+                 t:=qx.QA[i]-qy.QA[i];
+                 if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+                 qr.QA[i]:=ShortInt(t);
+               end;
+    PhyMult  : for i:=0 to SI-1 do begin
+                 t:=qx.QA[i]*Y;
+                 if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+                 qr.QA[i]:=ShortInt(t);
+               end;
   end;
   Result:=qr.QI;
 end;
+
+{$include runflatext.inc}
+
 
