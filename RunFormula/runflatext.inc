@@ -164,7 +164,7 @@ var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2
     L, exp, i : SizeInt;
     flg : boolean;
 
-  procedure FindPref;
+  procedure FindPref;                                 //DONE -oRFla.Text -cRev.2026.00.00: Proc FindPref
   var j : SizeInt;
   begin
     for j:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[j])^ do
@@ -184,6 +184,7 @@ begin
       exit;
   end;
   Scl:=1;
+  Offs:=0;
   Result:=0;
   while P<Fin do begin
     case P^ of
@@ -213,7 +214,9 @@ begin
                        if exp<>1 then k:=Power(k, exp);
                        Scl:=Scl*k;
                        Result:=PhyOp(Result, PhyOp(Sig, exp, PhyMult), PhyPlus);
+                       break;              // check for not found
                      end;
+                     P:=tf;
                    end
       else raise EError.Create(InvalidFormat);
     end;
@@ -221,7 +224,7 @@ begin
   end;
 end;
 
-procedure ApplyPhy(P, Fin:PChar; PV:PValRec);
+procedure ApplyPhy(P, Fin:PChar; PV:PValRec);         //DONE -oRFla.Text -cRev.2026.00.00: Proc ApplyPhy
 var Scl, Offs : TRFloat;
 begin
   with PV^ do begin

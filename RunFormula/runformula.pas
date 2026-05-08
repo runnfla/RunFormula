@@ -57,7 +57,7 @@ implementation
 
 {$define runfla_optuses}
 
-uses SysUtils
+uses SysUtils                  , Dialogs
 
 {$include runflaopt.inc}
 

@@ -615,7 +615,7 @@ begin
       PhyMinus : t:=qx.QA[i]-qy.QA[i];
       PhyMult  : t:=qx.QA[i]*Y;
     end;
-    if (t and (-1 xor $FF))<>0 then raise EError.Create(PhyOver);
+    if (abs(t) and (-1 xor $FF))<>0 then raise EError.Create(PhyOver);   /// ?????
     qr.QA[i]:=byte(t);
   end;
   Result:=qr.QI;
