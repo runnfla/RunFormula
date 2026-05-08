@@ -154,6 +154,7 @@ end;
 
 procedure DoParse(P:PChar);                           //DONE -oRFla.Parse -cRev.2026.05.03: Proc DoParse
 var vr : TValRec;
+    pv : PValRec;                   // pv of ValueToken
     tf : PChar;                     // textfin
     S : string;
     I : SizeInt;
@@ -194,6 +195,7 @@ var vr : TValRec;
       Tag:=TagValue;
       Source:=FlaPos;
       Size:=L;
+      pv:=@ValRec;
       ValRec.VType:=V.VType;
       ValRec.VAlloc:=BC;
       ValRec.VPhy:=0;
@@ -410,7 +412,8 @@ begin
               if PreTag<>TagValue then raise EError.Create(InvalidChar);
               inc(P);
               tf:=FindTextFin(P, '`');
-              PToken(BufP-ExprTokenSize)^.ValRec.VPhy:=PhyCapture(P, tf);
+              if pv^.VPhy<>0 then raise EError.Create(DimlessValue);      // ??? duplication
+              ApplyPhy(P, tf, pv);
               P:=tf;
             end;
       '{' : Comment:='}';
@@ -486,7 +489,6 @@ begin
           if IsKey('const') then raise EError.Create(Unsupported);
           if IsKey('global') then raise EError.Create(Unsupported);
           if IsKey('array') then raise EError.Create(Unsupported);
-          if IsKey('dim') then raise EError.Create(Unsupported);
           if IsKey('include') then raise EError.Create(Unsupported);
           if IsKey('inline') then raise EError.Create(Unsupported);
           if IsKey('branch') then raise EError.Create(Unsupported);

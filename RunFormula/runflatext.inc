@@ -42,6 +42,25 @@ begin
   raise EError.Create(UnexpectedEnd, Result);
 end;
 
+function BackCompare(P, Fin:PChar; constref S:ShortString; Tail:boolean=false):SizeInt;
+var ps : PByte;                                        //DONE -oRFla.Text -cRev.2026.05.07: Func BackCompare
+    L : SizeInt;
+begin
+  Result:=0;
+  L:=PByte(@S)^;
+  if Tail then begin
+    if (Fin-P)<L then exit;
+    P:=Fin-L;
+  end else if (Fin-P)<>L then exit;
+  ps:=PByte(@S)+1;
+  while P<Fin do begin
+    if ps^<>PByte(P)^ then exit;
+    inc(P);
+    inc(ps);
+  end;
+  Result:=L;
+end;
+
 function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oRFla.Text -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;
@@ -138,9 +157,85 @@ begin
     else Result:=Result*Power(10, scl-mex)*mf;
 end;
 
-function PhyCapture(P, Fin:PChar):SizeInt;                //DONE -oRFla.Text -cRev.2026.00.00: Func PhyCapture
+function PhyCapture(P, Fin:PChar; out Scl, Offs:TRFloat):SizeInt;
+var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2026.00.00: Func PhyCapture
+    abf, tf : PChar;
+    k : TRFloat;
+    L, exp, i : SizeInt;
+    flg : boolean;
+
+  procedure FindPref;
+  var j : SizeInt;
+  begin
+    for j:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[j])^ do
+      if BackCompare(P, abf, Abbr)>0 then begin
+        k:=k*Scale;
+        exit;
+      end;
+    raise EError.Create(InvalidFormat);
+  end;
+
 begin
+  for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do
+    if ((Flag and USG)<>0) and (BackCompare(P, Fin, Abbr)>0) then begin
+      Scl:=Scale;
+      Offs:=Offset;
+      Result:=Sig;
+      exit;
+  end;
+  Scl:=1;
   Result:=0;
+  while P<Fin do begin
+    case P^ of
+      #1..#20, '1' : ;
+      '/' : begin
+              if mf then raise EError.Create(InvalidChar, P);
+              mf:=true;
+            end;
+      'A'..'Z', 'a'..'z',
+      #$80..#$FF : begin
+                     abf:=P+1;
+                     tf:=FindTextFin(abf);
+                     while (abf^>='A') and (abf<tf) do inc(abf);
+                     for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
+                       if (Flag and USG)<>0 then continue;
+                       L:=BackCompare(P, abf, Abbr, (Flag and UPD)=0);
+                       if L=0 then continue;
+                       exp:=1;
+                       if abf<tf then begin
+                         exp:=IntCapture(abf, tf, flg);
+                         if not flg then raise EError.Create(InvalidFormat);
+                       end;
+                       if mf then exp:=-exp;
+                       k:=Scale;
+                       dec(abf, L);
+                       if P<abf then FindPref;
+                       if exp<>1 then k:=Power(k, exp);
+                       Scl:=Scl*k;
+                       Result:=PhyOp(Result, PhyOp(Sig, exp, PhyMult), PhyPlus);
+                     end;
+                   end
+      else raise EError.Create(InvalidFormat);
+    end;
+    inc(P);
+  end;
+end;
+
+procedure ApplyPhy(P, Fin:PChar; PV:PValRec);
+var Scl, Offs : TRFloat;
+begin
+  with PV^ do begin
+    VPhy:=PhyCapture(P, Fin, Scl, Offs);
+    case VType of
+      VFloat : Flo:=Flo*Scl+Offs;
+      VCplex, VGap : begin
+                       Flo:=Flo*Scl+Offs;
+                       Img:=Img*Scl+Offs;
+                     end;
+      else
+        if (Scl<>1) or (Offs<>0) then raise EError.Create(DimlessInt);
+    end;
+  end;
 end;
 
 procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.05.04: Proc ParseValue
@@ -198,13 +293,7 @@ begin
                     sig:=(sig shl 4) or 1;
                     continue;
                   end;
-      '`'       : begin
-                    if phy<>0 then raise EError.Create(InvalidFormat);
-                    inc(P);
-                    tf:=FindTextFin(P, '`');
-                    phy:=PhyCapture(P, tf);
-                    P:=tf;
-                  end;
+      '`'       : break
       else raise EError.Create(InvalidChar, P);
     end;
     inc(P);                                   // 0=1 "=2 (=8 )=9 [=B ]=D ,=C :=A
@@ -250,7 +339,10 @@ begin
                 end;
       else raise EError.Create(InvalidFormat);
     end;
-    VPhy:=phy;                       // after all raises
+  end;
+  if P<Fin then begin
+    inc(P);
+    ApplyPhy(P, FindTextFin(P, '`'), PV);
   end;
 end;
 

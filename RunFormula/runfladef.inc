@@ -235,9 +235,11 @@ const
 
   SFlaRec = SizeOf(TFlaRec);
 
-  FOD = 1;                  // output disable      // Units control flags
-  FBU = 2;                  // base unit
-  FPD = 4;                  // prefix disable
+  // Units control flags
+  UOD = 1;                // output disable
+  USG = 2;                // single unit, assembling disable
+  UPD = 4;                // prefix disable
+  UPOD = 8;               // prefix output disable
 
   OpTokenLevel : array[TTag] of integer = (
     0,       // TagValue

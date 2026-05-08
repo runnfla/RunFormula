@@ -1,7 +1,7 @@
 @echo off
 SET THEFILE=G:\Projects\RunFormula\GitHub\RunFormula\Demo\RFDemo.exe
 echo Linking %THEFILE%
-C:\lazarus\fpc\3.2.2\bin\x86_64-win64\ld.exe -b pei-x86-64  --gc-sections   --subsystem windows --entry=_WinMainCRTStartup    -o G:\Projects\RunFormula\GitHub\RunFormula\Demo\RFDemo.exe G:\Projects\RunFormula\GitHub\RunFormula\Demo\link3036.res
+C:\lazarus\fpc\3.2.2\bin\x86_64-win64\ld.exe -b pei-x86-64  --gc-sections   --subsystem windows --entry=_WinMainCRTStartup    -o G:\Projects\RunFormula\GitHub\RunFormula\Demo\RFDemo.exe G:\Projects\RunFormula\GitHub\RunFormula\Demo\link2196.res
 if errorlevel 1 goto linkend
 goto end
 :asmend

@@ -59,7 +59,10 @@ type
     IllegalBreak,
     PhyMismatch,
     IllegalPhy,
-    PhyOver
+    PhyOver,
+    PhyExists,
+    DimlessValue,
+    DimlessInt
   );
 
   TRunFlaError = packed record

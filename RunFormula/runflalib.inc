@@ -603,7 +603,7 @@ end;
 
 // ===== Quantities =====
 
-function PhyOp(X, Y : SizeInt; Op:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.00.00: Func PhyOp
+function PhyOp(X, Y : SizeInt; Op:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.05.07: Func PhyOp
 var qx, qy, qr : TQPhy;
     t, i : integer;
 begin

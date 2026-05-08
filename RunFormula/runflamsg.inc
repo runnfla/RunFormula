@@ -59,6 +59,9 @@ const
     'Illegal Break or Continue operation',
     'Dimensioned quantities mismatch',
     'Operation not allowed on dimensioned quantity',
-    'Dimensional exponent overflow'
+    'Dimensional exponent overflow',
+    'Dimensioned quantities already assigned',
+    'Cannot assign units to this value',
+    'Cannot assign scaled or offset quantity to integer value'
   );
 
