@@ -61,6 +61,19 @@ begin
   Result:=L;
 end;
 
+function Flo2Str(const F:TRFloat):string;
+const E : TCharSet = ['.', 'E', 'e'];
+var p : PChar;
+begin
+  Result:=FloatToStr(F);
+  p:=PChar(Result);
+  while p^<>#0 do begin
+    if p^ in E then exit;
+    inc(p);
+  end;
+  Result:=Result+'.0';
+end;
+
 function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oRFla.Text -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;
@@ -244,7 +257,7 @@ end;
 
 procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.05.04: Proc ParseValue
 var sig : SizeInt = 0;
-    phy : SizeInt = 0;
+ //   phy : SizeInt = 0;
     mf : boolean = false;
     flg : boolean = true;
     I, IL : SizeInt;
@@ -350,7 +363,7 @@ begin
   end;
 end;
 
-function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat):string;
+function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out PE:boolean):string;
 var fuflg : boolean = true;
     dx, dy : TDPhy;
     buf : PSizeInt;
@@ -362,6 +375,7 @@ begin
     if (Sig=Phy) and ((Flag and USG)<>0) and ((Flag and UOD)=0) then begin
       Scl:=Scale;
       Offs:=Offset;
+      PE:=((Flag and (UPD or UPOD))=0) and (Offs=0);
       Result:=Abbr;
       exit;
   end;
@@ -397,12 +411,13 @@ begin
     Scl:=Scl*Power(Scale, exp);
     dx.DI:=PhyMinus(dx.DI, PhyMult(Sig, exp));
   end;
-  for i:=0 to L do if buf[i]=1 then begin
+  PE:=false;
+  for i:=0 to L do if buf[i]=1 then with PUnitDesc(UnitList.List[i])^ do begin
     if fuflg then begin
-              ///////////////
+      PE:=((Flag and (UPD or UPOD))=0) and (Offset=0);
       fuflg:=false;
     end else Result:=Result+' ';
-    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
+    Result:=Abbr;
   end;
   for i:=0 to L do if buf[i]>1 then begin
     if fuflg then fuflg:=false else Result:=Result+' ';
@@ -421,5 +436,21 @@ begin
     if exp>1 then Result:=Result+IntToStr(exp);
   end;
   FreeMem(buf);
+end;
+
+function SelectPrefix(var F:TRFloat):string;
+var i : SizeInt;
+    t : TRFloat;
+begin
+  PByte(Result):=nil;
+  for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do
+    if (Flag and UOD)=0 then begin
+      t:=F/Scale;
+      if (t>=1) and (t<1000) then begin
+        F:=t;
+        Result:=Abbr;
+        exit;
+      end;
+    end;
 end;
 

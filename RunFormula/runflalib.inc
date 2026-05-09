@@ -302,34 +302,44 @@ begin
 end;
 
 function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsStr
-var S : string;
-    Scl, Offs, F, Im : TRFloat;
+var s : string;
+    scl, ofs, f : TRFloat;
+    pe : boolean;
 begin
   with PV^ do begin
     if VPhy<>0 then begin
-      S:=DecodePhy(VPhy, Scl, Offs);
+      s:=DecodePhy(VPhy, scl, ofs, pe);
       case VType of
-        VInt, VChar, VIGap : if (Scl<>1) or (Offs<>0) then raise EError.Create(DimlessInt);
-        VFloat : F:=(Flo-Offs)/Scl;
-        VCplex, VGap : begin F:=(Flo-Offs)/Scl; Im:=(Img-Offs)/Scl; end;
+        VInt, VChar, VIGap : if (scl<>1) or (ofs<>0) then raise EError.Create(DimlessInt);
+        VFloat : begin
+                   f:=Flo;
+                   if pe then s:=SelectPrefix(f)+s;
+                   Result:=Flo2Str((f-ofs)/scl)+'`'+s+'`';
+                   exit;
+                 end;
+        VCplex : begin
+                   Result:='('+Flo2Str((Flo-ofs)/scl)+','+Flo2Str(Img/scl)+')`'+s+'`';
+                   exit;
+                 end;
+        VGap   : begin
+                   Result:='['+Flo2Str((Flo-ofs)/scl)+':'+Flo2Str((Img-ofs)/scl)+']`'+s+'`';
+                   exit;
+                 end;
+        end;
       end;
-    end else case VType of
-      VFloat : F:=Flo;
-      VCplex, VGap : begin F:=Flo; Im:=Img; end;
+      case VType of
+        VNone  : PByte(Result):=nil;
+        VInt   : Result:=IntToStr(Int);
+        VFloat : Result:=Flo2Str(Flo);
+        VCplex : Result:='('+Flo2Str(Flo)+','+Flo2Str(Img)+')';
+        VChar  : Result:=char(Chr);
+        VStr   : Result:=string(Str);
+        VGap   : Result:='['+Flo2Str(Flo)+':'+Flo2Str(Img)+']';
+        VIGap  : Result:='['+Flo2Str(Int)+':'+Flo2Str(IGap)+']';
+        VArr   : raise EError.Create(InvalidArrVal);
+      end;
+      if VPhy<>0 then Result:=Result+'`'+s+'`';
     end;
-    case VType of
-      VNone  : PByte(Result):=nil;
-      VInt   : Result:=IntToStr(Int);
-      VFloat : Result:=FloatToStr(F);
-      VCplex : Result:='('+FloatToStr(F)+','+FloatToStr(Im)+')';
-      VChar  : Result:=char(Chr);
-      VStr   : Result:=string(Str);
-      VGap   : Result:='['+FloatToStr(F)+':'+FloatToStr(Im)+']';
-      VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
-      VArr   : raise EError.Create(InvalidArrVal);
-    end;
-    if VPhy<>0 then Result:=Result+'`'+S+'`';
-  end;
 end;
 
 function AsVrt(PV:PValRec):Variant;                       //DONE -oRFla.Lib -cRev.2026.03.30: Func AsVrt

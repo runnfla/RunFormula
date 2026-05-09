@@ -27,7 +27,7 @@ const
     (Sig: $00000000FEFE0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'H'),     // Inductance (Henry)
     (Sig: $00000000FFFE0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'Wb'),    // Magnetic Flux (Weber)
     (Sig: $00000000FFFE0100; Scale: 1; Offset: 0; Flag: $0; Abbr: 'T'),     // Magnetic Induction (Tesla)
-    (Sig: $0000000000FF0000; Scale: 1; Offset: 0; Flag: USG;  Abbr: 'Hz'),    // Frequency (Hertz)
+    (Sig: $0000000000FF0000; Scale: 1; Offset: 0; Flag: USG;  Abbr: 'Hz'),  // Frequency (Hertz)
 
     (Sig: $0000000000FE0101; Scale: 1; Offset: 0; Flag: $0; Abbr: 'N'),     // Force (Newton)
     (Sig: $0000000000FE0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'J'),     // Energy (Joule)
