@@ -169,7 +169,6 @@ begin
   Result:=dr.DI;
 end;
 
-
 function PhyMult(X, M:SizeInt):SizeInt;                    //DONE -oRFla.Lib -cRev.2026.05.09: Func PhyMult
 var dx, dr : TDPhy;
     t, i : integer;
@@ -182,7 +181,6 @@ begin
   end;
   Result:=dr.DI;
 end;
-
 
 // ===== Text =====
 

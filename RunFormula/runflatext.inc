@@ -188,7 +188,7 @@ begin
   Result:=0;
   while P<Fin do begin
     case P^ of
-      #1..#20, '1' : ;
+      #1..#$20, '1' : ;
       '/' : begin
               if mf then raise EError.Create(InvalidChar, P);
               mf:=true;
@@ -213,7 +213,7 @@ begin
                        if P<abf then FindPref;
                        if exp<>1 then k:=Power(k, exp);
                        Scl:=Scl*k;
-                       Result:=PhyPlus(PhyMult(Sig, exp), Result);
+                       Result:=PhyPlus(Result, PhyMult(Sig, exp));
                        break;              // check for not found
                      end;
                      P:=tf;
@@ -351,7 +351,8 @@ begin
 end;
 
 function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat):string;
-var dx, dy : TDPhy;
+var fuflg : boolean = true;
+    dx, dy : TDPhy;
     buf : PSizeInt;
     t, exp, emns, L, i : SizeInt;
     b : integer;
@@ -393,23 +394,32 @@ begin
     if (exp=0) and (emns=0) then continue;
     if emns<>0 then exp:=-emns;
     buf[i]:=exp;
-    if Scale<>1 then Scl:=Scl*Power(Scale, exp);
-    dx.DI:=PhyMinus(PhyMult(Sig, exp), dx.DI);
+    Scl:=Scl*Power(Scale, exp);
+    dx.DI:=PhyMinus(dx.DI, PhyMult(Sig, exp));
   end;
-
-
-
-
+  for i:=0 to L do if buf[i]=1 then begin
+    if fuflg then begin
+              ///////////////
+      fuflg:=false;
+    end else Result:=Result+' ';
+    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
+  end;
+  for i:=0 to L do if buf[i]>1 then begin
+    if fuflg then fuflg:=false else Result:=Result+' ';
+    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr+IntToStr(buf[i]);
+  end;
+  fuflg:=true;
   for i:=0 to L do begin
-    exp:=buf[i];
-    if exp<>0 then Result:=Result+' '+PUnitDesc(UnitList.List[i])^.Abbr+IntToStr(exp);
+    exp:=-buf[i];
+    if exp<=0 then continue;
+    if PByte(Result)=nil then Result:='1';
+    if fuflg then begin
+      Result:=Result+'/';
+      fuflg:=false;
+    end else Result:=Result+' ';
+    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
+    if exp>1 then Result:=Result+IntToStr(exp);
   end;
-
-
-
-
   FreeMem(buf);
 end;
-
-
 
