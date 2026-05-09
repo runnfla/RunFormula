@@ -483,8 +483,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <TopLine Value="44"/>
-        <CursorPos X="44" Y="458"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="43" Y="6"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -634,7 +634,6 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaphy.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <TopLine Value="22"/>
         <CursorPos X="93" Y="39"/>
