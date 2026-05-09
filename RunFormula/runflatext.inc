@@ -213,7 +213,7 @@ begin
                        if P<abf then FindPref;
                        if exp<>1 then k:=Power(k, exp);
                        Scl:=Scl*k;
-                       Result:=PhyOp(Result, PhyOp(Sig, exp, PhyMult), PhyPlus);
+                       Result:=PhyPlus(PhyMult(Sig, exp), Result);
                        break;              // check for not found
                      end;
                      P:=tf;
@@ -351,7 +351,7 @@ begin
 end;
 
 function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat):string;
-var qx, qy : TQPhy;
+var dx, dy : TDPhy;
     buf : PSizeInt;
     t, exp, emns, L, i : SizeInt;
     b : integer;
@@ -369,19 +369,19 @@ begin
   Offs:=0;
   PByte(Result):=nil;
   for i:=0 to L do buf[i]:=0;
-  qx.QI:=Phy;
+  dx.DI:=Phy;
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do if ((Flag and (USG or UOD))=0) then begin
-    qy.QI:=Sig;
+    dy.DI:=Sig;
     exp:=high(ShortInt);
     emns:=exp;
-    for b:=0 to SI-1 do if qy.QA[b]<>0 then begin
-      if qx.QA[b]=0 then begin
+    for b:=0 to SI-1 do if dy.DB[b]<>0 then begin
+      if dx.DB[b]=0 then begin
         exp:=0;
         emns:=0;
         break;
       end;
-      t:=abs(qx.QA[b]) div abs(qy.QA[b]);
-      if ((qx.QA[b] xor qy.QA[b]) and $80)=0 then begin
+      t:=abs(dx.DB[b]) div abs(dy.DB[b]);
+      if ((dx.DB[b] xor dy.DB[b]) and $80)=0 then begin
         if t<exp then exp:=t;
         emns:=0;
       end else begin
@@ -394,7 +394,7 @@ begin
     if emns<>0 then exp:=-emns;
     buf[i]:=exp;
     if Scale<>1 then Scl:=Scl*Power(Scale, exp);
-    qx.QI:=PhyOp(qx.QI, PhyOp(Sig, exp, PhyMult), PhyMinus);
+    dx.DI:=PhyMinus(PhyMult(Sig, exp), dx.DI);
   end;
 
 

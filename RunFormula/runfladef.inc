@@ -186,13 +186,11 @@ type
 
   PFlaRec = ^TFlaRec;
 
-  TQPhy = packed record
+  TDPhy = packed record
     case byte of
-      0 : (QI : SizeInt);
-      1 : (QA : array[0..SI-1] of ShortInt);
+      0 : (DI : SizeInt);
+      1 : (DB : array[0..SI-1] of ShortInt);
   end;
-
-  TPhyOp = (PhyPlus, PhyMinus, PhyMult);
 
   EError = class(Exception)
     FCode : TRunFlaErrCode;

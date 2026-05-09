@@ -111,6 +111,7 @@ end;
 function Power(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oRFla.Lib -cRev.2026.04.23: Func Power
 var i : SizeInt;            // Base^Scl
 begin
+  if Scl=1 then Exit(Base);
   Result:=1;
   i:=abs(Scl);
   repeat
@@ -137,6 +138,55 @@ begin
   if F3<F4 then m2:=F3 else m2:=F4;
   if m1<m2 then Result:=m1 else Result:=m2;
 end;
+
+// ===== Dimentions =====
+
+function PhyPlus(X, Y:SizeInt):SizeInt;                    //DONE -oRFla.Lib -cRev.2026.05.09: Func PhyPlus
+var dx, dy, dr : TDPhy;
+    t, i : integer;
+begin
+  dx.DI:=X;
+  dy.DI:=Y;
+  for i:=0 to SI-1 do begin
+    t:=dx.DB[i]+dy.DB[i];
+    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+    dr.DB[i]:=ShortInt(t);
+  end;
+  Result:=dr.DI;
+end;
+
+function PhyMinus(X, Y:SizeInt):SizeInt;                   //DONE -oRFla.Lib -cRev.2026.05.09: Func PhyMinus
+var dx, dy, dr : TDPhy;
+    t, i : integer;
+begin
+  dx.DI:=X;
+  dy.DI:=Y;
+  for i:=0 to SI-1 do begin
+    t:=dx.DB[i]-dy.DB[i];
+    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+    dr.DB[i]:=ShortInt(t);
+  end;
+  Result:=dr.DI;
+end;
+
+
+function PhyMult(X, M:SizeInt):SizeInt;                    //DONE -oRFla.Lib -cRev.2026.05.09: Func PhyMult
+var dx, dr : TDPhy;
+    t, i : integer;
+begin
+  dx.DI:=X;
+  for i:=0 to SI-1 do begin
+    t:=dx.DB[i]*M;
+    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+    dr.DB[i]:=ShortInt(t);
+  end;
+  Result:=dr.DI;
+end;
+
+
+// ===== Text =====
+
+{$include runflatext.inc}
 
 // ===== Data =====
 
@@ -252,8 +302,6 @@ begin
     VIGap : Result:=IGap;
   end;
 end;
-
-function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat):string; forward;
 
 function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsStr
 var S : string;
@@ -619,34 +667,6 @@ begin                                          //DONE -oRFla.Lib -cRev.2026.04.1
   FPnt:=Pnt;
 end;
 
-// ===== Quantities =====
 
-function PhyOp(X, Y : SizeInt; Op:TPhyOp):SizeInt;  //DONE -oRFla.Lib -cRev.2026.05.08: Func PhyOp
-var qx, qy, qr : TQPhy;
-    t, i : integer;
-begin
-  qx.QI:=X;
-  qy.QI:=Y;
-  case Op of
-    PhyPlus  : for i:=0 to SI-1 do begin
-                 t:=qx.QA[i]+qy.QA[i];
-                 if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
-                 qr.QA[i]:=ShortInt(t);
-               end;
-    PhyMinus : for i:=0 to SI-1 do begin
-                 t:=qx.QA[i]-qy.QA[i];
-                 if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
-                 qr.QA[i]:=ShortInt(t);
-               end;
-    PhyMult  : for i:=0 to SI-1 do begin
-                 t:=qx.QA[i]*Y;
-                 if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
-                 qr.QA[i]:=ShortInt(t);
-               end;
-  end;
-  Result:=qr.QI;
-end;
-
-{$include runflatext.inc}
 
 
