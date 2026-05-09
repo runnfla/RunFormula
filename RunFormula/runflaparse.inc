@@ -154,7 +154,6 @@ end;
 
 procedure DoParse(P:PChar);                           //DONE -oRFla.Parse -cRev.2026.05.03: Proc DoParse
 var vr : TValRec;
-    pv : PValRec;                   // pv of ValueToken
     tf : PChar;                     // textfin
     S : string;
     I : SizeInt;
@@ -195,16 +194,18 @@ var vr : TValRec;
       Tag:=TagValue;
       Source:=FlaPos;
       Size:=L;
-      pv:=@ValRec;
-      ValRec.VType:=V.VType;
-      ValRec.VAlloc:=BC;
-      ValRec.VPhy:=0;
-      case V.VType of
-        VInt   : ValRec.Int:=V.Int;
-        VFloat : ValRec.Flo:=V.Flo;
-        VCplex, VGap : begin ValRec.Flo:=V.Flo; ValRec.Img:=V.Img; end;
-        VChar  : ValRec.Chr:=V.Chr;
-        VIGap  : begin ValRec.Int:=V.Int; ValRec.IGap:=V.IGap; end;
+      PVRec:=@ValRec;
+      with PVRec^ do begin
+        VType:=V.VType;
+        VAlloc:=BC;
+        VPhy:=0;
+        case V.VType of
+          VInt   : Int:=V.Int;
+          VFloat : Flo:=V.Flo;
+          VCplex, VGap : begin Flo:=V.Flo; Img:=V.Img; end;
+          VChar  : Chr:=V.Chr;
+          VIGap  : begin Int:=V.Int; IGap:=V.IGap; end;
+        end;
       end;
     end;
     inc(BufP, L);
@@ -412,8 +413,8 @@ begin
               if PreTag<>TagValue then raise EError.Create(InvalidChar);
               inc(P);
               tf:=FindTextFin(P, '`');
-              if pv^.VPhy<>0 then raise EError.Create(DimlessValue);      // ??? duplication
-              ApplyPhy(P, tf, pv);
+              if PVRec^.VPhy<>0 then raise EError.Create(DimlessValue);      // ??? duplication
+              ApplyPhy(P, tf, PVRec);
               P:=tf;
             end;
       '{' : Comment:='}';

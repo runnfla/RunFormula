@@ -341,6 +341,7 @@ var Buf : array of string;
     BufSum : SizeInt = 0;                          // sum of closed Bufs
     ClsList, SubrList, DefList, VarList : TMemList;
     PreTag : TTag = TagLess;
+    PVRec : PValRec;                               // point to TValRec of ValueToken
     TextCodePage : TSystemCodePage;
     InDef : integer = 0;
     Comment : char = #0;
