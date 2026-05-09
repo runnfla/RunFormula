@@ -417,7 +417,7 @@ begin
       PE:=((Flag and (UPD or UPOD))=0) and (Offset=0);
       fuflg:=false;
     end else Result:=Result+' ';
-    Result:=Abbr;
+    Result:=Result+Abbr;
   end;
   for i:=0 to L do if buf[i]>1 then begin
     if fuflg then fuflg:=false else Result:=Result+' ';
