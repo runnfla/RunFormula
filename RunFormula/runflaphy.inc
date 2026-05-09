@@ -33,10 +33,10 @@ const
     (Sig: $0000000000FE0102; Scale: 1; Offset: 0; Flag: $0; Abbr: 'J'),     // Energy (Joule)
     (Sig: $0000000000FE01FF; Scale: 1; Offset: 0; Flag: $0; Abbr: 'Pa'),    // Pressure (Pascal)
 
-                                                                             // km/h ???
+    (Sig: $0000000000FF0001; Scale: 0.277777777778; Offset: 0; Flag: USG or UOD; Abbr: 'km/h'), // Speed (km/h)                                                                        // km/h ???
 
-    (Sig: $0000000100000000; Scale: 1; Offset: 273.15; Flag: USG; Abbr: 'grC'), // Temperature (Celsius)
-    (Sig: $0000000100000000; Scale: 0.555555555556; Offset: 255.3722222222; Flag: USG; Abbr: 'grF'), // Temperature (Fahrenheit)
+    (Sig: $0000000100000000; Scale: 1; Offset: 273.15; Flag: USG or UOD; Abbr: 'grC'), // Temperature (Celsius)
+    (Sig: $0000000100000000; Scale: 0.555555555556; Offset: 255.3722222222; Flag: USG or UOD; Abbr: 'grF'), // Temperature (Fahrenheit)
 
     (Sig: $0000000000000001; Scale: 0.0254;   Offset: 0; Flag: UPD or UOD; Abbr: 'in'),   // Inch
     (Sig: $0000000000000001; Scale: 0.3048;   Offset: 0; Flag: UPD or UOD; Abbr: 'ft'),   // Foot

@@ -372,7 +372,7 @@ var fuflg : boolean = true;
 begin
   L:=UnitList.Count-1;
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do
-    if (Sig=Phy) and ((Flag and USG)<>0) and ((Flag and UOD)=0) then begin
+    if (Sig=Phy) and ((Flag and UOD)=0) then begin
       Scl:=Scale;
       Offs:=Offset;
       PE:=((Flag and (UPD or UPOD))=0) and (Offs=0);
