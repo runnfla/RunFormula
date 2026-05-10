@@ -62,6 +62,9 @@ const
     'Dimensional exponent overflow',
     'Dimensioned quantities already assigned',
     'Cannot assign units to this value',
-    'Cannot assign scaled or offset quantity to integer value'
+    'Cannot assign scaled or offset quantity to integer value',
+    'Unit with offset cannot be specified',
+    'Unit is not found',
+    'Prefix is not found'
   );
 

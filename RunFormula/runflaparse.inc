@@ -175,8 +175,9 @@ var vr : TValRec;
     WriteString(PByte(P), Lng, sz, 0);
   end;
 
-  procedure ValueToken(constref V:TValRec);           //DONE -oRFla.Parse -cRev.2026.04.30: Proc ValueToken
+  procedure ValueToken(constref V:TValRec; Phy:SizeInt=0);   //DONE -oRFla.Parse -cRev.2026.05.10: Proc ValueToken
   var L : SizeInt;
+      pv : PValRec;
   begin
     case V.VType of
       VNone  : begin NoneToken; exit; end;
@@ -194,11 +195,11 @@ var vr : TValRec;
       Tag:=TagValue;
       Source:=FlaPos;
       Size:=L;
-      PVRec:=@ValRec;
-      with PVRec^ do begin
+      pv:=@ValRec;
+      with pv^ do begin
         VType:=V.VType;
         VAlloc:=BC;
-        VPhy:=0;
+        VPhy:=Phy;
         case V.VType of
           VInt   : Int:=V.Int;
           VFloat : Flo:=V.Flo;
@@ -410,11 +411,13 @@ begin
               CloseToken(TagArray);
             end;
       '`' : begin
-              if PreTag<>TagValue then raise EError.Create(InvalidChar);
               inc(P);
               tf:=FindTextFin(P, '`');
-              if PVRec^.VPhy<>0 then raise EError.Create(DimlessValue);      // ??? duplication
-              ApplyPhy(P, tf, PVRec);
+              OpToken(TagPhy);
+              with vr do begin
+                VType:=VCplex;
+                ValueToken(vr, PhyCapture(P, tf, Flo, Img));
+              end;
               P:=tf;
             end;
       '{' : Comment:='}';

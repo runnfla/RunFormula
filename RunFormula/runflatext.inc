@@ -61,19 +61,6 @@ begin
   Result:=L;
 end;
 
-function Flo2Str(const F:TRFloat):string;
-const E : TCharSet = ['.', 'E', 'e'];
-var p : PChar;
-begin
-  Result:=FloatToStr(F);
-  p:=PChar(Result);
-  while p^<>#0 do begin
-    if p^ in E then exit;
-    inc(p);
-  end;
-  Result:=Result+'.0';
-end;
-
 function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oRFla.Text -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;
@@ -171,26 +158,27 @@ begin
 end;
 
 function PhyCapture(P, Fin:PChar; out Scl, Offs:TRFloat):SizeInt;
-var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2026.00.00: Func PhyCapture
-    abf, tf : PChar;
+var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2026.05.10: Func PhyCapture
+    L : SizeInt = 0;       // raise UnknownUnit if empty UnitList
+    tf : PChar;
     k : TRFloat;
-    L, exp, i : SizeInt;
+    exp, i : SizeInt;
     flg : boolean;
 
-  procedure FindPref;                                 //DONE -oRFla.Text -cRev.2026.00.00: Proc FindPref
+  procedure FindPref;                                 //DONE -oRFla.Text -cRev.2026.05.10: Proc FindPref
   var j : SizeInt;
   begin
     for j:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[j])^ do
-      if BackCompare(P, abf, Abbr)>0 then begin
+      if BackCompare(P, tf-L, Abbr)>0 then begin
         k:=k*Scale;
         exit;
       end;
-    raise EError.Create(InvalidFormat);
+    raise EError.Create(UnknownPref, P);
   end;
 
 begin
   for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do
-    if ((Flag and USG)<>0) and (BackCompare(P, Fin, Abbr)>0) then begin
+    if BackCompare(P, Fin, Abbr)>0 then begin
       Scl:=Scale;
       Offs:=Offset;
       Result:=Sig;
@@ -201,57 +189,38 @@ begin
   Result:=0;
   while P<Fin do begin
     case P^ of
-      #1..#$20, '1' : ;
+      #0..#$20, '1' : ;
       '/' : begin
               if mf then raise EError.Create(InvalidChar, P);
               mf:=true;
             end;
-      'A'..'Z', 'a'..'z',
-      #$80..#$FF : begin
-                     abf:=P+1;
-                     tf:=FindTextFin(abf);
-                     while (abf^>='A') and (abf<tf) do inc(abf);
-                     for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
-                       if (Flag and USG)<>0 then continue;
-                       L:=BackCompare(P, abf, Abbr, (Flag and UPD)=0);
-                       if L=0 then continue;
-                       exp:=1;
-                       if abf<tf then begin
-                         exp:=IntCapture(abf, tf, flg);
-                         if not flg then raise EError.Create(InvalidFormat);
-                       end;
-                       if mf then exp:=-exp;
-                       k:=Scale;
-                       dec(abf, L);
-                       if P<abf then FindPref;
-                       if exp<>1 then k:=Power(k, exp);
-                       Scl:=Scl*k;
-                       Result:=PhyPlus(Result, PhyMult(Sig, exp));
-                       break;              // check for not found
-                     end;
-                     P:=tf;
-                     continue;
-                   end
-      else raise EError.Create(InvalidFormat);
+      else
+        if P^ in FirstChars then begin
+          tf:=FindTextFin(P);
+          for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
+            L:=BackCompare(P, tf, Abbr, (Flag and UPD)=0);
+            if L=0 then continue;
+            if Offset<>0 then raise EError.Create(OffsetUnit, P);
+            k:=Scale;
+            if P<(tf-L) then FindPref;
+            exp:=1;
+            if tf^='^' then begin
+              P:=tf+1;
+              tf:=FindTextFin(P);
+              exp:=IntCapture(P, tf, flg);
+              if not flg then raise EError.Create(InvalidChar, P);
+            end;
+            if mf then exp:=-exp;
+            Scl:=Scl*k;
+            Result:=PhyPlus(Result, PhyMult(Sig, exp));
+            break;
+          end;
+          if L=0 then raise EError.Create(UnknownUnit, P);
+          P:=tf;
+          continue;
+        end else raise EError.Create(InvalidChar, P);
     end;
     inc(P);
-  end;
-end;
-
-procedure ApplyPhy(P, Fin:PChar; PV:PValRec);         //DONE -oRFla.Text -cRev.2026.00.00: Proc ApplyPhy
-var Scl, Offs : TRFloat;
-begin
-  with PV^ do begin
-    VPhy:=PhyCapture(P, Fin, Scl, Offs);
-    case VType of
-      VFloat : Flo:=Flo*Scl+Offs;
-      VCplex, VGap : begin
-                       Flo:=Flo*Scl+Offs;
-                       Img:=Img*Scl+Offs;
-                     end;
-      else
-        if (Scl<>1) or (Offs<>0) then raise EError.Create(DimlessInt);
-    end;
   end;
 end;
 
@@ -357,10 +326,6 @@ begin
       else raise EError.Create(InvalidFormat);
     end;
   end;
-  if P<Fin then begin
-    inc(P);
-    ApplyPhy(P, FindTextFin(P, '`'), PV);
-  end;
 end;
 
 function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out PE:boolean):string;
@@ -421,7 +386,7 @@ begin
   end;
   for i:=0 to L do if buf[i]>1 then begin
     if fuflg then fuflg:=false else Result:=Result+' ';
-    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr+IntToStr(buf[i]);
+    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr+'^'+IntToStr(buf[i]);
   end;
   fuflg:=true;
   for i:=0 to L do begin
@@ -433,7 +398,7 @@ begin
       fuflg:=false;
     end else Result:=Result+' ';
     Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
-    if exp>1 then Result:=Result+IntToStr(exp);
+    if exp>1 then Result:=Result+'^'+IntToStr(exp);
   end;
   FreeMem(buf);
 end;

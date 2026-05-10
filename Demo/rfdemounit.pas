@@ -106,7 +106,8 @@ const TagName : array[TTag] of string = (
   'MOD',
   'Negative',
   'NOT',
-  'Power');
+  'Power',
+  'Phy');
 
 function MyRunFlaVar(constref Name:string; out Phy:SizeInt; out Save:boolean):Variant;
 begin

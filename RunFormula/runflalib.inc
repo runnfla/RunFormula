@@ -314,15 +314,15 @@ begin
         VFloat : begin
                    f:=Flo;
                    if pe then s:=SelectPrefix(f)+s;
-                   Result:=Flo2Str((f-ofs)/scl)+'`'+s+'`';
+                   Result:=FloatToStr((f-ofs)/scl)+'`'+s+'`';
                    exit;
                  end;
         VCplex : begin
-                   Result:='('+Flo2Str((Flo-ofs)/scl)+','+Flo2Str(Img/scl)+')`'+s+'`';
+                   Result:='('+FloatToStr((Flo-ofs)/scl)+','+FloatToStr(Img/scl)+')`'+s+'`';
                    exit;
                  end;
         VGap   : begin
-                   Result:='['+Flo2Str((Flo-ofs)/scl)+':'+Flo2Str((Img-ofs)/scl)+']`'+s+'`';
+                   Result:='['+FloatToStr((Flo-ofs)/scl)+':'+FloatToStr((Img-ofs)/scl)+']`'+s+'`';
                    exit;
                  end;
         end;
@@ -330,12 +330,12 @@ begin
       case VType of
         VNone  : PByte(Result):=nil;
         VInt   : Result:=IntToStr(Int);
-        VFloat : Result:=Flo2Str(Flo);
-        VCplex : Result:='('+Flo2Str(Flo)+','+Flo2Str(Img)+')';
+        VFloat : Result:=FloatToStr(Flo);
+        VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
         VChar  : Result:=char(Chr);
         VStr   : Result:=string(Str);
-        VGap   : Result:='['+Flo2Str(Flo)+':'+Flo2Str(Img)+']';
-        VIGap  : Result:='['+Flo2Str(Int)+':'+Flo2Str(IGap)+']';
+        VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
+        VIGap  : Result:='['+FloatToStr(Int)+':'+FloatToStr(IGap)+']';
         VArr   : raise EError.Create(InvalidArrVal);
       end;
       if VPhy<>0 then Result:=Result+'`'+s+'`';
@@ -359,9 +359,10 @@ begin
   end;
 end;
 
-procedure ValCopy(Src, Dst:PValRec);                      //DONE -oRFla.Lib -cRev.2026.04.28: Proc ValCopy
+function ValCopy(Src, Dst:PValRec):PValRec;               //DONE -oRFla.Lib -cRev.2026.05.10: Func ValCopy
 begin
-  with Dst^ do begin
+  Result:=Dst;
+  with Result^ do begin
     VType:=Src^.VType;
     VPhy:=Src^.VPhy;
     case VType of
@@ -455,6 +456,38 @@ begin
     VArr   : raise EError.Create(InvalidArrVal);
   end;
   Result:=-1;
+end;
+
+procedure ApplyPhyToPV(PV:PValRec; Phy:SizeInt; const Scl, Offs:TRFloat);
+begin                                                    //DONE -oRFla.Lib -cRev.2026.05.10: Proc ApplyPhyToPV
+  with PV^ do begin
+    if VType in [VNone, VStr, VArr] then raise EError.Create(DimlessValue);
+    VPhy:=Phy;
+    if (Scl<>1) or (Offs<>0) then case VType of
+      VInt   : begin
+                 VType:=VFloat;
+                 Flo:=Int*Scl+Offs;
+               end;
+      VFloat : Flo:=Flo*Scl+Offs;
+      VCplex : begin
+                 Flo:=Flo*Scl+Offs;
+                 Img:=Img*Scl;
+               end;
+      VChar  : begin
+                 VType:=VFloat;
+                 Flo:=Chr*Scl+Offs;
+               end;
+      VGap   : begin
+                 Flo:=Flo*Scl+Offs;
+                 Img:=Img*Scl+Offs;
+               end;
+      VIGap  : begin
+                 VType:=VGap;
+                 Flo:=Int*Scl+Offs;
+                 Img:=IGap*Scl+Offs;
+               end;
+    end;
+  end;
 end;
 
 // ===== MemList routines =====
@@ -674,7 +707,4 @@ begin                                          //DONE -oRFla.Lib -cRev.2026.04.1
   FCode:=Code;
   FPnt:=Pnt;
 end;
-
-
-
 

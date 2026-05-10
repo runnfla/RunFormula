@@ -161,11 +161,8 @@ begin
                      Result:=Expr(p, fn, 0);
                    end;
                    if Flow=EXT then Flow:=NML;
-                   if (Result^.VAlloc=VP) and (PoolIndex=loc) then begin
-                     pv:=NewLV(Context);
-                     ValCopy(Result, pv);
-                     Result:=pv;
-                   end;
+                   if (Result^.VAlloc=VP) and (PoolIndex=loc) then
+                     Result:=ValCopy(Result, NewLV(Context));
                    with PMemList(VarPool.List[loc])^ do begin
                      for i:=Count-1 downto 0 do FreeValue(@PVariable(List[i])^.Value);
                      MemListClear(PMemList(@List)^);
@@ -272,10 +269,7 @@ begin
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;
-  if Result^.VAlloc<>BC then begin
-    ValCopy(Result, Buf);
-    Result:=Buf;
-  end;
+  if Result^.VAlloc<>BC then Result:=ValCopy(Result, Buf);
   with Context do begin
     if VarPool.ListLng>0 then repeat
       inc(j);
@@ -341,7 +335,6 @@ var Buf : array of string;
     BufSum : SizeInt = 0;                          // sum of closed Bufs
     ClsList, SubrList, DefList, VarList : TMemList;
     PreTag : TTag = TagLess;
-    PVRec : PValRec;                               // point to TValRec of ValueToken
     TextCodePage : TSystemCodePage;
     InDef : integer = 0;
     Comment : char = #0;

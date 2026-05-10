@@ -62,7 +62,10 @@ type
     PhyOver,
     PhyExists,
     DimlessValue,
-    DimlessInt
+    DimlessInt,
+    OffsetUnit,
+    UnknownUnit,
+    UnknownPref
   );
 
   TRunFlaError = packed record

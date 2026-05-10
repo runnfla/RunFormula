@@ -55,7 +55,8 @@ type
     TagMOD,               // mod
     TagNegative,          // - unary
     TagNOT,               // not unary
-    TagPower);            // **
+    TagPower,             // **
+    TagPhy);              // Phy
 
   TAnsiRec = packed record                         // from astrings.inc
     CodePage : TSystemCodePage;                    // but packed just in case
@@ -276,7 +277,8 @@ const
     700,     // TagMOD        mod
     800,     // TagNegative   - unary
     800,     // TagNOT        not
-    901);    // TagPower      **   right-associative, 4**3**2 = 4**9
+    901,     // TagPower      **   right-associative, 4**3**2 = 4**9
+  10000);    // TagPhy must have highest priority
 
   CaseType : array[TVType, TVType] of TVType = (
 // ret. VInt VFloat VCplex VStr VGap VIGap VArr

@@ -56,7 +56,7 @@ end;
 
 function Expr(var P:PByte; Fin:PByte; Level:integer):PValRec;  //DONE -oRFla.Term -cRev.2026.04.27: Func Expr
 var L : PValRec = @CVNone;        // init VMode
-    R : PValRec;
+    LL, R : PValRec;
     tag : TTag;
     tkn : PByte;
     lvl : integer;
@@ -324,6 +324,11 @@ begin
                                           end else LGap(Min4(fc, fc, fd, fd), Max4(fc, fc, fd, fd));
                                         end;
                         VArr : raise EError.Create(InvalidArrVal);
+                      end;
+        TagPhy      : begin
+                        if L^.VPhy<>0 then raise EError.Create(PhyExists);
+                        if L^.VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
+                        ApplyPhyToPV(L, R^.VPhy, R^.Flo, R^.Img);
                       end;
       end;
       if (Lphy or Rphy)<>0 then case tag of
