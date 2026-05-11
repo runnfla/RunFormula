@@ -216,6 +216,7 @@ begin
                         FreeValue(L);
                         ValCopy(R, L);
                         FreeTerm(R);
+                        continue;
                       end;
         TagOR       : LVal(AsInt(L) or AsInt(R));                            // or
         TagXOR      : LVal(AsInt(L) xor AsInt(R));                           // xor
@@ -325,10 +326,11 @@ begin
                                         end;
                         VArr : raise EError.Create(InvalidArrVal);
                       end;
-        TagPhy      : begin
+        TagPhy      : begin                            // R always must be in BC
                         if L^.VPhy<>0 then raise EError.Create(PhyExists);
                         if L^.VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
                         ApplyPhyToPV(L, R^.VPhy, R^.Flo, R^.Img);
+                        continue;
                       end;
       end;
       if (Lphy or Rphy)<>0 then case tag of

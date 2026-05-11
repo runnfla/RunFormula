@@ -305,7 +305,7 @@ begin
   try                               // include memory exception
     ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
   except
-    Result^.VType:=VNone;         // recheck !!! - ParseValue can raise unexpectivly
+    Result^.VType:=VNone;
   end;
 end;
 

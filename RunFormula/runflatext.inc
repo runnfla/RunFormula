@@ -224,9 +224,8 @@ begin
   end;
 end;
 
-procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.05.04: Proc ParseValue
+procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.05.11: Proc ParseValue
 var sig : SizeInt = 0;
- //   phy : SizeInt = 0;
     mf : boolean = false;
     flg : boolean = true;
     I, IL : SizeInt;
@@ -234,24 +233,29 @@ var sig : SizeInt = 0;
     tf : PChar;
     c : char;
 begin
+  PV^.VPhy:=0;
   while P<Fin do begin
     c:=P^;
     case c of
-      #1..#$20  : ;
-      '"', #$27 : begin
+      #0..#$20  : ;
+      '"', #$27 : with PV^ do begin
+                    VType:=VStr;
+                    Str:=nil;
                     inc(P);
                     tf:=FindTextFin(P, c);
                     case tf-P of
-                      0 : raise EError.Create(InvalidFormat);
+                      0 : begin
+                            VType:=VNone;
+                            exit;
+                          end;
                       1 : I:=PByte(P)^;
-                      2 : if P^='^' then I:=PByte(P+1)^-$40 else c:=#0;
-                      else c:=#0;
-                    end;
-                    if c=#0 then with PV^ do begin
-                      VType:=VStr;
-                      Str:=nil;
-                      SetString(string(Str), P, tf-P);
-                      exit;
+                      2 : if P^<>'^' then begin
+                            SetString(string(Str), P, tf-P);
+                            exit;
+                          end else I:=PByte(P+1)^-$40;
+                      else
+                        SetString(string(Str), P, tf-P);
+                        exit;
                     end;
                     if mf then I:=-I;
                     F:=I;
@@ -260,7 +264,8 @@ begin
                   end;
       '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
       ',', ':'  : begin
-                    IL:=I; FL:=F;
+                    IL:=I;
+                    FL:=F;
                     mf:=false;
                     sig:=(sig shl 4) or (byte(c) and $F);
                   end;
@@ -279,60 +284,62 @@ begin
                     sig:=(sig shl 4) or 1;
                     continue;
                   end;
-      '`'       : break
+      '`'       : break;
       else raise EError.Create(InvalidChar, P);
     end;
-    inc(P);                                   // 0=1 "=2 (=8 )=9 [=B ]=D ,=C :=A
+    inc(P);                                 // 0=1 "=2 (=8 )=9 [=B ]=D ,=C :=A
   end;
-  with PV^ do begin
-    case sig of
-      1       : if flg then begin             // 0
-                  VType:=VInt;
-                  Int:=I;
-                end else begin
-                  VType:=VFloat;
-                  Flo:=F;
-                end;
-      2       : begin                         // "
-                  VType:=VChar;
-                  Chr:=byte(I);
-                end;
-      $1A1,                                   // 0:0 0:" ":0 ":"
-      $1A2,
-      $2A1,
-      $2A2,
-      $B1A1D,                                 // [0:0] [0:"] [":0] [":"]
-      $B1A2D,
-      $B2A1D,
-      $B2A2D  : if flg then begin
-                  if IL>I then raise EError.Create(InvalidRange);
-                  VType:=VIGap;
-                  Int:=IL;
-                  IGap:=I;
-                end else begin
-                  if FL>F then raise EError.Create(InvalidRange);
-                  VType:=VGap;
-                  Flo:=FL;
-                  Img:=F;
-                end;
-      $81C19,                                 // (0,0) (0,") (",0) (",")
-      $81C29,
-      $82C19,
-      $82C29  : begin
-                  VType:=VCplex;
-                  Flo:=FL;
-                  Img:=F;
-                end;
-      else raise EError.Create(InvalidFormat);
-    end;
+  with PV^ do case sig of
+    1       : if flg then begin             // 0
+                VType:=VInt;
+                Int:=I;
+              end else begin
+                VType:=VFloat;
+                Flo:=F;
+              end;
+    2       : begin                         // "
+                VType:=VChar;
+                Chr:=byte(I);
+              end;
+    $1A1,                                   // 0:0 0:" ":0 ":"
+    $1A2,
+    $2A1,
+    $2A2,
+    $B1A1D,                                 // [0:0] [0:"] [":0] [":"]
+    $B1A2D,
+    $B2A1D,
+    $B2A2D  : if flg then begin
+                if IL>I then raise EError.Create(InvalidRange);
+                VType:=VIGap;
+                Int:=IL;
+                IGap:=I;
+              end else begin
+                if FL>F then raise EError.Create(InvalidRange);
+                VType:=VGap;
+                Flo:=FL;
+                Img:=F;
+              end;
+    $81C19,                                 // (0,0) (0,") (",0) (",")
+    $81C29,
+    $82C19,
+    $82C29  : begin
+                VType:=VCplex;
+                Flo:=FL;
+                Img:=F;
+              end;
+    else raise EError.Create(InvalidFormat);
+  end;
+  if P<Fin then begin
+    inc(P);
+    ApplyPhyToPV(PV, PhyCapture(P, FindTextFin(P, '`'), F, FL), F, FL);
   end;
 end;
 
 function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out PE:boolean):string;
-var fuflg : boolean = true;
+var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.2026.05.00: Func DecodePhy
     dx, dy : TDPhy;
     buf : PSizeInt;
-    t, exp, emns, L, i : SizeInt;
+    L, t, exp, emns, i : SizeInt;
     b : integer;
 begin
   L:=UnitList.Count-1;
@@ -340,16 +347,16 @@ begin
     if (Sig=Phy) and ((Flag and UOD)=0) then begin
       Scl:=Scale;
       Offs:=Offset;
-      PE:=((Flag and (UPD or UPOD))=0) and (Offs=0);
+      PE:=(Flag and (UPD or UPOD))=0;
       Result:=Abbr;
       exit;
   end;
-  buf:=GetMem((L+1)*SI);
+  PByte(Result):=nil;
   Scl:=1;
   Offs:=0;
-  PByte(Result):=nil;
-  for i:=0 to L do buf[i]:=0;
   dx.DI:=Phy;
+  buf:=GetMem((L+1)*SI);
+  for i:=0 to L do buf[i]:=0;
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do if ((Flag and (USG or UOD))=0) then begin
     dy.DI:=Sig;
     exp:=high(ShortInt);

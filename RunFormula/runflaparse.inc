@@ -402,7 +402,7 @@ begin
               inc(P);
               tf:=FindTextFin(P, ']');
               ParseValue(P, tf, @vr);
-              ValueToken(vr);
+              ValueToken(vr, vr.VPhy);
               if vr.VType=VStr then DecStrRef(vr.Str);
               P:=tf;
             end;
@@ -411,6 +411,7 @@ begin
               CloseToken(TagArray);
             end;
       '`' : begin
+              if PreTag in [TagText, TagLocal, TagSubr, TagNone] then raise EError.Create(DimlessValue);
               inc(P);
               tf:=FindTextFin(P, '`');
               OpToken(TagPhy);

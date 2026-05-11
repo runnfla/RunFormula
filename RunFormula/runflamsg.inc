@@ -61,8 +61,7 @@ const
     'Operation not allowed on dimensioned quantity',
     'Dimensional exponent overflow',
     'Dimensioned quantities already assigned',
-    'Cannot assign units to this value',
-    'Cannot assign scaled or offset quantity to integer value',
+    'Cannot assign units to None, String or Array value',
     'Unit with offset cannot be specified',
     'Unit is not found',
     'Prefix is not found'

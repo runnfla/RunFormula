@@ -62,7 +62,6 @@ type
     PhyOver,
     PhyExists,
     DimlessValue,
-    DimlessInt,
     OffsetUnit,
     UnknownUnit,
     UnknownPref
