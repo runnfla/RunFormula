@@ -331,11 +331,12 @@ begin
   end;
   if P<Fin then begin
     inc(P);
-    ApplyPhyToPV(PV, PhyCapture(P, FindTextFin(P, '`'), F, FL), F, FL);
+    I:=PhyCapture(P, FindTextFin(P, '`'), F, FL);
+    ApplyPhyToPV(PV, I, F, FL);
   end;
 end;
 
-function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out PE:boolean):string;
+function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out Flg:SizeInt):string;
 var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.2026.05.00: Func DecodePhy
     dx, dy : TDPhy;
     buf : PSizeInt;
@@ -347,7 +348,7 @@ begin
     if (Sig=Phy) and ((Flag and UOD)=0) then begin
       Scl:=Scale;
       Offs:=Offset;
-      PE:=(Flag and (UPD or UPOD))=0;
+      Flg:=Flag;
       Result:=Abbr;
       exit;
   end;
@@ -383,10 +384,10 @@ begin
     Scl:=Scl*Power(Scale, exp);
     dx.DI:=PhyMinus(dx.DI, PhyMult(Sig, exp));
   end;
-  PE:=false;
+  Flg:=UPD;
   for i:=0 to L do if buf[i]=1 then with PUnitDesc(UnitList.List[i])^ do begin
     if fuflg then begin
-      PE:=((Flag and (UPD or UPOD))=0) and (Offset=0);
+      Flg:=Flag;
       fuflg:=false;
     end else Result:=Result+' ';
     Result:=Result+Abbr;
@@ -410,19 +411,22 @@ begin
   FreeMem(buf);
 end;
 
-function SelectPrefix(var F:TRFloat):string;
-var i : SizeInt;
+function SelectPref(F:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
+var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.05.12: Func SelectPref
     t : TRFloat;
 begin
   PByte(Result):=nil;
-  for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do
-    if (Flag and UOD)=0 then begin
-      t:=F/Scale;
-      if (t>=1) and (t<1000) then begin
-        F:=t;
-        Result:=Abbr;
-        exit;
-      end;
+  if (Flg and UPD)=0 then begin
+    F:=F/Scl;
+    for i:=0 to PrefList.Count-1 do
+      with PPrefAbbr(PrefList.List[i])^ do if ((Flag and UOD)=0) and ((Flag and Flg)=0) then begin
+        t:=F/Scale;
+        if (t>=1) and (t<1000) then begin
+          Scl:=Scl*Scale;
+          Result:=Abbr;
+          exit;
+        end;
     end;
+  end;
 end;
 

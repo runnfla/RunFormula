@@ -326,10 +326,12 @@ begin
                                         end;
                         VArr : raise EError.Create(InvalidArrVal);
                       end;
-        TagPhy      : begin                            // R always must be in BC
-                        if L^.VPhy<>0 then raise EError.Create(PhyExists);
-                        if L^.VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
-                        ApplyPhyToPV(L, R^.VPhy, R^.Flo, R^.Img);
+        TagPhy      : begin                   // R always must be in BC so FreeTerm(R) is not needed
+                        with L^ do begin
+                          if VPhy<>0 then raise EError.Create(PhyExists);
+                          if VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
+                        end;
+                        with R^ do ApplyPhyToPV(L, VPhy, Flo, Img);
                         continue;
                       end;
       end;

@@ -333,43 +333,41 @@ begin
   end;
 end;
 
-function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.05.11: Func AsStr
-var s : string;
-    scl, ofs, f : TRFloat;
-    pe : boolean;
+function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.05.12: Func AsStr
+var scl : TRFloat = 1;
+    ofs : TRFloat = 0;
+    s : string;
+    flg : SizeInt;
 begin
-  with PV^ do if VPhy<>0 then begin
-    s:=DecodePhy(VPhy, scl, ofs, pe)+'`';
-    case VType of
-      VInt   : begin
-                 f:=Int;
-                 if pe then s:=SelectPrefix(f)+s;
-                 Result:=FloatToStr((f-ofs)/scl)+'`'+s;
-               end;
-      VFloat : begin
-                 f:=Flo;
-                 if pe then s:=SelectPrefix(f)+s;
-                 Result:=FloatToStr((f-ofs)/scl)+'`'+s;
-               end;
+  PByte(s):=nil;
+  with PV^ do begin
+    if VPhy<>0 then begin
+      s:=DecodePhy(VPhy, scl, ofs, flg)+'`';
+      if ofs=0 then case VType of                          // flags are handled in SelectPref
+        VInt   : s:=SelectPref(Int, scl, flg)+s;
+        VFloat : s:=SelectPref(Flo, scl, flg)+s;
+        VChar  : s:=SelectPref(Chr, scl, flg)+s;
+      end;
+      s:='`'+s;
+    end;
+    if (scl<>1) or (ofs<>0) then case VType of
+      VInt   : Result:=FloatToStr((Int-ofs)/scl)+s;
+      VFloat : Result:=FloatToStr((Flo-ofs)/scl)+s;
       VCplex : Result:='('+FloatToStr((Flo-ofs)/scl)+','+FloatToStr(Img/scl)+')`'+s;
-      VChar  : begin
-                 f:=Chr;
-                 if pe then s:=SelectPrefix(f)+s;
-                 Result:=FloatToStr((f-ofs)/scl)+'`'+s;
-               end;
+      VChar  : Result:=FloatToStr((Chr-ofs)/scl)+s;
       VGap   : Result:='['+FloatToStr((Flo-ofs)/scl)+':'+FloatToStr((Img-ofs)/scl)+']`'+s;
       VIGap  : Result:='['+FloatToStr((Int-ofs)/scl)+':'+FloatToStr((IGap-ofs)/scl)+']`'+s;
+    end else case VType of
+      VNone  : PByte(Result):=nil;
+      VInt   : Result:=IntToStr(Int)+s;
+      VFloat : Result:=FloatToStr(Flo)+s;
+      VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')'+s;
+      VChar  : if VPhy=0 then Result:=char(Chr) else Result:=IntToStr(Chr)+s;
+      VStr   : Result:=string(Str);
+      VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']'+s;
+      VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']'+s;
+      VArr   : raise EError.Create(InvalidArrVal);
     end;
-  end else case VType of
-    VNone  : PByte(Result):=nil;
-    VInt   : Result:=IntToStr(Int);
-    VFloat : Result:=FloatToStr(Flo);
-    VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
-    VChar  : Result:=char(Chr);
-    VStr   : Result:=string(Str);
-    VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
-    VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
-    VArr   : raise EError.Create(InvalidArrVal);
   end;
 end;
 

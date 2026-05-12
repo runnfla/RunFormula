@@ -417,7 +417,7 @@ begin
               OpToken(TagPhy);
               with vr do begin
                 VType:=VCplex;
-                ValueToken(vr, PhyCapture(P, tf, Flo, Img));
+                ValueToken(vr, PhyCapture(P, tf, Flo, Img));   // safe due to constref
               end;
               P:=tf;
             end;
