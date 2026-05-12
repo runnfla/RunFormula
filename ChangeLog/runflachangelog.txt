@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  ChangeLog
-//  Rev. 10.05.2026
+//  Rev. 12.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -17,4 +17,7 @@
 
 ===== Version 0.0 - 2026.05.09
 - First RunFormula release
+
+===== Develop branch changes
+- Changed: Updated error message structure
 
