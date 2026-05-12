@@ -401,7 +401,7 @@ begin
   p:=Exp+ExprTokenSize;
   if PToken(p)^.Tag<>TagVar then raise EError.Create(VarExpected, p);
   pv:=NewVar(p);
-  inc(p, VarTokenSize);
+  inc(p, IndexTokenSize);
   if Pini=nil then begin
     if p<fin then begin
       if PToken(p)^.Tag<>TagAssign then raise EError.Create(AssignExpected, p);

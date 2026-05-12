@@ -118,7 +118,7 @@ var L : SizeInt = ExprTokenSize;
     ps : PSizeInt;
 begin
   Sequence(Expr);
-  if Idx>=0 then L:=VarTokenSize;
+  if Idx>=0 then L:=IndexTokenSize;
   RequestBuf(L);
   with PToken(BufP)^ do begin
     Tag:=Expr;
@@ -273,7 +273,7 @@ var vr : TValRec;
   var i : SizeInt;
   begin
     Sequence(TagVar);
-    RequestBuf(VarTokenSize);
+    RequestBuf(IndexTokenSize);
     i:=MemListFind(VarList, P, tf);
     if i<0 then begin
       i:=not i;
@@ -286,10 +286,10 @@ var vr : TValRec;
     with PToken(BufP)^ do begin
       Tag:=TagVar;
       Source:=FlaPos;
-      Size:=VarTokenSize;
+      Size:=IndexTokenSize;
       Index:=PFlaRec(VarList.List[i])^.Index;
     end;
-    inc(BufP, VarTokenSize);
+    inc(BufP, IndexTokenSize);
     P:=tf;
   end;
 

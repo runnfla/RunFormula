@@ -230,7 +230,7 @@ const
 
   OpTokenSize = PtrUInt(@TToken(nil^).Size);
   ExprTokenSize = PtrUInt(@TToken(nil^).Index);
-  VarTokenSize = ExprTokenSize+SI;
+  IndexTokenSize = ExprTokenSize+SI;
 
   SFlaRec = SizeOf(TFlaRec);
 

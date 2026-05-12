@@ -92,7 +92,7 @@ begin
                      dec(i);
                    until i<0;
                    if idx<0 then begin
-                     if PToken(Pnt+VarTokenSize)^.Tag<>TagAssign then begin
+                     if PToken(Pnt+IndexTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);
                        Result:=DoRunFlaVar(Context, Index);
                        if flg then ValCopy(Result, NewVar(Pnt, idx, false));
@@ -117,7 +117,7 @@ begin
       TagFunc  : begin
                    idx:=FuncArg.Count;
                    fin:=Pnt+Size;
-                   p:=Pnt+VarTokenSize;
+                   p:=Pnt+IndexTokenSize;
                    while p<fin do begin
                      PPByte(MemListAdd(FuncArg))^:=p;
                      inc(p, PToken(p)^.Size);
@@ -130,7 +130,7 @@ begin
       TagCall  : begin
                    idx:=FuncArg.Count;
                    fin:=Pnt+Size;
-                   p:=Pnt+VarTokenSize;
+                   p:=Pnt+IndexTokenSize;
                    while p<fin do begin
                      PPValRec(MemListAdd(FuncArg))^:=Term(p, Context);
                      inc(p, PToken(p)^.Size);

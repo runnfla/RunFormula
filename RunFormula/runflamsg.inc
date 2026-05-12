@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  Error messages include file
-//  Rev. 15.04.2026
+//  Rev. 11.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -18,52 +18,55 @@
 // TODO -oRFla.Msg -cRev.2026.04.15:
 
 const
-  RunFlaErrorMsg : array[TRunFlaErrCode] of string = (
-    'OK',
-    'Unknown Error',
-    'Memory Allocation Error',
-    'Stack overflow',
-    'Float Overflow Error',
-    'Function already exists',
-    'Invalid character',
-    'Invalid format',
-    'Unexpected End',
-    'Incompatible operand type: got Real but expected Integer',
-    'Incompatible operand type: got Complex but expected Integer',
-    'Incompatible operand type: got Complex but expected Real',
-    'Incompatible operand type: got Interval but expected Integer',
-    'Incompatible operand type: got Complex but expected Interval',
-    'Incompatible operand type: got None but expected Integer',
-    'Incompatible operand type: got None but expected Real',
-    'Incompatible operand type: got None but expected Complex',
-    'Incompatible operand type: got None but expected Interval',
-    'Invalid string operand',
-    'Invalid array operand',
-    'Division by Zero',
-    'One or more closing brackets or block terminators are missing',
-    'Mismatched bracket or block terminator',
-    'Function is not found',
-    'Variable expected',
-    'Variant Conversion Error',
-    'Variable is not found',
-    'Incorrect number of parameters',
-    'Define already exists',
-    'Maximum depth has been exceeded',
-    'Unsupported Feature',
-    'Variable already exists',
-    'Operator, comma or close bracket expected',
-    'Value, variable, function or open bracket expected',
-    'Assignment expected',
-    'Invalid operand value',
-    'Incorrect borders of range',
-    'Illegal Break or Continue operation',
-    'Dimensioned quantities mismatch',
-    'Operation not allowed on dimensioned quantity',
-    'Dimensional exponent overflow',
-    'Dimensioned quantities already assigned',
-    'Cannot assign units to None, String or Array value',
-    'Unit with offset cannot be specified',
-    'Unit is not found',
-    'Prefix is not found'
-  );
+  RunFlaErrorMsg : array[TRunFlaErrCode] of record
+      ErrCode : TRunFlaErrCode;
+      ErrMsg  : string;
+    end = (
+      (ErrCode : OK; ErrMsg : 'OK'),
+      (ErrCode : Unknown; ErrMsg : 'Unknown Error'),
+      (ErrCode : Malloc; ErrMsg : 'Memory Allocation Error'),
+      (ErrCode : StackOver; ErrMsg : 'Stack overflow'),
+      (ErrCode : Overflow; ErrMsg : 'Float Overflow Error'),
+      (ErrCode : FuncExists; ErrMsg : 'Function already exists'),
+      (ErrCode : InvalidChar; ErrMsg : 'Invalid character'),
+      (ErrCode : InvalidFormat; ErrMsg : 'Invalid format'),
+      (ErrCode : UnexpectedEnd; ErrMsg : 'Unexpected End'),
+      (ErrCode : IncompType_FI; ErrMsg : 'Incompatible operand type: got Real but expected Integer'),
+      (ErrCode : IncompType_CI; ErrMsg : 'Incompatible operand type: got Complex but expected Integer'),
+      (ErrCode : IncompType_CF; ErrMsg : 'Incompatible operand type: got Complex but expected Real'),
+      (ErrCode : IncompType_GI; ErrMsg : 'Incompatible operand type: got Interval but expected Integer'),
+      (ErrCode : IncompType_CG; ErrMsg : 'Incompatible operand type: got Complex but expected Interval'),
+      (ErrCode : IncompType_NI; ErrMsg : 'Incompatible operand type: got None but expected Integer'),
+      (ErrCode : IncompType_NF; ErrMsg : 'Incompatible operand type: got None but expected Real'),
+      (ErrCode : IncompType_NC; ErrMsg : 'Incompatible operand type: got None but expected Complex'),
+      (ErrCode : IncompType_NG; ErrMsg : 'Incompatible operand type: got None but expected Interval'),
+      (ErrCode : InvalidStrVal; ErrMsg : 'Invalid string operand'),
+      (ErrCode : InvalidArrVal; ErrMsg : 'Invalid array operand'),
+      (ErrCode : DivZero; ErrMsg : 'Division by Zero'),
+      (ErrCode : MissingBracket; ErrMsg : 'One or more closing brackets or block terminators are missing'),
+      (ErrCode : IllegalBracket; ErrMsg : 'Mismatched bracket or block terminator'),
+      (ErrCode : UnknownFunc; ErrMsg : 'Function is not found'),
+      (ErrCode : VarExpected; ErrMsg : 'Variable expected'),
+      (ErrCode : VariantError; ErrMsg : 'Variant Conversion Error'),
+      (ErrCode : UnknownVar; ErrMsg : 'Variable is not found'),
+      (ErrCode : ParamNumber; ErrMsg : 'Incorrect number of parameters'),
+      (ErrCode : DefExists; ErrMsg : 'Define already exists'),
+      (ErrCode : MaxDepth; ErrMsg : 'Maximum depth has been exceeded'),
+      (ErrCode : Unsupported; ErrMsg : 'Unsupported Feature'),
+      (ErrCode : VarExists; ErrMsg : 'Variable already exists'),
+      (ErrCode : OpExpected; ErrMsg : 'Operator, comma or close bracket expected'),
+      (ErrCode : NotOpExpected; ErrMsg : 'Value, variable, function or open bracket expected'),
+      (ErrCode : AssignExpected; ErrMsg : 'Assignment expected'),
+      (ErrCode : InvalidValue; ErrMsg : 'Invalid operand value'),
+      (ErrCode : InvalidRange; ErrMsg : 'Incorrect borders of range'),
+      (ErrCode : IllegalBreak; ErrMsg : 'Illegal Break or Continue operation'),
+      (ErrCode : PhyMismatch; ErrMsg : 'Dimensioned quantities mismatch'),
+      (ErrCode : IllegalPhy; ErrMsg : 'Operation not allowed on dimensioned quantity'),
+      (ErrCode : PhyOver; ErrMsg : 'Dimensional exponent overflow'),
+      (ErrCode : PhyExists; ErrMsg : 'Dimensioned quantities already assigned'),
+      (ErrCode : DimlessValue; ErrMsg : 'Cannot assign units to None, String or Array value'),
+      (ErrCode : OffsetUnit; ErrMsg : 'Unit with offset cannot be specified'),
+      (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
+      (ErrCode : UnknownPref; ErrMsg : 'Prefix is not found')
+    );
 

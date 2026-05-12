@@ -133,7 +133,7 @@ begin
   RunFlaFuncReg('appendresult', @AppendResult);
   cod:=RunFlaParse(FlaSynEdit.Text, Error);
   with Error do if Code<>OK then begin
-    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code];
+    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code].ErrMsg;
     FlaSynEdit.SelStart:=Position+1;
     FlaSynEdit.SelEnd:=Position+2;
     exit;
@@ -143,7 +143,7 @@ begin
   while p<fin do with PToken(p)^ do begin
     case Tag of
       TagValue, TagText : sz:=Size;
-      TagVar, TagFunc, TagCall : sz:=VarTokenSize;
+      TagVar, TagFunc, TagCall : sz:=IndexTokenSize;
       TagArray, TagBracket, TagCode, TagLocal, TagSubr, TagNone, TagExpr : sz:=ExprTokenSize;
       else sz:=OpTokenSize
     end;
@@ -200,7 +200,7 @@ begin
   src:=FlaSynEdit.Text;
   S:=RunFlaExecStr(RunFlaParse(src, Error), Error);
   with Error do if Code<>OK then begin
-    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code];
+    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code].ErrMsg;
     FlaSynEdit.SelStart:=Position+1;
     FlaSynEdit.SelEnd:=Position+2;
     exit;
@@ -234,7 +234,7 @@ begin
   then Exec:=RunFlaExecVrt(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar)
   else Exec:=RunFlaExecStr(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar);
   with FlaError do if Code<>OK then begin
-    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code]+
+    ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code].ErrMsg+
     ' "'+Value+'"';
     FlaSynEdit.SelStart:=Position+1;
     FlaSynEdit.SelEnd:=Position+2;
@@ -296,7 +296,7 @@ begin
   ResultMemo.Append('Size of TPrefAbbr = '+IntToStr(SizeOf(TPrefAbbr)));
   ResultMemo.Append('Size of OpToken = '+IntToStr(OpTokenSize));
   ResultMemo.Append('Size of ExprToken = '+IntToStr(ExprTokenSize));
-  ResultMemo.Append('Size of VarToken = '+IntToStr(VarTokenSize));
+  ResultMemo.Append('Size of IndexToken = '+IntToStr(IndexTokenSize));
 
   ResultMemo.Append('Done.');
 
