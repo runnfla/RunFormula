@@ -341,7 +341,7 @@ begin
                               if (Lphy<>Rphy) then raise EError.Create(PhyMismatch);
                               L^.VPhy:=Lphy;
                             end;
-        TagNegative : L^.VPhy:=Lphy;
+        TagNegative : L^.VPhy:=Rphy;
         TagMult : L^.VPhy:=PhyPlus(Lphy, Rphy);
         TagSlash, TagDIV : L^.VPhy:=PhyMinus(Lphy, Rphy);
         TagPower : L^.VPhy:=PhyMult(Lphy, AsInt(R));

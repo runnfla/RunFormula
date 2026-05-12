@@ -158,5 +158,13 @@ endfunc;
 
 appendresult("FINAL: " & TestLoop(1));
 
+8. Complex Power Calculation
+R = 24`Ohm`; L = 0.5`H`; C = 30`uF`; f = 50`Hz`;  U = 220`V`;
+
+w = 2*pi*f;
+Z = R + j*(w*L-1/(w*C));
+Zre = Re(Z); Zim = Im(Z);
+S = U ** 2/cplex(Zre, - Zim)
+
 
 
