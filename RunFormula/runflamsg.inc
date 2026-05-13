@@ -60,14 +60,14 @@ const
       (ErrCode : InvalidValue; ErrMsg : 'Invalid operand value'),
       (ErrCode : InvalidRange; ErrMsg : 'Incorrect borders of range'),
       (ErrCode : IllegalBreak; ErrMsg : 'Illegal Break or Continue operation'),
-      (ErrCode : PhyMismatch; ErrMsg : 'Dimensioned quantities mismatch'),
-      (ErrCode : IllegalPhy; ErrMsg : 'Operation not allowed on dimensioned quantity'),
-      (ErrCode : PhyOver; ErrMsg : 'Dimensional exponent overflow'),
-      (ErrCode : PhyExists; ErrMsg : 'Dimensioned quantities already assigned'),
+      (ErrCode : DimMismatch; ErrMsg : 'Dimensioned quantities mismatch'),
+      (ErrCode : IllegalDim; ErrMsg : 'Operation not allowed on dimensioned quantity'),
+      (ErrCode : DimOver; ErrMsg : 'Dimensional exponent overflow'),
+      (ErrCode : DimExists; ErrMsg : 'Dimensioned quantities already assigned'),
       (ErrCode : DimlessValue; ErrMsg : 'Cannot assign units to None, String or Array value'),
       (ErrCode : OffsetUnit; ErrMsg : 'Unit with offset cannot be specified'),
       (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
       (ErrCode : UnknownPref; ErrMsg : 'Prefix is not found'),
-      (ErrCode : UnDecodePhy; ErrMsg : 'Can not decode dimension, list of units is incomplete')
+      (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete')
     );
 

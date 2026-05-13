@@ -344,7 +344,7 @@ var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.
     b : integer;
 begin
   L:=UnitList.Count-1;
-  if L<0 then raise EError.Create(UnDecodePhy);
+  if L<0 then raise EError.Create(UnDecodeDim);
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do
     if (Sig=Phy) and ((Flag and UOD)=0) then begin
       Scl:=Scale;
@@ -388,7 +388,7 @@ begin
   end;
   if dx.DI<>0 then begin
     FreeMem(buf);
-    raise EError.Create(UnDecodePhy);
+    raise EError.Create(UnDecodeDim);
   end;
   Flg:=UPD;
   for i:=0 to L do if buf[i]=1 then with PUnitDesc(UnitList.List[i])^ do begin

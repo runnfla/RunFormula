@@ -127,7 +127,7 @@ begin
   with Result^ do begin
     VType:=VCplex;
     VPhy:=L^.VPhy;
-    if VPhy<>R^.VPhy then raise EError.Create(PhyMismatch);
+    if VPhy<>R^.VPhy then raise EError.Create(DimMismatch);
     Flo:=AsFloat(L);
     Img:=AsFloat(R);
   end;
@@ -169,7 +169,7 @@ begin
   R:=Param(-1, Context);
   with Result^ do begin
     VPhy:=L^.VPhy;
-    if VPhy<>R^.VPhy then raise EError.Create(PhyMismatch);
+    if VPhy<>R^.VPhy then raise EError.Create(DimMismatch);
     if (L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]) then begin
       VType:=VIGap;
       Int:=AsInt(L);
@@ -328,7 +328,7 @@ begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
@@ -355,7 +355,7 @@ begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                if (pv^.Flo=0) and (pv^.Img=0) then raise EError.Create(InvalidValue);
@@ -395,7 +395,7 @@ begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
@@ -435,7 +435,7 @@ begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
@@ -476,7 +476,7 @@ begin
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
   phy:=pv^.VPhy;
-  if (phy and $0101010101010101)>0 then raise EError.Create(IllegalPhy);
+  if (phy and $0101010101010101)>0 then raise EError.Create(IllegalDim);
   with Result^ do begin
     VPhy:=(phy shr 1) or (phy and $8080808080808080);
     case pv^.VType of
@@ -519,7 +519,7 @@ begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalPhy);
+  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                if (pv^.Flo=0) and ((pv^.Img=1) or (pv^.Img=-1)) then raise EError.Create(InvalidValue);

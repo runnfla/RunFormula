@@ -328,7 +328,7 @@ begin
                       end;
         TagPhy      : begin                   // R always must be in BC so FreeTerm(R) is not needed
                         with L^ do begin
-                          if VPhy<>0 then raise EError.Create(PhyExists);
+                          if VPhy<>0 then raise EError.Create(DimExists);
                           if VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
                         end;
                         with R^ do ApplyPhyToPV(L, VPhy, Flo, Img);
@@ -336,9 +336,9 @@ begin
                       end;
       end;
       if (Lphy or Rphy)<>0 then case tag of
-        TagOR, TagXOR, TagAND, TagSHL, TagSHR, TagMOD, TagNOT : raise EError.Create(IllegalPhy);
+        TagOR, TagXOR, TagAND, TagSHL, TagSHR, TagMOD, TagNOT : raise EError.Create(IllegalDim);
         TagPlus, TagMinus : begin
-                              if (Lphy<>Rphy) then raise EError.Create(PhyMismatch);
+                              if (Lphy<>Rphy) then raise EError.Create(DimMismatch);
                               L^.VPhy:=Lphy;
                             end;
         TagNegative : L^.VPhy:=Rphy;

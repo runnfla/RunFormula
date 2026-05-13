@@ -149,7 +149,7 @@ begin
   dy.DI:=Y;
   for i:=0 to SI-1 do begin
     t:=dx.DB[i]+dy.DB[i];
-    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(DimOver);
     dr.DB[i]:=ShortInt(t);
   end;
   Result:=dr.DI;
@@ -163,7 +163,7 @@ begin
   dy.DI:=Y;
   for i:=0 to SI-1 do begin
     t:=dx.DB[i]-dy.DB[i];
-    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(DimOver);
     dr.DB[i]:=ShortInt(t);
   end;
   Result:=dr.DI;
@@ -176,7 +176,7 @@ begin
   dx.DI:=X;
   for i:=0 to SI-1 do begin
     t:=dx.DB[i]*M;
-    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(PhyOver);
+    if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(DimOver);
     dr.DB[i]:=ShortInt(t);
   end;
   Result:=dr.DI;
@@ -277,7 +277,7 @@ end;
 function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsBool
 begin
   with PV^ do begin
-    if VPhy<>0 then raise EError.Create(IllegalPhy);
+    if VPhy<>0 then raise EError.Create(IllegalDim);
     case VType of
       VNone  : Result:=false;
       VInt   : Result:=Int<>0;
@@ -448,7 +448,7 @@ var IL, IR, GL, GR : SizeInt;
   end;
 
 begin
-  if (L^.VPhy<>R^.VPhy) then raise EError.Create(PhyMismatch);
+  if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
     VInt   : begin

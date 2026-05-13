@@ -57,15 +57,15 @@ type
     InvalidValue,
     InvalidRange,
     IllegalBreak,
-    PhyMismatch,
-    IllegalPhy,
-    PhyOver,
-    PhyExists,
+    DimMismatch,
+    IllegalDim,
+    DimOver,
+    DimExists,
     DimlessValue,
     OffsetUnit,
     UnknownUnit,
     UnknownPref,
-    UnDecodePhy
+    UnDecodeDim
   );
 
   TRunFlaError = packed record
