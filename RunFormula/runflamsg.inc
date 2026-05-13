@@ -68,6 +68,6 @@ const
       (ErrCode : OffsetUnit; ErrMsg : 'Unit with offset cannot be specified'),
       (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
       (ErrCode : UnknownPref; ErrMsg : 'Prefix is not found'),
-      (ErrCode : UnDecodePhy; ErrMsg : 'Can not decode dimension')
+      (ErrCode : UnDecodePhy; ErrMsg : 'Can not decode dimension, list of units is incomplete')
     );
 

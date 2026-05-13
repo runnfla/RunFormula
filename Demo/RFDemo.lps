@@ -210,7 +210,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="1005"/>
         <CursorPos X="15" Y="1024"/>
-        <UsageCount Value="61"/>
+        <UsageCount Value="63"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -483,8 +483,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos X="50" Y="5"/>
+        <CursorPos X="97" Y="20"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -492,7 +491,7 @@
         <Filename Value="..\RunFormula\runflaerr.inc"/>
         <EditorIndex Value="9"/>
         <TopLine Value="50"/>
-        <CursorPos X="5" Y="68"/>
+        <CursorPos X="34" Y="61"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -500,14 +499,14 @@
         <Filename Value="..\RunFormula\runflamsg.inc"/>
         <EditorIndex Value="10"/>
         <TopLine Value="47"/>
-        <CursorPos X="29" Y="71"/>
+        <CursorPos X="94" Y="71"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaopt.inc"/>
         <EditorIndex Value="11"/>
-        <CursorPos X="58" Y="6"/>
+        <CursorPos X="32" Y="6"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -523,22 +522,22 @@
         <Filename Value="..\RunFormula\runflalib.inc"/>
         <EditorIndex Value="3"/>
         <TopLine Value="333"/>
-        <CursorPos X="73" Y="341"/>
+        <CursorPos X="6" Y="341"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaparse.inc"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="311"/>
-        <CursorPos X="59" Y="288"/>
+        <TopLine Value="459"/>
+        <CursorPos X="22" Y="288"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="43" Y="8"/>
+        <CursorPos Y="8"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -546,14 +545,15 @@
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <EditorIndex Value="6"/>
         <TopLine Value="115"/>
-        <CursorPos X="34" Y="308"/>
+        <CursorPos X="26" Y="308"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\Help\Rus\runflahelp.txt"/>
         <EditorIndex Value="13"/>
-        <CursorPos X="54" Y="7"/>
+        <TopLine Value="96"/>
+        <CursorPos X="58" Y="41"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
@@ -577,7 +577,7 @@
         <Filename Value="..\Example\runflaexample.txt"/>
         <EditorIndex Value="14"/>
         <TopLine Value="143"/>
-        <CursorPos X="37" Y="154"/>
+        <CursorPos Y="154"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
@@ -627,17 +627,18 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflatext.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="195"/>
-        <CursorPos X="91" Y="340"/>
-        <UsageCount Value="42"/>
+        <TopLine Value="381"/>
+        <CursorPos X="18" Y="390"/>
+        <UsageCount Value="44"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaphy.inc"/>
         <EditorIndex Value="8"/>
         <CursorPos X="6" Y="20"/>
-        <UsageCount Value="42"/>
+        <UsageCount Value="44"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -656,8 +657,8 @@
       <Unit>
         <Filename Value="..\ChangeLog\runflachangelog.txt"/>
         <EditorIndex Value="15"/>
-        <CursorPos X="43" Y="7"/>
-        <UsageCount Value="19"/>
+        <CursorPos X="31" Y="7"/>
+        <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
