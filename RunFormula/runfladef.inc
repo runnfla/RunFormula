@@ -238,7 +238,6 @@ const
   UOD = 1;                // output disable
   USG = 2;                // single unit, assembling disable
   UPD = 4;                // prefix disable
-  UPOD = 8;               // prefix output disable
 
   OpTokenLevel : array[TTag] of integer = (
     0,       // TagValue

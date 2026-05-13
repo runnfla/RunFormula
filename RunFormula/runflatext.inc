@@ -159,7 +159,7 @@ end;
 
 function PhyCapture(P, Fin:PChar; out Scl, Offs:TRFloat):SizeInt;
 var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2026.05.10: Func PhyCapture
-    L : SizeInt = 0;       // raise UnknownUnit if empty UnitList
+    L : SizeInt = 0;       // this raise UnknownUnit if empty UnitList
     tf : PChar;
     k : TRFloat;
     exp, i : SizeInt;
@@ -337,7 +337,7 @@ begin
 end;
 
 function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out Flg:SizeInt):string;
-var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.2026.05.00: Func DecodePhy
+var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.2026.05.13: Func DecodePhy
     dx, dy : TDPhy;
     buf : PSizeInt;
     L, t, exp, emns, i : SizeInt;
@@ -358,10 +358,11 @@ begin
   dx.DI:=Phy;
   buf:=GetMem((L+1)*SI);
   for i:=0 to L do buf[i]:=0;
-  for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do if ((Flag and (USG or UOD))=0) then begin
+  for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do begin
+    if ((Flag and (USG or UOD))<>0) or (Offset<>0) then continue;
     dy.DI:=Sig;
     exp:=high(ShortInt);
-    emns:=exp;
+    emns:=high(ShortInt);
     for b:=0 to SI-1 do if dy.DB[b]<>0 then begin
       if dx.DB[b]=0 then begin
         exp:=0;
@@ -379,11 +380,12 @@ begin
       if (exp=0) and (emns=0) then break;
     end;
     if (exp=0) and (emns=0) then continue;
-    if emns<>0 then exp:=-emns;
+    if exp=0 then exp:=-emns;
     buf[i]:=exp;
     Scl:=Scl*Power(Scale, exp);
     dx.DI:=PhyMinus(dx.DI, PhyMult(Sig, exp));
   end;
+  if dx.DI<>0 then raise EError.Create(UnDecodePhy);
   Flg:=UPD;
   for i:=0 to L do if buf[i]=1 then with PUnitDesc(UnitList.List[i])^ do begin
     if fuflg then begin
@@ -411,21 +413,18 @@ begin
   FreeMem(buf);
 end;
 
-function SelectPref(F:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
-var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.05.12: Func SelectPref
+function SelectPref(const F:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
+var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.05.13: Func SelectPref
     t : TRFloat;
 begin
   PByte(Result):=nil;
-  if (Flg and UPD)=0 then begin
-    F:=F/Scl;
-    for i:=0 to PrefList.Count-1 do
-      with PPrefAbbr(PrefList.List[i])^ do if ((Flag and UOD)=0) and ((Flag and Flg)=0) then begin
-        t:=F/Scale;
-        if (t>=1) and (t<1000) then begin
-          Scl:=Scl*Scale;
-          Result:=Abbr;
-          exit;
-        end;
+  for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do begin
+    if (Flag and (Flg or UOD))<>0 then continue;
+    t:=F/Scale;
+    if (t>=1) and (t<1000) then begin
+      Scl:=Scl*Scale;
+      Result:=Abbr;
+      exit;
     end;
   end;
 end;

@@ -64,7 +64,8 @@ type
     DimlessValue,
     OffsetUnit,
     UnknownUnit,
-    UnknownPref
+    UnknownPref,
+    UnDecodePhy
   );
 
   TRunFlaError = packed record
