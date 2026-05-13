@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  ChangeLog
-//  Rev. 12.05.2026
+//  Rev. 13.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -20,4 +20,4 @@
 
 ===== Develop branch changes
 - Changed: Updated error message structure
-
+- Changed: In external function parameter Phy is renamed to Dim
