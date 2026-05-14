@@ -336,15 +336,17 @@ begin
                       end;
       end;
       if (Lphy or Rphy)<>0 then case tag of
-        TagOR, TagXOR, TagAND, TagSHL, TagSHR, TagMOD, TagNOT : raise EError.Create(IllegalDim);
-        TagPlus, TagMinus : begin
-                              if (Lphy<>Rphy) then raise EError.Create(DimMismatch);
-                              L^.VPhy:=Lphy;
-                            end;
-        TagNegative : L^.VPhy:=Rphy;
-        TagMult : L^.VPhy:=PhyPlus(Lphy, Rphy);
+        TagOR, TagXOR, TagAND, TagSHL,
+        TagSHR, TagNOT   : raise EError.Create(IllegalDim);
+        TagPlus,
+        TagMinus, TagMOD : begin
+                             if (Lphy<>Rphy) then raise EError.Create(DimMismatch);
+                             L^.VPhy:=Rphy;
+                           end;
+        TagNegative      : L^.VPhy:=Rphy;
+        TagMult          : L^.VPhy:=PhyPlus(Lphy, Rphy);
         TagSlash, TagDIV : L^.VPhy:=PhyMinus(Lphy, Rphy);
-        TagPower : L^.VPhy:=PhyMult(Lphy, AsInt(R));
+        TagPower         : L^.VPhy:=PhyMult(Lphy, AsInt(R));
       end;
     end else begin
       L:=Term(P, Context);
