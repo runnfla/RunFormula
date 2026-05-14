@@ -539,8 +539,8 @@
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="329"/>
-        <CursorPos X="26" Y="346"/>
+        <TopLine Value="330"/>
+        <CursorPos X="45" Y="350"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
