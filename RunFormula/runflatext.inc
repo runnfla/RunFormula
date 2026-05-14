@@ -211,7 +211,7 @@ begin
               if not flg then raise EError.Create(InvalidChar, P);
             end;
             if mf then exp:=-exp;
-            Scl:=Scl*k;
+            Scl:=Scl*Power(k, exp);
             Result:=PhyPlus(Result, PhyMult(Sig, exp));
             break;
           end;
