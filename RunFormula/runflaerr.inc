@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  Error codes include file
-//  Rev. 15.04.2026
+//  Rev. 15.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com

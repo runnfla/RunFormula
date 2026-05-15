@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
-//  Version 0.0
-//  Released at 9.05.2026
+//  Version 0.1.a
+//  Released at 15.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
