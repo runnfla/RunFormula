@@ -1,5 +1,5 @@
 # RunFormula
-RunFormula is intended to evaluate mathematical expressions provided as text using a scripting language if necessary.
+RunFormula is intended to evaluate mathematical expressions and physics formulas provided as text with scripting language support and physical dimension handling.
 
 Supported data types:
 - integers in decimal, hexadecimal and binary formats;
@@ -9,10 +9,11 @@ Supported data types:
 - strings and ASCII characters;
 
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod (%) div == <> < <= >= > & (string concatenation) ** (integer exponentiation).\
-Variables and runtime initialization of variables via external callback function.\
-A set of built-in functions and the ability to register and use additional user-defined functions.\
+Variables and runtime initialization of variables via an external callback function.\
+A base set of built-in functions and the ability to register and use additional user-defined functions.\
 Control flow functions: if() repeat() exit() result() continue() break()\
-Ability to use inline function definitions directly within the formula (subroutines).\
+Ability to define and subsequently use functions directly within the formula text (subroutines).\
+Support for physical dimensions, their runtime checking, automatic calculation of the resulting dimension, and automatic conversion of values between different unit systems.\
 Support for the define directive.\
 Compiling the source formula into bytecode for multiple execution.\
 Minimal dependencies (only SysUtils in the base configuration).
