@@ -1,7 +1,7 @@
 //*****************************************************
-// RunFormula Expression Parser and Evaluator
+// RunFormula Expression Scripting Engine
 // RunFormula Help File
-// Rev. 27.04.2026
+// Rev. 15.05.2026
 
 // Author: Alexander Torubarov
 // Contact: runfla@yandex.com
@@ -13,12 +13,13 @@
 // for full license information.
 //*****************************************************
 
-// TODO -
+// TODO -oRFla.Help -cRev.2026.05.15:
 
 1.a. Brief description.
 
-The RunFormula module is designed to calculate mathematical expressions presented
-in text form, using, if necessary, program logic.
+The RunFormula module is designed to calculate mathematical expressions and physical
+formulas presented in text form, with support for scripting language and processing
+units of measurement.
 
 Supported data types:
 - integers in decimal, hexadecimal and binary formats;
@@ -27,19 +28,24 @@ Supported data types:
 - intervals and operations on them;
 - ASCII strings and characters;
 
-Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod
+Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod (%)
 div == <> < <= >= > & (string concatenation) ** (exponentiation).
-Variables and runtime variable initialization are supported via
-external function.
-There is a set of built-in functions and the ability to register and use
+Variables and their dynamic initialization at runtime are supported via
+external callback function.
+There is a basic set of built-in functions and the ability to register and use
 additional user functions.
 Control flow functions: if() repeat() exit() result() continue() break()
-The ability to define and use functions directly in a formula (subroutine).
-Support for the define directive.
+The ability to declare and subsequently use functions directly in the text
+formulas (subroutines).
+Support of physical dimensions, their control during operations,
+automatic calculation of the result dimension and automatic conversion of values from
+one system of units to another.
+The define directive is supported.
 Compiling the source formula into bytecode for multiple execution.
 Minimum dependencies (only SysUtils in the basic configuration).
 
 1.b. Integration of RunFormula into the project.
+
 - Copy all files from the RunFormula directory (runformula.pas and all .inc files)
 to a project or to a separate directory;
 - Add RunFormula to the uses section of the interface or implementation section.
@@ -53,26 +59,35 @@ or, if a separate directory is used:
 implementation
 uses RunFormula in 'RunFormula/runformula.pas';
 
-The simplest way to use RunFormula is to call RunFlaParse and pass it
-output to the RunFlaExecStr or RunFlaExecVrt functions. For example:
+or specify the path to the RunFormula directory in the corresponding compiler option.
+
+The simplest way to use RunFormula is to call the RunFlaParse function and pass
+its result in the RunFlaExecStr or RunFlaExecVrt function. For example:
 
 ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) ); // displays 27
 
-RunFlaParse compiles the source formula into bytecode for execution by the RunFlaExecStr functions.
-or RunFlaExecVrt. The result of RunFlaExecStr is a string, and RunFlaExecVrt is
-Variant type variable.
-Please see the relevant help sections for more information on usage.
+The RunFlaParse function compiles the source formula into bytecode for execution by functions.
+RunFlaExecStr or RunFlaExecVrt. The result of the RunFlaExecStr function is a string,
+and RunFlaExecVrt is a variable of type Variant.
+Please see the relevant help sections for more information.
 
-2. Formula syntax.
-2.a. Comments.
-Comments in a formula can be specified in curly brackets or after a double
-slash. For example:
+2. Syntax of the formula scripting language.
+2.a. Language format. Comments.
+
+The scripting language uses a free format. Spaces, tabs, and line breaks are allowed.
+are separators where necessary, and are ignored otherwise.
+Spaces are not allowed inside identifiers, integers, real numbers, and constructions.
+"function(", "array[", "unit^order". Case is not sensitive, except
+specified cases.
+Comments can be written in curly braces or after a double slash.
+For example:
 
 { comment text }
 // comment text
 
 2.b. Integers.
-An integer can be specified in decimal, hexadecimal, or binary format.
+
+An integer can be specified in decimal, hexadecimal, and binary form.
 For example:
 
 X = 12345 // integer in decimal form
@@ -81,10 +96,29 @@ X = 0a12bH // integer in hexadecimal form
 X = 10101b // integer in binary form
 
 Characters are not case-sensitive, except for the 0x prefix.
-On overflow, the decimal number is converted to a real number, but for hexadecimal
+On overflow, decimal numbers are converted to real numbers, but for hexadecimal
 and binary numbers are not overflow checked.
+Valid ranges of integers:
+
+-9223372036854775807 ... 9223372036854775807 on 64-bit systems;
+-2147483647 ... 2147483647 on 32-bit systems;
+-32767 ... 32767 in 16-bit systems;
+
+Minimum system negative number (-9223372036854775808 in 64-bit,
+-2147483647 on 32-bit systems, -32768 on 16-bit systems) can be used,
+however, in some arithmetic operations (+ - * **) it is considered out of range
+range and is converted to a real number.
+The constructs "-number" or "- number" are interpreted as a positive number and unary
+minus (with the corresponding operation priority). If it is necessary to specify exactly
+If you are using a negative number, you should use square brackets. For example:
+
+X = - 3 ** 2 // result -9
+X = -10 ** 2 // result -100
+X = [- 3] ** 2 // result 9
+X = [-10] ** 2 // result 100
 
 2.c. Real numbers.
+
 A real number can be given as a decimal number with a point or as
 numbers with order. For example:
 
@@ -92,11 +126,20 @@ X = 12.34
 Y = 0.12
 X = 1E1
 Y = 0.2e-4
-Z = -23E+34
+Z = 23E+34
 
-When specifying negative numbers, it is also recommended not to separate the minus sign from the number.
+As with integers, the constructs "-number" or "- number" are interpreted as
+a positive number and a unary minus (with the corresponding operation precedence). If
+If you need to specify a negative number, you should use square brackets.
+For example:
+
+X = - 3.5 ** 2 // result -12.25
+X = -10.2E20 ** 2 // result -1.0404E42
+X = [- 3.5] ** 2 // result 12.25
+X = [-10.2E20] ** 2 // result 1.0404E42
 
 2.d. Text strings.
+
 The text string can be specified in quotes or apostrophes. If the string is specified in
 If it's in quotation marks, it can contain apostrophes and vice versa. For example:
 
@@ -105,6 +148,7 @@ X = '"A"' & "'s'" // result "A"'s'
 An empty string can be specified as "", '', or the constant None.
 
 2.e. ASCII characters.
+
 An ASCII character can be specified as a string containing that character. Unlike a string,
 an ASCII character can participate in arithmetic operations as an integer corresponding to
 its code. A control character can also be specified using the "^" prefix. For example:
@@ -114,90 +158,133 @@ X = "B" & "A" // result BA
 X = "One" & "^M" & "^J" & "Two" // output One and Two in 2 lines
 
 2.f. Constants.
+
 There are predefined constants:
+
 True // -1 integer
 False // 0 integer
-None // empty string
+None // empty string, no value set
 Pi // 3.14159265358979323846
 E // 2.71828182845904523536
 J // imaginary 1
-The characters are not case-sensitive.
 
 2.g. Complex numbers.
-To define a complex number, one should use an expression with a constant j - imaginary 1,
-or the built-in function Cplex(R, I). For example:
 
+To specify a complex number, you can use square brackets, an expression with
+constant j - imaginary 1, or the built-in function cplex(R, I). For example:
+
+X = [(-12.1, - 23.3)] // result (-12.1,-23.3)
 X = 4+5*j // result (4.5)
-X = Cplex(2, 3) // result (2,3)
+X = cplex(2, 3) // result (2,3)
 
 2.h. Intervals.
-Ranges can be specified using the Range(L, R) function. For example:
-X = Range(19, 23.5) // result [19:23.5]
 
-2.i. Brackets.
-An expression can be enclosed in parentheses, the value of the "parentheses" is the result of this
-expressions. Multiple expressions can be enclosed in parentheses, separated by a comma or
-semicolon. Then the expressions in parentheses are evaluated sequentially from left to right,
-and the result of the "brackets" is the value of the last expression. For example:
+The range can be specified using square brackets or the built-in function range(L, R).
+For example:
+
+X = [-1.1:23] // result [-1.1:23]
+X = range(19, 23.5) // result [19:23.5]
+
+The left boundary of the interval must be less than or equal to the right one.
+
+2.i. Square brackets.
+
+Any data type (except array) can be specified using square brackets.
+For example:
+
+X = [""] // empty string, None
+X = ["M"] + ['^C'] // ASCII characters
+X = ["qwerty"] & ['asdfg'] // strings, not recommended
+X = [-0x10] + [ - 20.3 ] // integers and real numbers
+X = [ ( - 12.1 ,-12.45)] // complex number
+X = [ - 100:25 ]-[ "^A" : "^Z" ]+[-"A":200.4] // intervals
+
+2.j. Operator brackets.
+
+One or more expressions may be enclosed in parentheses. Expressions in parentheses
+are calculated sequentially from left to right. The result of calculating the "brackets" is the result
+the last expression. Expressions in parentheses are separated by a comma or semicolon.
+For example:
 
 5 * (4 - 7) // result -15
 5 * ( 21 , 21 + 1; 21 + 2 ) // result 115
+5 * ( 21 + 1; 21 + 2; 100 ) // result 500
 
-Parentheses can be nested within each other. Before the closing parenthesis, a comma or
-Using a semicolon is allowed, but not recommended.
+Parentheses with expressions can be nested within each other. It is allowed to use a comma or
+semicolon before the closing parenthesis.
+Instead of parentheses, you can use the keywords "do" and "end" for the same purpose.
+For example:
+
+do
+X = 10;
+Y = 20;
+X + Y
+end
+
+If a group of expressions was opened with a parenthesis, it must also be closed with a parenthesis.
+bracket, and, conversely, if the group opened with the word "do", then it should be closed
+with the word "end".
 
 3.a. Mathematical operations.
+
 The table lists the supported mathematical operations for different value types.
 
-Integer Real Complex Interval ASCII Character String
+                   Integer Real Complex Interval ASCII Character String
 
-== <> < > <= >= + + + + integer +
-+ - * + + + + integer -
-/ substances. + + + substances. -
-or and xor div mod + - - - integer -
-shl (<<) shr (>>) not (unary)
-- (unary) + + + + integer -
-** substances. + + + - -
-& string string string string + +
+== <> < > <= >=       +     +     +        +        as integer     +
++ - *                 +     +     +        +        as integer     -
+/               real result +     +        +        real result    -
+or and xor div mod (%)
+shl (<<) shr (>>) not +     -     -        -        as integer     -
+- unary               +     +     +        +        as integer     -
+**                    +     +     +        +        as integer     -
+&                  string string string string           +         +
 
-When integer overflow occurs in + - * operations, the result is converted to a float type.
 ** - operation of raising to an integer power (positive or negative)
 & - string concatenation operation
+When integer overflow occurs in the + - * ** - (unary) operations, the result is converted
+into a real type.
 
 3.b. Operation priority.
-In an expression, mathematical operations are performed according to the following precedence:
-maximum: ** // raising to an integer power
-- not // unary
-* / shl (<<) shr (>>) div mod
-+ -
-& // concatenate strings
-== <> < > <= >=
-and
-or xor
-minimum: = // assignment
 
-assignment (=) and power (**) are performed from right to left, and everything else is performed from left to right.
+In an expression, mathematical operations are performed according to the following precedence:
+
+maximum:        **                                     // integer power
+                - not                                  // unary
+                * / shl (<<) shr (>>) div mod (%)
+                + -
+                &                                      // concatenate strings
+                == <> < > <= >=
+                and
+                or xor
+minimum:        =                                      // assignment
+
+The assignment (=) and exponentiation (**) operations are right-associative.
+and are performed sequentially from right to left.
 
 3.c. Type conversion.
+
 The value type can be converted according to the following table. It also
 The Variant type is specified, which is used to pass values to external functions.
 
-Integer Real Complex Interval ASCII Character String Variant
+                   Integer  Real  Complex  Interval  ASCII Character  String  Variant
 
-Integer --> + + X+0*i [X:X] - + +
-Real --> - + X+0*i [X:X] - + +
-Complex --> - - + - - (R,I) R
-Interval --> - (A+B)/2 (A+B)/2+0*i + - [A:B] (A+B)/2
-ASCII character --> + - - [X:X] + + +
-String --> - - - - - + +
-Variant --> + + - - if string[1] + NO
+Integer -->          +       +     X+0*j    [X:X]        -              +       +
+Real -->             -       +     X+0*j    [X:X]        -              +       +
+Complex -->          -       -      +         -          -            (R,I)     R
+Interval -->         -   (L+R)/2 (L+R)/2+0*j  +          -            [L:R]   (L+R)/2
+ASCII character -->  +       +     X+0*j    [X:X]        +              +       +
+String -->           -       -      -         -          -              +       +
+Variant -->          +       +      -         -      if string[1]       +       -
 
 4.a. Variables and the assignment operator.
-Variables can be used in an expression. Letters are allowed in the variable name.
-Latin alphabet, numbers, period symbol (except the first character), symbol
-underscores. The characters are not case-sensitive.
-The value of a variable is determined using the assignment operation:
+
+Variables can be used in expressions. Letters are allowed in the variable name.
+Latin alphabet, numbers, periods (except the first character), underscores.
+The value of a variable is set using the assignment operation:
+
 <variable> = <expression>
+
 Before being used in an expression, a variable must be defined using the operator
 assignment. The result of an assignment operation is equal to the value being assigned. For example:
 
@@ -205,21 +292,30 @@ X=2+4 // result 6
 abc=18/3 // result 6
 ( X=4, Y=6.1; Z=X+Y ) // result 10.1
 
+Since the assignment operation is right-associative, it is allowed in one expression
+assigning a value to several variables at once. For example:
+
+X = Y = Z = 3, X * Y * Z // result 27
+
 4.b. Initialization of variables during computation.
-A variable's value can be assigned during evaluation by calling an external variable.
-global function of the following type:
 
-function(constref Name:string; out Save:boolean):Variant;
+A variable's value can be assigned during a formula's evaluation using the inverse
+calling an external global function of the following type:
 
-In this function, the Name parameter is the name (in lowercase) of the variable being requested.
-The Save parameter determines whether the value should be saved in the variable (True), or
-the value should be requested each time (False). Variable (when the value is set
-Save) is always saved in the global variable list.
+function(constref Name:string; out Dim:SizeInt; out Save:boolean):Variant;
+
+Function parameters:
+Name - the name (in lowercase) of the requested variable;
+Dim - the encoded dimension of the variable value (0 - if not used);
+Save = True - save the value of the variable in the global list of variables and further
+do not ask for it;
+
 For example, let's define the following global function:
 
-function MyRunFlaVar(constref Name:string; out Save:boolean):Variant;
+function MyRunFlaVar(constref Name:string; out Dim:SizeInt; out Save:boolean):Variant;
 begin
 Result:=InputBox('', 'Get value for variable '+Name, '');
+Dim:=0;
 Save:=false;
 end;
 
@@ -231,29 +327,83 @@ For information about the Error parameter, see the error handling help section.
 The result will be a string display consisting of the two inputs combined.
 by the user of strings.
 
-Note: The Name parameter only has a valid value during function execution.
+Attention! The Name parameter has a valid value only during the function execution.
 RunFlaExecStr/RunFlaExecVrt. If the Name value is needed after, it should be
-copy to a new line, for example like this: UniqueString(Name) or
-MyName:=StrPas(PChar(Name));
+copy to a new line, for example like this:
 
-5. Error handling.
-5.a. Structure TRunFlaError.
+S:=Name;
+UniqueString(S);
+
+or
+
+S:=StrPas(PChar(Name));
+
+5. Use of dimensions of physical quantities.
+5.a. Units of measurement.
+
+A value can be assigned a physical dimension consisting of base units of measurement.
+The range of orders of magnitude of base units is from -127 to 127. In 64-bit systems
+Up to 8 base units are allowed, in 32-bit - up to 4, in 16-bit - up to 2.
+There can also be an unlimited number of quantities derived from them.
+
+5.b. Dimensions syntax.
+
+Dimensions in a formula are specified in backticks. For dimensions, units of measurement,
+Prefixes are case-sensitive. The order of units is specified after the "^" symbol without
+spaces. The order "^1" may not be specified. A negative order is specified by specifying
+units with positive order after the "/" symbol. For example:
+
+10`m`; 10`m^3`; 10`m/s`; 10`m/s^2`; 10 `1/m^2`; 10 `m^2 kg`
+
+Units of measurement may have prefixes (without spaces). For example:
+
+10`m` + 100`cm` // result 11`m`
+10`m^2` + 1000`mm^2` // result 10.001`m^2`
+10`cm/us^2` + 100`m/ms^2` // result 100.1`Gm/s^2`
+
+5.c. Assigning dimensions.
+
+Dimension can be assigned to an integer, real, complex number, interval,
+ASCII character. The dimension can be assigned to a number directly in the formula, value
+a variable in an expression (but not the variable itself), an expression, or a function result.
+For example:
+
+X = 10 m/s + 20 mm/s // result 20.01 km/s
+X = 10; X`m` + X`mm` // result 10.01`m`
+X = 10; range(X, X+1)`mm`+1`mm` // result [0.011:0.012]`m`
+X = 10; (X *2)`mm` + (X+2)`cm` // 140`mm`
+
+When assigning a dimension, the value is transformed in accordance with
+parameters of units of measurement, their order, and prefixes. Reassignment of dimensions
+not allowed.
+When using square brackets, the dimension can be specified either inside the brackets
+(recommended), both internally and externally. For example:
+
+[(10,20) `m/s`] == [(10,20)]`m/s`
+["^A":"^C" `km/h`] == [1:3] `km/h`
+
+6. Error handling.
+6.a. Structure TRunFlaError.
+
 To obtain information about an error during the execution of the RunFlaParse and
 RunFlaExecStr/RunFlaExecVrt is served by the TRunFlaError structure defined in the file
-runflaerr.inc. In this structure, Code is the error code from the TRunFlaErrCode list,
-Position - the position of the error, starting from 0, in the original formula. Variable of type
-TRunFlaError must be passed to the RunFlaParse and RunFlaExecStr/RunFlaExecVrt functions.
-The RunFlaParse function will fill this structure with error information. If there is no error,
-then Code will be assigned the code OK, Position - 0.
+runflaerr.inc. In it, Code is the error code from the TRunFlaErrCode list, Position is the position
+errors, starting from 0, in the original formula. Value is the result of the last operation in the form
+text string that is filled by the RunFlaExecStr/RunFlaExecVrt functions.
+A variable of type TRunFlaError must be passed to the RunFlaParse function and
+RunFlaExecStr/RunFlaExecVrt. The RunFlaParse function will fill this structure with information.
+about an error. If there is no error, Code will be assigned the code OK, Position - 0.
 The RunFlaExecStr/RunFlaExecVrt functions fill the TRunFlaError structure provided that
 it does not contain error information (Code = OK).
 
-5.b. Global variable RunFlaErrCode.
+6.b. Global variable RunFlaErrCode.
+
 Error code during execution of RunFlaParse, RunFlaExecStr, RunFlaExecVrt functions
 and RunFlaFuncReg is also written to the global variable RunFlaErrCode, but under the condition that
 that it did not contain any information about the error before (RunFlaErrCode = OK).
 
-5.c. Results of the RunFlaParse and RunFlaExecStr/RunFlaExecVrt functions on error.
+6.c. Results of the RunFlaParse and RunFlaExecStr/RunFlaExecVrt functions on error.
+
 If an error occurs in the RunFlaParse and RunFlaExecStr/RunFlaExecVrt functions,
 the result will be an empty string. When passing an empty string as the Fla parameter
 in the RunFlaParse and RunFlaExecStr/RunFlaExecVrt functions, their result will also be empty
@@ -262,18 +412,21 @@ Note: Passing a non-empty, valid, but formula-free parameter Fla to
 the RunFlaParse function (for example, containing only a comment) is equivalent to
 passing the constant None (empty string).
 
-5.d. User-generated error.
+6.d. User-generated error.
+
 In the variable value query functions (TRunFlaVar) and additional functions defined
 by the user (TRunFlaFunc), it is possible to interrupt the calculation and generate an error with
 code from the TRunFlaErrCode list. The RunFlaRaise procedure is used for this. For example:
 
-function MySumFunc(const ParamCount:SizeInt; Context:pointer):Variant;
+function MySumFunc(const ParamCount:SizeInt; out Dim:SizeInt; Context:pointer):Variant;
 begin
 if ParamCount<>2 then RunFlaRaise(ParamNumber); // checking the number of parameters
+Dim:=0;
 Result:=RunFlaParam(0-ParamCount, Context)+RunFlaParam(1-ParamCount, Context);
 end;
 
-5.e. Text error message.
+6.e. Error text message.
+
 To convert the error code into a text message, use the RunFlaErrorMsg list,
 defined in the runflamsg.inc file. For example:
 
@@ -281,27 +434,33 @@ procedure TForm1.ExecButtonClick(Sender: TObject);
 var Error : TRunFlaError;
 begin
 ShowMessage( RunFlaExecStr(RunFlaParse('9 * 3x', Error), Error) );
-ShowMessage( RunFlaErrorMsg[Error.Code] + ' at: ' + IntToStr( Error.Position ));
+ShowMessage( RunFlaErrorMsg[Error.Code].ErrMsg + ' at: ' + IntToStr( Error.Position ) +
+' "'+Error.Value+'"');
 end;
 
 This list and file can be replaced by the user.
 
-5.f. It is recommended to disable exception generation in MemGet
+6.f. It is recommended to disable exception generation in MemGet
 
-6. Functions.
-6.a. Predefined functions.
+7. Functions.
+7.a. Predefined functions.
+
 RunFormula has a set of predefined functions described in the corresponding help.
 
-6.b. User-defined functions.
+7.b. User-defined functions.
+
 It is possible to register and use additional user functions.
 The user-defined function must be global and have the following header:
 
-function MyFunc(const ParamCount:SizeInt; Context:pointer):Variant;
+function MyFunc(const ParamCount:SizeInt; out Dim:SizeInt; Context:pointer):Variant;
 
-In it, ParamCount is the number of parameters passed, Context is the pointer required
-to obtain the parameter values. The result type of the user-defined function is Variant.
+ParamCount - the number of parameters transferred;
+Dim - the encoded dimension of the variable value (0 - if not used);
+Context is a pointer required to obtain the value of the parameters.
+The result type of the user-defined function is Variant.
 
-6.c. Registering a user-defined function.
+7.c. Registering a user-defined function.
+
 The user-defined function must be registered using the RunFlaFuncReg function.
 In the RunFlaFuncReg function, Name is a string with the function name, necessarily in lowercase characters,
 Func - a pointer to a user-defined function. If a registration error occurs, the function
@@ -313,21 +472,22 @@ Registration is required once after the program is launched before calling the R
 registration with change of function address and overriding of predefined functions.
 In this case, RunFlaFuncReg will return the error code FuncExist, but the information will be changed.
 
-6.d. Obtaining parameter values.
+7.d. Obtaining parameter values.
+
 To obtain the values of the parameters of a user-defined function, use the RunFlaParam function.
 In it, Offset is calculated as <0-based number of the required parameter> - ParamCount, Context
 must be passed from the header of the user-defined function.
 Note: The value of the parameter (including in the case of a predefined function) is calculated
 only when requested within the function itself.
 
-6.e. Example of a user-defined function.
+7.e. Example of a user-defined function.
 
-function MyIFFunc(const ParamCount:SizeInt; Context:pointer):Variant;
+function MyIFFunc(const ParamCount:SizeInt; out Dim:SizeInt; Context:pointer):Variant;
 begin
 if ParamCount<>3 then RunFlaRaise(ParamNumber); // check the number of parameters
-if RunFlaParam(0-ParamCount, Context)>0 // testing the first parameter
-then Result:=RunFlaParam(1-ParamCount, Context) // if >0 return the second
-else Result:=RunFlaParam(2-ParamCount, Context); // if not, then the third
+if RunFlaParam(-3, Dim, Context)>0 // testing the first parameter
+then Result:=RunFlaParam(-2, Dim, Context) // if >0 return the second
+else Result:=RunFlaParam(-1, Dim, Context); // if not, then the third
 end;
 // registration with error checking
 if RunFlaFuncReg('myiffunc', @MyIFFunc)<>OK then ShowMessage('Registration Error');
@@ -338,8 +498,9 @@ Now if we introduce the formula
 
 we get the result 20. In this case, the subtraction Y-20 will not be performed.
 
-7. Subroutine functions defined in the formula.
-7.a. Defining a subroutine function.
+8. Subroutine functions defined in the formula.
+8.a. Defining a subroutine function.
+
 A formula can use subroutine functions defined directly within the formula itself.
 For example:
 
@@ -360,9 +521,8 @@ one or more expressions separated by [,;]
 the result of a subroutine function is the result of the last expression
 endfunc
 
-A comma or semicolon before endfunc is not allowed.
+8.b. Local variables in a subroutine function.
 
-7.b. Local variables in a subroutine function.
 A subroutine function creates its own local variable area. To obtain a value
 a variable or value assignment is searched for hierarchically
 from local scope to global scope. In order to create a variable (with the ability to
@@ -378,7 +538,8 @@ ABC(1, 2, 3)
 
 Formal variables are also created in the local scope.
 
-7.c. Default settings.
+8.c. Default settings.
+
 The parameters can specify a default value, which is used if it
 not passed in the call. For example:
 
@@ -388,8 +549,8 @@ endfunc;
 
 ABC(1) )
 
-8. Directives.
-8.a. The define directive.
+9. Directives.
+9.a. The define directive.
 The define <identifier> "text" directive replaces the specified identifier in the formula with text.
 The identifier may contain Latin letters, numbers, the period symbol (except for the first symbol), and the underscore symbol.
 The identifier is not case-sensitive. It must be defined before being used in a formula.
@@ -400,7 +561,8 @@ define MySum "2 plus 7"
 define plus ' + '
 MySum // result 9
 
-9. Running bytecode.
+10. Running bytecode.
+
 The result of the RunFlaParse function (bytecode) can be stored, and the functions
 RunFlaExecStr/RunFlaExecVrt can be called multiple times with it without prior
 calling RunFlaParse. This requires the following conditions to be met:
@@ -409,4 +571,3 @@ which was before the RunFlaParse call
 - to get information about the error, the TRunFlaError.Code field and the global variable
 RunFlaErrCode must be initialized to OK.
 - if the source code of RunFormula has changed, then RunFlaParse must be executed again.
-
