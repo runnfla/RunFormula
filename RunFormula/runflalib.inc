@@ -343,7 +343,7 @@ begin
   with PV^ do begin
     if VPhy<>0 then begin
       s:=DecodePhy(VPhy, scl, ofs, flg)+'`';
-      if ((flg and UPD)=0) and (ofs=0) then case VType of
+      if (flg and UPF)=0 then case VType of
         VInt   : s:=SelectPref(Int/scl, scl, flg)+s;
         VFloat : s:=SelectPref(Flo/scl, scl, flg)+s;
         VChar  : s:=SelectPref(Chr/scl, scl, flg)+s;

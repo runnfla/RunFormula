@@ -196,7 +196,7 @@ begin
     if not (P^ in UnitChars) then begin
       if fp<>nil then begin
         for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
-          L:=BackCompare(fp, P, Abbr, (Flag and UPD)=0);
+          L:=BackCompare(fp, P, Abbr, (Flag and UPF)=0);
           if L=0 then continue;
           if Offset<>0 then raise EError.Create(OffsetUnit, fp);
           K:=Scale;
@@ -217,7 +217,7 @@ begin
         fp:=nil;
       end;
       case P^ of
-        #0..#$20, '`' : ;
+        #0..#$20, '(', ')', '`' : ;
         '/'  : begin
                  if mf then raise EError.Create(InvalidChar, P);
                  mf:=true;
@@ -349,13 +349,14 @@ var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.
     L, t, exp, emns, i : SizeInt;
     b : integer;
 begin
+  Flg:=UPF;
   L:=UnitList.Count-1;
   if L<0 then raise EError.Create(UnDecodeDim);
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do
-    if (Sig=Phy) and ((Flag and UOD)=0) then begin
+    if (Sig=Phy) and ((Flag and UOP)=0) then begin
       Scl:=Scale;
       Offs:=Offset;
-      Flg:=Flag;
+      if Offs=0 then Flg:=Flag and (not USG);   // reset USG, enable prefix with USG flag
       Result:=Abbr;
       exit;
   end;
@@ -366,7 +367,7 @@ begin
   buf:=GetMem((L+1)*SI);
   for i:=0 to L do buf[i]:=0;
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do begin
-    if ((Flag and (USG or UOD))<>0) or (Offset<>0) then continue;
+    if ((Flag and (USG or UOP))<>0) or (Offset<>0) then continue;
     dy.DI:=Sig;
     exp:=high(ShortInt);
     emns:=high(ShortInt);
@@ -396,10 +397,11 @@ begin
     FreeMem(buf);
     raise EError.Create(UnDecodeDim);
   end;
-  Flg:=UPD;
+
+
   for i:=0 to L do if buf[i]=1 then with PUnitDesc(UnitList.List[i])^ do begin
     if fuflg then begin
-      Flg:=Flag;
+      if (Flag and UCPP)=0 then Flg:=Flag or USG;
       fuflg:=false;
     end else Result:=Result+' ';
     Result:=Result+Abbr;
@@ -408,18 +410,30 @@ begin
     if fuflg then fuflg:=false else Result:=Result+' ';
     Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr+'^'+IntToStr(buf[i]);
   end;
-  fuflg:=true;
-  for i:=0 to L do begin
-    exp:=-buf[i];
-    if exp<=0 then continue;
-    if PByte(Result)=nil then Result:='1';
-    if fuflg then begin
-      Result:=Result+'/';
-      fuflg:=false;
-    end else Result:=Result+' ';
-    Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
-    if exp>1 then Result:=Result+'^'+IntToStr(exp);
+
+  emns:=0;
+  for i:=0 to L do if buf[i]<0 then begin
+    inc(emns);
+    if emns=2 then break;
   end;
+
+  if emns>0 then begin
+    if PByte(Result)=nil then Result:='1';
+    Result:=Result+'/';
+    if emns=2 then Result:=Result+'(';
+
+    fuflg:=true;
+    for i:=0 to L do begin
+      exp:=-buf[i];
+      if exp<=0 then continue;
+      if fuflg then fuflg:=false else Result:=Result+' ';
+      Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
+      if exp>1 then Result:=Result+'^'+IntToStr(exp);
+    end;
+    if emns=2 then Result:=Result+')';
+
+  end;
+
   FreeMem(buf);
 end;
 
@@ -429,7 +443,7 @@ var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2
 begin
   PByte(Result):=nil;
   for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do begin
-    if (Flag and (Flg or UOD))<>0 then continue;
+    if (Flag and (Flg or UOP))<>0 then continue;
     t:=F/Scale;
     if (t>=1) and (t<1000) then begin
       Scl:=Scl*Scale;
