@@ -40,6 +40,10 @@ For example:
 ```
 ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );      // displays 27
 ```
+or, with physical dimensions:
+```
+ShowMessage( RunFlaExecStr( RunFlaParse('g=9.8`N/kg`, t=5, g * t`s` ** 2 / 2') ) );      // displays 122.5`m`
+```
 `RunFlaParse` compiles the source formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string,
 while `RunFlaExecVrt` returns a Variant.\
 See the corresponding help topics for advanced usage at [Help/Eng/runflahelp-eng.txt](https://github.com/runnfla/RunFormula/blob/main/Help/Eng/runflahelp-eng.txt) ([Help/Rus/runflahelp.txt](https://github.com/runnfla/RunFormula/blob/main/Help/Rus/runflahelp.txt) on russian).
