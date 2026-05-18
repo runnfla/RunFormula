@@ -679,7 +679,7 @@ begin
   end;
 end;
 
-function NewLV(var Context:TContext):PValRec; inline;         //DONE -oRFla.Lib -cRev.2026.04.18: Inline NewLV
+function NewLV(var Context:TContext):PValRec;                 //DONE -oRFla.Lib -cRev.2026.04.18: Func NewLV
 begin
   Result:=MemListAdd(Context.LVStack);
   with Result^ do begin

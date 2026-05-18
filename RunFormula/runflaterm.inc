@@ -54,19 +54,22 @@ begin                              // like PostParam
   end;
 end;
 
-function Expr(var P:PByte; Fin:PByte; Level:integer):PValRec;  //DONE -oRFla.Term -cRev.2026.04.27: Func Expr
+function Expr(var P:PByte; Fin:PByte; Level:integer):PValRec;  //DONE -oRFla.Term -cRev.2026.05.18: Func Expr
 var L : PValRec = @CVNone;        // init VMode
-    LL, R : PValRec;
+    R : PValRec;
     tag : TTag;
     tkn : PByte;
     lvl : integer;
     f, fa, fb, fc, fd, t : TRFloat;
-    Lphy, Rphy, I, J : SizeInt;
+    phy, I, J : SizeInt;
 
-  procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.04.22: Inline FreeLR
+  procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
   begin                                            // LVal should be called singly
     FreeTerm(R);
-    if L^.VAlloc=LV then FreeValue(L) else L:=NewLV(Context);
+    if L^.VAlloc<>LV then begin
+      L:=MemListAdd(Context.LVStack);             // like NewLV
+      L^.VAlloc:=LV;
+    end else FreeValue(L);
   end;
 
   procedure LVal(N:SizeInt);                                 //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Int
@@ -208,8 +211,24 @@ begin
       inc(P, OpTokenSize);
       R:=Expr(P, Fin, lvl);                      // R should be free on exit
       Context.ProcToken:=tkn;
-      Lphy:=L^.VPhy;
-      Rphy:=R^.VPhy;
+      phy:=0;
+      if (L^.VPhy or R^.VPhy)<>0 then case tag of
+        TagOR, TagXOR, TagAND, TagSHL,
+        TagSHR, TagNOT    : raise EError.Create(IllegalDim);
+        TagPlus, TagMinus : begin
+                              phy:=L^.VPhy;
+                              if (phy<>R^.VPhy) then raise EError.Create(DimMismatch);
+                            end;
+        TagNegative       : phy:=R^.VPhy;
+        TagMult           : phy:=PhyPlus(L^.VPhy, R^.VPhy);
+        TagSlash, TagDIV  : phy:=PhyMinus(L^.VPhy, R^.VPhy);
+        TagMOD            : begin
+                              phy:=R^.VPhy;
+                              if (phy<>0) and (phy<>L^.VPhy) then raise EError.Create(DimMismatch);
+                              phy:=L^.VPhy;
+                            end;
+        TagPower          : phy:=PhyMult(L^.VPhy, AsInt(R));
+      end;
       case tag of
         TagAssign   : begin                                                  // =
                         if L^.VAlloc<>VP then raise EError.Create(VarExpected);
@@ -335,22 +354,7 @@ begin
                         continue;
                       end;
       end;
-      if (Lphy or Rphy)<>0 then case tag of
-        TagOR, TagXOR, TagAND, TagSHL,
-        TagSHR, TagNOT    : raise EError.Create(IllegalDim);
-        TagPlus, TagMinus : begin
-                              if (Rphy<>Lphy) then raise EError.Create(DimMismatch);
-                              L^.VPhy:=Lphy;
-                            end;
-        TagNegative       : L^.VPhy:=Rphy;
-        TagMult           : L^.VPhy:=PhyPlus(Lphy, Rphy);
-        TagSlash, TagDIV  : L^.VPhy:=PhyMinus(Lphy, Rphy);
-        TagMOD            : begin
-                              if (Rphy<>0) and (Rphy<>Lphy) then raise EError.Create(DimMismatch);
-                              L^.VPhy:=Lphy;
-                            end;
-        TagPower          : L^.VPhy:=PhyMult(Lphy, AsInt(R));
-      end;
+      L^.VPhy:=phy;
     end else begin
       L:=Term(P, Context);
       inc(P, PToken(P)^.Size);
