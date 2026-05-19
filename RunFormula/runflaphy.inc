@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  Phy include file
-//  Rev. 17.05.2026
+//  Rev. 19.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -29,7 +29,7 @@ const
     (Sig: $000000000204FFFE; Scale: 1; Offset: 0; Flag: UMPF; Abbr: 'F'),           // Capacitance (Farad)
     (Sig: $00000000FEFE0102; Scale: 1; Offset: 0; Flag: UMPF; Abbr: 'H'),           // Inductance (Henry)
     (Sig: $00000000FEFD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'Ohm'),         // Resistance (Ohm)
-    (Sig: $00000000020301FE; Scale: 1; Offset: 0; Flag: UOP;  Abbr: 'S'),           // Conductance (Siemens)
+    (Sig: $000000000203FFFE; Scale: 1; Offset: 0; Flag: UOP;  Abbr: 'S'),           // Conductance (Siemens)
     (Sig: $00000000FFFE0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'Wb'),          // Magnetic Flux (Weber)
     (Sig: $00000000FFFE0100; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'T'),           // Magnetic Induction (Tesla)
     (Sig: $00000000FFFD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'V'),           // Voltage (Volt)
@@ -39,8 +39,8 @@ const
 
 // Mass volume area
     (Sig: $0000000000000100; Scale: 1E-3; Offset: 0; Flag: UOP; Abbr: 'g'),          // Metric Gram
-    (Sig: $0000000000000100; Scale: 1E+3; Offset: 0; Flag: USPF or UOP; Abbr: 't'),  // Metric Ton
-    (Sig: $0000000000000003; Scale: 1E-3; Offset: 0; Flag: UMPF or UOP; Abbr: 'l'),  // Litr
+    (Sig: $0000000000000100; Scale: 1E+3; Offset: 0; Flag: UPF or UOP; Abbr: 't'),   // Metric Ton
+    (Sig: $0000000000000003; Scale: 1E-3; Offset: 0; Flag: UMPF or UOP; Abbr: 'l'),  // Liter
     (Sig: $0000000000000002; Scale: 1E+4; Offset: 0; Flag: UPF or UOP;  Abbr: 'ha'), // Hectare
 
 // Mechanics
