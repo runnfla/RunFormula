@@ -698,20 +698,23 @@ end;
 
 function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_CONVERT
 var pv : PValRec;
+    s : string;
     phy : SizeInt;
     scl, ofs : TRFloat;
+    p : PByte;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
-  with Param(-1, Context)^ do begin
-    if VType<>VStr then raise EError.Create(InvalidValue);
-    phy:=PhyCapture(PChar(Str), PChar(Str+Ansi[-1]), scl, ofs);
-  end;
+  pv:=Param(-1, Context);
+  if not (pv^.VType in [VChar, VStr]) then raise EError.Create(InvalidValue);
+  s:=AsStr(pv);
   PostParam(Context);
+  p:=PByte(s);
+  phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
   Result:=NewLV(Context);
-  pv:=Param(-2, Context);
-  ValCopy(pv, Result);
+  ValCopy(Param(-2, Context), Result);
   PostParam(Context);
   with Result^ do if VPhy<>0 then begin
+    if VPhy<>phy then raise EError.Create(DimMismatch);
     VPhy:=0;
     if (scl<>1) or (ofs<>0) then case VType of
       VCplex : begin
@@ -728,8 +731,8 @@ begin
                  Img:=(IGap-ofs)/scl;
                end;
       else
-        VType:=VFloat;
         Flo:=(AsFloat(Result)-ofs)/scl;
+        VType:=VFloat;                       // after AsFloat
     end;
   end else ApplyPhyToPV(Result, phy, scl, ofs);
 end;
