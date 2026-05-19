@@ -1,5 +1,5 @@
 //*****************************************************
-//  RunFormula Expression Scripting Engine
+//  RunFormula Unit-aware Expression Scripting Engine
 //  Version 0.1.a
 //  Released at 15.05.2026
 
@@ -17,7 +17,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -oRFla.Main -cRev.2026.04.14:RunFormula: A unit-aware math and physics scripting engine.
+// TODO -oRFla.Main -cRev.2026.04.14:
 
 unit RunFormula;
 
@@ -65,7 +65,6 @@ uses SysUtils
 
 {$include runfladef.inc}
 {$include runflalib.inc}
-{$include runflaphy.inc}
 
 function Term(Pnt:PByte; var Context:TContext):PValRec;         //DONE -oRFla.Main -cRev.2026.04.28: Func Term
 var lst : PMemList;
@@ -440,6 +439,7 @@ begin                                                     //DONE -oRFla.Main -cR
 end;
 
 {$include runflafunc.inc}
+{$include runflaphy.inc}
 
 procedure Init;
 var UnitDesc : TUnitDesc;

@@ -200,6 +200,7 @@ begin
     if not (P^ in UnitChars) then begin
       if fp<>nil then begin
         L:=0;
+        sz:=P-fp;
         for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
           L:=BackCompare(fp, P, Abbr, (Flag and UPF)=0);
           if L=0 then continue;
