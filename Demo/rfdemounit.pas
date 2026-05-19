@@ -68,6 +68,7 @@ uses
 {$include ../RunFormula/runflamsg.inc}
 {$include ../RunFormula/runfladef.inc}
 {$include ../RunFormula/runflalib.inc}
+{$include ../RunFormula/runflaphy.inc}
 
 { TDemoForm }
 
@@ -248,10 +249,14 @@ var T : TTag;
     Token : TToken;
     Info, s : string;
     flg : boolean;
-    i : SizeInt;                p : pointer; C : char;
-    VT : TVType;                VVV : Variant;       b : byte;
+    i, j : SizeInt;
+    k : integer;
+    p : pointer;
+    VT : TVType;
     MemList : TMemList;
-
+    Lst : TStringList;
+    UnitDesc : TUnitDesc;
+    PrefAbbr : TPrefAbbr;
 
   function YN(b:boolean):string;
   begin
@@ -284,7 +289,28 @@ begin
   SetLength(info, 0);
   s:=s+info;
   ResultMemo.Append('Is nil & nil = nil'+YN(PByte(s)=nil));
-
+  flg:=true;
+  Lst:=TStringList.Create;
+  Lst.Sorted:=true;
+  Lst.CaseSensitive:=true;
+  for UnitDesc in Quantities do begin
+    Info:=UnitDesc.Abbr;
+    if Lst.Find(Info, k) then begin
+      ResultMemo.Append('Unit duplicated: '+Info);
+      flg:=false;
+    end else begin
+      Lst.Append(Info);
+      if (UnitDesc.Flag and UPF)=0 then for PrefAbbr in UnitPrefixes do begin
+        s:=PrefAbbr.Abbr+Info;
+        if Lst.Find(s, k) then begin
+          ResultMemo.Append('Unit duplicated: '+s);
+          flg:=false;
+        end else Lst.Append(s);
+      end;
+    end;
+  end;
+  Lst.Destroy;
+  ResultMemo.Append('Is Unit List valid'+YN(flg));
   ResultMemo.Append('Size of SizeInt = '+IntToStr(SI));
   ResultMemo.Append('Size of integer = '+IntToStr(Sint));
   ResultMemo.Append('Size of pointer = '+IntToStr(SPtr));
