@@ -64,7 +64,6 @@ type
     DimlessValue,
     OffsetUnit,
     UnknownUnit,
-    UnknownPref,
     UnDecodeDim
   );
 

@@ -42,7 +42,7 @@ begin
   raise EError.Create(UnexpectedEnd, Result);
 end;
 
-function BackCompare(P, Fin:PChar; constref S:ShortString; Tail:boolean=false):SizeInt;
+function BackCompare(P, Fin:PChar; constref S:ShortString; Tail:boolean):SizeInt;
 var ps : PByte;                                        //DONE -oRFla.Text -cRev.2026.05.07: Func BackCompare
     L : SizeInt;
 begin
@@ -158,37 +158,40 @@ begin
 end;
 
 function PhyCapture(P, Fin:PChar; out Scl, Offs:TRFloat):SizeInt;
-const Trim : TCharSet = [#0..#$20, '`'];              //DONE -oRFla.Text -cRev.2026.05.15: Func PhyCapture
+const Trim : TCharSet = [#0..#$20, '`'];              //DONE -oRFla.Text -cRev.2026.05.19: Func PhyCapture
 var mf : boolean = false;
-    L : SizeInt = 0;       // this raise UnknownUnit if empty UnitList
     fp : PChar = nil;
-    K : TRFloat;
-    exp, i : SizeInt;
+    t : TRFloat;
+    L, sz, exp, i : SizeInt;
     flg : boolean;
 
-  procedure FindPref;                                 //DONE -oRFla.Text -cRev.2026.05.15: Proc FindPref
+  function FindPref(var F:TRFloat):boolean;           //DONE -oRFla.Text -cRev.2026.05.19: Func FindPref
   var j : SizeInt;
-      prefin : PChar;
+      pfin : PChar;
   begin
-    prefin:=P-L;
+    Result:=false;
+    pfin:=P-L;
     for j:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[j])^ do
-      if BackCompare(fp, prefin, Abbr)>0 then begin
-        K:=K*Scale;
+      if BackCompare(fp, pfin, Abbr, false)>0 then begin
+        F:=F*Scale;
         exit;
       end;
-    raise EError.Create(UnknownPref, fp);
+    Result:=true;
   end;
 
 begin
   while (P<Fin) and (P^ in Trim) do inc(P);
-  while (Fin>P) and ((Fin-1)^ in Trim) do dec(Fin);
-  if P=Fin then raise EError.Create(InvalidChar, P);
-  for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do
-    if BackCompare(P, Fin, Abbr)>0 then begin
-      Scl:=Scale;
-      Offs:=Offset;
-      Result:=Sig;
-      exit;
+  while (P<Fin) and ((Fin-1)^ in Trim) do dec(Fin);
+  sz:=Fin-P;
+  if sz=0 then raise EError.Create(InvalidFormat);
+  for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
+    L:=BackCompare(P, Fin, Abbr, (Flag and UPF)=0);
+    if L=0 then continue;
+    Scl:=Scale;
+    if (L<sz) and FindPref(Scl) then continue;
+    Offs:=Offset;
+    Result:=Sig;
+    exit;
   end;
   Scl:=1;
   Offs:=0;
@@ -196,12 +199,13 @@ begin
   while P<=Fin do begin                 // fin point to separator
     if not (P^ in UnitChars) then begin
       if fp<>nil then begin
+        L:=0;
         for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
           L:=BackCompare(fp, P, Abbr, (Flag and UPF)=0);
           if L=0 then continue;
           if Offset<>0 then raise EError.Create(OffsetUnit, fp);
-          K:=Scale;
-          if (fp+L)<P then FindPref;
+          t:=Scale;
+          if (L<sz) and FindPref(t) then continue;
           exp:=1;
           if P^='^' then begin
             fp:=P+1;
@@ -210,7 +214,7 @@ begin
             if not flg then raise EError.Create(InvalidChar, fp);
           end;
           if mf then exp:=-exp;
-          Scl:=Scl*Power(K, exp);
+          Scl:=Scl*Power(t, exp);
           Result:=PhyPlus(Result, PhyMult(Sig, exp));
           break;
         end;
