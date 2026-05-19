@@ -158,7 +158,8 @@ begin
 end;
 
 function PhyCapture(P, Fin:PChar; out Scl, Offs:TRFloat):SizeInt;
-var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2026.05.15: Func PhyCapture
+const Trim : TCharSet = [#0..#$20, '`'];              //DONE -oRFla.Text -cRev.2026.05.15: Func PhyCapture
+var mf : boolean = false;
     L : SizeInt = 0;       // this raise UnknownUnit if empty UnitList
     fp : PChar = nil;
     K : TRFloat;
@@ -179,8 +180,8 @@ var mf : boolean = false;                             //DONE -oRFla.Text -cRev.2
   end;
 
 begin
-  while (P<Fin) and (P^ in [#0..#$20]) do inc(P);
-  while (Fin>P) and ((Fin-1)^ in [#0..#$20]) do dec(Fin);
+  while (P<Fin) and (P^ in Trim) do inc(P);
+  while (Fin>P) and ((Fin-1)^ in Trim) do dec(Fin);
   if P=Fin then raise EError.Create(InvalidChar, P);
   for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do
     if BackCompare(P, Fin, Abbr)>0 then begin
@@ -343,7 +344,7 @@ begin
 end;
 
 function DecodePhy(Phy:SizeInt; out Scl, Offs:TRFloat; out Flg:SizeInt):string;
-var fuflg : boolean = true;                            //DONE -oRFla.Text -cRev.2026.05.13: Func DecodePhy
+var fu : boolean = true;                              //DONE -oRFla.Text -cRev.2026.05.19: Func DecodePhy
     dx, dy : TDPhy;
     buf : PSizeInt;
     L, t, exp, emns, i : SizeInt;
@@ -397,48 +398,41 @@ begin
     FreeMem(buf);
     raise EError.Create(UnDecodeDim);
   end;
-
-
   for i:=0 to L do if buf[i]=1 then with PUnitDesc(UnitList.List[i])^ do begin
-    if fuflg then begin
+    if fu then begin
       if (Flag and UCPP)=0 then Flg:=Flag or USG;
-      fuflg:=false;
+      fu:=false;
     end else Result:=Result+' ';
     Result:=Result+Abbr;
   end;
   for i:=0 to L do if buf[i]>1 then begin
-    if fuflg then fuflg:=false else Result:=Result+' ';
+    if fu then fu:=false else Result:=Result+' ';
     Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr+'^'+IntToStr(buf[i]);
   end;
-
-  emns:=0;
+  b:=0;
   for i:=0 to L do if buf[i]<0 then begin
-    inc(emns);
-    if emns=2 then break;
+    inc(b);
+    if b=2 then break;
   end;
-
-  if emns>0 then begin
+  if b>0 then begin
     if PByte(Result)=nil then Result:='1';
     Result:=Result+'/';
-    if emns=2 then Result:=Result+'(';
-
-    fuflg:=true;
+    if b=2 then Result:=Result+'(';
+    fu:=true;
     for i:=0 to L do begin
       exp:=-buf[i];
       if exp<=0 then continue;
-      if fuflg then fuflg:=false else Result:=Result+' ';
+      if fu then fu:=false else Result:=Result+' ';
       Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
       if exp>1 then Result:=Result+'^'+IntToStr(exp);
     end;
-    if emns=2 then Result:=Result+')';
-
+    if b=2 then Result:=Result+')';
   end;
-
   FreeMem(buf);
 end;
 
 function SelectPref(const F:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
-var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.05.13: Func SelectPref
+var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.05.19: Func SelectPref
     t : TRFloat;
 begin
   PByte(Result):=nil;
