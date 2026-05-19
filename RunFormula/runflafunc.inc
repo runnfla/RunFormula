@@ -672,6 +672,68 @@ begin
   PostParam(Context);
 end;
 
+function Fla_STRIP(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_STRIP
+begin
+  if ParamCount<>1 then raise EError.Create(ParamNumber);
+  Result:=NewLV(Context);
+  ValCopy(Param(-1, Context), Result);
+  PostParam(Context);
+  Result^.VPhy:=0;
+end;
+
+function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_MATCH
+var phy : SizeInt;
+begin
+  if ParamCount<>2 then raise EError.Create(ParamNumber);
+  phy:=Param(-2, Context)^.VPhy;
+  PostParam(Context);
+  phy:=Param(-1, Context)^.VPhy xor phy;
+  PostParam(Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VType:=VInt;
+    if phy=0 then Int:=-1 else Int:=0;
+  end;
+end;
+
+function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_CONVERT
+var pv : PValRec;
+    phy : SizeInt;
+    scl, ofs : TRFloat;
+begin
+  if ParamCount<>2 then raise EError.Create(ParamNumber);
+  with Param(-1, Context)^ do begin
+    if VType<>VStr then raise EError.Create(InvalidValue);
+    phy:=PhyCapture(PChar(Str), PChar(Str+Ansi[-1]), scl, ofs);
+  end;
+  PostParam(Context);
+  Result:=NewLV(Context);
+  pv:=Param(-2, Context);
+  ValCopy(pv, Result);
+  PostParam(Context);
+  with Result^ do if VPhy<>0 then begin
+    VPhy:=0;
+    if (scl<>1) or (ofs<>0) then case VType of
+      VCplex : begin
+                 Flo:=(Flo-ofs)/scl;
+                 Img:=Img/scl;
+               end;
+      VGap   : begin
+                 Flo:=(Flo-ofs)/scl;
+                 Img:=(Img-ofs)/scl;
+               end;
+      VIGap  : begin
+                 VType:=VGap;
+                 Flo:=(Int-ofs)/scl;
+                 Img:=(IGap-ofs)/scl;
+               end;
+      else
+        VType:=VFloat;
+        Flo:=(AsFloat(Result)-ofs)/scl;
+    end;
+  end else ApplyPhyToPV(Result, phy, scl, ofs);
+end;
+
 {$define runfla_optfunc}
 {$include runflaopt.inc}
 {$undef runfla_optfunc}
@@ -708,6 +770,9 @@ begin
   FuncReg('abs', @Fla_ABS);
   FuncReg('char', @Fla_CHAR);
   FuncReg('compare', @Fla_COMPARE);
+  FuncReg('strip', @Fla_STRIP);
+  FuncReg('match', @Fla_MATCH);
+  FuncReg('convert', @Fla_CONVERT);
 
 {$define runfla_optreg}
 {$include runflaopt.inc}
