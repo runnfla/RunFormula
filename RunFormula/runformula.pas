@@ -439,7 +439,7 @@ begin                                                     //DONE -oRFla.Main -cR
 end;
 
 {$include runflafunc.inc}
-{$include runflaphy.inc}
+{$include runflaunits.inc}
 
 procedure Init;
 var UnitDesc : TUnitDesc;
@@ -447,7 +447,7 @@ var UnitDesc : TUnitDesc;
 begin
   MemListInit(FuncList, SFlaRec, FuncGrow);
   MemListInit(UnitList, SizeOf(TUnitDesc), UnitDescGrow);
-  for UnitDesc in Quantities do PUnitDesc(MemListAdd(UnitList))^:=UnitDesc;
+  for UnitDesc in DimUnits do PUnitDesc(MemListAdd(UnitList))^:=UnitDesc;
   MemListInit(PrefList, SizeOf(TPrefAbbr), PrefAbbrGrow);
   for PrefAbbr in UnitPrefixes do PPrefAbbr(MemListAdd(PrefList))^:=PrefAbbr;
 end;

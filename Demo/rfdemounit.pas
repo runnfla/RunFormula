@@ -68,7 +68,7 @@ uses
 {$include ../RunFormula/runflamsg.inc}
 {$include ../RunFormula/runfladef.inc}
 {$include ../RunFormula/runflalib.inc}
-{$include ../RunFormula/runflaphy.inc}
+{$include ../RunFormula/runflaunits.inc}
 
 { TDemoForm }
 
@@ -293,7 +293,7 @@ begin
   Lst:=TStringList.Create;
   Lst.Sorted:=true;
   Lst.CaseSensitive:=true;
-  for UnitDesc in Quantities do begin
+  for UnitDesc in DimUnits do begin
     Info:=UnitDesc.Abbr;
     if Lst.Find(Info, k) then begin
       ResultMemo.Append('Unit duplicated: '+Info);

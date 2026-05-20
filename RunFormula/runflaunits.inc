@@ -1,12 +1,12 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
-//  Phy include file
-//  Rev. 19.05.2026
+//  Dimension units include file
+//  Rev. 20.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
 
-//  Filename: runflamsg.inc
+//  Filename: runflaunits.inc
 
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
@@ -21,7 +21,7 @@ const
   UMPF = $100;      // multiple prefix forbidden
   USPF = $200;      // submultiple prefix forbidden
 
-  Quantities : array of TUnitDesc = (
+  DimUnits : array of TUnitDesc = (
 
 // Electromagnetics
     (Sig: $0000000000FD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'W'),           // Power (Watt)
