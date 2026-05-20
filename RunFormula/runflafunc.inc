@@ -672,15 +672,6 @@ begin
   PostParam(Context);
 end;
 
-function Fla_STRIP(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_STRIP
-begin
-  if ParamCount<>1 then raise EError.Create(ParamNumber);
-  Result:=NewLV(Context);
-  ValCopy(Param(-1, Context), Result);
-  PostParam(Context);
-  Result^.VPhy:=0;
-end;
-
 function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_MATCH
 var phy : SizeInt;
 begin
@@ -696,20 +687,25 @@ begin
   end;
 end;
 
-function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_CONVERT
-var pv : PValRec;
-    s : string;
-    phy : SizeInt;
+function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.20: Func Fla_CONVERT
+var phy : SizeInt;
     scl, ofs : TRFloat;
-    p : PByte;
+    p, fin : PByte;
 begin
   if ParamCount<>2 then raise EError.Create(ParamNumber);
-  pv:=Param(-1, Context);
-  if not (pv^.VType in [VChar, VStr]) then raise EError.Create(InvalidValue);
-  s:=AsStr(pv);
+  with Param(-1, Context)^ do case VType of
+    VChar : begin
+              p:=@Chr;
+              fin:=p+1;
+            end;
+    VStr  : begin
+              p:=Str;
+              fin:=p+Ansi[-1];
+            end;
+    else raise EError.Create(InvalidValue);
+  end;
+  phy:=PhyCapture(PChar(p), PChar(fin), scl, ofs);
   PostParam(Context);
-  p:=PByte(s);
-  phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
   Result:=NewLV(Context);
   ValCopy(Param(-2, Context), Result);
   PostParam(Context);
@@ -773,7 +769,6 @@ begin
   FuncReg('abs', @Fla_ABS);
   FuncReg('char', @Fla_CHAR);
   FuncReg('compare', @Fla_COMPARE);
-  FuncReg('strip', @Fla_STRIP);
   FuncReg('match', @Fla_MATCH);
   FuncReg('convert', @Fla_CONVERT);
 
