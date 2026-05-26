@@ -335,6 +335,7 @@ var Buf : array of string;
     ClsList, SubrList, DefList, VarList : TMemList;
     PreTag : TTag = TagLess;
     TextCodePage : TSystemCodePage;
+    TokenAddr : PByte;                       // --> ValueToken
     InDef : integer = 0;
     Comment : char = #0;
     FlaPos : integer = 0;                    // position in Fla

@@ -157,6 +157,7 @@ var vr : TValRec;
     tf : PChar;                     // textfin
     S : string;
     I : SizeInt;
+    scl, ofs : TRFloat;
     c : char;
     flg : boolean;
 
@@ -209,6 +210,7 @@ var vr : TValRec;
         end;
       end;
     end;
+    TokenAddr:=BufP;
     inc(BufP, L);
   end;
 
@@ -410,16 +412,29 @@ begin
               CloseToken(TagExpr);
               CloseToken(TagArray);
             end;
-      '`' : begin
-              if PreTag in [TagText, TagLocal, TagSubr, TagNone] then raise EError.Create(DimlessValue);
-              inc(P);
-              tf:=FindTextFin(P, '`');
-              OpToken(TagPhy);
-              with vr do begin
-                VType:=VCplex;
-                ValueToken(vr, PhyCapture(P, tf, Flo, Img));   // safe due to constref
-              end;
-              P:=tf;
+      '`' : case PreTag of
+              TagValue : begin
+                           tf:=FindTextFin(P+1, '`');
+                           I:=PhyCapture(P, tf, scl, ofs);
+                           if (scl<>1) or (ofs<>0) then begin
+                             ApplyPhyToPV(ValCopy(@PToken(TokenAddr)^.ValRec, @vr), I, scl, ofs);
+                             BufP:=TokenAddr;
+                             PreTag:=TagOp;
+                             ValueToken(vr, vr.VPhy);
+                           end else PToken(TokenAddr)^.ValRec.VPhy:=I;
+                           P:=tf;
+                         end;
+              TagVar, TagArray, TagBracket, TagDo : begin
+                                                      tf:=FindTextFin(P+1, '`');
+                                                      OpToken(TagPhy);
+                                                      with vr do begin
+                                                        VType:=VCplex;        // safe due to constref
+                                                        ValueToken(vr, PhyCapture(P, tf, Flo, Img));
+                                                      end;
+                                                      P:=tf;
+                                                    end;
+              TagText, TagLocal, TagSubr, TagNone : raise EError.Create(DimlessValue);
+              else raise EError.Create(NotOpExpected);
             end;
       '{' : Comment:='}';
       else
