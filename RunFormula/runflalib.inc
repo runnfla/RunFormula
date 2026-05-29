@@ -382,7 +382,7 @@ begin
             end;
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
-    VChar : Result:=char(Chr);
+    VChar : Result:=Chr;
     VStr  : Result:=Str2Str(string(Str));
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;

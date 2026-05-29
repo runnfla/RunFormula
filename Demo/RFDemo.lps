@@ -21,8 +21,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
         <EditorIndex Value="12"/>
-        <TopLine Value="59"/>
-        <CursorPos X="36" Y="71"/>
+        <TopLine Value="256"/>
+        <CursorPos Y="267"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -522,8 +522,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="183"/>
-        <CursorPos X="23" Y="185"/>
+        <TopLine Value="372"/>
+        <CursorPos X="40" Y="384"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -546,15 +546,15 @@
       <Unit>
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="703"/>
-        <CursorPos X="37" Y="715"/>
+        <CursorPos X="10" Y="85"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\Help\Rus\runflahelp.txt"/>
         <EditorIndex Value="13"/>
-        <CursorPos X="32" Y="6"/>
+        <TopLine Value="265"/>
+        <CursorPos X="89" Y="276"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
@@ -655,18 +655,18 @@
       </Unit>
       <Unit>
         <Filename Value="..\ChangeLog\runflachangelog.txt"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="15"/>
-        <CursorPos X="32" Y="6"/>
+        <CursorPos X="39" Y="7"/>
         <UsageCount Value="44"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaunits.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <TopLine Value="105"/>
-        <CursorPos X="63" Y="22"/>
+        <CursorPos X="52" Y="22"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit>
