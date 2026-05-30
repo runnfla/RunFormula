@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  Essential functions include file
-//  Rev. 5.05.2026
+//  Rev. 30.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -687,12 +687,9 @@ begin
   end;
 end;
 
-function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.20: Func Fla_CONVERT
-var phy : SizeInt;
-    scl, ofs : TRFloat;
-    p, fin : PByte;
+function SubQty(var Context:TContext; out Phy:SizeInt; out Scl, Offs:TRFloat):PValRec;
+var p, fin : PByte;                                                   //DONE -oRFla.Func -cRev.2026.05.30: Func SubQty
 begin
-  if ParamCount<>2 then raise EError.Create(ParamNumber);
   with Param(-1, Context)^ do case VType of
     VChar : begin
               p:=@Chr;
@@ -704,12 +701,28 @@ begin
             end;
     else raise EError.Create(InvalidValue);
   end;
-  phy:=PhyCapture(PChar(p), PChar(fin), scl, ofs);
+  Phy:=PhyCapture(PChar(p), PChar(fin), Scl, Offs);
   PostParam(Context);
-  Result:=NewLV(Context);
-  ValCopy(Param(-2, Context), Result);
+  Result:=ValCopy(Param(-2, Context), NewLV(Context));
   PostParam(Context);
-  with Result^ do if VPhy<>0 then begin
+end;
+
+function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.30: Func Fla_QTY
+var phy : SizeInt;
+    scl, ofs : TRFloat;
+begin
+  if ParamCount<>2 then raise EError.Create(ParamNumber);
+  Result:=SubQty(Context, phy, scl, ofs);
+  ApplyPhyToPV(Result, phy, scl, ofs);
+end;
+
+function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.30: Func Fla_CONVERT
+var phy : SizeInt;
+    scl, ofs : TRFloat;
+begin
+  if ParamCount<>2 then raise EError.Create(ParamNumber);
+  Result:=SubQty(Context, phy, scl, ofs);
+  with Result^ do begin
     if VPhy<>phy then raise EError.Create(DimMismatch);
     VPhy:=0;
     if (scl<>1) or (ofs<>0) then case VType of
@@ -730,7 +743,7 @@ begin
         Flo:=(AsFloat(Result)-ofs)/scl;
         VType:=VFloat;                       // after AsFloat
     end;
-  end else ApplyPhyToPV(Result, phy, scl, ofs);
+  end;
 end;
 
 {$define runfla_optfunc}
@@ -770,6 +783,7 @@ begin
   FuncReg('char', @Fla_CHAR);
   FuncReg('compare', @Fla_COMPARE);
   FuncReg('match', @Fla_MATCH);
+  FuncReg('qty', @Fla_QTY);
   FuncReg('convert', @Fla_CONVERT);
 
 {$define runfla_optreg}
