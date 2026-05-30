@@ -421,7 +421,10 @@ begin
                              BufP:=TokenAddr;
                              PreTag:=TagOp;
                              ValueToken(vr, vr.VPhy);
-                           end else PToken(TokenAddr)^.ValRec.VPhy:=I;
+                           end else with PToken(TokenAddr)^.ValRec do begin
+                             if VPhy<>0 then raise EError.Create(DimExists);
+                             VPhy:=I;
+                           end;
                            P:=tf;
                          end;
               TagVar, TagArray, TagBracket, TagDo : begin

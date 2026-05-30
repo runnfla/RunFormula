@@ -183,8 +183,9 @@ begin
 end;
 
 procedure ApplyPhyToPV(PV:PValRec; Phy:SizeInt; const Scl, Offs:TRFloat);
-begin                                                    //DONE -oRFla.Lib -cRev.2026.05.10: Proc ApplyPhyToPV
+begin                                                    //DONE -oRFla.Lib -cRev.2026.05.30: Proc ApplyPhyToPV
   with PV^ do begin
+    if VPhy<>0 then raise EError.Create(DimExists);
     if VType in [VNone, VStr, VArr] then raise EError.Create(DimlessValue);
     VPhy:=Phy;
     if (Scl<>1) or (Offs<>0) then case VType of
