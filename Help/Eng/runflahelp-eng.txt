@@ -1,7 +1,7 @@
 //*****************************************************
 // RunFormula Expression Scripting Engine
 // RunFormula Help File
-// Rev. 15.05.2026
+// Rev. 30.05.2026
 
 // Author: Alexander Torubarov
 // Contact: runfla@yandex.com
@@ -19,7 +19,7 @@
 
 The RunFormula module is designed to calculate mathematical expressions and physical
 formulas presented in text form, with support for scripting language and processing
-units of measurement.
+physical dimensions.
 
 Supported data types:
 - integers in decimal, hexadecimal and binary formats;
@@ -97,7 +97,7 @@ X = 10101b // integer in binary form
 
 Characters are not case-sensitive, except for the 0x prefix.
 On overflow, decimal numbers are converted to real numbers, but for hexadecimal
-and binary numbers are not overflow checked.
+and binary numbers overflow is not checked.
 Valid ranges of integers:
 
 -9223372036854775807 ... 9223372036854775807 on 64-bit systems;
@@ -147,7 +147,7 @@ X = '"A"' & "'s'" // result "A"'s'
 
 An empty string can be specified as "", '', or the constant None.
 
-2.e. ASCII characters.
+2.e. ASCII symbols.
 
 An ASCII character can be specified as a string containing that character. Unlike a string,
 an ASCII character can participate in arithmetic operations as an integer corresponding to
@@ -229,35 +229,37 @@ with the word "end".
 
 The table lists the supported mathematical operations for different value types.
 
-                   Integer Real Complex Interval ASCII Character String
+                    Integer Real Complex Interval ASCII Character String
 
-== <> < > <= >=       +     +     +        +        as integer     +
-+ - *                 +     +     +        +        as integer     -
-/               real result +     +        +        real result    -
+== <> < > <= >=        +     +      +       +      as an integer     +
++ - *                  +     +      +       +       as a whole       -
+/                real result +      +       +      real result       -
 or and xor div mod (%)
-shl (<<) shr (>>) not +     -     -        -        as integer     -
-- unary               +     +     +        +        as integer     -
-**                    +     +     +        +        as integer     -
-&                  string string string string           +         +
+shl (<<) shr (>>) not  +     -      -       -     as an integer      -
+- unary                +     +      +       +      as a whole        -
+**                     +     +      +       +      as a whole        -
+&                   string string string string        +             +
 
 ** - operation of raising to an integer power (positive or negative)
 & - string concatenation operation
 When integer overflow occurs in the + - * ** - (unary) operations, the result is converted
 into a real type.
+For intervals, the == and <> operators function as in and not in, and the < > <= >= operators function as
+compare intervals by midpoints
 
 3.b. Operation priority.
 
 In an expression, mathematical operations are performed according to the following precedence:
 
-maximum:        **                                     // integer power
-                - not                                  // unary
-                * / shl (<<) shr (>>) div mod (%)
-                + -
-                &                                      // concatenate strings
+maximum:             **               // raising to an integer power
+                  - not               // unary
+             * / shl (<<) shr (>>) div mod (%)
+                  + -
+                  &                   // concatenate strings
                 == <> < > <= >=
-                and
+                 and
                 or xor
-minimum:        =                                      // assignment
+minimum:          =                   // assignment
 
 The assignment (=) and exponentiation (**) operations are right-associative.
 and are performed sequentially from right to left.
@@ -267,15 +269,15 @@ and are performed sequentially from right to left.
 The value type can be converted according to the following table. It also
 The Variant type is specified, which is used to pass values to external functions.
 
-                   Integer  Real  Complex  Interval  ASCII Character  String  Variant
+                    Integer Real Complex Interval ASCII Character String Variant
 
-Integer -->          +       +     X+0*j    [X:X]        -              +       +
-Real -->             -       +     X+0*j    [X:X]        -              +       +
-Complex -->          -       -      +         -          -            (R,I)     R
-Interval -->         -   (L+R)/2 (L+R)/2+0*j  +          -            [L:R]   (L+R)/2
-ASCII character -->  +       +     X+0*j    [X:X]        +              +       +
-String -->           -       -      -         -          -              +       +
-Variant -->          +       +      -         -      if string[1]       +       -
+Integer -->            +     +    X+0*j    [X:X]        -            +       +
+Real -->               -     +    X+0*j    [X:X]        -            +       +
+Complex -->            -     -      +        -          -          (R,I)     R
+Interval -->           -   (L+R)/2 (L+R)/2+0*j +        -          [L:R]   (L+R)/2
+ASCII character -->    +     +     X+0*j   [X:X]        +            +      byte
+String -->             -     -      -        -          -            +       +
+Variant -->            +     +      -        -     if string[1]      +       -
 
 4.a. Variables and the assignment operator.
 
@@ -445,7 +447,81 @@ This list and file can be replaced by the user.
 7. Functions.
 7.a. Predefined functions.
 
-RunFormula has a set of predefined functions described in the corresponding help.
+RunFormula has a set of predefined functions. All functions, except those specified,
+cases, support all valid parameter types.
+
+result([result]) - terminates the script execution and returns the value as
+result. If the value is not specified, then None
+
+exit([result]) - early exit from the function with the specified result. If the result
+If not specified, then None. If in a global block, then exit the script.
+
+break([value]) - early exit from the loop
+
+continue() - early loop iteration
+
+if(<condition>, <value 1> [, value 2]) - if the condition is met, then returns
+value 1 if not, then value 2 if set
+
+repeat(<condition>, <value>) - repeats the value while the condition is true
+
+type(<argument>) - returns an integer corresponding to the argument type
+
+re(<complex argument>) - returns the real part of the complex argument
+
+im(<complex argument>) - returns the imaginary part of the complex argument
+
+cplex(<real part>, <imaginary part>) - forms a complex value
+
+left(<interval>) - returns the left boundary of the interval
+
+right(<interval>) - returns the right boundary of the interval
+
+range(<left bound>, <right bound>) - generates an interval value. Left bound
+must be less than or equal to the right
+
+frac(<argument>) - returns the fractional part of the actual argument
+
+int(<argument>) - returns the fractional part of the real argument as a real number
+
+trunc(<argument>) - truncates the actual argument to an integer
+
+sign(<argument>) - returns -1 0 +1 according to the sign of the argument
+
+length(<string>) - returns the length of the string
+
+string(<argument>) - converts the argument to a string, equivalent to <argument> & ""
+
+value(<string>) - converts a string to a numeric value
+
+exp(<argument>) - calculates the exponential of the argument
+
+ln(<argument>) - calculates the natural logarithm of the argument
+
+sin(<argument>) - calculates the sine of the argument
+
+cos(<argument>) - calculates the cosine of the argument
+
+sqrt(<argument>) - calculates the square root of the argument
+
+arctan(<argument>) - calculates the arctangent of the argument
+
+round(<argument>) - rounds the argument. For complex numbers, rounding is in polar
+coordinates
+
+abs(<argument>) - returns the absolute value of the argument
+
+char(<argument>) - converts the argument to type Char
+
+compare(<argument 1>, <argument 2>) - compares arguments, returns -1 0 +1
+
+match((<argument 1>, <argument 2>) - compares the dimensions of the arguments, returns
+true or false
+
+qty(<argument>, <string>) - assigns the dimension specified by the string
+
+convert(<argument>, <string>) - converts the argument to a unitless value with
+transformation in accordance with a given dimension
 
 7.b. User-defined functions.
 
@@ -456,7 +532,7 @@ function MyFunc(const ParamCount:SizeInt; out Dim:SizeInt; Context:pointer):Vari
 
 ParamCount - the number of parameters transferred;
 Dim - the encoded dimension of the variable value (0 - if not used);
-Context is a pointer required to obtain the value of the parameters.
+Context is a pointer needed to obtain the value of the parameters.
 The result type of the user-defined function is Variant.
 
 7.c. Registering a user-defined function.
@@ -571,3 +647,4 @@ which was before the RunFlaParse call
 - to get information about the error, the TRunFlaError.Code field and the global variable
 RunFlaErrCode must be initialized to OK.
 - if the source code of RunFormula has changed, then RunFlaParse must be executed again.
+
