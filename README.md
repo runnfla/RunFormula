@@ -2,11 +2,11 @@
 RunFormula is intended to evaluate mathematical expressions and physics formulas provided as text with scripting language support and physical dimension handling.
 
 Supported data types:
-- integers in decimal, hexadecimal and binary formats;
-- floating-point numbers in decimal and scientific notation;
-- complex numbers and operations on them;
-- intervals and operations on them;
-- strings and ASCII characters;
+* integers in decimal, hexadecimal and binary formats;
+* floating-point numbers in decimal and scientific notation;
+* complex numbers and operations on them;
+* intervals and operations on them;
+* strings and ASCII characters;
 
 Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod (%) div == <> < <= >= > & (string concatenation) ** (integer exponentiation).\
 Variables and runtime initialization of variables via an external callback function.\
