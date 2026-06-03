@@ -701,10 +701,26 @@ end;
 
 // ===== Exceptions =====
 
-constructor EError.Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
-begin                                          //DONE -oRFla.Lib -cRev.2026.04.18: Cstr EError.Create
+constructor EError.Create(Code:TRunFlaErrCode);
+begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create None
   inherited Create('');
   FCode:=Code;
-  FPnt:=Pnt;
+  FPos:=nil;
+  FToken:=nil;
 end;
 
+constructor EError.Create(Code:TRunFlaErrCode; CharPos:PChar);
+begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create CharPos
+  inherited Create('');
+  FCode:=Code;
+  FPos:=CharPos;
+  FToken:=nil;
+end;
+
+constructor EError.Create(Code:TRunFlaErrCode; Token:PByte);
+begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create Token
+  inherited Create('');
+  FCode:=Code;
+  FPos:=nil;
+  FToken:=Token;
+end;

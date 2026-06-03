@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  Essential functions include file
-//  Rev. 30.05.2026
+//  Rev. 3.06.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com

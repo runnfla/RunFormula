@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  ChangeLog
-//  Rev. 01.06.2026
+//  Rev. 3.06.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -15,10 +15,10 @@
 
 // TODO - -oRFla.Change -cRev.2026.05.10:
 
-===== Version 0.0 - 2026.05.09
+===== Version 0.0 - 9.05.2026
 - First RunFormula release
 
-===== Version 0.1.b - 2026.06.01
+===== Version 0.1.b - 1.06.2026
 - Changed: Error message structure is updated
 - Changed: In external function parameter Phy is renamed to Dim
 - Changed: Help files are updated
@@ -26,3 +26,4 @@
 - Changed: Char value is converted to a Variant of type byte
 
 ===== Develop branch changes
+- Fixed: Incorrect error position in qtx function

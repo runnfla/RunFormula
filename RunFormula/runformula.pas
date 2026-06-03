@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Version 0.1.b
-//  Released at 01.06.2026
+//  Released at 1.06.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -218,7 +218,7 @@ var Context : TContext;
     i : SizeInt;
     j : SizeInt = -1;
 
-  procedure FillError(Err:TRunFlaErrCode; P:pointer=nil);     //DONE -oRFla.Main -cRev.2026.05.06: Proc FillError
+  procedure FillError(Err:TRunFlaErrCode; P:PByte=nil);    //DONE -oRFla.Main -cRev.2026.05.06: Proc FillError
   begin
     if Err<>OK then begin
       if RunFlaErrCode=OK then RunFlaErrCode:=Err;
@@ -255,7 +255,7 @@ begin
     if Context.Flow in [BRK, CON] then raise EError.Create(IllegalBreak);
     FillError(OK);
   except
-    on E:EError do FillError(E.FCode, E.FPnt);
+    on E:EError do FillError(E.FCode, E.FToken);
     on E:EResult do begin
       Result:=Context.TermResult;
       FillError(OK);
@@ -384,7 +384,7 @@ begin
     end else Result:=Buf[0];
     FillError(OK);
   except
-    on E:EError do FillError(E.FCode, E.FPnt);
+    on E:EError do FillError(E.FCode, E.FPos);
     on E:EOverflow do FillError(Overflow);
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);

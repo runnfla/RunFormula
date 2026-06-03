@@ -195,8 +195,11 @@ type
 
   EError = class(Exception)
     FCode : TRunFlaErrCode;
-    FPnt : pointer;
-    constructor Create(Code:TRunFlaErrCode; Pnt:pointer=nil);
+    FPos : pointer;
+    FToken : PByte;
+    constructor Create(Code:TRunFlaErrCode);
+    constructor Create(Code:TRunFlaErrCode; CharPos:PChar);
+    constructor Create(Code:TRunFlaErrCode; Token:PByte);
   end;
 
   EResult = class(Exception);
