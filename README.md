@@ -19,7 +19,7 @@ Compiling the source formula into bytecode for multiple execution.\
 Minimal dependencies (only SysUtils in the base configuration).
 
 #### Integrating RunFormula into your project
-- Copy all files from the `RunFormula` directory (`runformula.pas` and all .inc files) to your project or a separate directory.
+- Copy all files from the `RunFormula` directory (`runformula.pas` and all `.inc` files) to your project or a separate directory.
 - Add `RunFormula` to the `uses` clause of either the `interface` or `implementation` section.
 
 For example, like this:
