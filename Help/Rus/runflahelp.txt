@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  RunFormula Help File
-//  Rev. 30.05.2026
+//  Rev. 8.05.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -647,4 +647,98 @@ RunFlaExecStr/RunFlaExecVrt могут быть многократно вызв�
   - для получения информации об ошибке поле TRunFlaError.Code и глобальная переменная
   RunFlaErrCode должна быть  инициализирована как OK.
   - если изменился исходный код RunFormula, то RunFlaParse должна быть выполнена заново.
+
+11. Предопределенные единицы измерения.
+
+В файле runflaunits.inc определеныы единицы измерения, которые есть в модуле по умолчанию.
+
+// Electromagnetics
+  'W'         // Power (Watt)
+  'C'         // Charge (Coulomb)
+  'F'         // Capacitance (Farad)
+  'H'         // Inductance (Henry)
+  'Ohm'       // Resistance (Ohm)
+  'S'         // Conductance (Siemens)
+  'Wb'        // Magnetic Flux (Weber)
+  'T'         // Magnetic Induction (Tesla)
+  'V'         // Voltage (Volt)
+  'Hz'        // Frequency (Hertz)
+  'Wh'        // Watt-hour
+  'Ah'        // Ampere-hour
+
+// Mass volume area
+  'g'         // Metric Gram
+  't'         // Metric Ton
+  'l'         // Liter
+  'ha'        // Hectare
+
+// Mechanics
+  'N'         // Force (Newton)
+  'J'         // Energy (Joule)
+  'Pa'        // Pressure (Pascal)
+  'atm'       // Pressure (Standard Atmosphere)
+  'bar'       // Pressure (bar)
+  'mmHg'      // Pressure (mmHg)
+  'mmH2O'     // Pressure (mmH2O)
+  'kgf'       // Kilogram-force
+  'hp'        // Horsepower
+  'rpm'       // Revolutions per minute
+
+// Optics
+  'lm'        // Luminous Flux (Lumen)
+  'lx'        // Illuminance (Lux)
+
+// Thermo
+  'degC'      // Temperature (Celsius)
+  'cal'       // Calorie
+  'BTU'       // British Thermal Unit
+  'degF'      // Temperature (Fahrenheit)
+
+// Nuclear
+  'eV'        // Electronvolt (eV)
+  'R'         // Roentgen
+  'Sv'        // Equivalent Dose (Sievert)
+  'Ci'        // Curie
+  'Bq'        // Activity (Becquerel)
+  'Gy'        // Absorbed Dose (Gray)
+  'b'         // Cross-section (Barn)
+  'u'         // Unified atomic mass unit
+
+// Speed
+  'km/h'      // Speed (km/h)
+  'mph'       // Miles per hour
+  'kn'        // Knots
+
+// Time
+  'min'       // Minute
+  'h'         // Hour
+  'd'         // Day
+  'wk'        // Week
+  'mo'        // Month
+  'yr'        // Year
+
+// US units
+  'in'        // Inch
+  'ft'        // Foot
+  'yd'        // Yard
+  'mi'        // Mile
+  'nmi'       // Nautical Mile
+  'ac'        // Acre
+  'lb'        // Pound
+  'oz'        // Ounce
+  'ton'       // Short Ton
+  'st'        // Stone
+  'gal'       // Gallon
+  'qt'        // Quart
+  'pt'        // Pint
+  'fl_oz'     // Fluid Ounce
+
+// SI units
+  'A'         // Current (Ampere)
+  'K'         // Temperature (Kelvin)
+  'kg'        // Mass (Kilogram)
+  'm'         // Length (Meter)
+  's'         // Time (Second)
+  'mol'       // Amount of Substance (Mole)
+  'cd'        // Luminous Intensity (Candela)
 
