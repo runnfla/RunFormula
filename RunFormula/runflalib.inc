@@ -672,11 +672,19 @@ begin
   end;
 end;
 
-procedure PostParam(var Context:TContext);                    //DONE -oRFla.Lib -cRev.2026.04.18: Proc PostParam
+procedure PostParam(var Context:TContext);                    //DONE -oRFla.Lib -cRev.2026.04.18: Proc PostParam TermResult
 begin
   with Context do if TermResult^.VAlloc=LV then begin
     FreeValue(TermResult);
     dec(LVStack.Count);
+  end;
+end;
+
+procedure PostParam(PV:PValRec; var Context:TContext);        //DONE -oRFla.Lib -cRev.2026.06.10: Proc PostParam PV
+begin
+  if PV^.VAlloc=LV then begin
+    FreeValue(PV);
+    dec(Context.LVStack.Count);
   end;
 end;
 
