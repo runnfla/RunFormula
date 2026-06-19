@@ -78,6 +78,7 @@
     <Parsing>
       <Style Value="1"/>
       <SyntaxOptions>
+        <CStyleOperator Value="False"/>
         <AllowLabel Value="False"/>
       </SyntaxOptions>
     </Parsing>
