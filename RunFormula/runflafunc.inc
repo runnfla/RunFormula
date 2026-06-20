@@ -82,43 +82,44 @@ begin
   until false;
 end;
 
-function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.04: Func Fla_TYPE
+function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_TYPE
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-     VType:=VInt;
-     Int:=SizeInt(Param(-1, Context)^.VType);
+    VType:=VInt;
+    Int:=SizeInt(Param(-1, Context)^.VType);
   end;
   PostParam(Context);
 end;
 
 // ----- helper functions -----
 
-function RMS(const X,Y:TRFloat):TRFloat;                   //DONE -oRFla.Func -cRev.2026.06.09: Func RMS
+function RMS(const X,Y:TRFloat):TRFloat;                   //DONE -oRFla.Func -cRev.2026.06.20: Func RMS
 var ax : TRFloat;
 begin
   ax:=abs(X);
   if Y=0 then Exit(ax);
   Result:=abs(Y);
-  if ax=0 then exit;                      // Smith's algorithm
-  if ax>=Result then Result:=ax*sqrt(sqr(Result/ax)+1)
-    else Result:=Result*sqrt(sqr(ax/Result)+1);
+  if X=0 then exit;                      // Smith's algorithm
+  if ax<Result then Result:=Result*sqrt(sqr(ax/Result)+1)
+    else Result:=ax*sqrt(sqr(Result/ax)+1);
 end;
 
-function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.05.05: Func FlArcTan
+function FlArcTan(const Y,X:TRFloat):TRFloat;              //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
 begin
   if X=0 then begin
-    if Y>=0 then Result:=Cpi/2 else Result:=-Cpi/2;
-    exit;
+    if Y>0 then Exit(Cpi/2);
+    if Y<0 then Exit(-Cpi/2);
+    Exit(0);
   end;
   Result:=arctan(Y/X);
   if X<0 then begin
-    if Y>=0 then Result:=Result+Cpi else Result:=Result-Cpi;
+    if Y<0 then Result:=Result-Cpi else Result:=Result+Cpi;
   end;
 end;
 
-function FlaRound(const F:TRFloat; D:integer):TRFloat;     //DONE -oRFla.Func -cRev.2026.06.00: Func FlaRound
+function FlaRound(const F:TRFloat; D:integer):TRFloat;     //DONE -oRFla.Func -cRev.2026.06.20: Func FlaRound
 begin
   case D of
     -2 : begin                                       // math frac = X - floor(X)
@@ -130,9 +131,9 @@ begin
            Result:=int(F);
            if (F<0) and (F<>Result) then Result:=Result-1;
          end;
-    0  : if F>=0 then Result:=int(F+0.5)             // round
-           else Result:=int(F-0.5);
-    1  : begin                                       // ceil
+     0 : if F<0 then Result:=int(F-0.5)              // math round
+           else Result:=int(F+0.5);
+     1 : begin                                       // ceil
            Result:=int(F);
            if (F>0) and (F<>Result) then Result:=Result+1;
          end;
@@ -318,19 +319,19 @@ begin
   with ValCopy(Param(-1, Context), Result)^ do case VType of
     VNone, VStr, VArr : raise EError.Create(InvalidValue);
     VFloat : begin
-               Flo:=System.Int(Flo);
+               Flo:=System.int(Flo);
                if abs(Flo)<=HI then begin
                  Int:=trunc(Flo);
                  VType:=VInt;
                end;
              end;
     VCplex : begin
-               Flo:=System.Int(Flo);
-               Img:=System.Int(Img);
+               Flo:=System.int(Flo);
+               Img:=System.int(Img);
              end;
     VGap   : begin
-               Flo:=System.Int(Flo);
-               Img:=System.Int(Img);
+               Flo:=System.int(Flo);
+               Img:=System.int(Img);
                if (abs(Flo)<=HI) and (abs(Img)<=HI) then begin
                  g:=trunc(Img);
                  Int:=trunc(Flo);
@@ -368,6 +369,29 @@ begin
                           Flo:=FlaRound(Flo, 1);
                           Img:=FlaRound(Img, 1);
                         end;
+  end;
+  PostParam(Context);
+end;
+
+function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_ROUND
+const Grad = 180/Cpi;
+var md, ar : TRFloat;
+begin
+  if ParamCount<>1 then raise EError.Create(ParamNumber);
+  Result:=NewLV(Context);
+  with ValCopy(Param(-1, Context), Result)^ do case VType of
+    VNone, VStr, VArr : raise EError.Create(InvalidValue);
+    VFloat : Flo:=FlaRound(Flo, 0);
+    VCplex : begin
+               md:=FlaRound(RMS(Flo, Img), 0);
+               ar:=FlaRound(FlArcTan(Img, Flo)*Grad, 0)/Grad;
+               Flo:=md*cos(ar);
+               Img:=md*sin(ar);
+             end;
+    VGap   : begin
+               Flo:=FlaRound(Flo, -1);
+               Img:=FlaRound(Img, 1);
+             end;
   end;
   PostParam(Context);
 end;
@@ -734,54 +758,9 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ROUND
-const Grad = 180/Cpi;
-var f, fa, fb : TRFloat;
-    t : TVType;
-    phy : SizeInt;
-begin
-  if ParamCount<>1 then raise EError.Create(ParamNumber);
-  with Param(-1, Context)^ do begin
-    phy:=VPhy;
-    t:=VType;
-    case t of
-      VFloat : fa:=Flo;
-      VCplex, VGap : begin fa:=Flo; fb:=Img; end;
-      VStr : raise EError.Create(InvalidStrVal);
-      VArr : raise EError.Create(InvalidArrVal);
-      else Exit(Context.TermResult);
-    end;
-  end;
-  PostParam(Context);
-  Result:=NewLV(Context);
-  with Result^ do begin
-    VPhy:=phy;
-    case t of
-      VFloat : begin
-                 VType:=VInt;
-                 Int:=round(fa);
-               end;
-      VCplex : begin
-                 VType:=VCplex;
-                 f:=sqrt(sqr(fa)+sqr(fb));
-                 if frac(f)>=0.5 then f:=f+1;
-                 f:=System.int(f);
-                 fa:=round(FlArcTan(fb, fa)*Grad)/Grad;
-                 Flo:=f*cos(fa);
-                 Img:=f*sin(fa);
-               end;
-      VGap   : begin
-                 VType:=VIGap;
-                 Int:=round(fa);
-                 IGap:=round(fb);
-               end;
-    end;
-  end;
-end;
-
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ABS
 var pv : PValRec;
-    fa, fb : TRFloat;
+    fl, fr : TRFloat;
     al, ar : SizeInt;
 begin
   if ParamCount<>1 then raise EError.Create(ParamNumber);
@@ -789,49 +768,33 @@ begin
   pv:=Param(-1, Context);
   with Result^ do begin
     VType:=pv^.VType;
-    VPhy:=pv^.VPhy;
     case VType of
       VInt   : Int:=abs(pv^.Int);
       VFloat : Flo:=abs(pv^.Flo);
       VCplex : begin
                  VType:=VFloat;
-                 Flo:=sqrt(sqr(pv^.Flo)+sqr(pv^.Img));
-                 {x := Abs(z.Flo);
-  y := Abs(z.Img);
-  if x = 0 then Exit(y);
-  if y = 0 then Exit(x);
-
-  if x > y then begin
-    temp := y / x;
-    Exit(x * sqrt(1 + temp * temp));
-  end else begin
-    temp := x / y;
-    Exit(y * sqrt(1 + temp * temp));
-  end;
-end;}
-
-
+                 Flo:=RMS(pv^.Flo, pv^.Img);
                end;
-      VChar  : Chr:=abs(pv^.Chr);
-      VStr   : raise EError.Create(InvalidStrVal);
+      VChar  : Chr:=pv^.Chr;
       VGap   : begin
+                 fl:=abs(pv^.Flo);
+                 fr:=abs(pv^.Img);
                  if (pv^.Flo>0) or (pv^.Img<0) then begin
-                   fa:=abs(pv^.Flo);
-                   fb:=abs(pv^.Img);
-                   if fa<fb then Flo:=fa else Flo:=fb;
+                   if fl<fr then Flo:=fl else Flo:=fr;
                  end else Flo:=0;
-                 Img:=Max4(pv^.Flo, -pv^.Flo, pv^.Img, -pv^.Img);
+                 if fl<fr then Img:=fr else Img:=fl;
                end;
       VIGap  : begin
                  al:=abs(pv^.Int);
                  ar:=abs(pv^.IGap);
                  if (pv^.Int>0) or (pv^.IGap<0) then begin
                    if al<ar then Int:=al else Int:=ar;
-                 end else Flo:=0;
-                 if al>ar then IGap:=al else IGap:=ar;
+                 end else Int:=0;
+                 if al<ar then IGap:=ar else IGap:=al;
                end;
-      VArr   : raise EError.Create(InvalidArrVal);
+      else raise EError.Create(InvalidValue);
     end;
+    VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
@@ -967,6 +930,7 @@ begin
   FuncReg('trunc', @Fla_TRUNC);
   FuncReg('floor', @Fla_FLOOR);
   FuncReg('ceil', @Fla_CEIL);
+  FuncReg('round', @Fla_ROUND);
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
   FuncReg('string', @Fla_STRING);
@@ -978,7 +942,6 @@ begin
   FuncReg('cos', @Fla_COS);
   FuncReg('sqrt', @Fla_SQRT);
   FuncReg('arctan', @Fla_ARCTAN);
-  FuncReg('round', @Fla_ROUND);
   FuncReg('abs', @Fla_ABS);
   FuncReg('char', @Fla_CHAR);
   FuncReg('compare', @Fla_COMPARE);
