@@ -95,7 +95,7 @@ end;
 
 // ----- helper functions -----
 
-function RMS(const X,Y:TRFloat):TRFloat;                   //DONE -oRFla.Func -cRev.2026.06.20: Func RMS
+function FlHypot(const X,Y:TRFloat):TRFloat;               //DONE -oRFla.Func -cRev.2026.06.20: Func FlHypot
 var ax : TRFloat;
 begin
   ax:=abs(X);
@@ -383,7 +383,7 @@ begin
     VNone, VStr, VArr : raise EError.Create(InvalidValue);
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
-               md:=FlaRound(RMS(Flo, Img), 0);
+               md:=FlaRound(FlHypot(Flo, Img), 0);
                ar:=FlaRound(FlArcTan(Img, Flo)*Grad, 0)/Grad;
                Flo:=md*cos(ar);
                Img:=md*sin(ar);
@@ -773,7 +773,7 @@ begin
       VFloat : Flo:=abs(pv^.Flo);
       VCplex : begin
                  VType:=VFloat;
-                 Flo:=RMS(pv^.Flo, pv^.Img);
+                 Flo:=FlHypot(pv^.Flo, pv^.Img);
                end;
       VChar  : Chr:=pv^.Chr;
       VGap   : begin
