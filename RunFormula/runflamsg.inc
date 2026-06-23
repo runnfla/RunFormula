@@ -69,6 +69,6 @@ const
       (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
       (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
       (ErrCode : RangeType; ErrMsg : 'Range should be with integer borders'),
-      (ErrCode : CommaDigit; ErrMsg : 'Comma Digit')
+      (ErrCode : CommaDigit; ErrMsg : 'Digit is not allowed, please insert space')
     );
 

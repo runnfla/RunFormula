@@ -31,3 +31,7 @@
 ceil(), find(), substr()
 - Changed: Embedded functions logic (detailed in help) - frac(), trunc()
 - Removed: Embedded function - int()
+- Added: New constants - HighInt, LowInt
+- Added: New error codes: RangeType, CommaDigit
+- Added: Digit is not allowed immediately after a comma or semicolon
+

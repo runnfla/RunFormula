@@ -362,7 +362,7 @@ begin
 end;
 
 function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_TRUNC
-const HI = High(SizeInt);
+const HI = high(SizeInt);
 var I : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
