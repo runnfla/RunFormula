@@ -521,6 +521,7 @@ end;
 
 function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.22: Func Fla_FIND
 var ofs : SizeInt = 0;
+    L : SizeInt = 0;
     s, sb : string;
     ps, psub : PByte;
 begin
@@ -534,21 +535,25 @@ begin
     else RaiseError(ParamNumber);
   end;
   ParamCount:=-ParamCount;
-  sb:=AsStr(Param(ParamCount+1, Context));
-  PostParam(Context);
-  psub:=PByte(sb);
-  Result:=NewLV(Context);
-  with Result^ do begin
-    VType:=VInt;
-    Int:=ofs;
-  end;
-  if psub=nil then exit;
   s:=AsStr(Param(ParamCount, Context));
   PostParam(Context);
   ps:=PByte(s);
+  if ps<>nil then L:=PSizeInt(ps)[-1];
+  Result:=NewLV(Context);
   with Result^ do begin
+    VType:=VInt;
     Int:=-1;
-    if ps<>nil then Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub);
+  end;
+  if ofs>=L then exit;
+  sb:=AsStr(Param(ParamCount+1, Context));
+  PostParam(Context);
+  psub:=PByte(sb);
+  if psub=nil then begin
+    Result^.Int:=ofs;
+    exit;
+  end;
+  with Result^ do begin
+    if ps<>nil then Int:=SubPos(ps+ofs, ps+L, psub);
     if (ofs<>0) and (Int<>-1) then inc(Int, ofs);
   end;
 end;
