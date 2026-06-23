@@ -315,6 +315,27 @@ begin
   PostParam(L, Context);
 end;
 
+function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.23: Func Fla_BALL
+var c, m : TRFloat;
+    phy : SizeInt;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  c:=AsFloat(Param(-2, Context));
+  phy:=Context.TermResult^.VPhy;
+  PostParam(Context);
+  m:=AsFloat(Param(-1, Context));
+  if m<0 then RaiseError(InvalidValue);
+  if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
+  PostParam(Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VType:=VGap;
+    Flo:=c-m;
+    Img:=c+m;
+    VPhy:=phy;
+  end;
+end;
+
 function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_FRAC
 var pv : PValRec;
 begin
@@ -519,14 +540,17 @@ begin
   Result:=NewLV(Context);
   with Result^ do begin
     VType:=VInt;
-    Int:=0;
+    Int:=ofs;
   end;
   if psub=nil then exit;
   s:=AsStr(Param(ParamCount, Context));
   PostParam(Context);
   ps:=PByte(s);
-  with Result^ do if ps<>nil then Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub)
-    else Int:=-1;
+  with Result^ do begin
+    Int:=-1;
+    if ps<>nil then Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub);
+    if (ofs<>0) and (Int<>-1) then inc(Int, ofs);
+  end;
 end;
 
 function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.00: Func Fla_SUBSTR
@@ -970,6 +994,7 @@ begin
   FuncReg('right', @Fla_RIGHT);
   FuncReg('margin', @Fla_MARGIN);
   FuncReg('range', @Fla_RANGE);
+  FuncReg('ball', @Fla_BALL);
   FuncReg('frac', @Fla_FRAC);
   FuncReg('trunc', @Fla_TRUNC);
   FuncReg('floor', @Fla_FLOOR);

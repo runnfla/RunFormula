@@ -67,6 +67,8 @@ const
       (ErrCode : DimlessValue; ErrMsg : 'Cannot assign units to None, String or Array value'),
       (ErrCode : OffsetUnit; ErrMsg : 'Unit with offset cannot be specified'),
       (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
-      (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete')
+      (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
+      (ErrCode : RangeType; ErrMsg : 'Range should be with integer borders'),
+      (ErrCode : CommaDigit; ErrMsg : 'Comma Digit')
     );
 
