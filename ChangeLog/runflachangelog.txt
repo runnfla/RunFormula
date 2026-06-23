@@ -27,6 +27,6 @@
 
 ===== Develop branch changes =====
 - Fixed: Incorrect error position in qtx() function
-- Added: New embedded functions - margin(), arg(), conj(), rect(), floor(), ceil()
+- Added: New embedded functions - margin(), arg(), conj(), rect(), floor(), ceil(), find(), substr()
 - Changed: Embedded functions logic (detailed in help) - frac(), trunc()
 - Removed: Embedded function - int()

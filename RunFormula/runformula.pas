@@ -204,7 +204,7 @@ function RunFlaParam(Offset:SizeInt; out Dim:SizeInt; Context:pointer):Variant;
 type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Func RunFlaParam
 begin
   with PContext(Context)^.FuncArg do begin
-    if (Offset>=0) or (Offset<(-Count)) then raise EError.Create(ParamNumber);
+    if (Offset>=0) or (Offset<(-Count)) then RaiseError(ParamNumber);
     Result:=AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^));
     Dim:=PContext(Context)^.TermResult^.VPhy;
   end;

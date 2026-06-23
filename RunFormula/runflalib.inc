@@ -37,6 +37,43 @@ begin
   end;
 end;
 
+function BufZ(Lng:SizeInt):PByte; inline;                 //DONE -oRFla.Lib -cRev.2026.06.00: Inline BufZ
+begin
+  Result:=GetMem(Lng+1);
+  Result[Lng]:=0;
+end;
+
+// ===== Exceptions =====
+
+constructor EError.Create(Code:TRunFlaErrCode);
+begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create None
+  inherited Create('');
+  FCode:=Code;
+  FPos:=nil;
+  FToken:=nil;
+end;
+
+constructor EError.Create(Code:TRunFlaErrCode; CharPos:PChar);
+begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create CharPos
+  inherited Create('');
+  FCode:=Code;
+  FPos:=CharPos;
+  FToken:=nil;
+end;
+
+constructor EError.Create(Code:TRunFlaErrCode; Token:PByte);
+begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create Token
+  inherited Create('');
+  FCode:=Code;
+  FPos:=nil;
+  FToken:=Token;
+end;
+
+procedure RaiseError(ErrCode:TRunFlaErrCode);  //DONE -oRFla.Lib -cRev.2026.06.20: Proc RaiseError
+begin
+  raise EError.Create(ErrCode);
+end;
+
 // ===== Strings =====
 
 function Str2Ptr(constref S:string):PByte; inline;        //DONE -oRFla.Lib -cRev.2026.05.03: Inline Str2Ptr
@@ -60,6 +97,22 @@ begin
     InterlockedDecrement(PSizeInt(PS)[-2])
 {$endif}
     else FreeMem(PS-SAnsiRec);
+end;
+
+function MakeStr(Lng:SizeInt; constref LS:string):string;  //DONE -oRFla.Lib -cRev.2026.06.00: Func MakeStr
+var cp : TSystemCodePage = CP_ACP;
+    p : PByte;
+begin
+  p:=PByte(LS);
+  if p<>nil then cp:=PAnsiRec(p-SAnsiRec)^.CodePage;
+  p:=BufZ(Lng+SAnsiRec);
+  with PAnsiRec(p)^ do begin
+    CodePage:=cp;
+    ElementSize:=1;
+    Ref:=1;
+    Len:=Lng;
+  end;
+  PByte(Result):=p+SAnsiRec;
 end;
 
 function Str2Str(constref S:string):string;               //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str
@@ -707,28 +760,3 @@ begin
   end;
 end;
 
-// ===== Exceptions =====
-
-constructor EError.Create(Code:TRunFlaErrCode);
-begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create None
-  inherited Create('');
-  FCode:=Code;
-  FPos:=nil;
-  FToken:=nil;
-end;
-
-constructor EError.Create(Code:TRunFlaErrCode; CharPos:PChar);
-begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create CharPos
-  inherited Create('');
-  FCode:=Code;
-  FPos:=CharPos;
-  FToken:=nil;
-end;
-
-constructor EError.Create(Code:TRunFlaErrCode; Token:PByte);
-begin                                          //DONE -oRFla.Lib -cRev.2026.06.03: Cstr EError.Create Token
-  inherited Create('');
-  FCode:=Code;
-  FPos:=nil;
-  FToken:=Token;
-end;

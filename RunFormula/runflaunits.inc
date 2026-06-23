@@ -104,6 +104,10 @@ const
     (Sig: $0000000000000003; Scale: 0.003785411784/8; Offset: 0; Flag: UPF or UOP; Abbr: 'pt'),   // Pint
     (Sig: $0000000000000003; Scale: 0.003785411784/128;  Offset: 0; Flag: UPF or UOP; Abbr: 'fl oz'),  // Fluid Ounce
 
+//световой год (ly)
+// Сила: ньютон (N), дина (dyn).
+//Магнетизм: тесла (T), гаусс (G).
+
 // SI units: J N Th I T M L
     (Sig: $0000000001000000; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'A'),      // Current (Ampere)
     (Sig: $0000000100000000; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'K'),      // Temperature (Kelvin)
