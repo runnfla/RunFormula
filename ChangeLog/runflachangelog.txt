@@ -1,7 +1,7 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
 //  ChangeLog
-//  Rev. 3.06.2026
+//  Rev. 25.06.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -33,5 +33,6 @@ ceil(), find(), substr()
 - Removed: Embedded function - int()
 - Added: New constants - HighInt, LowInt
 - Added: New error codes: RangeType, CommaDigit, InvalidType
-- Added: Digit is not allowed immediately after a comma or semicolon
+- Changed: Digit is not allowed immediately after a comma or semicolon, space or
+separator required
 
