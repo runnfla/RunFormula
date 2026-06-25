@@ -86,6 +86,7 @@ type
 
 const
   SI = SizeOf(SizeInt);
+  HI = high(SizeInt);
   LI = low(SizeInt);
   Sint = SizeOf(integer);
   SPtr = SizeOf(pointer);

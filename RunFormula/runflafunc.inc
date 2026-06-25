@@ -354,7 +354,7 @@ begin
                       Flo:=FlaRound(pv^.Flo, -2);
                       Img:=FlaRound(pv^.Img, -2);
                     end;
-      else RaiseError(InvalidValue);
+      else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -362,16 +362,15 @@ begin
 end;
 
 function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_TRUNC
-const HI = high(SizeInt);
 var I : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidValue);
+    VNone, VStr, VArr : RaiseError(InvalidType);
     VFloat : begin
                Flo:=System.int(Flo);
-               if abs(Flo)<=HI then begin
+               if (Flo>=LI) and (Flo<=HI) then begin
                  Int:=trunc(Flo);
                  VType:=VInt;
                end;
@@ -383,7 +382,7 @@ begin
     VGap   : begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
-               if (abs(Flo)<=HI) and (abs(Img)<=HI) then begin
+               if (Flo>=LI) and (Flo<=HI) and (Img>=LI) and (Img<=HI) then begin
                  I:=trunc(Img);
                  Int:=trunc(Flo);
                  IGap:=I;
@@ -399,7 +398,7 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidValue);
+    VNone, VStr, VArr : RaiseError(InvalidType);
     VFloat            : Flo:=FlaRound(Flo, -1);
     VCplex, VGap      : begin
                           Flo:=FlaRound(Flo, -1);
@@ -414,7 +413,7 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidValue);
+    VNone, VStr, VArr : RaiseError(InvalidType);
     VFloat            : Flo:=FlaRound(Flo, 1);
     VCplex, VGap      : begin
                           Flo:=FlaRound(Flo, 1);
@@ -431,7 +430,7 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidValue);
+    VNone, VStr, VArr : RaiseError(InvalidType);
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
                md:=FlaRound(FlHypot(Flo, Img), 0);
@@ -453,17 +452,10 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   with Param(-1, Context)^ do case VType of
     VNone  : I:=0;
-    VInt   : begin
-               if Int=0 then I:=0;
-               if Int>0 then I:=1;
-             end;
-    VFloat : begin
-              if Flo=0 then I:=0;
-              if Flo>0 then I:=1;
-             end;
+    VInt   : if Int=0 then I:=0 else if Int>0 then I:=1;
+    VFloat : if Flo=0 then I:=0 else if Flo>0 then I:=1;
     VCplex : if Flo=0 then begin
-               if Img=0 then I:=0;
-               if Img>0 then I:=1;
+               if Img=0 then I:=0 else if Img>0 then I:=1;
              end else if Flo>0 then I:=1;
     VChar  : begin
                I:=1;
@@ -473,14 +465,8 @@ begin
                I:=1;
                if Ansi[-1]=0 then I:=0;
              end;
-    VGap   : begin
-               if (Flo<=0) and (Img>=0) then I:=0;
-               if Flo>0 then I:=1;
-             end;
-    VIGap  : begin
-               if (Int<=0) and (IGap>=0) then I:=0;
-               if Int>0 then I:=1;
-             end;
+    VGap   : if (Flo<=0) and (Img>=0) then I:=0 else if Flo>0 then I:=1;
+    VIGap  : if (Int<=0) and (IGap>=0) then I:=0 else if Int>0 then I:=1;
     VArr   : RaiseError(InvalidArrVal);
   end;
   PostParam(Context);
@@ -555,23 +541,53 @@ end;
 
 function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.00: Func Fla_SUBSTR
 var s : string;
-    p : PSizeInt;
-    L : SizeInt;
+    pv : PValRec;
+    p : PByte;
+    L, R, lng : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  L:=AsInt(Param(-1, Context));
-  PostParam(Context);
+  Result:=NewLV(Context);
+  Result^.VType:=VNone;
 
   s:=AsStr(Param(-2, Context));
   PostParam(Context);
-  p:=PSizeInt(s);
-  Result:=NewLV(Context);
-  with Result^ do begin
-    VType:=VInt;
-    Int:=0;
-    if p<>nil then Int:=p[-1];
+  p:=PByte(s);
+  if p=nil then exit;
+  lng:=PSizeInt(p)[-1]-1;
+  if lng=-1 then exit;
+
+
+  pv:=Param(-1, Context);
+  with pv^ do begin
+    if not (VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
+    if VPhy<>0 then RaiseError(IllegalDim);
+  end;
+  L:=AsIGapL(pv);
+  R:=AsIGapR(pv);
+  PostParam(Context);
+
+  if (L>lng) or (R<0) then exit;
+  if L<0 then L:=0;
+  if R>lng then R:=lng;
+  lng:=R-L+1;
+
+  with Result^ do if L<>R then begin
+    VType:=VStr;
+    Str:=MakeStrPtr(lng, s);
+    DataCopy(p+L, Str, lng);
+  end else begin
+    VType:=VChar;
+    Chr:=p[L];
   end;
 end;
+
+
+
+
+
+
+
+
 
 
 

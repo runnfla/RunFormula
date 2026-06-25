@@ -99,8 +99,8 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function MakeStr(Lng:SizeInt; constref LS:string):string;  //DONE -oRFla.Lib -cRev.2026.06.00: Func MakeStr
-var cp : TSystemCodePage = CP_ACP;
+function MakeStrPtr(Lng:SizeInt; constref LS:string):PByte;
+var cp : TSystemCodePage = CP_ACP;                        //DONE -oRFla.Lib -cRev.2026.06.00: Func MakeStrPtr
     p : PByte;
 begin
   p:=PByte(LS);
@@ -112,7 +112,7 @@ begin
     Ref:=1;
     Len:=Lng;
   end;
-  PByte(Result):=p+SAnsiRec;
+  Result:=p+SAnsiRec;
 end;
 
 function Str2Str(constref S:string):string;               //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str

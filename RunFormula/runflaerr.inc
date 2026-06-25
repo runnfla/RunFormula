@@ -66,7 +66,8 @@ type
     UnknownUnit,
     UnDecodeDim,
     RangeType,
-    CommaDigit
+    CommaDigit,
+    InvalidType
   );
 
   TRunFlaError = packed record
