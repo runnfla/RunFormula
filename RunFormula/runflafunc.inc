@@ -283,7 +283,7 @@ begin
   pv:=Param(-1, Context);
   with Result^ do begin
     VType:=VFloat;
-    Flo:=AsRGap(pv)/2-AsLGap(pv)/2;
+    Flo:=AsRGap(pv)*0.5-AsLGap(pv)*0.5;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
@@ -434,7 +434,7 @@ begin
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
                md:=FlaRound(FlHypot(Flo, Img), 0);
-               ar:=FlaRound(FlArcTan(Img, Flo)*Grad, 0)/Grad;
+               ar:=FlaRound(FlArcTan(Img, Flo)*Grad, 0)*(1/Grad);
                Flo:=md*cos(ar);
                Img:=md*sin(ar);
              end;
