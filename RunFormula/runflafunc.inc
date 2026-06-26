@@ -95,7 +95,7 @@ end;
 
 // ----- helper functions -----
 
-function FlHypot(const X,Y:TRFloat):TRFloat;               //DONE -oRFla.Func -cRev.2026.06.20: Func FlHypot
+function FlHypot(const X, Y:TRFloat):TRFloat;              //DONE -oRFla.Func -cRev.2026.06.20: Func FlHypot
 var ax : TRFloat;
 begin
   ax:=abs(X);
@@ -106,7 +106,7 @@ begin
     else Result:=ax*sqrt(sqr(Result/ax)+1);
 end;
 
-function FlArcTan(const Y,X:TRFloat):TRFloat;              //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
+function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
 begin
   if X=0 then begin
     if Y>0 then Exit(Cpi/2);
@@ -539,39 +539,33 @@ begin
   end;
 end;
 
-function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.00: Func Fla_SUBSTR
+function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.26: Func Fla_SUBSTR
 var s : string;
     pv : PValRec;
     p : PByte;
     L, R, lng : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  Result:=NewLV(Context);
-  Result^.VType:=VNone;
-
-  s:=AsStr(Param(-2, Context));
-  PostParam(Context);
-  p:=PByte(s);
-  if p=nil then exit;
-  lng:=PSizeInt(p)[-1]-1;
-  if lng=-1 then exit;
-
-
   pv:=Param(-1, Context);
   with pv^ do begin
     if not (VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
     if VPhy<>0 then RaiseError(IllegalDim);
   end;
   L:=AsIGapL(pv);
-  R:=AsIGapR(pv);
+  R:=AsIGapR(pv)+1;
   PostParam(Context);
-
-  if (L>lng) or (R<0) then exit;
+  s:=AsStr(Param(-2, Context));
+  PostParam(Context);
+  p:=PByte(s);
+  Result:=NewLV(Context);
+  Result^.VType:=VNone;
+  if p=nil then exit;
+  lng:=PSizeInt(p)[-1];
   if L<0 then L:=0;
+  if (R<=0) or (L>=lng) then exit;
   if R>lng then R:=lng;
-  lng:=R-L+1;
-
-  with Result^ do if L<>R then begin
+  lng:=R-L;
+  with Result^ do if lng>1 then begin
     VType:=VStr;
     Str:=MakeStrPtr(lng, s);
     DataCopy(p+L, Str, lng);

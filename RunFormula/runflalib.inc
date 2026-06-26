@@ -37,7 +37,7 @@ begin
   end;
 end;
 
-function BufZ(Lng:SizeInt):PByte; inline;                 //DONE -oRFla.Lib -cRev.2026.06.00: Inline BufZ
+function BufZ(Lng:SizeInt):PByte; inline;                 //DONE -oRFla.Lib -cRev.2026.06.25: Inline BufZ
 begin
   Result:=GetMem(Lng+1);
   Result[Lng]:=0;
@@ -99,11 +99,11 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function MakeStrPtr(Lng:SizeInt; constref LS:string):PByte;
-var cp : TSystemCodePage = CP_ACP;                        //DONE -oRFla.Lib -cRev.2026.06.00: Func MakeStrPtr
+function MakeStrPtr(Lng:SizeInt; constref TS:string):PByte;
+var cp : TSystemCodePage = CP_ACP;                        //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
     p : PByte;
 begin
-  p:=PByte(LS);
+  p:=PByte(TS);
   if p<>nil then cp:=PAnsiRec(p-SAnsiRec)^.CodePage;
   p:=BufZ(Lng+SAnsiRec);
   with PAnsiRec(p)^ do begin
