@@ -379,10 +379,12 @@ begin
       '*' : OpToken(TagMult);
       '+' : OpToken(TagPlus);
       ',',';' : begin
-                  if (P+1)^ in ['0'..'9'] then RaiseError(CommaDigit);
+                  inc(P);
+                  if P^ in ['0'..'9'] then raise EError.Create(CommaDigit, P);
                   CloseToken(TagExpr);
                   PreTag:=TagNone;
                   ExprToken(TagExpr, TagExpr);
+                  continue;
                 end;
       '-' : if PreTag>=TagOp then OpToken(TagNegative, true) else OpToken(TagMinus);
       '/' : OpToken(TagSlash);
