@@ -21,7 +21,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
         <EditorIndex Value="15"/>
-        <TopLine Value="112"/>
+        <TopLine Value="111"/>
         <CursorPos X="45" Y="171"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -109,7 +109,7 @@
         <EditorIndex Value="9"/>
         <TopLine Value="90"/>
         <CursorPos X="3" Y="103"/>
-        <UsageCount Value="61"/>
+        <UsageCount Value="62"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -294,7 +294,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="103"/>
         <CursorPos X="14" Y="116"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="35"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -501,8 +501,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runflamsg.inc"/>
         <EditorIndex Value="13"/>
-        <TopLine Value="50"/>
-        <CursorPos X="28" Y="72"/>
+        <TopLine Value="17"/>
+        <CursorPos X="30" Y="60"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -524,8 +524,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="97"/>
-        <CursorPos X="91" Y="106"/>
+        <TopLine Value="484"/>
+        <CursorPos X="10" Y="473"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -549,16 +549,16 @@
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="420"/>
-        <CursorPos X="61" Y="438"/>
+        <TopLine Value="542"/>
+        <CursorPos X="51" Y="576"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\Help\Rus\runflahelp.txt"/>
         <EditorIndex Value="16"/>
-        <TopLine Value="688"/>
-        <CursorPos X="54" Y="704"/>
+        <TopLine Value="689"/>
+        <CursorPos X="56" Y="695"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
@@ -661,7 +661,7 @@
         <EditorIndex Value="17"/>
         <TopLine Value="12"/>
         <CursorPos X="69" Y="19"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="79"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
@@ -670,7 +670,7 @@
         <EditorIndex Value="11"/>
         <TopLine Value="19"/>
         <CursorPos X="35" Y="109"/>
-        <UsageCount Value="45"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -707,11 +707,7 @@
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="171" Column="3" TopLine="150"/>
-      </Position>
+    <JumpHistory HistoryIndex="28">
       <Position>
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <Caret Line="173" Column="76" TopLine="152"/>

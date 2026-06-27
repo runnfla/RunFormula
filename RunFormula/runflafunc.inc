@@ -525,17 +525,17 @@ begin
     Int:=-1;
   end;
   ParamCount:=-ParamCount;
-  sb:=AsStr(Param(ParamCount+1, Context));
-  PostParam(Context);
-  psub:=PByte(sb);
-  if psub=nil then exit;
   s:=AsStr(Param(ParamCount, Context));
   PostParam(Context);
   ps:=PByte(s);
   if ps=nil then exit;
+  sb:=AsStr(Param(ParamCount+1, Context));
+  PostParam(Context);
+  psub:=PByte(sb);
+  if psub=nil then exit;
   with Result^ do begin
     Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub);
-    if (ofs<>0) and (Int<>-1) then inc(Int, ofs);
+    if (ofs>0) and (Int<>-1) then inc(Int, ofs);
   end;
 end;
 
@@ -575,32 +575,6 @@ begin
   end;
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_VALUE
 var s : string;
     p : PByte;
@@ -610,12 +584,25 @@ begin
   s:=AsStr(Param(-1, Context));
   PostParam(Context);
   p:=PByte(s);
-  try                               // include memory exception
+  try
+    if p=nil then RaiseError(InvalidValue);       // any error
     ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
   except
     Result^.VType:=VNone;
   end;
 end;
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_EXP
 var pv : PValRec;
