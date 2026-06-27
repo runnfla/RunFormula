@@ -225,11 +225,18 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CONJ(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_CONJ
+function Fla_CONJ(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_CONJ
+var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with ValCopy(Param(-1, Context), Result)^ do Img:=-Img;
+  pv:=Param(-1, Context);
+  with Result^ do begin
+    VType:=VCplex;
+    Flo:=AsRe(pv);
+    Img:=-AsIm(pv);
+    VPhy:=pv^.VPhy;
+  end;
   PostParam(Context);
 end;
 
@@ -575,15 +582,15 @@ begin
   end;
 end;
 
-function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_VALUE
+function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_VALUE
 var s : string;
     p : PByte;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  Result:=NewLV(Context);
   s:=AsStr(Param(-1, Context));
   PostParam(Context);
   p:=PByte(s);
+  Result:=NewLV(Context);
   try
     if p=nil then RaiseError(InvalidValue);       // any error
     ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
@@ -591,6 +598,9 @@ begin
     Result^.VType:=VNone;
   end;
 end;
+
+
+
 
 
 
