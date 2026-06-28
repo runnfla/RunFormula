@@ -95,15 +95,15 @@ end;
 
 // ----- helper functions -----
 
-function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Func -cRev.2026.06.20: Func Hypot2
+function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Func -cRev.2026.06.28: Func Hypot2
 var ax : TRFloat;
 begin
-  ax:=abs(X);
+  ax:=abs(X)*0.5;
   if Y=0 then Exit(ax);
-  Result:=abs(Y);
+  Result:=abs(Y)*0.5;
   if X=0 then exit;                      // Smith's algorithm
-  if ax<Result then Result:=(Result*0.5)*sqrt(sqr(ax/Result)+1)
-    else Result:=(ax*0.5)*sqrt(sqr(Result/ax)+1);
+  if ax<Result then Result:=Result*sqrt(sqr(ax/Result)+1)
+    else Result:=ax*sqrt(sqr(Result/ax)+1);
 end;
 
 function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
@@ -751,74 +751,61 @@ begin
   PostParam(Context);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_SQRT
 var pv : PValRec;
-    f, t : TRFloat;
+    f, m : TRFloat;
     phy : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
   phy:=pv^.VPhy;
-  if (phy and $0101010101010101)>0 then raise EError.Create(IllegalDim);
+  if (phy and $0101010101010101)>0 then RaiseError(IllegalDim);
   with Result^ do begin
-    VPhy:=(phy shr 1) or (phy and $8080808080808080);
     case pv^.VType of
       VCplex : begin
                  VType:=VCplex;
-                 f:=abs(pv^.Flo);
-                 t:=abs(pv^.Img);
-                 if (f<>0) or (t<>0) then begin
-                   if f>t then f:=f*sqrt(sqr(t/f)+1)*0.5 else f:=t*sqrt(sqr(f/t)+1)*0.5;
-                 end;
-                 t:=f+pv^.Flo*0.5;
-                 if t<0 then t:=0;
-                 Flo:=sqrt(t);
-                 t:=f-pv^.Flo*0.5;
-                 if t<0 then t:=0;
-                 Img:=sqrt(t);
+                 m:=abs(Hypot2(pv^.Flo, pv^.Img));
+                 f:=m+pv^.Flo*0.5;
+                 if f<0 then f:=0;
+                 Flo:=sqrt(f);
+                 f:=m-pv^.Flo*0.5;
+                 if f<0 then f:=0;
+                 Img:=sqrt(f);
                  if pv^.Img<0 then Img:=-Img;
                end;
       VGap, VIGap : begin
-                      VType:=VGap;
                       f:=AsRGap(pv);
-                      if f>=0 then Img:=sqrt(f) else raise EError.Create(InvalidValue);
+                      if f>=0 then Img:=sqrt(f) else RaiseError(InvalidValue);
                       f:=AsLGap(pv);
                       if f>=0 then Flo:=sqrt(f) else Flo:=0;
+                      VType:=VGap;
                     end;
       else
-        VType:=VFloat;
         f:=AsFloat(pv);
-        if f<0 then raise EError.Create(InvalidValue);
+        if f<0 then RaiseError(InvalidValue);
         Flo:=sqrt(f);
+        VType:=VFloat;
     end;
+    VPhy:=(phy shr 1) or (phy and $8080808080808080);
   end;
   PostParam(Context);
 end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ARCTAN
 var pv : PValRec;
