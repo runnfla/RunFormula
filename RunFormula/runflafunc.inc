@@ -95,15 +95,15 @@ end;
 
 // ----- helper functions -----
 
-function FlHypot(const X, Y:TRFloat):TRFloat;              //DONE -oRFla.Func -cRev.2026.06.20: Func FlHypot
+function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Func -cRev.2026.06.20: Func Hypot2
 var ax : TRFloat;
 begin
   ax:=abs(X);
   if Y=0 then Exit(ax);
   Result:=abs(Y);
   if X=0 then exit;                      // Smith's algorithm
-  if ax<Result then Result:=Result*sqrt(sqr(ax/Result)+1)
-    else Result:=ax*sqrt(sqr(Result/ax)+1);
+  if ax<Result then Result:=(Result*0.5)*sqrt(sqr(ax/Result)+1)
+    else Result:=(ax*0.5)*sqrt(sqr(Result/ax)+1);
 end;
 
 function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
@@ -166,6 +166,14 @@ begin
     end;
     inc(plook);
   end;
+end;
+
+function Dsincos(const F, CS:TRFloat):integer;                           //DONE -oRFla.Func -cRev.2026.06.28: Func Dsincos
+var w : TRFloat;
+begin
+  Result:=0;
+  w:=frac(F*(0.5/Cpi)-CS);
+  if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
 end;
 
 // -----
@@ -378,8 +386,8 @@ begin
     VFloat : begin
                Flo:=System.int(Flo);
                if (Flo>=LI) and (Flo<=HI) then begin
-                 Int:=trunc(Flo);
                  VType:=VInt;
+                 Int:=trunc(Flo);
                end;
              end;
     VCplex : begin
@@ -390,10 +398,10 @@ begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
                if (Flo>=LI) and (Flo<=HI) and (Img>=LI) and (Img<=HI) then begin
+                 VType:=VIGap;
                  I:=trunc(Img);
                  Int:=trunc(Flo);
                  IGap:=I;
-                 VType:=VIGap;
                end;
              end;
   end;
@@ -440,7 +448,7 @@ begin
     VNone, VStr, VArr : RaiseError(InvalidType);
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
-               md:=FlaRound(FlHypot(Flo, Img), 0);
+               md:=FlaRound(Hypot2(Flo, Img)*2, 0);
                ar:=FlaRound(FlArcTan(Img, Flo)*Grad, 0)*(1/Grad);
                Flo:=md*cos(ar);
                Img:=md*sin(ar);
@@ -599,29 +607,14 @@ begin
   end;
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_EXP
+function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_EXP
 var pv : PValRec;
     f : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
@@ -641,46 +634,38 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_LN
+function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_LN
 var pv : PValRec;
     f : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               if (pv^.Flo=0) and (pv^.Img=0) then raise EError.Create(InvalidValue);
+               if (pv^.Flo=0) and (pv^.Img=0) then RaiseError(InvalidValue);
                VType:=VCplex;
-               Flo:=ln(sqr(pv^.Flo)+sqr(pv^.Img))*0.5;
+               Flo:=ln(Hypot2(pv^.Flo, pv^.Img))+ln(2);
                Img:=FlArcTan(pv^.Img, pv^.Flo);
              end;
     VGap, VIGap : begin
                     f:=AsLGap(pv);
-                    if f<=0 then raise EError.Create(InvalidValue);
+                    if f<=0 then RaiseError(InvalidValue);
                     Flo:=ln(f);
                     Img:=ln(AsRGap(pv));
                     VType:=VGap;
                   end;
     else
       f:=AsFloat(pv);
-      if f<=0 then raise EError.Create(InvalidValue);
+      if f<=0 then RaiseError(InvalidValue);
       Flo:=ln(f);
       VType:=VFloat;
   end;
   PostParam(Context);
 end;
 
-function Dsincos(const F, cs:TRFloat):integer;                           //DONE -oRFla.Func -cRev.2026.05.05: Func Dsincos
-var w : TRFloat;
-begin
-  Result:=0;
-  w:=frac(F/(Cpi*2)-cs);
-  if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
-end;
-
-function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_SIN
+function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_SIN
 var pv : PValRec;
     fa, fb, d : TRFloat;
     k : integer;
@@ -688,23 +673,26 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
-               fa:=exp(pv^.Img);
-               fb:=1/fa;
-               Flo:=sin(pv^.Flo)*(fa+fb)*0.5;
-               Img:=cos(pv^.Flo)*(fa-fb)*0.5;
+               fa:=exp(pv^.Img)*0.5;
+               fb:=0.25/fa;
+               Flo:=sin(pv^.Flo)*(fa+fb);
+               Img:=cos(pv^.Flo)*(fa-fb);
              end;
     VGap, VIGap : begin
                     VType:=VGap;
-                    Flo:=-1; Img:=1;
-                    fa:=AsLGap(pv); fb:=AsRGap(pv);
+                    Flo:=-1;
+                    Img:=1;
+                    fa:=AsLGap(pv);
+                    fb:=AsRGap(pv);
                     d:=fb-fa;
                     if d<(Cpi*2) then begin
                       k:=(Dsincos(fa, -0.25) shl 1) or Dsincos(fb, -0.25);
-                      fa:=sin(fa); fb:=sin(fb);
+                      fa:=sin(fa);
+                      fb:=sin(fb);
                       case k of
                         0 : if d<Cpi then begin Flo:=fa; Img:=fb; end;
                         1 : if fa<fb then Flo:=fa else Flo:=fb;
@@ -720,7 +708,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_COS
+function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_COS
 var pv : PValRec;
     fa, fb, d : TRFloat;
     k : integer;
@@ -728,23 +716,26 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                VType:=VCplex;
-               fa:=exp(pv^.Img);
-               fb:=1/fa;
-               Flo:=cos(pv^.Flo)*(fa+fb)*0.5;
-               Img:=-sin(pv^.Flo)*(fa-fb)*0.5;
+               fa:=exp(pv^.Img)*0.5;
+               fb:=0.25/fa;
+               Flo:=cos(pv^.Flo)*(fa+fb);
+               Img:=-sin(pv^.Flo)*(fa-fb);
              end;
     VGap, VIGap : begin
                     VType:=VGap;
-                    Flo:=-1; Img:=1;
-                    fa:=AsLGap(pv); fb:=AsRGap(pv);
+                    Flo:=-1;
+                    Img:=1;
+                    fa:=AsLGap(pv);
+                    fb:=AsRGap(pv);
                     d:=fb-fa;
                     if d<(Cpi*2) then begin
                       k:=(Dsincos(fa, 0.5) shl 1) or Dsincos(fb, 0.5);
-                      fa:=cos(fa); fb:=cos(fb);
+                      fa:=cos(fa);
+                      fb:=cos(fb);
                       case k of
                         0 : if d<Cpi then begin Flo:=fa; Img:=fb; end;
                         1 : if fa<fb then Flo:=fa else Flo:=fb;
@@ -759,6 +750,30 @@ begin
   end;
   PostParam(Context);
 end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_SQRT
 var pv : PValRec;
@@ -848,7 +863,7 @@ begin
       VFloat : Flo:=abs(pv^.Flo);
       VCplex : begin
                  VType:=VFloat;
-                 Flo:=FlHypot(pv^.Flo, pv^.Img);
+                 Flo:=Hypot2(pv^.Flo, pv^.Img)*2;
                end;
       VChar  : Chr:=pv^.Chr;
       VGap   : begin
