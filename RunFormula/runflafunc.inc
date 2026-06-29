@@ -795,15 +795,15 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
                f:=abs(pv^.Flo);
                m:=abs(pv^.Img);
-               if (m=1) and (f=0) then raise EError.Create(InvalidValue);
+               if (m=1) and (f=0) then RaiseError(InvalidValue);
                if m>f then f:=m;
                if f>0 then begin
-                 Flo:=FlArcTan(pv^.Flo/f*2, 1/f-(pv^.Flo/f)*pv^.Flo-(pv^.Img/f)*pv^.Img);
+                 Flo:=FlArcTan(pv^.Flo/f*2, 1/f-(pv^.Flo/f)*pv^.Flo-(pv^.Img/f)*pv^.Img)*0.5;
                  Img:=ln(Hypot2(pv^.Flo, pv^.Img+1)/Hypot2(pv^.Flo, pv^.Img-1))*0.5;
                end else begin
                  Flo:=0;
