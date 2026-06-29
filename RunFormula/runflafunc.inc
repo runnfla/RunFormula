@@ -87,8 +87,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VInt;
     Int:=SizeInt(Param(-1, Context)^.VType);
+    VType:=VInt;
   end;
   PostParam(Context);
 end;
@@ -183,8 +183,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VFloat;
     Flo:=AsRe(Param(-1, Context));
+    VType:=VFloat;
     VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
@@ -195,8 +195,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VFloat;
     Flo:=AsIm(Param(-1, Context));
+    VType:=VFloat;
     VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
@@ -210,9 +210,9 @@ begin
   L:=Param(-2, Context);
   R:=Param(-1, Context);
   with Result^ do begin
-    VType:=VCplex;
     Flo:=AsFloat(L);
     Img:=AsFloat(R);
+    VType:=VCplex;
     VPhy:=L^.VPhy;
     if VPhy<>R^.VPhy then RaiseError(DimMismatch);
   end;
@@ -227,8 +227,8 @@ begin
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
   with Result^ do begin
-    VType:=VFloat;
     Flo:=FlArcTan(AsIm(pv), AsRe(pv));
+    VType:=VFloat;
   end;
   PostParam(Context);
 end;
@@ -240,9 +240,9 @@ begin
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
   with Result^ do begin
-    VType:=VCplex;
     Flo:=AsRe(pv);
     Img:=-AsIm(pv);
+    VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
@@ -258,9 +258,9 @@ begin
   Result:=NewLV(Context);
   md:=AsFloat(Param(-2, Context));
   with Result^ do begin
-    VType:=VCplex;
     Flo:=md*cos(ar);
     Img:=md*sin(ar);
+    VType:=VCplex;
     VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
@@ -271,8 +271,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VFloat;
     Flo:=AsLGap(Param(-1, Context));
+    VType:=VFloat;
     VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
@@ -283,8 +283,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VFloat;
     Flo:=AsRGap(Param(-1, Context));
+    VType:=VFloat;
     VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
@@ -297,8 +297,8 @@ begin
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
   with Result^ do begin
-    VType:=VFloat;
     Flo:=AsRGap(pv)*0.5-AsLGap(pv)*0.5;
+    VType:=VFloat;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
@@ -313,13 +313,13 @@ begin
   R:=Param(-1, Context);
   with Result^ do begin
     if (L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]) then begin
-      VType:=VIGap;
       Int:=AsInt(L);
+      VType:=VIGap;
       IGap:=AsInt(R);
       if IGap<Int then RaiseError(InvalidRange);
     end else begin
-      VType:=VGap;
       Flo:=AsFloat(L);
+      VType:=VGap;
       Img:=AsFloat(R);
       if Img<Flo then RaiseError(InvalidRange);
     end;
@@ -344,9 +344,9 @@ begin
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VGap;
     Flo:=c-m;
     Img:=c+m;
+    VType:=VGap;
     VPhy:=phy;
   end;
 end;
@@ -386,8 +386,8 @@ begin
     VFloat : begin
                Flo:=System.int(Flo);
                if (Flo>=LI) and (Flo<=HI) then begin
-                 VType:=VInt;
                  Int:=trunc(Flo);
+                 VType:=VInt;
                end;
              end;
     VCplex : begin
@@ -398,10 +398,10 @@ begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
                if (Flo>=LI) and (Flo<=HI) and (Img>=LI) and (Img<=HI) then begin
-                 VType:=VIGap;
                  I:=trunc(Img);
                  Int:=trunc(Flo);
                  IGap:=I;
+                 VType:=VIGap;
                end;
              end;
   end;
@@ -486,8 +486,8 @@ begin
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VInt;
     Int:=I;
+    VType:=VInt;
   end;
 end;
 
@@ -580,12 +580,12 @@ begin
   if R>lng then R:=lng;
   lng:=R-L;
   with Result^ do if lng>1 then begin
-    VType:=VStr;
     Str:=MakeStrPtr(lng, s);
+    VType:=VStr;
     DataCopy(p+L, Str, lng);
   end else begin
-    VType:=VChar;
     Chr:=p[L];
+    VType:=VChar;
   end;
 end;
 
@@ -616,19 +616,19 @@ begin
   if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               VType:=VCplex;
                f:=exp(pv^.Flo);
                Flo:=f*cos(pv^.Img);
                Img:=f*sin(pv^.Img);
+               VType:=VCplex;
              end;
     VGap, VIGap : begin
-                    VType:=VGap;
                     Flo:=exp(AsLGap(pv));
                     Img:=exp(AsRGap(pv));
+                    VType:=VGap;
                   end;
     else
-      VType:=VFloat;
       Flo:=exp(AsFloat(pv));
+      VType:=VFloat;
   end;
   PostParam(Context);
 end;
@@ -644,9 +644,9 @@ begin
   with Result^ do case pv^.VType of
     VCplex : begin
                if (pv^.Flo=0) and (pv^.Img=0) then RaiseError(InvalidValue);
-               VType:=VCplex;
                Flo:=ln(Hypot2(pv^.Flo, pv^.Img))+ln(2);
                Img:=FlArcTan(pv^.Img, pv^.Flo);
+               VType:=VCplex;
              end;
     VGap, VIGap : begin
                     f:=AsLGap(pv);
@@ -675,11 +675,11 @@ begin
   if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               VType:=VCplex;
                fa:=exp(pv^.Img)*0.5;
                fb:=0.25/fa;
                Flo:=sin(pv^.Flo)*(fa+fb);
                Img:=cos(pv^.Flo)*(fa-fb);
+               VType:=VCplex;
              end;
     VGap, VIGap : begin
                     VType:=VGap;
@@ -701,8 +701,8 @@ begin
                     end;
                   end;
     else
-      VType:=VFloat;
       Flo:=sin(AsFloat(pv));
+      VType:=VFloat;
   end;
   PostParam(Context);
 end;
@@ -718,11 +718,11 @@ begin
   if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               VType:=VCplex;
                fa:=exp(pv^.Img)*0.5;
                fb:=0.25/fa;
                Flo:=cos(pv^.Flo)*(fa+fb);
                Img:=-sin(pv^.Flo)*(fa-fb);
+               VType:=VCplex;
              end;
     VGap, VIGap : begin
                     VType:=VGap;
@@ -744,8 +744,8 @@ begin
                     end;
                   end;
     else
-      VType:=VFloat;
       Flo:=cos(AsFloat(pv));
+      VType:=VFloat;
   end;
   PostParam(Context);
 end;
@@ -788,24 +788,9 @@ begin
   PostParam(Context);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ARCTAN
+function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_ARCTAN
 var pv : PValRec;
-    f : TRFloat;
+    f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -813,32 +798,58 @@ begin
   if pv^.VPhy<>0 then raise EError.Create(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               if (pv^.Flo=0) and ((pv^.Img=1) or (pv^.Img=-1)) then raise EError.Create(InvalidValue);
+               f:=abs(pv^.Flo);
+               m:=abs(pv^.Img);
+               if (m=1) and (f=0) then raise EError.Create(InvalidValue);
+               if m>f then f:=m;
+               if f>0 then begin
+                 Flo:=FlArcTan(pv^.Flo/f*2, 1/f-(pv^.Flo/f)*pv^.Flo-(pv^.Img/f)*pv^.Img);
+                 Img:=ln(Hypot2(pv^.Flo, pv^.Img+1)/Hypot2(pv^.Flo, pv^.Img-1))*0.5;
+               end else begin
+                 Flo:=0;
+                 Img:=0;
+               end;
                VType:=VCplex;
-
-      {         m1:=abs(pv^.Flo);
-               m2:=abs(pv^.Img);
-               if m1<m2 then m1:=m2;
-               f:=FlArcTan(pv^.Flo/m1*2, 1/m1- (pv^.Flo/m1)*pv^.Flo - (pv^.Img/m1)*pv^.Img);
-               i:=ln(hypot2(pv^.Flo, 1+pv^.Img)/ hypot2(pv^.Flo, 1-pv^.Img))*0.5;
-       }
-
-
-               f:=sqr(pv^.Flo)+sqr(pv^.Img)+1;
-               Flo:=FlArcTan(pv^.Flo*2, 2-f)/2;
-               Img:=ln((f+pv^.Img*2)/(f-pv^.Img*2))/4;
              end;
     VGap, VIGap : begin
-                    VType:=VGap;
                     Flo:=arctan(AsLGap(pv));
                     Img:=arctan(AsRGap(pv));
+                    VType:=VGap;
                   end;
     else
-      VType:=VFloat;
       Flo:=arctan(AsFloat(pv));
+      VType:=VFloat;
   end;
   PostParam(Context);
 end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ABS
 var pv : PValRec;
