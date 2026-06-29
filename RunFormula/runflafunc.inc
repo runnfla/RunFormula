@@ -823,35 +823,7 @@ begin
   PostParam(Context);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_ABS
+function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_ABS
 var pv : PValRec;
     fl, fr : TRFloat;
     al, ar : SizeInt;
@@ -865,8 +837,8 @@ begin
       VInt   : Int:=abs(pv^.Int);
       VFloat : Flo:=abs(pv^.Flo);
       VCplex : begin
-                 VType:=VFloat;
                  Flo:=Hypot2(pv^.Flo, pv^.Img)*2;
+                 VType:=VFloat;
                end;
       VChar  : Chr:=pv^.Chr;
       VGap   : begin
@@ -885,12 +857,37 @@ begin
                  end else Int:=0;
                  if al<ar then IGap:=ar else IGap:=al;
                end;
-      else raise EError.Create(InvalidValue);
+      else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_CHAR
 var I : SizeUInt;
