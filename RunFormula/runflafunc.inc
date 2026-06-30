@@ -876,7 +876,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_COMPARE
+function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.06.30: Func Fla_COMPARE
 var pv : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -890,39 +890,7 @@ begin
   PostParam(pv, Context);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_MATCH
+function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.30: Func Fla_MATCH
 var phy : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -932,10 +900,21 @@ begin
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VInt;
     if phy=0 then Int:=-1 else Int:=0;
+    VType:=VInt;
   end;
 end;
+
+
+
+
+
+
+
+
+
+
+
 
 function SubQty(var Context:TContext; out Phy:SizeInt; out Scl, Offs:TRFloat):PValRec;
 var p, fin : PByte;                                                      //DONE -oRFla.Func -cRev.2026.05.30: Func SubQty
