@@ -864,41 +864,13 @@ begin
   PostParam(Context);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.05.05: Func Fla_CHAR
-var I : SizeUInt;
+function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_CHAR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  I:=AsInt(Param(-1, Context));
-  if I>$FF then raise EError.Create(InvalidValue);
   with Result^ do begin
+    Chr:=AsInt(Param(-1, Context)) and $FF;
     VType:=VChar;
-    Chr:=byte(I);
     VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
@@ -911,13 +883,44 @@ begin
   Result:=NewLV(Context);
   pv:=Param(-2, Context);
   with Result^ do begin
-    VType:=VInt;
     Int:=Compare(pv, Param(-1, Context));
+    VType:=VInt;
   end;
   PostParam(Context);
-  Context.TermResult:=pv;
-  PostParam(Context);
+  PostParam(pv, Context);
 end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.05.19: Func Fla_MATCH
 var phy : SizeInt;
