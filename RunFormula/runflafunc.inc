@@ -18,7 +18,7 @@
 // TODO -oRFla.Func -cRev.2026.00.00:
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
-begin                               //DONE -oRFla.Func -cRev.2026.04.18: Inline BreakParam
+begin                               //DONE -oRFla.Func -cRev.2026.07.01: Inline BreakParam
   case ParamCount of
     0 : Result:=@CVNone;
     1 : Result:=Param(-1, Context);
@@ -27,36 +27,37 @@ begin                               //DONE -oRFla.Func -cRev.2026.04.18: Inline 
   Context.Flow:=F;
 end;
 
-function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_RESULT
+function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.01: Func Fla_RESULT
 begin
   Context.TermResult:=BreakParam(ParamCount, Context, RSL);
   raise EResult.Create('');
 end;
 
-function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_EXIT
+function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.07.01: Func Fla_EXIT
 begin
   Result:=BreakParam(ParamCount, Context, EXT);
 end;
 
-function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_BREAK
+function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.07.01: Func Fla_BREAK
 begin
   Result:=BreakParam(ParamCount, Context, BRK);
 end;
 
-function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_CONTINUE
+function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.07.01: Func Fla_CONTINUE
 begin
   Result:=BreakParam(ParamCount, Context, CON);
 end;
 
-function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_IF
+function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.07.01: Func Fla_IF
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  b:=AsBool(Param(0-ParamCount, Context));
+  ParamCount:=-ParamCount;
+  b:=AsBool(Param(ParamCount, Context));
   PostParam(Context);
   Result:=@CVNone;
-  if b then Result:=Param(1-ParamCount, Context)
-    else if ParamCount=3 then Result:=Param(-1, Context);
+  if b then Result:=Param(ParamCount+1, Context)
+    else if ParamCount=-3 then Result:=Param(-1, Context);
 end;
 
 function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_REPEAT
