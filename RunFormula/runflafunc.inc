@@ -1,7 +1,7 @@
-//*****************************************************
+//******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Embedded functions include file
-//  Rev. 3.06.2026
+//  Rev. 2.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -13,7 +13,7 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
 // TODO -oRFla.Func -cRev.2026.00.00:
 
@@ -330,7 +330,7 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.23: Func Fla_BALL
+function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.23: Func Fla_BALL
 var c, m : TRFloat;
     phy : SizeInt;
 begin
@@ -519,7 +519,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.22: Func Fla_FIND
+function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.22: Func Fla_FIND
 var ofs : SizeInt = 0;
     s, sb : string;
     ps, psub : PByte;
