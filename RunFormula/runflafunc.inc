@@ -60,17 +60,16 @@ begin
     else if ParamCount=-3 then Result:=Param(-1, Context);
 end;
 
-function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.04.18: Func Fla_REPEAT
-var flg : boolean;
+function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_REPEAT
+var b : boolean;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=@CVNone;
   repeat
-    flg:=AsBool(Param(-2, Context));
+    b:=AsBool(Param(-2, Context));
     PostParam(Context);
-    if not flg then exit;
-    Context.TermResult:=Result;
-    PostParam(Context);
+    if not b then exit;
+    PostParam(Result, Context);
     Result:=Param(-1, Context);
     with Context do case Flow of
       EXT : exit;
