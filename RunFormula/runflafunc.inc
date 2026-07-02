@@ -905,19 +905,8 @@ begin
   end;
 end;
 
-
-
-
-
-
-
-
-
-
-
-
 function SubQty(var Context:TContext; out Phy:SizeInt; out Scl, Offs:TRFloat):PValRec;
-var p, fin : PByte;                                                      //DONE -oRFla.Func -cRev.2026.05.30: Func SubQty
+var p, fin : PByte;                                                      //DONE -oRFla.Func -cRev.2026.07.02: Func SubQty
 begin
   with Param(-1, Context)^ do case VType of
     VChar : begin
@@ -928,15 +917,16 @@ begin
               p:=Str;
               fin:=p+Ansi[-1];
             end;
-    else raise EError.Create(InvalidValue);
+    else RaiseError(InvalidType);
   end;
   Phy:=PhyCapture(PChar(p), PChar(fin), Scl, Offs);
   PostParam(Context);
-  Result:=ValCopy(Param(-2, Context), NewLV(Context));
+  Result:=NewLV(Context);
+  ValCopy(Param(-2, Context), Result);
   PostParam(Context);
 end;
 
-function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.05.30: Func Fla_QTY
+function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_QTY
 var phy : SizeInt;
     scl, ofs : TRFloat;
 begin
@@ -944,6 +934,28 @@ begin
   Result:=SubQty(Context, phy, scl, ofs);
   ApplyPhyToPV(Result, phy, scl, ofs);
 end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.05.30: Func Fla_CONVERT
 var phy : SizeInt;
