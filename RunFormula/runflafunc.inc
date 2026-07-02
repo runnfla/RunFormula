@@ -935,37 +935,14 @@ begin
   ApplyPhyToPV(Result, phy, scl, ofs);
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.05.30: Func Fla_CONVERT
+function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_CONVERT
 var phy : SizeInt;
     scl, ofs : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=SubQty(Context, phy, scl, ofs);
   with Result^ do begin
-    if VPhy<>phy then raise EError.Create(DimMismatch);
-    VPhy:=0;
+    if VPhy<>phy then RaiseError(DimMismatch);
     if (scl<>1) or (ofs<>0) then case VType of
       VCplex : begin
                  Flo:=(Flo-ofs)/scl;
@@ -976,14 +953,15 @@ begin
                  Img:=(Img-ofs)/scl;
                end;
       VIGap  : begin
-                 VType:=VGap;
                  Flo:=(Int-ofs)/scl;
                  Img:=(IGap-ofs)/scl;
+                 VType:=VGap;
                end;
       else
         Flo:=(AsFloat(Result)-ofs)/scl;
-        VType:=VFloat;                       // after AsFloat
+        VType:=VFloat;
     end;
+    VPhy:=0;
   end;
 end;
 
