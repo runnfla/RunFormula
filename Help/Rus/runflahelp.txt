@@ -825,6 +825,11 @@ None, если ни одного запроса не было.
   'mo'        // Month
   'yr'        // Year
 
+// Astronomical
+  'au'        // Astronomical Unit
+  'ly'        // Light Year
+  'pc'        // Parsec
+
 // US units
   'in'        // Inch
   'ft'        // Foot
@@ -839,7 +844,24 @@ None, если ни одного запроса не было.
   'gal'       // Gallon
   'qt'        // Quart
   'pt'        // Pint
-  'fl oz'     // Fluid Ounce
+  'floz'      // Fluid Ounce
+
+// CGS units
+  'Fr'        // Franklin
+  'Bi'        // Biot
+  'Mx'        // Maxwell
+  'Gs'        // Gauss
+  'Oe'        // Oersted
+  'Gb'        // Gilbert
+  'dyn'       // Dyne
+  'erg'       // Erg
+  'ba'        // Barye
+  'P'         // Poise
+  'St'        // Stokes
+  'Kz'        // Kayser
+  'ph'        // Phot
+  'sb'        // Stilb
+  'Lb'        // Lambert
 
 // SI units
   'A'         // Current (Ampere)
