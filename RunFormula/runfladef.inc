@@ -84,6 +84,11 @@ type
 
   PMemList = ^TMemList;
 
+  TRegFPU = record
+    MXCSR  : LongWord;
+    CW8087 : word;
+  end;
+
 const
   SI = SizeOf(SizeInt);
   HI = high(SizeInt);

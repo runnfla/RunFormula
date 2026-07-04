@@ -211,9 +211,28 @@ begin
   PostParam(PContext(Context)^);
 end;
 
+procedure SetRegFPU(var Reg:TRegFPU); inline;              //DONE -oRFla.Main -cRev.2026.07.04: Inline SetRegFPU
+begin
+  with Reg do begin
+    MXCSR:=GetMXCSR;
+    SetMXCSR((MXCSR and $FFFF003F) or $00001900);
+    CW8087:=Get8087CW;
+    Set8087CW((CW8087 and $F0C0) or $0332);
+  end;
+end;
+
+procedure RestoreRegFPU(var Reg:TRegFPU); inline;          //DONE -oRFla.Main -cRev.2026.07.04: Inline RestoreRegFPU
+begin
+  with Reg do begin
+    SetMXCSR(MXCSR);
+    Set8087CW(CW8087);
+  end;
+end;
+
 function Exec(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar; Buf:PValRec):PValRec;
 const InitProc : TToken = (Tag : TagCode; Source : 0);     //DONE -oRFla.Main -cRev.2026.05.06: Func Exec
 var Context : TContext;
+    RegFPU : TRegFPU;
     p : PByte;
     i : SizeInt;
     j : SizeInt = -1;
@@ -247,6 +266,7 @@ begin
     ByteCode:=p;
     Flow:=NML;
   end;
+  SetRegFPU(RegFPU);
   try
     if p=nil then raise EError.Create(OK);
     Context.VarTable:=p+PToken(p)^.Size+OpTokenSize;
@@ -268,6 +288,7 @@ begin
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;
+  RestoreRegFPU(RegFPU);
   if Result^.VAlloc<>BC then Result:=ValCopy(Result, Buf);
   with Context do begin
     if VarPool.ListLng>0 then repeat
@@ -333,6 +354,7 @@ var Buf : array of string;
     BufP : PByte = PByte(BufSize);
     BufSum : SizeInt = 0;                          // sum of closed Bufs
     ClsList, SubrList, DefList, VarList : TMemList;
+    RegFPU : TRegFPU;
     PreTag : TTag = TagLess;
     TextCodePage : TSystemCodePage;
     TokenAddr : PByte;                       // --> ValueToken
@@ -345,6 +367,7 @@ var Buf : array of string;
 {$include runflaparse.inc}
 
 begin
+  SetRegFPU(RegFPU);
   try
     PByte(Result):=nil;
     MemListInit(ClsList, SizeOf(TCls), ClsGrow);
@@ -386,9 +409,13 @@ begin
   except
     on E:EError do FillError(E.FCode, E.FPos);
     on E:EOverflow do FillError(Overflow);
+    on E:EDivByZero do FillError(DivZero);
+    on E:EZeroDivide do FillError(DivZero);
+    on E:EInvalidOp do FillError(InvalidValue);
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;
+  RestoreRegFPU(RegFPU);
   for i:=0 to DefList.Count-1 do DecStrRef(PFlaRec(DefList.List[i])^.PText);
   MemListFree(VarList);
   MemListFree(DefList);
