@@ -388,42 +388,48 @@ begin
 end;
 
 function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
-var scaled : boolean = false;
-    scl, ofs : TRFloat;
+const F : TFormatSettings =
+        (CurrencyFormat : 0;
+         NegCurrFormat : 0;
+         ThousandSeparator : #0;
+         DecimalSeparator : '.');
+var scl : TRFloat = 1;
+    ofs : TRFloat = 0;
     s : string;
     flg : SizeInt;
 begin
-  PByte(s):=nil;
-  with PV^ do begin
-    if VPhy<>0 then begin
-      s:=DecodePhy(VPhy, scl, ofs, flg)+'`';
-      if (flg and UPF)=0 then case VType of
-        VInt   : s:=SelectPref(Int/scl, scl, flg)+s;
-        VFloat : s:=SelectPref(Flo/scl, scl, flg)+s;
-        VChar  : s:=SelectPref(Chr/scl, scl, flg)+s;
+  with PV^ do case VType of
+    VNone : PByte(Result):=nil;
+    VStr  : Result:=string(Str);
+    VArr  : RaiseError(InvalidArrVal);
+    else
+      PByte(s):=nil;
+      if VPhy<>0 then begin
+        s:=DecodePhy(VPhy, scl, ofs, flg)+'`';
+        if (flg and UPF)=0 then case VType of
+          VInt   : s:=SelectPref(Int/scl, scl, flg)+s;
+          VFloat : s:=SelectPref(Flo/scl, scl, flg)+s;
+          VChar  : s:=SelectPref(Chr/scl, scl, flg)+s;
+        end;
+        s:='`'+s;
       end;
-      s:='`'+s;
-      scaled:=(scl<>1) or (ofs<>0);
-    end;
-    if scaled then case VType of
-      VInt   : Result:=FloatToStr((Int-ofs)/scl);
-      VFloat : Result:=FloatToStr((Flo-ofs)/scl);
-      VCplex : Result:='('+FloatToStr((Flo-ofs)/scl)+','+FloatToStr(Img/scl)+')';
-      VChar  : Result:=FloatToStr((Chr-ofs)/scl);
-      VGap   : Result:='['+FloatToStr((Flo-ofs)/scl)+':'+FloatToStr((Img-ofs)/scl)+']';   // min/max ?
-      VIGap  : Result:='['+FloatToStr((Int-ofs)/scl)+':'+FloatToStr((IGap-ofs)/scl)+']';
-    end else case VType of
-      VNone  : PByte(Result):=nil;
-      VInt   : Result:=IntToStr(Int);
-      VFloat : Result:=FloatToStr(Flo);
-      VCplex : Result:='('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
-      VChar  : if VPhy=0 then Result:=char(Chr) else Result:=IntToStr(Chr);
-      VStr   : Result:=string(Str);
-      VGap   : Result:='['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
-      VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
-      VArr   : raise EError.Create(InvalidArrVal);
-    end;
-    Result:=Result+s;
+      if (scl<>1) or (ofs<>0) then case VType of
+        VInt   : Result:=FloatToStr((Int-ofs)/scl, F);
+        VFloat : Result:=FloatToStr((Flo-ofs)/scl, F);
+        VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+','+FloatToStr(Img/scl, F)+')';
+        VChar  : Result:=FloatToStr((Chr-ofs)/scl, F);
+        VGap   : Result:='['+FloatToStr((Flo-ofs)/scl, F)+':'+FloatToStr((Img-ofs)/scl, F)+']';
+        VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IGap-ofs)/scl, F)+']';
+      end else case VType of
+        VInt   : Result:=IntToStr(Int);
+        VFloat : Result:=FloatToStr(Flo, F);
+        VCplex : Result:='('+FloatToStr(Flo, F)+','+FloatToStr(Img, F)+')';
+        VChar  : if VPhy=0 then Result:=char(Chr) else Result:=IntToStr(Chr);
+        VGap   : Result:='['+FloatToStr(Flo, F)+':'+FloatToStr(Img, F)+']';
+        VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
+      end;
+      Result:=Result+s;
+      PAnsiRec(PByte(Result)-SAnsiRec)^.CodePage:=CP_ACP;
   end;
 end;
 
