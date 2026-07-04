@@ -35,4 +35,5 @@ ceil(), find(), substr()
 - Added: New error codes: RangeType, CommaDigit, InvalidType
 - Changed: Digit is not allowed immediately after a comma or semicolon, space or
 separator required
+- Fixed: Decimal separator is now always a dot, regardless of system locale
 
