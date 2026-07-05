@@ -99,7 +99,7 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function MakeStrPtr(Lng:SizeInt; constref TS:string):PByte;
+function MakeStrPtr(Lng:SizeInt; var TS:string):PByte;
 var cp : TSystemCodePage = CP_ACP;                        //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
     p : PByte;
 begin
