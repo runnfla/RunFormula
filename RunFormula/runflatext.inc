@@ -61,6 +61,11 @@ begin
   Result:=L;
 end;
 
+function Hex2Str(I:SizeInt):PByte;
+begin
+  Result:=Str2Ptr(IntToHex(I, 0));
+end;
+
 function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oRFla.Text -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;
@@ -275,14 +280,20 @@ begin
                     P:=tf;
                   end;
       '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
+      '+'       : sig:=(sig shl 4) or 7;
       ',', ':'  : begin
+                    inc(P);
+                    if (c=',') and (P^ in ['0'..'9']) then raise EError.Create(CommaDigit, P);
                     IL:=I;
                     FL:=F;
                     mf:=false;
                     sig:=(sig shl 4) or (byte(c) and $F);
+                    continue;
                   end;
       '-'       : mf:=true;
       '0'..'9'  : begin
+                 //   if PWord(P)=$... then break
+
                     tf:=FindTextFin(P);
                     if flg then begin
                       I:=IntCapture(P, tf, flg);
@@ -299,8 +310,11 @@ begin
       '`'       : break;
       else raise EError.Create(InvalidChar, P);
     end;
-    inc(P);                                 // 0=1 "=2 (=8 )=9 [=B ]=D ,=C :=A
+    inc(P);                                 // 0=1 "=2 +=7 (=8 )=9 [=B ]=D ,=C :=A
   end;
+
+
+
   with PV^ do case sig of
     1       : if flg then begin             // 0
                 VType:=VInt;
@@ -313,6 +327,31 @@ begin
                 VType:=VChar;
                 Chr:=byte(I);
               end;
+    $171,                                   // 0+0 0+" "+0 "+"
+    $172,
+    $271,
+    $272,
+    $B171D,                                 // [0+0] [0+"] ["+0] ["+"]
+    $B172D,
+    $B271D,
+    $B272D  : if flg then begin
+                if I>=0 then raise EError.Create(InvalidRange);
+                VType:=VIGap;
+                Int:=IL+I;
+                IGap:=IL-I;
+              end else begin
+                if F>=0 then raise EError.Create(InvalidRange);
+                VType:=VGap;
+                Flo:=FL+F;
+                Img:=FL-F;
+              end;
+
+
+
+
+
+
+
     $1A1,                                   // 0:0 0:" ":0 ":"
     $1A2,
     $2A1,

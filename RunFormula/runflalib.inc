@@ -99,20 +99,18 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function MakeStrPtr(Lng:SizeInt; var TS:string):PByte;
+function MakeStrPtr(Lng:SizeInt; PS:PByte=nil):PByte;
 var cp : TSystemCodePage = CP_ACP;                        //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
-    p : PByte;
 begin
-  p:=PByte(TS);
-  if p<>nil then cp:=PAnsiRec(p-SAnsiRec)^.CodePage;
-  p:=BufZ(Lng+SAnsiRec);
-  with PAnsiRec(p)^ do begin
+  if PS<>nil then cp:=PAnsiRec(PS-SAnsiRec)^.CodePage;
+  PS:=BufZ(Lng+SAnsiRec);
+  with PAnsiRec(PS)^ do begin
     CodePage:=cp;
     ElementSize:=1;
     Ref:=1;
     Len:=Lng;
   end;
-  Result:=p+SAnsiRec;
+  Result:=PS+SAnsiRec;
 end;
 
 function Str2Str(constref S:string):string;               //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str

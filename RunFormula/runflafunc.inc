@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Embedded functions include file
-//  Rev. 2.07.2026
+//  Rev. 6.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -519,6 +519,17 @@ begin
   PostParam(Context);
 end;
 
+function Fla_HEX(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.06: Func Fla_HEX
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    Str:=Hex2Str(AsInt(Param(-1, Context)));
+    VType:=VStr;
+  end;
+  PostParam(Context);
+end;
+
 function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.22: Func Fla_FIND
 var ofs : SizeInt = 0;
     s, sb : string;
@@ -580,7 +591,7 @@ begin
   if R>lng then R:=lng;
   lng:=R-L;
   with Result^ do if lng>1 then begin
-    Str:=MakeStrPtr(lng, s);
+    Str:=MakeStrPtr(lng, PByte(s));
     VType:=VStr;
     DataCopy(p+L, Str, lng);
   end else begin
@@ -965,6 +976,20 @@ begin
   end;
 end;
 
+function Fla_UNITSTR(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.07.06: Func Fla_UNITSTR
+var f1, f2 : TRFloat;
+    t : SizeInt;
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VType:=VStr;
+    Str:=Str2Ptr(DecodePhy(Param(-1, Context)^.VPhy, f1, f2, t));
+    if Str=nil then VType:=VNone;
+  end;
+  PostParam(Context);
+end;
+
 {$define runfla_optfunc}
 {$include runflaopt.inc}
 {$undef runfla_optfunc}
@@ -997,6 +1022,7 @@ begin
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
   FuncReg('string', @Fla_STRING);
+  FuncReg('hex', @Fla_HEX);
   FuncReg('find', @Fla_FIND);
   FuncReg('substr', @Fla_SUBSTR);
   FuncReg('value', @Fla_VALUE);
@@ -1012,6 +1038,7 @@ begin
   FuncReg('match', @Fla_MATCH);
   FuncReg('qty', @Fla_QTY);
   FuncReg('convert', @Fla_CONVERT);
+  FuncReg('unitstr', @Fla_UNITSTR);
 
 {$define runfla_optreg}
 {$include runflaopt.inc}
