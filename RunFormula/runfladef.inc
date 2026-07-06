@@ -97,6 +97,8 @@ const
   SPtr = SizeOf(pointer);
   SRFloat = SizeOf(TRFloat);
 
+  Hex0x = {$ifdef ENDIAN_LITTLE} $7830 {$else} $3078 {$endif};   //0x
+
 type
   TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
 

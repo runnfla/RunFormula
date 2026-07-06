@@ -519,7 +519,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_HEX(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.06: Func Fla_HEX
+function Fla_HEXSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.06: Func Fla_HEXSTR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -1022,7 +1022,7 @@ begin
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
   FuncReg('string', @Fla_STRING);
-  FuncReg('hex', @Fla_HEX);
+  FuncReg('hexstr', @Fla_HEXSTR);
   FuncReg('find', @Fla_FIND);
   FuncReg('substr', @Fla_SUBSTR);
   FuncReg('value', @Fla_VALUE);

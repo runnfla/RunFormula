@@ -61,9 +61,25 @@ begin
   Result:=L;
 end;
 
-function Hex2Str(I:SizeInt):PByte;
+function Hex2Str(I:SizeInt):PByte;                                 //DONE -oRFla.Text -cRev.2026.07.06: Func Hex2Str
+const Digits : array[0..$F] of char = '0123456789ABCDEF';
+var L : SizeInt = 2;
+    p : PChar;
+    t : SizeInt;
 begin
-  Result:=Str2Ptr(IntToHex(I, 0));
+  t:=I;
+  repeat
+    inc(L);
+    t:=t shr 4;
+  until t=0;
+  Result:=MakeStrPtr(L);
+  p:=PChar(Result+L);
+  repeat
+    dec(p);
+    p^:=Digits[I and $F];
+    I:=I shr 4;
+  until I=0;
+  PWord(Result)^:=Hex0x;
 end;
 
 function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oRFla.Text -cRev.2026.04.29: Func IntCapture
@@ -72,7 +88,7 @@ var Base : (DecI, HexI, BinI) = HexI;
 begin
   Result:=0;
   Done:=false;
-  if PWord(P)^<> {$ifdef ENDIAN_LITTLE} $7830 {$else} $3078 {$endif}   //0x
+  if PWord(P)^<>Hex0x
     then case (Fin-1)^ of
       '0'..'9' : Base:=DecI;
       'B', 'b' : begin Base:=BinI; dec(Fin); end;

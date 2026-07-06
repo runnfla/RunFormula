@@ -99,8 +99,8 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function MakeStrPtr(Lng:SizeInt; PS:PByte=nil):PByte;
-var cp : TSystemCodePage = CP_ACP;                        //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
+function MakeStrPtr(Lng:SizeInt; PS:PByte=nil):PByte;     //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
+var cp : TSystemCodePage = CP_ACP;
 begin
   if PS<>nil then cp:=PAnsiRec(PS-SAnsiRec)^.CodePage;
   PS:=BufZ(Lng+SAnsiRec);
