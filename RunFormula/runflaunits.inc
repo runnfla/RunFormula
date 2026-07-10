@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Dimension units include file
-//  Rev. 4.07.2026
+//  Rev. 10.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -24,35 +24,35 @@ const
   DimUnits : array of TUnitDesc = (
 
 // Electromagnetics
-    (Sig: $0000000000FD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'W'),     // Power (Watt)
-    (Sig: $0000000001010000; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'C'),     // Charge (Coulomb)
     (Sig: $000000000204FFFE; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'F'),     // Capacitance (Farad)
     (Sig: $00000000FEFE0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'H'),     // Inductance (Henry)
     (Sig: $00000000FEFD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'Ohm'),   // Resistance (Ohm)
     (Sig: $000000000203FFFE; Scale: 1; Offset: 0; Flag: UOP;  Abbr: 'S'),     // Conductance (Siemens)
-    (Sig: $00000000FFFE0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'Wb'),    // Magnetic Flux (Weber)
-    (Sig: $00000000FFFE0100; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'T'),     // Magnetic Induction (Tesla)
     (Sig: $00000000FFFD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'V'),     // Voltage (Volt)
+    (Sig: $00000000FFFE0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'Wb'),    // Magnetic Flux (Weber)
+    (Sig: $0000000000FD0102; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'W'),     // Power (Watt)
+    (Sig: $00000000FFFE0100; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'T'),     // Magnetic Induction (Tesla)
+    (Sig: $0000000001010000; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'C'),     // Charge (Coulomb)
     (Sig: $0000000000FF0000; Scale: 1; Offset: 0; Flag: USG;  Abbr: 'Hz'),    // Frequency (Hertz)
     (Sig: $0000000000FE0102; Scale: 3600; Offset: 0; Flag: UOP; Abbr: 'Wh'),  // Watt-hour
     (Sig: $0000000001010000; Scale: 3600; Offset: 0; Flag: UOP; Abbr: 'Ah'),  // Ampere-hour
 
 // Mass volume area
     (Sig: $0000000000000100; Scale: 1E-3; Offset: 0; Flag: UOP; Abbr: 'g'),           // Metric Gram
-    (Sig: $0000000000000100; Scale: 1E+3; Offset: 0; Flag: USPF or UOP; Abbr: 't'),   // Metric Ton
+    (Sig: $0000000000000100; Scale: 1E+3; Offset: 0; Flag: UPF or UOP; Abbr: 't'),    // Metric Ton
     (Sig: $0000000000000003; Scale: 1E-3; Offset: 0; Flag: UMPF or UOP; Abbr: 'l'),   // Liter
     (Sig: $0000000000000002; Scale: 1E+4; Offset: 0; Flag: UPF or UOP;  Abbr: 'ha'),  // Hectare
 
 // Mechanics
-    (Sig: $0000000000FE0101; Scale: 1; Offset: 0; Flag: 0; Abbr: 'N'),                // Force (Newton)
     (Sig: $0000000000FE0102; Scale: 1; Offset: 0; Flag: 0; Abbr: 'J'),                // Energy (Joule)
     (Sig: $0000000000FE01FF; Scale: 1; Offset: 0; Flag: 0; Abbr: 'Pa'),               // Pressure (Pascal)
+    (Sig: $0000000000FE0101; Scale: 1; Offset: 0; Flag: 0; Abbr: 'N'),                // Force (Newton)
     (Sig: $0000000000FE01FF; Scale: 101325;    Offset: 0; Flag: UPF or UOP; Abbr: 'atm'),  // Pressure (Standard Atmosphere)
     (Sig: $0000000000FE01FF; Scale: 1E+5;      Offset: 0; Flag: UOP; Abbr: 'bar'),    // Pressure (bar)
     (Sig: $0000000000FE01FF; Scale: 133.3223684210526316; Offset: 0; Flag: UPF or UOP; Abbr: 'mmHg'),  // Pressure (mmHg)
     (Sig: $0000000000FE01FF; Scale: 9.80665;   Offset: 0; Flag: UPF or UOP; Abbr: 'mmH2O'),   // Pressure (mmH2O)
     (Sig: $0000000000FE0101; Scale: 9.80665;   Offset: 0; Flag: UPF or UOP; Abbr: 'kgf'),     // Kilogram-force
-    (Sig: $0000000000FD0102; Scale: 745.69987158227022; Offset: 0; Flag: UPF or UOP; Abbr: 'hp'),  // Horsepower
+    (Sig: $0000000000FD0102; Scale: 735.49875; Offset: 0; Flag: UPF or UOP; Abbr: 'ch'),      // Metric Horsepower
     (Sig: $0000000000FF0000; Scale: 1/60;      Offset: 0; Flag: UPF or UOP; Abbr: 'rpm'),     // Revolutions per minute
 
 // Optics
@@ -94,6 +94,9 @@ const
     (Sig: $0000000000000001; Scale: 30856775814913673; Offset: 0; Flag: UOP; Abbr: 'pc'),         // Parsec
 
 // US units
+    (Sig: $0000000000FE01FF; Scale: 6894.757293168361;  Offset: 0; Flag: UPF or UOP; Abbr: 'psi'),  // Pound-force per Square Inch
+    (Sig: $0000000000FD0102; Scale: 745.69987158227022; Offset: 0; Flag: UPF or UOP; Abbr: 'hp'),   // Horsepower
+    (Sig: $0000000000FE0101; Scale: 4.4482216152605;    Offset: 0; Flag: UPF or UOP; Abbr: 'lbf'),  // Pound-force
     (Sig: $0000000000000001; Scale: 0.0254;     Offset: 0; Flag: UPF or UOP; Abbr: 'in'),   // Inch
     (Sig: $0000000000000001; Scale: 0.3048;     Offset: 0; Flag: UPF or UOP; Abbr: 'ft'),   // Foot
     (Sig: $0000000000000001; Scale: 0.9144;     Offset: 0; Flag: UPF or UOP; Abbr: 'yd'),   // Yard
@@ -104,18 +107,18 @@ const
     (Sig: $0000000000000100; Scale: 0.45359237/16; Offset: 0; Flag: UPF or UOP; Abbr: 'oz'),   // Ounce
     (Sig: $0000000000000100; Scale: 907.18474;     Offset: 0; Flag: UPF or UOP; Abbr: 'ton'),  // Short Ton
     (Sig: $0000000000000100; Scale: 6.35029318;    Offset: 0; Flag: UPF or UOP; Abbr: 'st'),   // Stone
-    (Sig: $0000000000000003; Scale: 0.003785411784;     Offset: 0; Flag: UPF or UOP; Abbr: 'gal'),  // Gallon
-    (Sig: $0000000000000003; Scale: 0.003785411784/4;   Offset: 0; Flag: UPF or UOP; Abbr: 'qt'),   // Quart
-    (Sig: $0000000000000003; Scale: 0.003785411784/8;   Offset: 0; Flag: UPF or UOP; Abbr: 'pt'),   // Pint
+    (Sig: $0000000000000003; Scale: 0.003785411784;     Offset: 0; Flag: UPF or UOP; Abbr: 'gal'),   // Gallon
+    (Sig: $0000000000000003; Scale: 0.003785411784/4;   Offset: 0; Flag: UPF or UOP; Abbr: 'qt'),    // Quart
+    (Sig: $0000000000000003; Scale: 0.003785411784/8;   Offset: 0; Flag: UPF or UOP; Abbr: 'pt'),    // Pint
     (Sig: $0000000000000003; Scale: 0.003785411784/128; Offset: 0; Flag: UPF or UOP; Abbr: 'floz'),  // Fluid Ounce
 
 // CGS units
     (Sig: $0000000001010000; Scale: 3.335640951981520737E-10; Offset: 0; Flag: UPF or UOP; Abbr: 'Fr'), // Franklin
     (Sig: $0000000001000000; Scale: 10;    Offset: 0; Flag: UPF or UOP; Abbr: 'Bi'),  // Biot
     (Sig: $00000000FFFE0102; Scale: 1E-8;  Offset: 0; Flag: UOP; Abbr: 'Mx'),         // Maxwell
-    (Sig: $00000000FFFE0100; Scale: 1E-4;  Offset: 0; Flag: UOP; Abbr: 'Gs'),         // Gauss
+    (Sig: $00000000FFFE0100; Scale: 1E-4;  Offset: 0; Flag: UOP; Abbr: 'G'),          // Gauss
     (Sig: $00000000010000FF; Scale: 79.57747154594766788;  Offset: 0; Flag: UOP; Abbr: 'Oe'), // Oersted
-    (Sig: $0000000001000000; Scale: 0.7957747154594766788; Offset: 0; Flag: UOP; Abbr: 'Gb'), // Gilbert
+    (Sig: $0000000001000000; Scale: 0.7957747154594766788; Offset: 0; Flag: UOP; Abbr: 'Gi'), // Gilbert
     (Sig: $0000000000FE0101; Scale: 1E-5;  Offset: 0; Flag: UOP; Abbr: 'dyn'),        // Dyne
     (Sig: $0000000000FE0102; Scale: 1E-7;  Offset: 0; Flag: UOP; Abbr: 'erg'),        // Erg
     (Sig: $0000000000FE01FF; Scale: 0.1;   Offset: 0; Flag: UOP; Abbr: 'ba'),         // Barye
@@ -124,7 +127,7 @@ const
     (Sig: $00000000000000FF; Scale: 100;   Offset: 0; Flag: UPF or UOP; Abbr: 'Kz'),  // Kayser
     (Sig: $00010000000000FE; Scale: 10000; Offset: 0; Flag: UPF or UOP; Abbr: 'ph'),  // Phot
     (Sig: $00010000000000FE; Scale: 10000; Offset: 0; Flag: UPF or UOP; Abbr: 'sb'),  // Stilb
-    (Sig: $00010000000000FE; Scale: 3183.098861837906715;  Offset: 0; Flag: UPF or UOP; Abbr: 'Lb'),  // Lambert
+    (Sig: $00010000000000FE; Scale: 3183.098861837906715; Offset: 0; Flag: UPF or UOP; Abbr: 'Lb'),  // Lambert
 
 // SI units: J N Th I T M L
     (Sig: $0000000001000000; Scale: 1; Offset: 0; Flag: 0;    Abbr: 'A'),      // Current (Ampere)
