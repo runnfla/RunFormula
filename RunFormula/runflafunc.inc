@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Embedded functions include file
-//  Rev. 6.07.2026
+//  Rev. 7.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -202,17 +202,17 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_CPLEX
+function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.07.07: Func Fla_CPLEX
 var L, R : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   L:=Param(-2, Context);
-  R:=Param(-1, Context);
   with Result^ do begin
     Flo:=AsFloat(L);
-    Img:=AsFloat(R);
     VType:=VCplex;
+    R:=Param(-1, Context);
+    Img:=AsFloat(R);
     VPhy:=L^.VPhy;
     if VPhy<>R^.VPhy then RaiseError(DimMismatch);
   end;
@@ -369,7 +369,9 @@ begin
                       Flo:=FlaRound(pv^.Flo, -2);
                       Img:=FlaRound(pv^.Img, -2);
                     end;
-      else RaiseError(InvalidType);
+      else
+        VType:=VNone;
+        RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -512,9 +514,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VStr;
     Str:=Str2Ptr(AsStr(Param(-1, Context)));
-    if Str=nil then VType:=VNone;
+    if Str<>nil then VType:=VStr;
   end;
   PostParam(Context);
 end;
@@ -540,6 +541,7 @@ begin
     3 : begin
           ofs:=AsInt(Param(-1, Context));
           if ofs<0 then RaiseError(InvalidValue);
+          if Context.TermResult^.VPhy<>0 then RaiseError(IllegalDim);
           PostParam(Context);
         end;
     else RaiseError(ParamNumber);
@@ -583,7 +585,6 @@ begin
   PostParam(Context);
   p:=PByte(s);
   Result:=NewLV(Context);
-  Result^.VType:=VNone;
   if p=nil then exit;
   lng:=PSizeInt(p)[-1];
   if L<0 then L:=0;
@@ -772,13 +773,13 @@ begin
   with Result^ do begin
     case pv^.VType of
       VCplex : begin
-                 VType:=VCplex;
                  m:=Hypot2(pv^.Flo, pv^.Img);
                  f:=m+pv^.Flo*0.5;
                  if f>0 then Flo:=sqrt(f) else Flo:=0;
                  f:=m-pv^.Flo*0.5;
                  if f>0 then Img:=sqrt(f) else Img:=0;
                  if pv^.Img<0 then Img:=-Img;
+                 VType:=VCplex;
                end;
       VGap, VIGap : begin
                       f:=AsRGap(pv);
@@ -868,7 +869,9 @@ begin
                  end else Int:=0;
                  if al<ar then IGap:=ar else IGap:=al;
                end;
-      else RaiseError(InvalidType);
+      else
+        VType:=VNone;
+        RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -983,9 +986,8 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VStr;
     Str:=Str2Ptr(DecodePhy(Param(-1, Context)^.VPhy, f1, f2, t));
-    if Str=nil then VType:=VNone;
+    if Str<>nil then VType:=VStr;
   end;
   PostParam(Context);
 end;

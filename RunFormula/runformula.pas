@@ -171,8 +171,8 @@ begin
       TagText  : begin
                    Result:=NewLV(Context);
                    with Result^ do begin
-                     VType:=VStr;
                      Str:=@Text;
+                     VType:=VStr;
                    end;
                  end;
       TagLocal : begin

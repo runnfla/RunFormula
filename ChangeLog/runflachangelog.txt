@@ -37,4 +37,5 @@ ceil(), find(), substr(), hexstr(), unitstr()
 separator required
 - Fixed: Decimal separator is now always a dot, regardless of system locale
 - Added: CGS and Astronomical dimension units
+- Fixed: Memory access violation caused by certain errors
 
