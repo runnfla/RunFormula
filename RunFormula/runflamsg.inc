@@ -1,7 +1,7 @@
-//*****************************************************
-//  RunFormula Expression Scripting Engine
+//******************************************************
+//  RunFormula Unit-aware Expression Scripting Engine
 //  Error messages include file
-//  Rev. 15.05.2026
+//  Rev. 11.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -13,9 +13,9 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
-// TODO -oRFla.Msg -cRev.2026.04.15:
+// TODO -oRFla.Msg -cRev.2026.00.00:
 
 const
   RunFlaErrorMsg : array[TRunFlaErrCode] of record
@@ -58,7 +58,7 @@ const
       (ErrCode : NotOpExpected; ErrMsg : 'Value, variable, function or open bracket expected'),
       (ErrCode : AssignExpected; ErrMsg : 'Assignment expected'),
       (ErrCode : InvalidValue; ErrMsg : 'Invalid operand value'),
-      (ErrCode : InvalidRange; ErrMsg : 'Incorrect borders of range'),
+      (ErrCode : InvalidRange; ErrMsg : 'Incorrect range bounds'),
       (ErrCode : IllegalBreak; ErrMsg : 'Illegal Break or Continue operation'),
       (ErrCode : DimMismatch; ErrMsg : 'Dimensioned quantities mismatch'),
       (ErrCode : IllegalDim; ErrMsg : 'Operation not allowed on dimensioned quantity'),
@@ -68,8 +68,8 @@ const
       (ErrCode : OffsetUnit; ErrMsg : 'Unit with offset cannot be specified'),
       (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
       (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
-      (ErrCode : RangeType; ErrMsg : 'Range should be with integer borders'),
-      (ErrCode : CommaDigit; ErrMsg : 'Digit is not allowed, please insert space or separator'),
+      (ErrCode : RangeType; ErrMsg : 'Range bounds must be integers'),
+      (ErrCode : CommaDigit; ErrMsg : 'Space required between number and comma/semicolon'),
       (ErrCode : InvalidType; ErrMsg : 'Invalid parameter type')
     );
 
