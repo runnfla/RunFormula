@@ -777,100 +777,101 @@ None, если ни одного запроса не было.
   T       // Magnetic Induction (Tesla)
   C       // Charge (Coulomb)
   Hz      // Frequency (Hertz)
-  Wh      // Watt-hour
-  Ah      // Ampere-hour
+  Wh      // Watt-hour : 3600
+  Ah      // Ampere-hour : 3600
 
 // Mass volume area
-  g       // Metric Gram
-  t       // Metric Ton
-  l       // Liter
-  ha      // Hectare
+  g       // Metric Gram : 1E-3
+  t       // Metric Ton : 1E+3
+  l       // Liter : 1E-3
+  ha      // Hectare : 1E+4
 
 // Mechanics
   J       // Energy (Joule)
   Pa      // Pressure (Pascal)
   N       // Force (Newton)
-  atm     // Pressure (Standard Atmosphere)
-  bar     // Pressure (bar)
-  mmHg    // Pressure (mmHg)
-  mmH2O   // Pressure (mmH2O)
-  kgf     // Kilogram-force
-  ch      // Metric Horsepower
-  rpm     // Revolutions per minute
+  atm     // Pressure (Standard Atmosphere) : 101325
+  bar     // Pressure (bar) : 1E+5
+  mmHg    // Pressure (mmHg) : 133.3223684210526316
+  mmH2O   // Pressure (mmH2O) : 9.80665
+  kgf     // Kilogram-force : 9.80665
+  ch      // Metric Horsepower : 735.49875
+  rpm     // Revolutions per minute : 1/60
 
 // Optics
   lm      // Luminous Flux (Lumen)
   lx      // Illuminance (Lux)
 
 // Thermo
-  degC    // Temperature (Celsius)
-  cal     // Calorie
-  BTU     // British Thermal Unit
-  degF    // Temperature (Fahrenheit)
+  degC    // Temperature (Celsius) : X*1.0+273.15
+  cal     // Calorie : 4.184
+  Btu     // British Thermal Unit : 1055.05585262
+  degF    // Temperature (Fahrenheit) : X*5/9+(273.15-32*5/9)
 
 // Nuclear
-  eV      // Electronvolt (eV)
-  R       // Roentgen
+  eV      // Electronvolt (eV) : 1.602176634E-19
+  R       // Roentgen : 2.58E-4
   Sv      // Equivalent Dose (Sievert)
-  Ci      // Curie
+  Ci      // Curie : 3.7E+10
   Bq      // Activity (Becquerel)
   Gy      // Absorbed Dose (Gray)
-  b       // Cross-section (Barn)
-  u       // Unified atomic mass unit
+  b       // Cross-section (Barn) : 1E-28
+  u       // Unified atomic mass unit : 1.66053906892E-27
+  ang     // Angstrom : 1E-10
 
 // Speed
-  km/h    // Speed (km/h)
-  mph     // Miles per hour
-  kn      // Knots
+  km/h    // Speed (km/h) : 1/3.6
+  mph     // Miles per hour : 0.44704
+  kn      // Knots : 1852/3600
 
 // Time
-  min     // Minute
-  h       // Hour
-  d       // Day
-  wk      // Week
-  mo      // Month
-  yr      // Year
+  min     // Minute : 60
+  h       // Hour : 3600
+  d       // Day : 86400
+  wk      // Week : 604800
+  mo      // Month : 2629800
+  yr      // Year : 31557600
 
 // Astronomical
-  au      // Astronomical Unit
-  ly      // Light Year
-  pc      // Parsec
+  au      // Astronomical Unit : 149597870700
+  ly      // Light Year : 9460730472580800
+  pc      // Parsec : 30856775814913673
 
 // US units
-  psi     // Pound-force per Square Inch
-  hp      // Horsepower
-  lbf     // Pound-force
-  in      // Inch
-  ft      // Foot
-  yd      // Yard
-  mi      // Mile
-  nmi     // Nautical Mile
-  ac      // Acre
-  lb      // Pound
-  oz      // Ounce
-  ton     // Short Ton
-  st      // Stone
-  gal     // Gallon
-  qt      // Quart
-  pt      // Pint
-  floz    // Fluid Ounce
+  psi     // Pound-force per Square Inch : 6894.757293168361
+  hp      // Horsepower : 745.69987158227022
+  lbf     // Pound-force : 4.4482216152605
+  in      // Inch : 0.0254
+  ft      // Foot : 0.3048
+  yd      // Yard : 0.9144
+  mi      // Mile : 1609.344
+  nmi     // Nautical Mile : 1852
+  ac      // Acre : 4046.8564224
+  lb      // Pound : 0.45359237
+  oz      // Ounce : 0.45359237/16
+  ton     // Short Ton : 907.18474
+  st      // Stone : 6.35029318
+  gal     // Gallon : 0.003785411784
+  qt      // Quart : 0.003785411784/4
+  pt      // Pint : 0.003785411784/8
+  floz    // Fluid Ounce : 0.003785411784/128
 
 // CGS units
-  Fr      // Franklin
-  Bi      // Biot
-  Mx      // Maxwell
-  G       // Gauss
-  Oe      // Oersted
-  Gi      // Gilbert
-  dyn     // Dyne
-  erg     // Erg
-  ba      // Barye
-  P       // Poise
-  St      // Stokes
-  Kz      // Kayser
-  ph      // Phot
-  sb      // Stilb
-  Lb      // Lambert
+  Fr      // Franklin : 3.335640951981520737E-10
+  Bi      // Biot : 10
+  Mx      // Maxwell : 1E-8
+  G       // Gauss : 1E-4
+  Oe      // Oersted : 79.57747154594766788
+  Gi      // Gilbert : 0.7957747154594766788
+  dyn     // Dyne : 1E-5
+  erg     // Erg : 1E-7
+  ba      // Barye : 0.1
+  P       // Poise : 0.1
+  St      // Stokes : 1E-4
+  Kz      // Kayser : 100
+  ph      // Phot : 10000
+  sb      // Stilb : 10000
+  Lb      // Lambert : 3183.098861837906715
 
 // SI units: J N Th I T M L
   A       // Current (Ampere)
