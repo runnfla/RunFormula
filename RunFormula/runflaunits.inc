@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Dimension units include file
-//  Rev. 10.07.2026
+//  Rev. 13.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -60,10 +60,10 @@ const
     (Sig: $00010000000000FE; Scale: 1; Offset: 0; Flag: UOP; Abbr: 'lx'),     // Illuminance (Lux)
 
 // Thermo
-    (Sig: $0000000100000000; Scale: 1; Offset: 273.15; Flag: UOP;  Abbr: 'degC'),    // Temperature (Celsius)
-    (Sig: $0000000000FE0102; Scale: 4.184; Offset: 0; Flag:  UOP;  Abbr: 'cal'),     // Calorie
-    (Sig: $0000000000FE0102; Scale: 1055.05585262; Offset: 0; Flag: UPF or UOP;  Abbr: 'BTU'),  // British Thermal Unit
-    (Sig: $0000000100000000; Scale: 5/9; Offset: 273.15-32*5/9; Flag: UOP; Abbr: 'degF'),       // Temperature (Fahrenheit)
+    (Sig: $0000000100000000; Scale: 1; Offset: 273.15; Flag: UPF or UOP; Abbr: 'degC'),           // Temperature (Celsius)
+    (Sig: $0000000000FE0102; Scale: 4.184; Offset: 0; Flag: UOP; Abbr: 'cal'),                    // Calorie
+    (Sig: $0000000000FE0102; Scale: 1055.05585262; Offset: 0; Flag: UPF or UOP; Abbr: 'Btu'),     // British Thermal Unit
+    (Sig: $0000000100000000; Scale: 5/9; Offset: 273.15-32*5/9; Flag: UPF or UOP; Abbr: 'degF'),  // Temperature (Fahrenheit)
 
 // Nuclear
     (Sig: $0000000000FE0102; Scale: 1.602176634E-19;   Offset: 0; Flag: UOP; Abbr: 'eV'),  // Electronvolt (eV)
@@ -73,7 +73,8 @@ const
     (Sig: $0000000000FF0000; Scale: 1;                 Offset: 0; Flag: UOP; Abbr: 'Bq'),  // Activity (Becquerel)
     (Sig: $0000000000FE0002; Scale: 1;                 Offset: 0; Flag: UOP; Abbr: 'Gy'),  // Absorbed Dose (Gray)
     (Sig: $0000000000000002; Scale: 1E-28;             Offset: 0; Flag: UOP; Abbr: 'b'),   // Cross-section (Barn)
-    (Sig: $0000000000000100; Scale: 1.66053906892E-27; Offset: 0; Flag: UPF or UOP;  Abbr: 'u'),   // Unified atomic mass unit
+    (Sig: $0000000000000100; Scale: 1.66053906892E-27; Offset: 0; Flag: UPF or UOP; Abbr: 'u'),    // Unified atomic mass unit
+    (Sig: $0000000000000001; Scale: 1E-10;             Offset: 0; Flag: UPF or UOP; Abbr: 'ang'),  // Angstrom
 
 // Speed
     (Sig: $0000000000FF0001; Scale: 1/3.6;     Offset: 0; Flag: UPF or UOP; Abbr: 'km/h'),  // Speed (km/h)
