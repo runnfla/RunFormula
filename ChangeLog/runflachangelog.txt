@@ -21,7 +21,6 @@
 ===== Version 0.1.b - 1.06.2026 =====
 - Changed: Error message structure is updated
 - Changed: In external function parameter Phy is renamed to Dim
-- Changed: Help files are updated
 - Added: Physical dimension handling
 - Changed: Char value is converted to a Variant of type byte
 
@@ -36,6 +35,7 @@ ceil(), find(), substr(), hexstr(), unitstr()
 - Changed: Digit is not allowed immediately after a comma or semicolon, space or
 separator required
 - Fixed: Decimal separator is now always a dot, regardless of system locale
-- Added: CGS and Astronomical dimension units
+- Added: CGS and Astronomical units of measurement
 - Fixed: Memory access violation caused by certain errors
+- Added: Syntax validation for brackets in unit expressions
 
