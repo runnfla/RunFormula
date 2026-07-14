@@ -103,14 +103,13 @@ function MakeStrPtr(Lng:SizeInt; PS:PByte=nil):PByte;     //DONE -oRFla.Lib -cRe
 var cp : TSystemCodePage = CP_ACP;
 begin
   if PS<>nil then cp:=PAnsiRec(PS-SAnsiRec)^.CodePage;
-  PS:=BufZ(Lng+SAnsiRec);
-  with PAnsiRec(PS)^ do begin
+  with PAnsiRec(BufZ(Lng+SAnsiRec))^ do begin
     CodePage:=cp;
     ElementSize:=1;
     Ref:=1;
     Len:=Lng;
+    Result:=PByte(@Len)+SI;
   end;
-  Result:=PS+SAnsiRec;
 end;
 
 function Str2Str(constref S:string):string;               //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str
@@ -238,7 +237,6 @@ begin                                                    //DONE -oRFla.Lib -cRev
   with PV^ do begin
     if VPhy<>0 then raise EError.Create(DimExists);
     if VType in [VNone, VStr, VArr] then raise EError.Create(DimlessValue);
-    VPhy:=Phy;
     if (Scl<>1) or (Offs<>0) then case VType of
       VInt   : begin
                  VType:=VFloat;
@@ -263,6 +261,7 @@ begin                                                    //DONE -oRFla.Lib -cRev
                  Img:=IGap*Scl+Offs;
                end;
     end;
+    VPhy:=Phy;
   end;
 end;
 
@@ -403,25 +402,25 @@ begin
     else
       PByte(s):=nil;
       if VPhy<>0 then begin
-        s:=DecodePhy(VPhy, scl, ofs, flg)+'`';
+        s:=DecodePhy(VPhy, scl, ofs, flg);
         if (flg and UPF)=0 then case VType of
           VInt   : s:=SelectPref(Int/scl, scl, flg)+s;
           VFloat : s:=SelectPref(Flo/scl, scl, flg)+s;
           VChar  : s:=SelectPref(Chr/scl, scl, flg)+s;
         end;
-        s:='`'+s;
+        s:=#$20+s;
       end;
       if (scl<>1) or (ofs<>0) then case VType of
         VInt   : Result:=FloatToStr((Int-ofs)/scl, F);
         VFloat : Result:=FloatToStr((Flo-ofs)/scl, F);
-        VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+','+FloatToStr(Img/scl, F)+')';
+        VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+', '+FloatToStr(Img/scl, F)+')';
         VChar  : Result:=FloatToStr((Chr-ofs)/scl, F);
         VGap   : Result:='['+FloatToStr((Flo-ofs)/scl, F)+':'+FloatToStr((Img-ofs)/scl, F)+']';
         VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IGap-ofs)/scl, F)+']';
       end else case VType of
         VInt   : Result:=IntToStr(Int);
         VFloat : Result:=FloatToStr(Flo, F);
-        VCplex : Result:='('+FloatToStr(Flo, F)+','+FloatToStr(Img, F)+')';
+        VCplex : Result:='('+FloatToStr(Flo, F)+', '+FloatToStr(Img, F)+')';
         VChar  : if VPhy=0 then Result:=char(Chr) else Result:=IntToStr(Chr);
         VGap   : Result:='['+FloatToStr(Flo, F)+':'+FloatToStr(Img, F)+']';
         VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
@@ -749,6 +748,7 @@ function NewLV(var Context:TContext):PValRec;                 //DONE -oRFla.Lib 
 begin
   Result:=MemListAdd(Context.LVStack);
   with Result^ do begin
+    VType:=VNone;
     VAlloc:=LV;
     VPhy:=0;
   end;

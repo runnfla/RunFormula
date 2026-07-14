@@ -97,7 +97,13 @@ const
   SPtr = SizeOf(pointer);
   SRFloat = SizeOf(TRFloat);
 
-  Hex0x = {$ifdef ENDIAN_LITTLE} $7830 {$else} $3078 {$endif};   //0x
+{$ifdef ENDIAN_LITTLE}
+  Hex0x = $7830;     // 0x
+  Unt1s = $2F31      // 1/
+{$else}
+  Hex0x = $3078;
+  Unt1s = $312F;
+{$endif};
 
 type
   TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
@@ -236,7 +242,7 @@ const
   CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
   TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
-  UnitChars : TCharSet = ['A'..'Z', 'a'..'z', #$80..#$FF];
+  UnitChars : TCharSet = ['0'..'9', 'A'..'Z', 'a'..'z', #$80..#$FF];
   Cpi = 3.14159265358979323846;
   CElr = 2.71828182845904523536;
 

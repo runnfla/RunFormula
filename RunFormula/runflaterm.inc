@@ -15,7 +15,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -oRFla.Term -cRev.2026.04.27:
+// TODO -oRFla.Term -cRev.2026.07.10: Review Concal function
 
 function Vrt2Val(constref V:Variant):PValRec;                  //DONE -oRFla.Term -cRev.2026.03.30: Func Vrt2Val
 var S : string;
@@ -30,9 +30,8 @@ begin
       varString, varUString : begin
                                 S:=V;
                                 if length(S)<>1 then begin
-                                  VType:=VStr;
                                   Str:=Str2Ptr(S);
-                                  if Str=nil then VType:=VNone;
+                                  if Str<>nil then VType:=VStr;
                                 end else begin
                                   VType:=VChar;
                                   Chr:=PByte(S)^;
@@ -192,7 +191,7 @@ var L : PValRec = @CVNone;        // init VMode
   procedure Concat;                                          //DONE -oRFla.Term -cRev.2026.04.26: Proc Concat
   var p : PByte;                             // not inline
   begin
-    p:=Str2Ptr(AsStr(L)+AsStr(R));
+    p:=Str2Ptr(AsStr(L)+AsStr(R));           // REVIEW !! строка с новым PTR может не собраться
     FreeLR;
     with L^ do begin
       VType:=VStr;

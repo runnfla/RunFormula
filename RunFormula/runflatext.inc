@@ -1,6 +1,6 @@
 //*****************************************************
 //  RunFormula Expression Scripting Engine
-//  Text include file
+//  Text functions include file
 //  Rev. 15.05.2026
 
 //  Author: Alexander Torubarov
@@ -15,7 +15,7 @@
 //  for full license information.
 //*****************************************************
 
-// TODO -oRFla.Text -cRev.2026.05.03:
+// TODO -oRFla.Text -cRev.2026.07.14: Select HF for Extended
 
 function FirstChar(P:PChar; const CharSet:TCharSet):PChar;
 var c : char;                                        //DONE -oRFla.Text -cRev.2026.04.29: Func FirstChar
@@ -179,21 +179,23 @@ begin
 end;
 
 function PhyCapture(P, Fin:PChar; out Scl, Offs:TRFloat):SizeInt;
-const Trim : TCharSet = [#0..#$20, '`'];              //DONE -oRFla.Text -cRev.2026.05.19: Func PhyCapture
-var mf : boolean = false;
+var mf : boolean = false;                                      //DONE -oRFla.Text -cRev.2026.07.13: Func PhyCapture
     fp : PChar = nil;
+    brc : integer = 0;
     t : TRFloat;
-    L, sz, exp, i : SizeInt;
+    L, SZ, exp, i : SizeInt;
     flg : boolean;
+    c : char;
 
-  function FindPref(var F:TRFloat):boolean;           //DONE -oRFla.Text -cRev.2026.05.19: Func FindPref
+  function FindPref(PU:PChar; var F:TRFloat):boolean;          //DONE -oRFla.Text -cRev.2026.07.10: Func FindPref
   var j : SizeInt;
       pfin : PChar;
   begin
     Result:=false;
-    pfin:=P-L;
+    if L=SZ then exit;
+    pfin:=PU+SZ-L;
     for j:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[j])^ do
-      if BackCompare(fp, pfin, Abbr, false)>0 then begin
+      if BackCompare(PU, pfin, Abbr, false)>0 then begin
         F:=F*Scale;
         exit;
       end;
@@ -201,39 +203,58 @@ var mf : boolean = false;
   end;
 
 begin
-  while (P<Fin) and (P^ in Trim) do inc(P);
-  while (P<Fin) and ((Fin-1)^ in Trim) do dec(Fin);
-  sz:=Fin-P;
-  if sz=0 then raise EError.Create(InvalidFormat);
+  while (P<Fin) and (P^<=#$20) do inc(P);
+  while (P<Fin) and ((Fin-1)^<=#$20) do dec(Fin);
+  if P=Fin then RaiseError(UnexpectedEnd);
+  if PWord(P)^=Unt1s then begin
+    inc(P, 2);
+    while (P<Fin) and (P^<=#$20) do inc(P);
+    mf:=true;
+  end;
+  SZ:=Fin-P;
+  if SZ=0 then RaiseError(UnexpectedEnd);
   for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
     L:=BackCompare(P, Fin, Abbr, (Flag and UPF)=0);
     if L=0 then continue;
-    Scl:=Scale;
-    if (L<sz) and FindPref(Scl) then continue;
+    t:=Scale;
+    if FindPref(P, t) then continue;
     Offs:=Offset;
-    Result:=Sig;
+    if (Offs<>0) and ((L<SZ) or mf) then raise EError.Create(OffsetUnit, Fin-L);
+    if mf then begin
+      Scl:=1/t;
+      Result:=PhyMult(Sig, -1);
+    end else begin
+      Scl:=t;
+      Result:=Sig;
+    end;
     exit;
   end;
   Scl:=1;
   Offs:=0;
   Result:=0;
   while P<=Fin do begin                 // fin point to separator
-    if not (P^ in UnitChars) then begin
+    c:=P^;
+    if c in UnitChars then begin
+      if fp=nil then fp:=P;
+    end else begin
       if fp<>nil then begin
+        SZ:=P-fp;
         L:=0;
-        sz:=P-fp;
         for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
           L:=BackCompare(fp, P, Abbr, (Flag and UPF)=0);
           if L=0 then continue;
-          if Offset<>0 then raise EError.Create(OffsetUnit, fp);
           t:=Scale;
-          if (L<sz) and FindPref(t) then continue;
+          if FindPref(fp, t) then continue;
+          if Offset<>0 then raise EError.Create(OffsetUnit, P-L);
           exp:=1;
-          if P^='^' then begin
+          if c='^' then begin
             fp:=P+1;
+            if not (fp^ in ['0'..'9']) then raise EError.Create(InvalidChar, fp);
             P:=FindTextFin(fp);
             exp:=IntCapture(fp, P, flg);
-            if not flg then raise EError.Create(InvalidChar, fp);
+            if not flg then raise EError.Create(InvalidFormat, fp);
+            if exp>127 then raise EError.Create(DimOver, fp);
+            c:=P^;
           end;
           if mf then exp:=-exp;
           Scl:=Scl*Power(t, exp);
@@ -243,21 +264,43 @@ begin
         if L=0 then raise EError.Create(UnknownUnit, fp);
         fp:=nil;
       end;
-      case P^ of
-        #0..#$20, '(', ')', '`' : ;
-        '/'  : begin
-                 if mf then raise EError.Create(InvalidChar, P);
-                 mf:=true;
-               end;
-         '1' : if Result<>0 then raise EError.Create(InvalidChar, P);
-         else raise EError.Create(InvalidChar, P);
+      case c of
+        #0..#$20 : ;
+        '(' : inc(brc);
+        ')' : begin
+                if brc=0 then raise EError.Create(IllegalBracket, P);
+                dec(brc);
+              end;
+        '/' : begin
+                if mf then raise EError.Create(InvalidFormat, P);
+                if brc<>0 then raise EError.Create(MissingBracket, P);
+                mf:=true;
+              end;
+        '^' : raise EError.Create(InvalidChar, P);
+        else if P<Fin then raise EError.Create(InvalidChar, P);
       end;
-    end else if fp=nil then fp:=P;
+    end;
     inc(P);
   end;
+  if brc<>0 then raise EError.Create(MissingBracket, P);
 end;
 
-procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.05.11: Proc ParseValue
+procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.07.14: Proc ParseValue
+type THF = record
+       case byte of
+         0 : (F : TRFloat);
+         1 : (H : array[1..SRFloat] of byte);
+     end;
+const
+{$ifdef ENDIAN_LITTLE}
+  {$if SRFloat = 4}  HF : THF = (H : ($FE, $FF, $7F, $7F)); {$endif}
+  {$if SRFloat = 8}  HF : THF = (H : ($E2, $FF, $FF, $FF, $FF, $FF, $EF, $7F)); {$endif}
+  {$if SRFloat = 10} HF : THF = (H : ($00, $00, $00, $00, $00, $00, $00, $80, $FE, $7F)); {$endif}
+{$else}
+  {$if SRFloat = 4}  HF : THF = (H : ($7F, $7F, $FF, $FE)); {$endif}
+  {$if SRFloat = 8}  HF : THF = (H : ($7F, $EF, $FF, $FF, $FF, $FF, $FF, $E2)); {$endif}
+  {$if SRFloat = 10} HF : THF = (H : ($7F, $FE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF)); {$endif}
+{$endif}
 var sig : SizeInt = 0;
     mf : boolean = false;
     flg : boolean = true;
@@ -266,139 +309,146 @@ var sig : SizeInt = 0;
     tf : PChar;
     c : char;
 begin
-  PV^.VPhy:=0;
   while P<Fin do begin
     c:=P^;
     case c of
       #0..#$20  : ;
-      '"', #$27 : with PV^ do begin
-                    VType:=VStr;
-                    Str:=nil;
+      '"', #$27 : begin
                     inc(P);
-                    tf:=FindTextFin(P, c);
-                    case tf-P of
-                      0 : begin
-                            VType:=VNone;
-                            exit;
-                          end;
+                    case FindTextFin(P, c)-P of
                       1 : I:=PByte(P)^;
-                      2 : if P^<>'^' then begin
-                            SetString(string(Str), P, tf-P);
-                            exit;
-                          end else I:=PByte(P+1)^-$40;
-                      else
-                        SetString(string(Str), P, tf-P);
-                        exit;
+                      2 : if P^='^' then begin
+                            inc(P);
+                            I:=PByte(P)^-$40;
+                          end else raise EError.Create(InvalidFormat, P);
+                      else raise EError.Create(InvalidFormat, P);
                     end;
                     if mf then I:=-I;
                     F:=I;
                     sig:=(sig shl 4) or 2;
-                    P:=tf;
+                    inc(P);
                   end;
       '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
-      '+'       : sig:=(sig shl 4) or 7;
-      ',', ':'  : begin
-                    inc(P);
-                    if (c=',') and (P^ in ['0'..'9']) then raise EError.Create(CommaDigit, P);
-                    IL:=I;
-                    FL:=F;
-                    mf:=false;
-                    sig:=(sig shl 4) or (byte(c) and $F);
-                    continue;
+      '+', ',', ':' : begin
+                        case c of
+                          '+' : c:=#7;
+                          ',' : if (P+1)^ in ['0'..'9'] then raise EError.Create(CommaDigit, P+1);
+                        end;
+                        IL:=I;
+                        FL:=F;
+                        mf:=false;
+                        sig:=(sig shl 4) or (byte(c) and $F);
+                      end;
+      '-'       : begin
+                    if mf then raise EError.Create(InvalidChar, P);
+                    mf:=true;
                   end;
-      '-'       : mf:=true;
       '0'..'9'  : begin
-                 //   if PWord(P)=$... then break
-
+                    if PWord(P)^=Unt1s then break;
                     tf:=FindTextFin(P);
+                    if flg then I:=IntCapture(P, tf, flg);
                     if flg then begin
-                      I:=IntCapture(P, tf, flg);
                       if mf then I:=-I;
                       F:=I;
-                    end;
-                    if not flg then begin
+                      P:=tf;
+                    end else begin
                       F:=FloatCapture(P);
                       if mf then F:=-F;
-                    end else P:=tf;
+                    end;
                     sig:=(sig shl 4) or 1;
                     continue;
                   end;
-      '`'       : break;
-      else raise EError.Create(InvalidChar, P);
+      else
+        if c in UnitChars then break;
+        raise EError.Create(InvalidChar, P);
     end;
     inc(P);                                 // 0=1 "=2 +=7 (=8 )=9 [=B ]=D ,=C :=A
   end;
-
-
-
-  with PV^ do case sig of
-    1       : if flg then begin             // 0
-                VType:=VInt;
-                Int:=I;
-              end else begin
-                VType:=VFloat;
-                Flo:=F;
-              end;
-    2       : begin                         // "
-                VType:=VChar;
-                Chr:=byte(I);
-              end;
-    $171,                                   // 0+0 0+" "+0 "+"
-    $172,
-    $271,
-    $272,
-    $B171D,                                 // [0+0] [0+"] ["+0] ["+"]
-    $B172D,
-    $B271D,
-    $B272D  : if flg then begin
-                if I>=0 then raise EError.Create(InvalidRange);
-                VType:=VIGap;
-                Int:=IL+I;
-                IGap:=IL-I;
-              end else begin
-                if F>=0 then raise EError.Create(InvalidRange);
-                VType:=VGap;
-                Flo:=FL+F;
-                Img:=FL-F;
-              end;
-
-
-
-
-
-
-
-    $1A1,                                   // 0:0 0:" ":0 ":"
-    $1A2,
-    $2A1,
-    $2A2,
-    $B1A1D,                                 // [0:0] [0:"] [":0] [":"]
-    $B1A2D,
-    $B2A1D,
-    $B2A2D  : if flg then begin
-                if IL>I then raise EError.Create(InvalidRange);
-                VType:=VIGap;
-                Int:=IL;
-                IGap:=I;
-              end else begin
-                if FL>F then raise EError.Create(InvalidRange);
-                VType:=VGap;
-                Flo:=FL;
-                Img:=F;
-              end;
-    $81C19,                                 // (0,0) (0,") (",0) (",")
-    $81C29,
-    $82C19,
-    $82C29  : begin
-                VType:=VCplex;
-                Flo:=FL;
-                Img:=F;
-              end;
-    else raise EError.Create(InvalidFormat);
+  with PV^ do begin
+    case sig of
+      1       : if flg then begin             // 0
+                  Int:=I;
+                  VType:=VInt;
+                end else begin
+                  Flo:=F;
+                  VType:=VFloat;
+                end;
+      2       : begin                         // "
+                  Chr:=byte(I);
+                  VType:=VChar;
+                end;
+      $171,                                   // 0+0 0+" "+0 "+"
+      $172,
+      $271,
+      $272,
+      $B171D,                                 // [0+0] [0+"] ["+0] ["+"]
+      $B172D,
+      $B271D,
+      $B272D  : if (not flg) or OverPlus(IL, I, Int) or OverPlus(IL, -I, IGap) then begin
+                  if F>0 then RaiseError(InvalidRange);
+                  Flo:=FL+F;
+                  Img:=FL-F;
+                  VType:=VGap;
+                end else begin
+                  if I>0 then RaiseError(InvalidRange);
+                  VType:=VIGap;
+                end;
+      $1A1,                                   // 0:0 0:" ":0 ":"
+      $1A2,
+      $2A1,
+      $2A2,
+      $B1A1D,                                 // [0:0] [0:"] [":0] [":"]
+      $B1A2D,
+      $B2A1D,
+      $B2A2D  : if flg then begin
+                  if IL>I then RaiseError(InvalidRange);
+                  Int:=IL;
+                  IGap:=I;
+                  VType:=VIGap;
+                end else begin
+                  if FL>F then RaiseError(InvalidRange);
+                  Flo:=FL;
+                  Img:=F;
+                  VType:=VGap;
+                end;
+      $1AA,                                    // 0:: "::
+      $2AA,
+      $B1AAD,                                  // [0::] ["::]
+      $B2AAD  : if flg then begin
+                  Int:=I;
+                  IGap:=HI;
+                  VType:=VIGap;
+                end else begin
+                  Flo:=F;
+                  Img:=HF.F;
+                  VType:=VGap;
+                end;
+      $AA1,                                    // ::0 ::"
+      $AA2,
+      $BAA1D,                                  // [::0] [::"]
+      $BAA2D  : if flg then begin
+                  Int:=LI;
+                  IGap:=I;
+                  VType:=VIGap;
+                end else begin
+                  Flo:=-HF.F;
+                  Img:=F;
+                  VType:=VGap;
+                end;
+      $81C19,                                 // (0,0) (0,") (",0) (",")
+      $81C29,
+      $82C19,
+      $82C29  : begin
+                  Flo:=FL;
+                  Img:=F;
+                  VType:=VCplex;
+                end;
+      else RaiseError(InvalidFormat);
+    end;
+    VPhy:=0;
   end;
   if P<Fin then begin
-    inc(P);
-    I:=PhyCapture(P, FindTextFin(P, '`'), F, FL);
+    I:=PhyCapture(P, Fin, F, FL);
     ApplyPhyToPV(PV, I, F, FL);
   end;
 end;
@@ -462,11 +512,11 @@ begin
     if fu then begin
       if (Flag and UCPP)=0 then Flg:=Flag or USG;
       fu:=false;
-    end else Result:=Result+' ';
+    end else Result:=Result+#$20;
     Result:=Result+Abbr;
   end;
   for i:=0 to L do if buf[i]>1 then begin
-    if fu then fu:=false else Result:=Result+' ';
+    if fu then fu:=false else Result:=Result+#$20;
     Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr+'^'+IntToStr(buf[i]);
   end;
   b:=0;
@@ -482,7 +532,7 @@ begin
     for i:=0 to L do begin
       exp:=-buf[i];
       if exp<=0 then continue;
-      if fu then fu:=false else Result:=Result+' ';
+      if fu then fu:=false else Result:=Result+#$20;
       Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;
       if exp>1 then Result:=Result+'^'+IntToStr(exp);
     end;
