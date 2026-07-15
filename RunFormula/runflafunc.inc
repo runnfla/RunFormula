@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Embedded functions include file
-//  Rev. 7.07.2026
+//  Rev. 15.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -584,7 +584,7 @@ begin
   end;
 end;
 
-function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.26: Func Fla_SUBSTR
+function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.15: Func Fla_SUBSTR
 var s : string;
     pv : PValRec;
     p : PByte;
@@ -606,8 +606,8 @@ begin
   if p=nil then exit;
   lng:=PSizeInt(p)[-1];
   if L<0 then L:=0;
+  if (R>lng) or (R=LI) then R:=lng;
   if (R<=0) or (L>=lng) then exit;
-  if R>lng then R:=lng;
   lng:=R-L;
   with Result^ do if lng>1 then begin
     Str:=MakeStrPtr(lng, PByte(s));
