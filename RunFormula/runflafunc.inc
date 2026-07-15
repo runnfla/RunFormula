@@ -168,7 +168,7 @@ begin
   end;
 end;
 
-function Dsincos(const F, CS:TRFloat):integer;                           //DONE -oRFla.Func -cRev.2026.06.28: Func Dsincos
+function Dsincos(const F, CS:TRFloat):integer;             //DONE -oRFla.Func -cRev.2026.06.28: Func Dsincos
 var w : TRFloat;
 begin
   Result:=0;
@@ -207,12 +207,12 @@ var L, R : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  L:=Param(-2, Context);
   with Result^ do begin
+    L:=Param(-2, Context);
     Flo:=AsFloat(L);
-    VType:=VCplex;
     R:=Param(-1, Context);
     Img:=AsFloat(R);
+    VType:=VCplex;
     VPhy:=L^.VPhy;
     if VPhy<>R^.VPhy then RaiseError(DimMismatch);
   end;
@@ -225,8 +225,8 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
   with Result^ do begin
+    pv:=Param(-1, Context);
     Flo:=FlArcTan(AsIm(pv), AsRe(pv));
     VType:=VFloat;
   end;
@@ -238,8 +238,8 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
   with Result^ do begin
+    pv:=Param(-1, Context);
     Flo:=AsRe(pv);
     Img:=-AsIm(pv);
     VType:=VCplex;
@@ -256,8 +256,8 @@ begin
   if Context.TermResult^.VPhy<>0 then RaiseError(IllegalDim);
   PostParam(Context);
   Result:=NewLV(Context);
-  md:=AsFloat(Param(-2, Context));
   with Result^ do begin
+    md:=AsFloat(Param(-2, Context));
     Flo:=md*cos(ar);
     Img:=md*sin(ar);
     VType:=VCplex;
@@ -266,26 +266,40 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_LEFT
+function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_LEFT
+var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Flo:=AsLGap(Param(-1, Context));
-    VType:=VFloat;
-    VPhy:=Context.TermResult^.VPhy;
+    pv:=Param(-1, Context);
+    if pv^.VType in [VInt, VChar, VIGap] then begin
+      Int:=AsIGapL(pv);
+      VType:=VInt;
+    end else begin
+      Flo:=AsLGap(pv);
+      VType:=VFloat;
+    end;
+    VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_RIGHT
+function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_RIGHT
+var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Flo:=AsRGap(Param(-1, Context));
-    VType:=VFloat;
-    VPhy:=Context.TermResult^.VPhy;
+    pv:=Param(-1, Context);
+    if pv^.VType in [VInt, VChar, VIGap] then begin
+      Int:=AsIGapR(pv);
+      VType:=VInt;
+    end else begin
+      Flo:=AsRGap(pv);
+      VType:=VFloat;
+    end;
+    VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
@@ -295,8 +309,8 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
   with Result^ do begin
+    pv:=Param(-1, Context);
     Flo:=AsRGap(pv)*0.5-AsLGap(pv)*0.5;
     VType:=VFloat;
     VPhy:=pv^.VPhy;
@@ -309,19 +323,19 @@ var L, R : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  L:=Param(-2, Context);
-  R:=Param(-1, Context);
   with Result^ do begin
+    L:=Param(-2, Context);
+    R:=Param(-1, Context);
     if (L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]) then begin
       Int:=AsInt(L);
-      VType:=VIGap;
       IGap:=AsInt(R);
       if IGap<Int then RaiseError(InvalidRange);
+      VType:=VIGap;
     end else begin
       Flo:=AsFloat(L);
-      VType:=VGap;
       Img:=AsFloat(R);
       if Img<Flo then RaiseError(InvalidRange);
+      VType:=VGap;
     end;
     VPhy:=L^.VPhy;
     if VPhy<>R^.VPhy then RaiseError(DimMismatch);
@@ -330,25 +344,29 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.23: Func Fla_BALL
-var c, m : TRFloat;
-    phy : SizeInt;
+function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_BALL
+var L, R : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  c:=AsFloat(Param(-2, Context));
-  phy:=Context.TermResult^.VPhy;
-  PostParam(Context);
-  m:=AsFloat(Param(-1, Context));
-  if m<0 then RaiseError(InvalidValue);
-  if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
-  PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    Flo:=c-m;
-    Img:=c+m;
-    VType:=VGap;
-    VPhy:=phy;
+    L:=Param(-2, Context);
+    R:=Param(-1, Context);
+    if (not ((L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]))) or
+      OverPlus(AsInt(L), -AsInt(R), Int) or OverPlus(AsInt(L), AsInt(R), IGap) then begin
+        Flo:=AsFloat(L)-AsFloat(R);
+        Img:=AsFloat(L)+AsFloat(R);
+        if Img<Flo then RaiseError(InvalidRange);
+        VType:=VGap;
+    end else begin
+      if IGap<Int then RaiseError(InvalidRange);
+      VType:=VIGap;
+    end;
+    VPhy:=L^.VPhy;
+    if VPhy<>R^.VPhy then RaiseError(DimMismatch);
   end;
+  PostParam(Context);
+  PostParam(L, Context);
 end;
 
 function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_FRAC
@@ -356,8 +374,8 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
   with Result^ do begin
+    pv:=Param(-1, Context);
     VType:=pv^.VType;
     case VType of
       VInt, VChar : begin
@@ -610,8 +628,8 @@ begin
   PostParam(Context);
   p:=PByte(s);
   Result:=NewLV(Context);
+  if p=nil then exit;
   try
-    if p=nil then RaiseError(InvalidValue);       // any error
     ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
   except
     Result^.VType:=VNone;
@@ -842,8 +860,8 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
   with Result^ do begin
+    pv:=Param(-1, Context);
     VType:=pv^.VType;
     case VType of
       VInt   : Int:=abs(pv^.Int);
@@ -864,9 +882,10 @@ begin
       VIGap  : begin
                  al:=abs(pv^.Int);
                  ar:=abs(pv^.IGap);
+                 Int:=0;
                  if (pv^.Int>0) or (pv^.IGap<0) then begin
                    if al<ar then Int:=al else Int:=ar;
-                 end else Int:=0;
+                 end;
                  if al<ar then IGap:=ar else IGap:=al;
                end;
       else
@@ -883,7 +902,7 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Chr:=AsInt(Param(-1, Context)) and $FF;
+    Chr:=byte(AsInt(Param(-1, Context)));
     VType:=VChar;
     VPhy:=Context.TermResult^.VPhy;
   end;
@@ -895,8 +914,8 @@ var pv : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-2, Context);
   with Result^ do begin
+    pv:=Param(-2, Context);
     Int:=Compare(pv, Param(-1, Context));
     VType:=VInt;
   end;
@@ -914,8 +933,9 @@ begin
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    if phy=0 then Int:=-1 else Int:=0;
     VType:=VInt;
+    Int:=-1;
+    if phy<>0 then Int:=0;
   end;
 end;
 
