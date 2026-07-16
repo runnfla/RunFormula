@@ -408,39 +408,45 @@ begin
               tf:=FindTextFin(P, ']');
               ParseValue(P, tf, @vr);
               ValueToken(vr, vr.VPhy);
-              if vr.VType=VStr then DecStrRef(vr.Str);
               P:=tf;
             end;
       ']' : begin
               CloseToken(TagExpr);
               CloseToken(TagArray);
             end;
-      '`' : case PreTag of
-              TagValue : begin
-                           tf:=FindTextFin(P+1, '`');
-                           I:=PhyCapture(P, tf, scl, ofs);
-                           if (scl<>1) or (ofs<>0) then begin
-                             ApplyPhyToPV(ValCopy(@PToken(TokenAddr)^.ValRec, @vr), I, scl, ofs);
-                             BufP:=TokenAddr;
-                             PreTag:=TagOp;
-                             ValueToken(vr, vr.VPhy);
-                           end else with PToken(TokenAddr)^.ValRec do begin
-                             if VPhy<>0 then raise EError.Create(DimExists);
-                             VPhy:=I;
-                           end;
-                           P:=tf;
-                         end;
-              TagVar, TagArray, TagBracket, TagDo : begin
-                                                      tf:=FindTextFin(P+1, '`');
-                                                      OpToken(TagPhy);
-                                                      with vr do begin
-                                                        VType:=VCplex;        // safe due to constref
-                                                        ValueToken(vr, PhyCapture(P, tf, Flo, Img));
-                                                      end;
-                                                      P:=tf;
-                                                    end;
-              TagText, TagLocal, TagSubr, TagNone : raise EError.Create(DimlessValue);
-              else raise EError.Create(NotOpExpected);
+      '`' : begin
+              inc(P);
+              tf:=FindTextFin(P, '`');
+              I:=PhyCapture(P, tf, scl, ofs);
+              case PreTag of
+                TagValue    : begin
+                                if (scl<>1) or (ofs<>0) then begin
+                                  ApplyPhyToPV(ValCopy(@PToken(TokenAddr)^.ValRec, @vr), I, scl, ofs);
+                                  BufP:=TokenAddr;
+                                  PreTag:=TagOp;
+                                  ValueToken(vr, vr.VPhy);
+                                end else with PToken(TokenAddr)^.ValRec do begin
+                                  if VPhy<>0 then raise EError.Create(DimExists);
+                                  VPhy:=I;
+                                end;
+                              end;
+                TagVar,
+                TagArray,
+                TagBracket,
+                TagDo       : begin
+                                OpToken(TagPhy);
+                                with vr do begin
+                                  VType:=VCplex;
+                                  Flo:=scl;
+                                  Img:=ofs;
+                                  ValueToken(vr, I);
+                                end;
+                              end;
+                TagText,
+                TagNone     : raise EError.Create(DimlessValue);
+                else raise EError.Create(NotOpExpected);
+              end;
+              P:=tf;
             end;
       '{' : Comment:='}';
       else
@@ -510,8 +516,7 @@ begin
           if IsKey('pi') then begin FloatToken(Cpi); continue; end;
           if IsKey('e') then begin FloatToken(CElr); continue; end;
           if IsKey('j') then begin CplexToken(0, 1); continue; end;
-          if IsKey('highint') then begin IntToken(HI); continue; end;
-          if IsKey('lowint') then begin IntToken(LI); continue; end;
+          if IsKey('maxint') then begin IntToken(HI); continue; end;
           if IsKey('none') then begin NoneToken; continue; end;
           if IsKey('error') then raise EError.Create(Unsupported);
           if IsKey('const') then raise EError.Create(Unsupported);
