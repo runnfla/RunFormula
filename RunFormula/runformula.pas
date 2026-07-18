@@ -8,7 +8,7 @@
 
 //  Filename: runformula.pas
 //  Source Code: Object Pascal / FreePascal
-//  Compatible: Lazarus 4.2 x64 win10
+//  Compatible: Lazarus 4.2 x64 win10 linux
 
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
@@ -41,6 +41,7 @@ function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
 function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
 function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
 function RunFlaParam(Offset:SizeInt; out Dim:SizeInt; Context:pointer):Variant;
+function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
 
@@ -207,6 +208,16 @@ begin
     if (Offset>=0) or (Offset<(-Count)) then RaiseError(ParamNumber);
     Result:=AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^));
     Dim:=PContext(Context)^.TermResult^.VPhy;
+  end;
+  PostParam(PContext(Context)^);
+end;
+
+function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
+type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Func RunFlaParamAsStr
+begin
+  with PContext(Context)^.FuncArg do begin
+    if (Offset>=0) or (Offset<(-Count)) then RaiseError(ParamNumber);
+    Result:=Str2Str(AsStr(Term(PPByte(List[Count+Offset])^, PContext(Context)^)));
   end;
   PostParam(PContext(Context)^);
 end;

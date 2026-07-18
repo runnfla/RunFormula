@@ -119,7 +119,7 @@ end;
 
 function AppendResult(const ParamCount:SizeInt; out Phy:SizeInt; Context:pointer):Variant;
 begin
-  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParam(0-ParamCount, Phy, Context);
+  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParamAsStr(-1, Context);
 end;
 
 procedure TDemoForm.ParseButtonClick(Sender: TObject);

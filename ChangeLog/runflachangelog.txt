@@ -38,4 +38,5 @@ separator required
 - Added: CGS and Astronomical units of measurement
 - Fixed: Memory access violation caused by certain errors
 - Added: Syntax validation for brackets in unit expressions
+- Added: New inteface function - RunFlaParamAsStr
 
