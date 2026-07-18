@@ -39,4 +39,5 @@ separator required
 - Fixed: Memory access violation caused by certain errors
 - Added: Syntax validation for brackets in unit expressions
 - Added: New inteface function - RunFlaParamAsStr
+- Changed: Dimensions are passed by reference in interface functions
 

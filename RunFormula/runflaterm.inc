@@ -17,12 +17,11 @@
 
 // TODO -oRFla.Term -cRev.2026.07.10: Review Concal function
 
-function Vrt2Val(constref V:Variant):PValRec;                  //DONE -oRFla.Term -cRev.2026.03.30: Func Vrt2Val
+procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
 var S : string;
 begin
-  Result:=NewLV(Context);
   try
-    with Result^ do case PVarData(@V)^.vtype of
+    with PV^ do case PVarData(@V)^.vtype of
       varEmpty, varNull     : begin VType:=VNone{; Str:=nil; }end;
       varSmallInt, varInteger, varShortInt, varByte, varWord, varLongWord,
         varInt64, varQWord  : begin VType:=VInt; Int:=V; end;
@@ -418,17 +417,21 @@ begin
   end else ValCopy(Pini, pv);
 end;
 
-function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;   //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar
-var phy : SizeInt;
+function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;          //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar
 begin                                                   // not inline
-  with Context do Result:=Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), phy, flg));
-  Result^.VPhy:=phy;
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VPhy:=0;
+    with Context do Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), flg, VPhy), Result);
+  end;
 end;
 
-function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;     // not inline
-var phy : SizeInt;                                               //DONE -oRFla.Term -cRev.2026.04.25: Func DoUserFunc
-begin
-  Result:=Vrt2Val(UFunc(I, phy, P));
-  Result^.VPhy:=phy;
+function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;   //DONE -oRFla.Term -cRev.2026.04.25: Func DoUserFunc
+begin                                                   // not inline
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VPhy:=0;
+    Vrt2Val(UFunc(I, P, VPhy), Result);
+  end;
 end;
 
