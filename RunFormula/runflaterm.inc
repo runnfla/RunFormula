@@ -17,33 +17,6 @@
 
 // TODO -oRFla.Term -cRev.2026.07.10: Review Concal function
 
-procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
-var S : string;
-begin
-  try
-    with PV^ do case PVarData(@V)^.vtype of
-      varEmpty, varNull     : begin VType:=VNone{; Str:=nil; }end;
-      varSmallInt, varInteger, varShortInt, varByte, varWord, varLongWord,
-        varInt64, varQWord  : begin VType:=VInt; Int:=V; end;
-      varSingle, varDouble  : begin VType:=VFloat; Flo:=V; end;
-      varString, varUString : begin
-                                S:=V;
-                                if length(S)<>1 then begin
-                                  Str:=Str2Ptr(S);
-                                  if Str<>nil then VType:=VStr;
-                                end else begin
-                                  VType:=VChar;
-                                  Chr:=PByte(S)^;
-                                end;
-                              end;
-      varBoolean            : begin VType:=VInt; if V then Int:=-1 else Int:=0; end;
-      else raise EError.Create(VariantError);
-    end;
-  except
-    on E:EConvertError do raise EError.Create(VariantError);
-  end;
-end;
-
 procedure FreeTerm(PV:PValRec); inline;                        //DONE -oRFla.Term -cRev.2026.04.18: Inline FreeTerm
 begin                              // like PostParam
   if PV^.VAlloc=LV then begin
@@ -417,21 +390,46 @@ begin
   end else ValCopy(Pini, pv);
 end;
 
+procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
+var S : string;
+begin
+  try
+    with PV^ do case PVarData(@V)^.vtype of
+      varEmpty, varNull     : begin
+                                VType:=VNone;
+                                VPhy:=0;
+                              end;
+      varSmallInt, varInteger, varShortInt, varByte, varWord, varLongWord,
+        varInt64, varQWord  : begin VType:=VInt; Int:=V; end;
+      varSingle, varDouble  : begin VType:=VFloat; Flo:=V; end;
+      varString, varUString : begin
+                                S:=V;
+                                if length(S)<>1 then begin
+                                  Str:=Str2Ptr(S);
+                                  if Str<>nil then VType:=VStr;
+                                  VPhy:=0;
+                                end else begin
+                                  VType:=VChar;
+                                  Chr:=PByte(S)^;
+                                end;
+                              end;
+      varBoolean            : begin VType:=VInt; if V then Int:=-1 else Int:=0; end;
+      else raise EError.Create(VariantError);
+    end;
+  except
+    on E:EConvertError do raise EError.Create(VariantError);
+  end;
+end;
+
 function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;          //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar
 begin                                                   // not inline
   Result:=NewLV(Context);
-  with Result^ do begin
-    VPhy:=0;
-    with Context do Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), flg, VPhy), Result);
-  end;
+  with Context do Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), flg, Result^.VPhy), Result);
 end;
 
 function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;   //DONE -oRFla.Term -cRev.2026.04.25: Func DoUserFunc
 begin                                                   // not inline
   Result:=NewLV(Context);
-  with Result^ do begin
-    VPhy:=0;
-    Vrt2Val(UFunc(I, P, VPhy), Result);
-  end;
+  Vrt2Val(UFunc(I, P, Result^.VPhy), Result);
 end;
 
