@@ -46,8 +46,7 @@ ShowMessage( RunFlaExecStr( RunFlaParse('g=9.8`N/kg`, t=5, g*t`s`**2/2') ) );  /
 ```
 `RunFlaParse` compiles the source formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string,
 while `RunFlaExecVrt` returns a Variant.\
-For more information on using RunFormula, please refer to the help files in the [Help](https://github.com/runnfla/RunFormula/blob/main/Help) directory (available in both English and Russian).
-See the corresponding help topics for advanced usage at [Help/Eng/runflahelp-eng.txt](https://github.com/runnfla/RunFormula/blob/main/Help/Eng/runflahelp-eng.txt) ([Help/Rus/runflahelp.txt](https://github.com/runnfla/RunFormula/blob/main/Help/Rus/runflahelp.txt)  in Russian).
+For more information on using RunFormula, please refer to the help files in the [Help](https://github.com/runnfla/RunFormula/blob/main/Help) directory (available in both English and Russian). Feel free to ask questions in [Discussions](https://github.com/runnfla/RunFormula/discussions).
 
 --\
 **Author:** Alexander Torubarov\
