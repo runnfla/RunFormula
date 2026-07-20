@@ -374,6 +374,7 @@ begin
                   VType:=VFloat;
                 end;
       2       : begin                         // "
+                  if I<0 then RaiseError(InvalidFormat);
                   Chr:=byte(I);
                   VType:=VChar;
                 end;
