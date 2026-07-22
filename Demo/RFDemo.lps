@@ -485,8 +485,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <TopLine Value="28"/>
-        <CursorPos X="36" Y="5"/>
+        <CursorPos X="53" Y="8"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -535,6 +534,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <EditorIndex Value="2"/>
+        <TopLine Value="214"/>
         <CursorPos X="108" Y="427"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -542,7 +542,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <EditorIndex Value="7"/>
-        <CursorPos X="44" Y="6"/>
+        <CursorPos X="57" Y="9"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -625,8 +625,8 @@
         <Filename Value="..\RunFormula\runflatext.inc"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="364"/>
-        <CursorPos X="49" Y="374"/>
+        <TopLine Value="422"/>
+        <CursorPos X="27" Y="430"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>

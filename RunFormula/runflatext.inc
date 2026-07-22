@@ -314,6 +314,7 @@ begin
     case c of
       #0..#$20  : ;
       '"', #$27 : begin
+                    if mf then RaiseError(InvalidFormat);
                     inc(P);
                     case FindTextFin(P, c)-P of
                       1 : I:=PByte(P)^;
@@ -323,7 +324,6 @@ begin
                           end else raise EError.Create(InvalidFormat, P);
                       else raise EError.Create(InvalidFormat, P);
                     end;
-                    if mf then I:=-I;
                     F:=I;
                     sig:=(sig shl 4) or 2;
                     inc(P);
@@ -374,7 +374,6 @@ begin
                   VType:=VFloat;
                 end;
       2       : begin                         // "
-                  if I<0 then RaiseError(InvalidFormat);
                   Chr:=byte(I);
                   VType:=VChar;
                 end;
@@ -428,7 +427,7 @@ begin
       $AA2,
       $BAA1D,                                  // [::0] [::"]
       $BAA2D  : if flg then begin
-                  Int:=LI;
+                  Int:=LI+1;
                   IGap:=I;
                   VType:=VIGap;
                 end else begin
