@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  ChangeLog
-//  Rev. 20.07.2026
+//  Rev. 23.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -24,7 +24,7 @@
 - Added: Physical dimension handling
 - Changed: Char value is converted to a Variant of type byte
 
-===== Develop branch changes =====
+===== Version 0.2 - 23.07.2026 =====
 - Fixed: Incorrect error position in qtx() function
 - Added: New embedded functions - margin(), ball(), arg(), conj(), rect(), floor(),
 ceil(), find(), substr(), hexstr(), unitstr()
@@ -42,4 +42,7 @@ separator required
 - Changed: Dimensions are passed by reference in interface functions
 - Changed: Number-to-string and string-to-number conversion use a Unified
 numeric format
+
+===== Develop branch changes =====
+
 
