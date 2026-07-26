@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  ChangeLog
-//  Rev. 23.07.2026
+//  Rev. 26.07.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -41,8 +41,9 @@ separator required
 - Added: New inteface function - RunFlaParamAsStr
 - Changed: Dimensions are passed by reference in interface functions
 - Changed: Number-to-string and string-to-number conversion use a Unified
-numeric format
+numeric format without backticks for units
 
 ===== Develop branch changes =====
+- Added: The ASCII character with code 0x7 can be used to define a string
 
 

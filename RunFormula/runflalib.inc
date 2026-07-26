@@ -223,6 +223,7 @@ function PhyMult(X, M:SizeInt):SizeInt;                    //DONE -oRFla.Lib -cR
 var dx, dr : TDPhy;
     t, i : integer;
 begin
+  if (M>high(ShortInt)) or (M<=low(ShortInt)) then raise EError.Create(DimOver);
   dx.DI:=X;
   for i:=0 to SI-1 do begin
     t:=dx.DB[i]*M;

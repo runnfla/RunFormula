@@ -7,7 +7,7 @@
 //  Contact: runfla@yandex.com
 
 //  Filename: runformula.pas
-//  Source Code: Object Pascal / FreePascal
+//  Source Code: Object Pascal / FPC
 //  Compatible: Lazarus 4.2 x64 win10 linux
 
 //  Copyright (C) 2026 Alexander Torubarov

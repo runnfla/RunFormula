@@ -354,18 +354,19 @@ begin
       continue;
     end;
     case c of
-      #0..#$20 : ;
-      '"', #$27 : begin
-                    inc(P);
-                    tf:=FindTextFin(P, c);
-                    case tf-P of
-                      0 : NoneToken;
-                      1 : CharToken(PByte(P)^);
-                      2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken(P, tf-P);
-                      else TextToken(P, tf-P);
-                    end;
-                    P:=tf;
-                  end;
+      #0..#6 : ;
+      #7, '"', #$27 : begin
+                        inc(P);
+                        tf:=FindTextFin(P, c);
+                        case tf-P of
+                          0 : NoneToken;
+                          1 : CharToken(PByte(P)^);
+                          2 : if P^='^' then CharToken(PByte(P+1)^-$40) else TextToken(P, tf-P);
+                          else TextToken(P, tf-P);
+                        end;
+                        P:=tf;
+                      end;
+      #8..#$20 : ;
       '%' : OpToken(TagMOD);
       '&' : OpToken(TagConcat);
       '(' : begin

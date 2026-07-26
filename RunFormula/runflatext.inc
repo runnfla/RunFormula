@@ -253,7 +253,6 @@ begin
             P:=FindTextFin(fp);
             exp:=IntCapture(fp, P, flg);
             if not flg then raise EError.Create(InvalidFormat, fp);
-            if exp>127 then raise EError.Create(DimOver, fp);
             c:=P^;
           end;
           if mf then exp:=-exp;
@@ -427,6 +426,7 @@ begin
       $AA2,
       $BAA1D,                                  // [::0] [::"]
       $BAA2D  : if flg then begin
+                  if I=LI then RaiseError(InvalidRange);
                   Int:=LI+1;
                   IGap:=I;
                   VType:=VIGap;

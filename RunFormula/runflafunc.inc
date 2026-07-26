@@ -15,7 +15,7 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Func -cRev.2026.00.00:
+// TODO -oRFla.Func -cRev.2026.07.24: Remove value check in math functions
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
 begin                               //DONE -oRFla.Func -cRev.2026.07.01: Inline BreakParam
@@ -854,6 +854,7 @@ begin
 end;
 
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_ABS
+const HRF = - TRFloat(LI);
 var pv : PValRec;
     fl, fr : TRFloat;
     al, ar : SizeInt;
@@ -864,7 +865,10 @@ begin
     pv:=Param(-1, Context);
     VType:=pv^.VType;
     case VType of
-      VInt   : Int:=abs(pv^.Int);
+      VInt   : if pv^.Int=LI then begin
+                 Flo:=HRF;
+                 VType:=VFloat;
+               end else Int:=abs(pv^.Int);
       VFloat : Flo:=abs(pv^.Flo);
       VCplex : begin
                  Flo:=Hypot2(pv^.Flo, pv^.Img)*2;
@@ -879,7 +883,7 @@ begin
                  end else Flo:=0;
                  if fl<fr then Img:=fr else Img:=fl;
                end;
-      VIGap  : begin
+      VIGap  : if pv^.Int>LI then begin
                  al:=abs(pv^.Int);
                  ar:=abs(pv^.IGap);
                  Int:=0;
@@ -887,7 +891,11 @@ begin
                    if al<ar then Int:=al else Int:=ar;
                  end;
                  if al<ar then IGap:=ar else IGap:=al;
-               end;
+               end else begin
+                 if pv^.IGap<0 then Flo:=-TRFloat(pv^.IGap) else Flo:=0;
+                 Img:=HRF;
+                 VType:=VGap;
+               end
       else
         VType:=VNone;
         RaiseError(InvalidType);
