@@ -405,7 +405,7 @@ begin
     VNone, VStr, VArr : RaiseError(InvalidType);
     VFloat : begin
                Flo:=System.int(Flo);
-               if (Flo>=LI) and (Flo<=HI) then begin
+               if (Flo>LI) and (Flo<=HI) then begin
                  Int:=trunc(Flo);
                  VType:=VInt;
                end;
@@ -417,7 +417,7 @@ begin
     VGap   : begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
-               if (Flo>=LI) and (Flo<=HI) and (Img>=LI) and (Img<=HI) then begin
+               if (Flo>LI) and (Flo<=HI) and (Img>LI) and (Img<=HI) then begin
                  I:=trunc(Img);
                  Int:=trunc(Flo);
                  IGap:=I;
