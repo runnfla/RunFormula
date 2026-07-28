@@ -45,5 +45,6 @@ numeric format without backticks for units
 
 ===== Develop branch changes =====
 - Added: The ASCII character with code 0x7 can be used to define a string
+- Added: New embedded functions - pow()
 
 

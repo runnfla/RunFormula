@@ -285,21 +285,6 @@ begin
 end;
 
 procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.07.14: Proc ParseValue
-type THF = record
-       case byte of
-         0 : (F : TRFloat);
-         1 : (H : array[1..SRFloat] of byte);
-     end;
-const
-{$ifdef ENDIAN_LITTLE}
-  {$if SRFloat = 4}  HF : THF = (H : ($FE, $FF, $7F, $7F)); {$endif}
-  {$if SRFloat = 8}  HF : THF = (H : ($E2, $FF, $FF, $FF, $FF, $FF, $EF, $7F)); {$endif}
-  {$if SRFloat = 10} HF : THF = (H : ($00, $00, $00, $00, $00, $00, $00, $80, $FE, $7F)); {$endif}
-{$else}
-  {$if SRFloat = 4}  HF : THF = (H : ($7F, $7F, $FF, $FE)); {$endif}
-  {$if SRFloat = 8}  HF : THF = (H : ($7F, $EF, $FF, $FF, $FF, $FF, $FF, $E2)); {$endif}
-  {$if SRFloat = 10} HF : THF = (H : ($7F, $FE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF)); {$endif}
-{$endif}
 var sig : SizeInt = 0;
     mf : boolean = false;
     flg : boolean = true;

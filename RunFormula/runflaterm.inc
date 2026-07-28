@@ -394,6 +394,7 @@ procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Ter
 var S : string;
 begin
   try
+  //  if PV = nil then ............ !!!
     with PV^ do case PVarData(@V)^.vtype of
       varEmpty, varNull     : begin
                                 VType:=VNone;
@@ -417,7 +418,8 @@ begin
       else raise EError.Create(VariantError);
     end;
   except
-    on E:EConvertError do raise EError.Create(VariantError);
+// on E:EConvertError do raise EError.Create(VariantError);
+    raise EError.Create(VariantError);
   end;
 end;
 

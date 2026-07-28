@@ -96,6 +96,8 @@ const
   Sint = SizeOf(integer);
   SPtr = SizeOf(pointer);
   SRFloat = SizeOf(TRFloat);
+  Cpi = 3.14159265358979323846;
+  CElr = 2.71828182845904523536;
 
 {$ifdef ENDIAN_LITTLE}
   Hex0x = $7830;     // 0x
@@ -104,6 +106,24 @@ const
   Hex0x = $3078;
   Unt1s = $312F;
 {$endif};
+
+type
+  THF = record
+    case byte of
+      0 : (F : TRFloat);
+      1 : (H : array[1..SRFloat] of byte);
+  end;
+
+const
+{$ifdef ENDIAN_LITTLE}
+  {$if SRFloat = 4}  HF : THF = (H : ($FE, $FF, $7F, $7F)); {$endif}
+  {$if SRFloat = 8}  HF : THF = (H : ($E2, $FF, $FF, $FF, $FF, $FF, $EF, $7F)); {$endif}
+  {$if SRFloat = 10} HF : THF = (H : ($00, $00, $00, $00, $00, $00, $00, $80, $FE, $7F)); {$endif}
+{$else}
+  {$if SRFloat = 4}  HF : THF = (H : ($7F, $7F, $FF, $FE)); {$endif}
+  {$if SRFloat = 8}  HF : THF = (H : ($7F, $EF, $FF, $FF, $FF, $FF, $FF, $E2)); {$endif}
+  {$if SRFloat = 10} HF : THF = (H : ($7F, $FE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF)); {$endif}
+{$endif}
 
 type
   TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
@@ -243,8 +263,6 @@ const
   TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
   UnitChars : TCharSet = ['0'..'9', 'A'..'Z', 'a'..'z', #$80..#$FF];
-  Cpi = 3.14159265358979323846;
-  CElr = 2.71828182845904523536;
 
   OpTokenSize = PtrUInt(@TToken(nil^).Size);
   ExprTokenSize = PtrUInt(@TToken(nil^).Index);

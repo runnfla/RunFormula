@@ -18,7 +18,7 @@
 // TODO -oRFla.Func -cRev.2026.07.24: Remove value check in math functions
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
-begin                               //DONE -oRFla.Func -cRev.2026.07.01: Inline BreakParam
+begin                                                      //DONE -oRFla.Func -cRev.2026.07.01: Inline BreakParam
   case ParamCount of
     0 : Result:=@CVNone;
     1 : Result:=Param(-1, Context);
@@ -176,6 +176,15 @@ begin
   if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
 end;
 
+function RealPow(const Base, Scl:TRFloat; Inf:boolean):TRFloat;
+begin                                                      //DONE -oRFla.Func -cRev.2026.07.27: Func RealPow
+  if Base=0 then begin
+    if Scl>0 then Exit(0);
+    if Scl=0 then Exit(1);
+    if Inf then Result:=HF.F else RaiseError(InvalidValue);
+  end else Result:=exp(ln(Base)*Scl);
+end;
+
 // -----
 
 function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_RE
@@ -285,7 +294,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_RIGHT
+function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_RIGHT
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -344,7 +353,7 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_BALL
+function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_BALL
 var L, R : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -693,6 +702,72 @@ begin
   end;
   PostParam(Context);
 end;
+
+function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.28: Func Fla_POW
+var X, Y : PValRec;               // pow(X, Y) = X^Y
+    f, fe, ft, m : TRFloat;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    Y:=Param(-1, Context);
+    X:=Param(-2, Context);
+    if (X^.VPhy<>0) or (Y^.VPhy<>0) then RaiseError(IllegalDim);
+    if (X^.VType=VCplex) or (Y^.VType=VCplex) then begin
+      ft:=AsIm(X);
+      fe:=AsRe(X);
+      m:=Hypot2(fe, ft);
+      if m>0 then begin
+        m:=ln(m)+ln(2);
+        f:=FlArcTan(ft, fe);
+        fe:=AsRe(Y);
+        ft:=fe*f+AsIm(Y)*m;
+        fe:=exp(fe*m-AsIm(Y)*f);
+        Flo:=fe*cos(ft);
+        Img:=fe*sin(ft);
+      end else begin
+        if AsRe(Y)<=0 then RaiseError(InvalidValue);
+        Flo:=0;
+        Img:=0;
+      end;
+      VType:=VCplex;
+    end else if (X^.VType in [VGap, VIGap]) or (Y^.VType in [VGap, VIGap]) then begin
+      f:=AsRGap(X);
+      if f<0 then RaiseError(InvalidValue);
+      m:=AsLGap(Y);
+      ft:=RealPow(f, m, true);
+      fe:=RealPow(f, AsRGap(Y), true);
+      f:=AsLGap(X);
+      if f<0 then f:=0;
+      m:=RealPow(f, m, true);
+      f:=RealPow(f, AsRGap(Y), true);
+      Flo:=Min4(f, m, fe, ft);
+      Img:=Max4(f, m, fe, ft);
+      VType:=VGap;
+    end else begin
+      Flo:=RealPow(AsFloat(X), AsFloat(Y), false);
+      VType:=VFloat;
+    end;
+  end;
+  PostParam(Context);
+  PostParam(Y, Context);
+end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_SIN
 var pv : PValRec;
@@ -1058,6 +1133,7 @@ begin
   FuncReg('value', @Fla_VALUE);
   FuncReg('exp', @Fla_EXP);
   FuncReg('ln', @Fla_LN);
+  FuncReg('pow', @Fla_POW);
   FuncReg('sin', @Fla_SIN);
   FuncReg('cos', @Fla_COS);
   FuncReg('sqrt', @Fla_SQRT);
