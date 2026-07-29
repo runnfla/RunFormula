@@ -15,7 +15,7 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Func -cRev.2026.07.24: Remove value check in math functions
+// TODO -oRFla.Func -cRev.2026.00.00:
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
 begin                                                      //DONE -oRFla.Func -cRev.2026.07.01: Inline BreakParam
@@ -52,7 +52,7 @@ function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE 
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  ParamCount:=-ParamCount;
+  ParamCount:= - ParamCount;
   b:=AsBool(Param(ParamCount, Context));
   PostParam(Context);
   Result:=@CVNone;
@@ -250,7 +250,7 @@ begin
   with Result^ do begin
     pv:=Param(-1, Context);
     Flo:=AsRe(pv);
-    Img:=-AsIm(pv);
+    Img:= - AsIm(pv);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
@@ -362,7 +362,7 @@ begin
     L:=Param(-2, Context);
     R:=Param(-1, Context);
     if (not ((L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]))) or
-      OverPlus(AsInt(L), -AsInt(R), Int) or OverPlus(AsInt(L), AsInt(R), IGap) then begin
+      OverPlus(AsInt(L), - AsInt(R), Int) or OverPlus(AsInt(L), AsInt(R), IGap) then begin
         Flo:=AsFloat(L)-AsFloat(R);
         Img:=AsFloat(L)+AsFloat(R);
         if Img<Flo then RaiseError(InvalidRange);
@@ -578,7 +578,7 @@ begin
     VType:=VInt;
     Int:=-1;
   end;
-  ParamCount:=-ParamCount;
+  ParamCount:= - ParamCount;
   s:=AsStr(Param(ParamCount, Context));
   PostParam(Context);
   ps:=PByte(s);
@@ -674,7 +674,6 @@ end;
 
 function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_LN
 var pv : PValRec;
-    f : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -682,22 +681,17 @@ begin
   if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               if (pv^.Flo=0) and (pv^.Img=0) then RaiseError(InvalidValue);
                Flo:=ln(Hypot2(pv^.Flo, pv^.Img))+ln(2);
                Img:=FlArcTan(pv^.Img, pv^.Flo);
                VType:=VCplex;
              end;
     VGap, VIGap : begin
-                    f:=AsLGap(pv);
-                    if f<=0 then RaiseError(InvalidValue);
-                    Flo:=ln(f);
+                    Flo:=ln(AsLGap(pv));
                     Img:=ln(AsRGap(pv));
                     VType:=VGap;
                   end;
     else
-      f:=AsFloat(pv);
-   //   if f<=0 then RaiseError(InvalidValue);
-      Flo:=ln(f);
+      Flo:=ln(AsFloat(pv));
       VType:=VFloat;
   end;
   PostParam(Context);
@@ -890,7 +884,7 @@ begin
                fa:=exp(pv^.Img)*0.5;
                fb:=0.25/fa;
                Flo:=cos(pv^.Flo)*(fa+fb);
-               Img:=-sin(pv^.Flo)*(fa-fb);
+               Img:= - sin(pv^.Flo)*(fa-fb);
                VType:=VCplex;
              end;
     VGap, VIGap : begin
@@ -925,9 +919,9 @@ var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
-  if (pv^.VPhy and $0101010101010101)>0 then RaiseError(IllegalDim);
   with Result^ do begin
+    pv:=Param(-1, Context);
+    if (pv^.VPhy and $0101010101010101)<>0 then RaiseError(IllegalDim);
     case pv^.VType of
       VCplex : begin
                  m:=Hypot2(pv^.Flo, pv^.Img);
@@ -935,21 +929,17 @@ begin
                  if f>0 then Flo:=sqrt(f) else Flo:=0;
                  f:=m-pv^.Flo*0.5;
                  if f>0 then Img:=sqrt(f) else Img:=0;
-                 if pv^.Img<0 then Img:=-Img;
+                 if pv^.Img<0 then Img:= - Img;
                  VType:=VCplex;
                end;
       VGap, VIGap : begin
-                      f:=AsRGap(pv);
-                      if f<0 then RaiseError(InvalidValue);
-                      Img:=sqrt(f);
                       f:=AsLGap(pv);
                       if f>0 then Flo:=sqrt(f) else Flo:=0;
+                      Img:=sqrt(AsRGap(pv));
                       VType:=VGap;
                     end;
       else
-        f:=AsFloat(pv);
-        if f<0 then RaiseError(InvalidValue);
-        Flo:=sqrt(f);
+        Flo:=sqrt(AsFloat(pv));
         VType:=VFloat;
     end;
     VPhy:=(pv^.VPhy shr 1) or (pv^.VPhy and $8080808080808080);
