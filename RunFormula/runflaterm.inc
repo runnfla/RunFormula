@@ -31,7 +31,7 @@ var L : PValRec = @CVNone;        // init VMode
     tag : TTag;
     tkn : PByte;
     lvl : integer;
-    f, fa, fb, fc, fd, t : TRFloat;
+    fa, fb, fc, fd : TRFloat;
     phy, I, J : SizeInt;
 
   procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
@@ -108,6 +108,13 @@ var L : PValRec = @CVNone;        // init VMode
       Int:=GL;
       IGap:=GR;
     end;
+  end;
+
+  function LGap:PValRec;                                     //DONE -oRFla.Term -cRev.2026.07.29: Func LGap
+  begin
+    FreeLR;
+    L^.VType:=VGap;
+    Result:=L;
   end;
 
   function OverPower(Base:SizeInt; out RI:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.04.25: Func OverPower
@@ -253,29 +260,21 @@ begin
                         VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
-                                        LGap(Min4(fa*fc, fa*fd, fb*fc, fb*fd), Max4(fa*fc, fa*fd, fb*fc, fb*fd));
+                                        MinMaxGap(fa*fc, fa*fd, fb*fc, fb*fd, LGap);
                                       end;
                         VArr   : raise EError.Create(InvalidArrVal);
                       end;
         TagSlash    : case CaseType[L^.VType, R^.VType] of                   // /
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                         VCplex : begin
-                                   fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
-                                   if abs(fc)>=abs(fd) then begin
-                                     t:=fd/fc;
-                                     f:=fc+fd*t;
-                                     LVal((fa+fb*t)/f, (fb-fa*t)/f);
-                                   end else begin
-                                     t:=fc/fd;
-                                     f:=fd+fc*t;
-                                     LVal((fa*t+fb)/f, (fb*t-fa)/f);
-                                   end;
+                                   CplexDiv(AsRe(L), AsIm(L), AsRe(R), AsIm(R), fa, fb);
+                                   LVal(fa, fb);
                                  end;
                         VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
                                         if (fc<=0) and (fd>=0) then raise EError.Create(DivZero);
-                                        LGap(Min4(fa/fc, fa/fd, fb/fc, fb/fd), Max4(fa/fc, fa/fd, fb/fc, fb/fd));
+                                        MinMaxGap(fa/fc, fa/fd, fb/fc, fb/fd, LGap);
                                       end;
                         VArr   : raise EError.Create(InvalidArrVal);
                       end;
@@ -307,12 +306,13 @@ begin
                         VStr   : raise EError.Create(InvalidStrVal);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); I:=AsInt(R);
-                                        fc:=Power(fa, I); fd:=Power(fb, I);
-                                        if (fa<=0) and (fb>=0) then begin
+                                        fc:=Power(fa, I);
+                                        fd:=Power(fb, I);
+                                        if (fa<=0) and (fb>=0) and (I<>0) then begin
                                           if I<0 then raise EError.Create(DivZero);
-                                          if (I and 1)=0 then LGap(0, Max4(fc, fd, 0, 0))
+                                          if (I and 1)=0 then MinMaxGap(fc, fd, 0, 0, LGap)
                                             else LGap(fc, fd);
-                                          end else LGap(Min4(fc, fc, fd, fd), Max4(fc, fc, fd, fd));
+                                          end else MinMaxGap(fc, fc, fd, fd, LGap);
                                         end;
                         VArr : raise EError.Create(InvalidArrVal);
                       end;

@@ -173,20 +173,39 @@ begin
   if Scl<0 then Result:=1/Result;
 end;
 
-function Max4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oRFla.Lib -cRev.2026.04.27: Func Max4
-var m1, m2 : TRFloat;
+procedure CplexDiv(const FA, FB, FC, FD:TRFloat; out Re, Im:TRFloat);
+var f, t : TRFloat;                         //DONE -oRFla.Lib -cRev.2026.07.28: Proc CplexDiv
 begin
-  if F1>F2 then m1:=F1 else m1:=F2;
-  if F3>F4 then m2:=F3 else m2:=F4;
-  if m1>m2 then Result:=m1 else Result:=m2;
+  if abs(FC)>=abs(FD) then begin            // Smith's algorithm
+   t:=FD/FC;
+   f:=FC+FD*t;
+   Re:=(FA+FB*t)/f;
+   Im:=(FB-FA*t)/f;
+ end else begin
+   t:=FC/FD;
+   f:=FD+FC*t;
+   Re:=(FA*t+FB)/f;
+   Im:=(FB*t-FA)/f;
+ end;
 end;
 
-function Min4(const F1, F2, F3, F4:TRFloat):TRFloat;       //DONE -oRFla.Lib -cRev.2026.04.27: Func Min4
-var m1, m2 : TRFloat;
+procedure MinMaxGap(const F1, F2, F3, F4:TRFloat; PV:PValRec);
+var m1, m2, x1, x2 : TRFloat;               //DONE -oRFla.Lib -cRev.2026.07.29: Proc MinMaxGap
 begin
-  if F1<F2 then m1:=F1 else m1:=F2;
-  if F3<F4 then m2:=F3 else m2:=F4;
-  if m1<m2 then Result:=m1 else Result:=m2;
+  if F1<F2 then begin
+    m1:=F1; x1:=F2;
+  end else begin
+    m1:=F2; x1:=F1;
+  end;
+  if F3<F4 then begin
+    m2:=F3; x2:=F4;
+  end else begin
+    m2:=F4; x2:=F3;
+  end;
+  with PV^ do begin
+    if m1<m2 then Flo:=m1 else Flo:=m2;
+    if x1<x2 then Img:=x2 else Img:=x1;
+  end;
 end;
 
 // ===== Dimentions =====
