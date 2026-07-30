@@ -742,8 +742,8 @@ begin
   PostParam(Y, Context);
 end;
 
-function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_LOG
-var X, Y : PValRec;               // log(X, Y) = log Y(X)
+function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.30: Func Fla_LOG
+var X, Y : PValRec;               // log(X, Y) = logY(X)
     f, fe, ft, m : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -751,7 +751,7 @@ begin
   with Result^ do begin
     X:=Param(-2, Context);
     Y:=Param(-1, Context);
-    if (X^.VPhy<>0) or (Y^.VPhy<>0) then RaiseError(IllegalDim);
+    if (Y^.VPhy<>0) or (X^.VPhy<>0) then RaiseError(IllegalDim);
     if (X^.VType=VCplex) or (Y^.VType=VCplex) then begin
       f:=AsIm(X);
       m:=AsRe(X);
@@ -762,38 +762,9 @@ begin
       CplexDiv(fe, ft, ln(Hypot2(m, f))+ln(2), FlArcTan(f, m), Flo, Img);
       VType:=VCplex;
     end else if (X^.VType in [VGap, VIGap]) or (Y^.VType in [VGap, VIGap]) then begin
-
-
-
-       {
-           x_lo := AsLGap(X);
-      x_hi := AsRGap(X);
-      y_lo := AsLGap(Y);
-      y_hi := AsRGap(Y);
-
-      // Валидация входных диапазонов
-      if (x_lo <= 0) or (y_lo <= 0) then RaiseError(InvalidValue);
-      if (y_lo <= 1) and (y_hi >= 1) then RaiseError(InvalidBase); // Точка разрыва (деление на ln(1)=0)
-
-      // Предварительно вычисляем натуральные логарифмы всех границ
-      ln_x_lo := ln(x_lo);
-      ln_x_hi := ln(x_hi);
-      ln_y_lo := ln(y_lo);
-      ln_y_hi := ln(y_hi);
-
-      // Считаем строго 4 угла прямоугольника взаимодействий
-      ft := ln_x_hi / ln_y_lo; // Log(X.Hi) / Log(Y.Lo)
-      fe := ln_x_hi / ln_y_hi; // Log(X.Hi) / Log(Y.Hi)
-      m  := ln_x_lo / ln_y_lo; // Log(X.Lo) / Log(Y.Lo)
-      f  := ln_x_lo / ln_y_hi; // Log(X.Lo) / Log(Y.Hi)
-
-      // Поиск экстремумов среди всех комбинаций углов
-      Flo := Min4(f, m, fe, ft);
-      Img := Max4(f, m, fe, ft);
-      VType := VGap;
-                }
-
-
+      m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
+      if (fe<=1) and (ft>=1) then RaiseError(InvalidValue);
+      MinMaxGap(ln(m)/ln(fe), ln(m)/ln(ft), ln(f)/ln(fe), ln(f)/ln(ft), Result);
       VType:=VGap;
     end else begin
       Flo:=ln(AsFloat(X))/ln(AsFloat(Y));
@@ -803,13 +774,6 @@ begin
   PostParam(Context);
   PostParam(X, Context);
 end;
-
-
-
-
-
-
-
 
 function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_SIN
 var pv : PValRec;
