@@ -176,14 +176,17 @@ begin
   if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
 end;
 
-function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.07.27: Func RealPow
+function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.07.30: Func RealPow
 begin
+  if Base>0 then begin
+    Result:=exp(ln(Base)*Scale);
+    exit;
+  end;
   if Base=0 then begin
     if Scale>0 then Exit(0);
     if Scale=0 then Exit(1);
-    RaiseError(InvalidValue);
   end;
-  Result:=exp(ln(Base)*Scale);
+  RaiseError(InvalidValue);
 end;
 
 // -----
@@ -698,7 +701,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.28: Func Fla_POW
+function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.30: Func Fla_POW
 var X, Y : PValRec;               // pow(X, Y) = X^Y
     f, fe, ft, m : TRFloat;
 begin
@@ -727,17 +730,8 @@ begin
       end;
       VType:=VCplex;
     end else if (X^.VType in [VGap, VIGap]) or (Y^.VType in [VGap, VIGap]) then begin
-      f:=AsRGap(X);
-      if f<0 then RaiseError(InvalidValue);
-      m:=AsLGap(Y);
-      ft:=RealPow(f, m);
-      fe:=RealPow(f, AsRGap(Y));
-      f:=AsLGap(X);
-      if f<0 then f:=0;
-      m:=RealPow(f, m);
-      f:=RealPow(f, AsRGap(Y));
-    //  Flo:=Min4(f, m, fe, ft);
-    //  Img:=Max4(f, m, fe, ft);
+      m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
+      MinMaxGap(RealPow(m, fe), RealPow(m, ft), RealPow(f, fe), RealPow(f, ft), Result);
       VType:=VGap;
     end else begin
       Flo:=RealPow(AsFloat(X), AsFloat(Y));
