@@ -189,6 +189,17 @@ begin
  end;
 end;
 
+procedure MinMaxGap(const F1, F2:TRFloat; PV:PValRec);
+begin                                   //DONE -oRFla.Lib -cRev.2026.07.29: Proc MinMaxGap
+  with PV^ do if F1<F2 then begin
+    Flo:=F1;
+    Img:=F2;
+  end else begin
+    Flo:=F2;
+    Img:=F1;
+  end;
+end;
+
 procedure MinMaxGap(const F1, F2, F3, F4:TRFloat; PV:PValRec);
 var m1, m2, x1, x2 : TRFloat;               //DONE -oRFla.Lib -cRev.2026.07.29: Proc MinMaxGap
 begin

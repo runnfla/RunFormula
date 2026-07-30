@@ -312,7 +312,7 @@ begin
                                           if I<0 then raise EError.Create(DivZero);
                                           if (I and 1)=0 then MinMaxGap(fc, fd, 0, 0, LGap)
                                             else LGap(fc, fd);
-                                          end else MinMaxGap(fc, fc, fd, fd, LGap);
+                                          end else MinMaxGap(fc, fd, LGap);
                                         end;
                         VArr : raise EError.Create(InvalidArrVal);
                       end;

@@ -176,13 +176,14 @@ begin
   if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
 end;
 
-function RealPow(const Base, Scl:TRFloat; Inf:boolean):TRFloat;
-begin                                                      //DONE -oRFla.Func -cRev.2026.07.27: Func RealPow
+function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.07.27: Func RealPow
+begin
   if Base=0 then begin
-    if Scl>0 then Exit(0);
-    if Scl=0 then Exit(1);
-    if Inf then Result:=HF.F else RaiseError(InvalidValue);
-  end else Result:=exp(ln(Base)*Scl);
+    if Scale>0 then Exit(0);
+    if Scale=0 then Exit(1);
+    RaiseError(InvalidValue);
+  end;
+  Result:=exp(ln(Base)*Scale);
 end;
 
 // -----
@@ -729,17 +730,17 @@ begin
       f:=AsRGap(X);
       if f<0 then RaiseError(InvalidValue);
       m:=AsLGap(Y);
-      ft:=RealPow(f, m, true);
-      fe:=RealPow(f, AsRGap(Y), true);
+      ft:=RealPow(f, m);
+      fe:=RealPow(f, AsRGap(Y));
       f:=AsLGap(X);
       if f<0 then f:=0;
-      m:=RealPow(f, m, true);
-      f:=RealPow(f, AsRGap(Y), true);
+      m:=RealPow(f, m);
+      f:=RealPow(f, AsRGap(Y));
     //  Flo:=Min4(f, m, fe, ft);
     //  Img:=Max4(f, m, fe, ft);
       VType:=VGap;
     end else begin
-      Flo:=RealPow(AsFloat(X), AsFloat(Y), false);
+      Flo:=RealPow(AsFloat(X), AsFloat(Y));
       VType:=VFloat;
     end;
   end;
@@ -796,18 +797,7 @@ begin
       Flo := Min4(f, m, fe, ft);
       Img := Max4(f, m, fe, ft);
       VType := VGap;
-
-
                 }
-
-
-
-
-
-
-
-
-
 
 
       VType:=VGap;
@@ -947,7 +937,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_ARCTAN
+function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.30: Func Fla_ARCTAN
 var pv : PValRec;
     f, m : TRFloat;
 begin
@@ -957,17 +947,10 @@ begin
   if pv^.VPhy<>0 then RaiseError(IllegalDim);
   with Result^ do case pv^.VType of
     VCplex : begin
-               f:=abs(pv^.Flo);
-               m:=abs(pv^.Img);
-               if (m=1) and (f=0) then RaiseError(InvalidValue);
-               if m>f then f:=m;
-               if f>0 then begin
-                 Flo:=FlArcTan(pv^.Flo/f*2, 1/f-(pv^.Flo/f)*pv^.Flo-(pv^.Img/f)*pv^.Img)*0.5;
-                 Img:=ln(Hypot2(pv^.Flo, pv^.Img+1)/Hypot2(pv^.Flo, pv^.Img-1))*0.5;
-               end else begin
-                 Flo:=0;
-                 Img:=0;
-               end;
+               CplexDiv(pv^.Img+1, - pv^.Flo, 1-pv^.Img, pv^.Flo, f, m);
+               Flo:= - FlArcTan(m, f)*0.5;
+               if (m=0) and (f<-1) then Flo:= - Flo;
+               Img:=(ln(Hypot2(f, m))+ln(2))*0.5;
                VType:=VCplex;
              end;
     VGap, VIGap : begin
@@ -985,7 +968,6 @@ end;
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_ABS
 const HRF = - TRFloat(LI);
 var pv : PValRec;
-    fl, fr : TRFloat;
     al, ar : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -1005,12 +987,8 @@ begin
                end;
       VChar  : Chr:=pv^.Chr;
       VGap   : begin
-                 fl:=abs(pv^.Flo);
-                 fr:=abs(pv^.Img);
-                 if (pv^.Flo>0) or (pv^.Img<0) then begin
-                   if fl<fr then Flo:=fl else Flo:=fr;
-                 end else Flo:=0;
-                 if fl<fr then Img:=fr else Img:=fl;
+                 MinMaxGap(abs(pv^.Flo), abs(pv^.Img), Result);
+                 if (pv^.Flo<0) and (pv^.Img>0) then Flo:=0;
                end;
       VIGap  : if pv^.Int>LI then begin
                  al:=abs(pv^.Int);
@@ -1032,6 +1010,37 @@ begin
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
+
+//        Чтобы максимально переиспользовать код и объединить логику abs и умножения, вам нужно сделать одну универсальную «низкоуровневую» функцию умножения, которая принимает не два интервала, а четыре отдельные границы.Вся интервальная арифметика (и умножение, и abs, и возведение в квадрат) под капотом сводится к перебору комбинаций произведений. Если вынести этот перебор в базовую функцию, вы получите идеальный повторный код.1. Единое «ядро» для вашего парсера (Псевдокод)text// Базовое ядро: считает экстремумы из 4-х комбинаций произведений
+//Функция _ядро_умножения_границ(a1, a2, b1, b2) {
+//    p1 = a1 * b1;
+//    p2 = a1 * b2;
+//    p3 = a2 * b1;
+//    p4 = a2 * b2;
+
+//    новый_мин = Найти_Минимум(p1, p2, p3, p4);
+//    новый_макс = Найти_Максимум(p1, p2, p3, p4);
+
+//    Возврат Новый Целый_Интервал(новый_мин, новый_макс);
+//}
+//Используйте код с осторожностью.2. Повторное использование для Умножения ИнтерваловСтандартное умножение двух интервалов теперь просто транслирует свои границы в ядро:textФункция умножить_интервалы(A, B) {
+//    // Прямой проброс границ в общее ядро
+//    Возврат _ядро_умножения_границ(A.min, A.max, B.min, B.max);
+//}
+//Используйте код с осторожностью.3. Повторное использование для функции ABSЧтобы применить это же ядро для abs (включая правильную обработку нуля), вам нужно передавать в него модули границ исходного интервала, но с одним хитрым переключателем знаков.Математически, модуль интервала — это умножение его абсолютных границ на специальный базис. Логика склеивается идеально:textФункция abs_интервала(X) {
+//    // 1. Отрезаем знаки у исходных границ
+//    abs_min = abs(X.min);
+//    abs_max = abs(X.max);
+
+//    // 2. Если интервал пересекает ноль, искусственно создаем ноль на левой границе
+//    //    Иначе просто умножаем абсолютные значения на 1
+//    Если (X.min < 0 и X.max > 0) {
+//        Возврат _ядро_умножения_границ(0, abs_max, 0, abs_min);
+//    } Иначе {
+//        Возврат _ядро_умножения_границ(abs_min, abs_max, 1, 1);
+//    }
+//}
+
 end;
 
 function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_CHAR
