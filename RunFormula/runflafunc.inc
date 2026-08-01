@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Embedded functions include file
-//  Rev. 15.07.2026
+//  Rev. 1.08.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com

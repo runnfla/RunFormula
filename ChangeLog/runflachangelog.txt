@@ -43,8 +43,10 @@ separator required
 - Changed: Number-to-string and string-to-number conversion use a Unified
 numeric format without backticks for units
 
-===== Develop branch changes =====
+===== Version 0.2a - 1.08.2026 =====
 - Added: The ASCII character with code 0x7 can be used to define a string
-- Added: New embedded functions - pow(), log()
+- Added: New embedded functions - pow(), log(), tan()
+
+===== Develop branch changes =====
 
 

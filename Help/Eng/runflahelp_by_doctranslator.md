@@ -2,7 +2,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  RunFormula Help file
-//  Rev. 22.07.2026
+//  Rev. 1.08.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -119,7 +119,8 @@ A text string can be specified in quotes or apostrophes. If the string is specif
 ```
   X = '"A"' & "'s'";       // result "A"'s'
 ```
-An empty string can be specified as "", '' or the constant None.
+An empty string can be specified as "", '' or the constant None.\
+An ASCII character with the code 0x7 can also be used to define a string.
 
 #### 2.e. ASCII Characters
 
@@ -581,11 +582,17 @@ All functions, except for specified cases, support all permissible parameter typ
 
 `exp(<parameter>)` - calculates the exponent of the given parameter
 
+`pow(<base>, <exponent>)` - raises the base to the power
+
 `ln(<parameter>)` - calculates the natural logarithm of the given parameter
+
+`log(<argument>, <base>)` - calculates the logarithm of the argument to the given base
 
 `sin(<parameter>)` - calculates the sine of the given parameter
 
 `cos(<parameter>)` - calculates the cosine of the given parameter
+
+`tan(<parameter>)` -  calculates the tangent of the given parameter
 
 `sqrt(<parameter>)` - calculates the square root of the given parameter
 

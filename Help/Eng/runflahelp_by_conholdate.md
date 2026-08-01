@@ -1,8 +1,8 @@
-﻿<pre>
+<pre>
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  RunFormula Help file
-//  Rev. 22.07.2026
+//  Rev. 1.08.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -120,7 +120,8 @@ A text string can be specified in double or single quotes. If a string is enclos
 ```
   X = '"A"' & "'s'";       // result "A"'s'
 ```
-An empty string can be specified as `""`, `''`, or by using the constant `None`.
+An empty string can be specified as `""`, `''`, or by using the constant `None`.\
+An ASCII character with the code 0x7 can also be used to define a string.
 
 #### 2.e. ASCII Characters
 
@@ -574,9 +575,12 @@ All functions support all valid parameter types unless otherwise noted.
 #### 11.b. Mathematical Functions
 
 `exp(<parameter>)` — computes the exponential of the parameter.  
+`pow(<base>, <exponent>)` - raises the base to the power
 `ln(<parameter>)` — computes the natural logarithm.  
+`log(<argument>, <base>)` - calculates the logarithm of the argument to the given base
 `sin(<parameter>)` — computes the sine.  
 `cos(<parameter>)` — computes the cosine.  
+`tan(<parameter>)` -  calculates the tangent of the given parameter
 `sqrt(<parameter>)` — computes the square root.  
 `arctan(<parameter>)` — computes the arctangent.  
 `abs(<parameter>)` — returns the absolute value; for complex numbers, returns the modulus; for intervals, returns an interval of absolute values of all contained numbers.
