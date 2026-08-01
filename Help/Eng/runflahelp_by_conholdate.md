@@ -574,16 +574,16 @@ All functions support all valid parameter types unless otherwise noted.
 
 #### 11.b. Mathematical Functions
 
-`exp(<parameter>)` — computes the exponential of the parameter.  
+`exp(<parameter>)` — computes the exponential of the parameter
 `pow(<base>, <exponent>)` - raises the base to the power
-`ln(<parameter>)` — computes the natural logarithm.  
+`ln(<parameter>)` — computes the natural logarithm
 `log(<argument>, <base>)` - calculates the logarithm of the argument to the given base
-`sin(<parameter>)` — computes the sine.  
-`cos(<parameter>)` — computes the cosine.  
+`sin(<parameter>)` — computes the sine
+`cos(<parameter>)` — computes the cosine
 `tan(<parameter>)` -  calculates the tangent of the given parameter
-`sqrt(<parameter>)` — computes the square root.  
-`arctan(<parameter>)` — computes the arctangent.  
-`abs(<parameter>)` — returns the absolute value; for complex numbers, returns the modulus; for intervals, returns an interval of absolute values of all contained numbers.
+`sqrt(<parameter>)` — computes the square root
+`arctan(<parameter>)` — computes the arctangent
+`abs(<parameter>)` — returns the absolute value; for complex numbers, returns the modulus; for intervals, returns an interval of absolute values of all contained numbers
 
 #### 11.c. Complex Number Functions
 
