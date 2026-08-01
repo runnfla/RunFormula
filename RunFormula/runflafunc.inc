@@ -168,25 +168,26 @@ begin
   end;
 end;
 
-function Dsincos(const F, CS:TRFloat):integer;             //DONE -oRFla.Func -cRev.2026.06.28: Func Dsincos
-var w : TRFloat;
-begin
-  Result:=0;
-  w:=frac(F*(0.5/Cpi)-CS);
-  if (w>0.5) or ((w<0) and (w>-0.5)) then Result:=1;
-end;
-
 function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.07.30: Func RealPow
 begin
-  if Base>0 then begin
-    Result:=exp(ln(Base)*Scale);
-    exit;
-  end;
+  if Base>0 then Exit(exp(ln(Base)*Scale));
   if Base=0 then begin
     if Scale>0 then Exit(0);
     if Scale=0 then Exit(1);
   end;
   RaiseError(InvalidValue);
+end;
+
+function SCosGap(const L, R:TRFloat):integer;                             //DONE -oRFla.Func -cRev.2026.08.01: Func CosGap
+var fl, d : TRFloat;
+begin
+  fl:=FlaRound(L/Cpi, -1);
+  d:=FlaRound(R/Cpi, -1)-fl;
+  if d<1 then Exit(0);
+  if d>=2 then Exit(2);
+  d:=frac(abs(fl)*0.5);
+  Result:=-1;
+  if (d>0.25) and (d<0.75) then Result:=1;
 end;
 
 // -----
@@ -777,8 +778,7 @@ end;
 
 function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_SIN
 var pv : PValRec;
-    fa, fb, d : TRFloat;
-    k : integer;
+    fa, fb : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -793,23 +793,15 @@ begin
                VType:=VCplex;
              end;
     VGap, VIGap : begin
-                    VType:=VGap;
-                    Flo:=-1;
-                    Img:=1;
                     fa:=AsLGap(pv);
                     fb:=AsRGap(pv);
-                    d:=fb-fa;
-                    if d<(Cpi*2) then begin
-                      k:=(Dsincos(fa, -0.25) shl 1) or Dsincos(fb, -0.25);
-                      fa:=sin(fa);
-                      fb:=sin(fb);
-                      case k of
-                        0 : if d<Cpi then begin Flo:=fa; Img:=fb; end;
-                        1 : if fa<fb then Flo:=fa else Flo:=fb;
-                        2 : if fa<fb then Img:=fb else Img:=fa;
-                        3 : if d<Cpi then begin Flo:=fb; Img:=fa; end;
-                      end;
+                    MinMaxGap(sin(fa), sin(fb), Result);
+                    case SCosGap(fa-(Cpi/2), fb-(Cpi/2)) of
+                      -1 : Flo:=-1;
+                      1  : Img:=1;
+                      2  : begin Flo:=-1; Img:=1; end;
                     end;
+                    VType:=VGap;
                   end;
     else
       Flo:=sin(AsFloat(pv));
@@ -820,8 +812,7 @@ end;
 
 function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_COS
 var pv : PValRec;
-    fa, fb, d : TRFloat;
-    k : integer;
+    fa, fb : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -836,26 +827,58 @@ begin
                VType:=VCplex;
              end;
     VGap, VIGap : begin
-                    VType:=VGap;
-                    Flo:=-1;
-                    Img:=1;
                     fa:=AsLGap(pv);
                     fb:=AsRGap(pv);
-                    d:=fb-fa;
-                    if d<(Cpi*2) then begin
-                      k:=(Dsincos(fa, 0.5) shl 1) or Dsincos(fb, 0.5);
-                      fa:=cos(fa);
-                      fb:=cos(fb);
-                      case k of
-                        0 : if d<Cpi then begin Flo:=fa; Img:=fb; end;
-                        1 : if fa<fb then Flo:=fa else Flo:=fb;
-                        2 : if fa<fb then Img:=fb else Img:=fa;
-                        3 : if d<Cpi then begin Flo:=fb; Img:=fa; end;
-                      end;
+                    MinMaxGap(cos(fa), cos(fb), Result);
+                    case SCosGap(fa, fb) of
+                      -1 : Flo:=-1;
+                      1  : Img:=1;
+                      2  : begin Flo:=-1; Img:=1; end;
                     end;
+                    VType:=VGap;
                   end;
     else
       Flo:=cos(AsFloat(pv));
+      VType:=VFloat;
+  end;
+  PostParam(Context);
+end;
+
+function Fla_TAN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_TAN
+var pv : PValRec;
+    f, fc, fx : TRFloat;
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  with Result^ do case pv^.VType of
+    VCplex : begin
+     // try
+               f:=exp(pv^.Img*2);
+               fx:=f+1/f;
+    // except
+
+               fc:=cos(pv^.Flo*2);
+               Flo:=sin(pv^.Flo*2)/(fx*0.5+fc);
+               Img:=(f-1/f)/(fc*2+fx);
+     //  except
+     //           Flo := 0.0;
+     //           if pv^.Img > 0 then Img := 1.0 else Img := -1.0;
+     //  end;
+
+               VType:=VCplex;
+             end;
+    VGap, VIGap : begin
+                    f:=AsLGap(pv);
+                    fc:=AsRGap(pv);
+                    if SCosGap(f-(Cpi/2), fc-(Cpi/2))<>0 then RaiseError(InvalidValue);
+                    MinMaxGap(sin(f)/cos(f), sin(fc)/cos(fc), Result);
+                    VType:=VGap;
+                  end;
+    else
+      f:=AsFloat(pv);
+      Flo:=sin(f)/cos(f);
       VType:=VFloat;
   end;
   PostParam(Context);
@@ -1158,6 +1181,7 @@ begin
   FuncReg('log', @Fla_LOG);
   FuncReg('sin', @Fla_SIN);
   FuncReg('cos', @Fla_COS);
+  FuncReg('tan', @Fla_TAN);
   FuncReg('sqrt', @Fla_SQRT);
   FuncReg('arctan', @Fla_ARCTAN);
   FuncReg('abs', @Fla_ABS);
