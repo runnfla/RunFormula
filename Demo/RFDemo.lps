@@ -544,8 +544,8 @@
       <Unit>
         <Filename Value="..\RunFormula\runflafunc.inc"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="853"/>
-        <CursorPos X="41" Y="866"/>
+        <TopLine Value="1163"/>
+        <CursorPos X="53" Y="1176"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -655,7 +655,8 @@
         <Filename Value="..\ChangeLog\runflachangelog.txt"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="17"/>
-        <CursorPos X="42" Y="5"/>
+        <TopLine Value="26"/>
+        <CursorPos X="54" Y="49"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
@@ -663,7 +664,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runflaunits.inc"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="61"/>
+        <TopLine Value="35"/>
         <CursorPos X="95" Y="74"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>

@@ -1174,7 +1174,8 @@ begin
   FuncReg('hexstr', @Fla_HEXSTR);
   FuncReg('find', @Fla_FIND);
   FuncReg('substr', @Fla_SUBSTR);
-  FuncReg('value', @Fla_VALUE);
+  FuncReg('value', @Fla_VALUE);       // delete this
+  FuncReg('val', @Fla_VALUE);
   FuncReg('exp', @Fla_EXP);
   FuncReg('ln', @Fla_LN);
   FuncReg('pow', @Fla_POW);

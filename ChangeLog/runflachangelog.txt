@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  ChangeLog
-//  Rev. 1.08.2026
+//  Rev. 3.08.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -48,5 +48,5 @@ numeric format without backticks for units
 - Added: New embedded functions - pow(), log(), tan()
 
 ===== Develop branch changes =====
-
+- Changed: Embedded function value() is renamed to val()
 
