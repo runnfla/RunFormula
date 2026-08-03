@@ -12,10 +12,10 @@ Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod 
 Variables and runtime initialization of variables via an external callback function.\
 A base set of built-in functions and the ability to register and use additional user-defined functions.\
 Control flow functions: if() repeat() exit() result() continue() break()\
-Ability to define and subsequently use functions directly within the formula text (subroutines).\
+Ability to define and subsequently use functions directly within source script (subroutines).\
 Support for physical dimensions, their runtime checking, automatic calculation of the resulting dimension, and automatic conversion of values between different unit systems.\
 Support for the define directive.\
-Compiling the source formula into bytecode for multiple execution.\
+Compiling the source script into bytecode for multiple execution.\
 Minimal dependencies (only SysUtils in the base configuration).
 
 #### Integrating RunFormula into your project
@@ -42,10 +42,9 @@ ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) );  // displays 27
 ```
 or, with physical units:
 ```
-ShowMessage( RunFlaExecStr( RunFlaParse('g=9.8`N/kg`, t=5, g*t`s`**2/2') ) );  // displays 122.5`m`
+ShowMessage( RunFlaExecStr( RunFlaParse('g = 9.8`N/kg`, t = 5, g * t`s` ** 2 / 2') ) );  // displays 122.5 m
 ```
-`RunFlaParse` compiles the source formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string,
-while `RunFlaExecVrt` returns a Variant.\
+`RunFlaParse` compiles the source script into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. The result of `RunFlaExecStr` is a string, while `RunFlaExecVrt` returns a Variant.\
 For more information on using RunFormula, please refer to the help files in the [Help](https://github.com/runnfla/RunFormula/blob/main/Help) directory (available in both English and Russian). Feel free to ask questions in [Discussions](https://github.com/runnfla/RunFormula/discussions).
 
 --\
