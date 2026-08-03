@@ -652,7 +652,7 @@ All functions, except for specified cases, support all permissible parameter typ
 
 `substr(<string>, <interval>)` - returns a substring, with the start and end positions specified by an interval. Positions in the string are counted starting from 0. If the left or right boundaries of the interval are outside the string, they are adjusted to the start or end of the string, respectively. If the interval is completely outside the string, it returns None. If the returned value is a single character, it is returned as an ASCII character type.
 
-`value(<string>)` - converts a string in Unified Numeric Format to a value. If conversion is not possible, it returns None.
+`val(<string>)` - converts a string in Unified Numeric Format to a value. If conversion is not possible, it returns None.
 
 `char(<integer>)` - extracts the least significant byte of an integer and converts it to an ASCII character.
 

@@ -619,7 +619,7 @@ All functions support all valid parameter types unless otherwise noted.
 `string(<parameter>)` — converts parameter to string (equivalent to `<parameter> & ""`).  
 `find(<string>, <pattern>, [<offset>])` — finds `pattern` in `string` and returns its start index (0-based). Optional `offset` (positive) starts the search from that position; comparison is byte-wise and case-sensitive. Returns `-1` if not found, or if `string`/`pattern` is empty or `offset ≥ length(string)`.  
 `substr(<string>, <interval>)` — returns a substring whose start and end positions are given by the interval (0-based). Out-of-bounds bounds are clamped to the string edges; if entirely outside, returns `None`; single-character results are returned as ASCII characters.  
-`value(<string>)` — converts the string (in Unified Numeric Format) to a value; returns `None` on failure.  
+`val(<string>)` — converts the string (in Unified Numeric Format) to a value; returns `None` on failure.  
 `char(<integer>)` — extracts the least significant byte and converts it to an ASCII character.  
 `hexstr(<integer>)` — converts integer to hexadecimal text.
 
