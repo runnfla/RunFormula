@@ -633,7 +633,7 @@ begin
   end;
 end;
 
-function Fla_VALUE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_VALUE
+function Fla_VAL(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_VAL
 var s : string;
     p : PByte;
 begin
@@ -1096,7 +1096,7 @@ begin
   ApplyPhyToPV(Result, phy, scl, ofs);
 end;
 
-function Fla_CONVERT(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_CONVERT
+function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_CONV
 var phy : SizeInt;
     scl, ofs : TRFloat;
 begin
@@ -1174,8 +1174,8 @@ begin
   FuncReg('hexstr', @Fla_HEXSTR);
   FuncReg('find', @Fla_FIND);
   FuncReg('substr', @Fla_SUBSTR);
-  FuncReg('value', @Fla_VALUE);       // delete this
-  FuncReg('val', @Fla_VALUE);
+  FuncReg('value', @Fla_VAL);           // delete this
+  FuncReg('val', @Fla_VAL);
   FuncReg('exp', @Fla_EXP);
   FuncReg('ln', @Fla_LN);
   FuncReg('pow', @Fla_POW);
@@ -1190,7 +1190,8 @@ begin
   FuncReg('compare', @Fla_COMPARE);
   FuncReg('match', @Fla_MATCH);
   FuncReg('qty', @Fla_QTY);
-  FuncReg('convert', @Fla_CONVERT);
+  FuncReg('convert', @Fla_CONV);        // delete this
+  FuncReg('conv', @Fla_CONV);
   FuncReg('unitstr', @Fla_UNITSTR);
 
 {$define runfla_optreg}
