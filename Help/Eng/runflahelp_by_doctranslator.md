@@ -677,9 +677,9 @@ All functions, except for specified cases, support all permissible parameter typ
 ```
   qty(20, "degC")        // result 293.15`K`
 ```
-`convert(<parameter>, <dimension>)` - converts a parameter with a dimension to a dimensionless value. If necessary, the parameter is converted according to the specified dimension. For example:
+`conv(<parameter>, <dimension>)` - converts a parameter with a dimension to a dimensionless value. If necessary, the parameter is converted according to the specified dimension. For example:
 ```
-  convert(293.15 `K`, "degC")      // result 20
+  conv(293.15 `K`, "degC")      // result 20
 ```
 `unitstr(<parameter>)` - returns the dimension of the parameter as a string. If the parameter has no dimension, it returns None.
 
