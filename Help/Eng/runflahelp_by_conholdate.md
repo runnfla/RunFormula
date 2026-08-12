@@ -332,11 +332,11 @@ Bounds may be integers, floating-point numbers (optionally signed), or ASCII cha
 
 An interval may be specified by midpoint and deviation:
 ```
-  [midpoint ± deviation]
+  [midpoint +- deviation]
 ```  
 For example:
 ```
-  X = [10 ± 0.1]               // interval [9.9:10.1]
+  X = [10 +- 0.1]               // interval [9.9:10.1]
 ```
 Midpoint and deviation may be integers, floating-point numbers (midpoint optionally signed), or ASCII characters. Square brackets may be omitted in script text.  
 Alternatively, bounds may be defined using double colons (`::`) to represent minimum and maximum possible values:
@@ -348,11 +348,11 @@ Alternatively, bounds may be defined using double colons (`::`) to represent min
 
 A physical dimension may be appended to numeric values. The dimension must be separated from the number by at least one space. For example:
 ```
-  X = [10±2 m/s]  // result [8:12] m/s
+  X = [10+-2 m/s]  // result [8:12] m/s
 ``` 
 Note: When assigning dimensions within the formula itself, use backticks (e.g., `` `m/s` ``):
 ```
-  X = [10 ± 2]`m/s` + [3 ±1 km/h]
+  X = [10 +- 2]`m/s` + [3 +-1 km/h]
 ```
 
 ### 5. Script-Defined Subroutine Functions
@@ -638,7 +638,7 @@ All functions support all valid parameter types unless otherwise noted.
 `match(<param1>, <param2>)` — compares dimensions, returns `True` if equal, otherwise `False`.  
 `qty(<parameter>, <dimension>)` — assigns a dimension (as a string) to a dimensionless parameter, converting it as needed. For example:
 ```
-  qty(20, "degC")        // result 293.15`K`
+  qty(20, "degC")        // result 293.15 K
 ```
 `conv(<parameter>, <dimension>)` — converts a dimensional parameter to dimensionless, performing unit conversion if necessary. For example:
 ```

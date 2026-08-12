@@ -675,7 +675,7 @@ All functions, except for specified cases, support all permissible parameter typ
 
 `qty(<parameter>, <dimension>)` - assigns a dimension to a dimensionless parameter, specified as a string. If necessary, the parameter is converted according to the specified dimension. For example:
 ```
-  qty(20, "degC")        // result 293.15`K`
+  qty(20, "degC")        // result 293.15 K
 ```
 `conv(<parameter>, <dimension>)` - converts a parameter with a dimension to a dimensionless value. If necessary, the parameter is converted according to the specified dimension. For example:
 ```

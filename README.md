@@ -1,5 +1,5 @@
 # RunFormula
-RunFormula is intended to evaluate mathematical expressions and physics formulas provided as text with scripting language support and physical dimension handling.
+RunFormula is a module for FreePascal and Lazarus intended to evaluate mathematical expressions and physics formulas provided as text with scripting language support and physical dimension handling.
 
 Supported data types:
 * integers in decimal, hexadecimal and binary formats;
