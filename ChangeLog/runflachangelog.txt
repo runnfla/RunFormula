@@ -40,7 +40,7 @@ separator required
 - Added: Syntax validation for brackets in unit expressions
 - Added: New inteface function - RunFlaParamAsStr
 - Changed: Dimensions are passed by reference in interface functions
-- Changed: Number-to-string and string-to-number conversion use a Unified
+- Changed: Number-to-string and string-to-number conversions use a Unified
 numeric format without backticks for units
 
 ===== Version 0.2a - 1.08.2026 =====
