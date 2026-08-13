@@ -574,7 +574,8 @@
       </Unit>
       <Unit>
         <Filename Value="..\Example\runflaexample.txt"/>
-        <EditorIndex Value="18"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="17"/>
         <CursorPos X="38" Y="88"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -652,17 +653,15 @@
         <UsageCount Value="7"/>
       </Unit>
       <Unit>
-        <Filename Value="..\ChangeLog\runflachangelog.txt"/>
-        <EditorIndex Value="17"/>
+        <Filename Value="..\Changelog\runflachangelog.txt"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="24"/>
         <CursorPos X="61" Y="43"/>
         <UsageCount Value="100"/>
-        <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaunits.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
         <TopLine Value="95"/>
         <CursorPos X="95" Y="74"/>
@@ -711,7 +710,7 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\inc\sstrings.inc"/>
-        <EditorIndex Value="19"/>
+        <EditorIndex Value="18"/>
         <TopLine Value="500"/>
         <CursorPos X="6" Y="284"/>
         <UsageCount Value="63"/>
