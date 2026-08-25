@@ -327,7 +327,7 @@ begin
                     sig:=(sig shl 4) or 2;
                     inc(P);
                   end;
-      '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
+      '%', '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
       '+', ',', ':' : begin
                         case c of
                           '+' : c:=#7;
@@ -361,7 +361,7 @@ begin
         if c in UnitChars then break;
         raise EError.Create(InvalidChar, P);
     end;
-    inc(P);                                 // 0=1 "=2 +=7 (=8 )=9 [=B ]=D ,=C :=A
+    inc(P);                                 // 0=1 "=2 %=5 +=7 (=8 )=9 [=B ]=D ,=C :=A
   end;
   with PV^ do begin
     case sig of
@@ -433,6 +433,19 @@ begin
                 end else begin
                   Flo:=-HF.F;
                   Img:=F;
+                  VType:=VGap;
+                end;
+      $1715,                                   // 0+0% 0+"% "+0% "+"%
+      $1725,
+      $2715,
+      $2725,
+      $B1715D,                                 // [0+0%] [0+"%] ["+0%] ["+"%]
+      $B1725D,
+      $B2715D,
+      $B2725D  : begin
+                  if F>0 then RaiseError(InvalidRange);
+                  Flo:=FL*(F*0.01+1);
+                  Img:=FL*(1-F*0.01);
                   VType:=VGap;
                 end;
       $81C19,                                 // (0,0) (0,") (",0) (",")

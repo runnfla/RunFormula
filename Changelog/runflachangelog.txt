@@ -26,10 +26,10 @@
 
 ===== Version 0.2 - 23.07.2026 =====
 - Fixed: Incorrect error position in qtx() function
-- Added: New embedded functions - margin(), ball(), arg(), conj(), rect(), floor(),
+- Added: New built-in functions - margin(), ball(), arg(), conj(), rect(), floor(),
 ceil(), find(), substr(), hexstr(), unitstr()
-- Changed: Embedded functions logic (detailed in help) - frac(), trunc()
-- Removed: Embedded function - int()
+- Changed: Built-in functions logic (detailed in help) - frac(), trunc()
+- Removed: Built-in function - int()
 - Added: New constant - MaxInt
 - Added: New error codes - RangeType, CommaDigit, InvalidType
 - Changed: Digit is not allowed immediately after a comma or semicolon, space or
@@ -45,8 +45,9 @@ numeric format without backticks for units
 
 ===== Version 0.2a - 1.08.2026 =====
 - Added: The ASCII character with code 0x7 can be used to define a string
-- Added: New embedded functions - pow(), log(), tan()
+- Added: New built-in functions - pow(), log(), tan()
 
 ===== Develop branch changes =====
-- Changed: Embedded functions value(), convert() are renamed to val(), conv()
+- Changed: Built-in functions value(), convert() are renamed to val(), conv()
+- Changed: Built-in function abs(char) returns an integer value
 

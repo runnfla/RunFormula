@@ -3,7 +3,7 @@ object DemoForm: TDemoForm
   Height = 764
   Top = 32
   Width = 1232
-  Caption = 'RunFormula Test and Demo'
+  Caption = 'RunFormula: Demo and Test'
   ClientHeight = 764
   ClientWidth = 1232
   DesignTimePPI = 120

@@ -95,17 +95,6 @@ end;
 
 // ----- helper functions -----
 
-function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Func -cRev.2026.06.28: Func Hypot2
-var ax : TRFloat;
-begin
-  ax:=abs(X)*0.5;
-  if Y=0 then Exit(ax);
-  Result:=abs(Y)*0.5;
-  if X=0 then exit;                      // Smith's algorithm
-  if ax<Result then Result:=Result*sqrt(sqr(ax/Result)+1)
-    else Result:=ax*sqrt(sqr(Result/ax)+1);
-end;
-
 function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
 begin
   if X=0 then begin
@@ -946,82 +935,50 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_ABS
-const HRF = - TRFloat(LI);
+function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_ABS
+const NLI = - TRFloat(LI);
 var pv : PValRec;
-    al, ar : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    VType:=pv^.VType;
-    case VType of
-      VInt   : if pv^.Int=LI then begin
-                 Flo:=HRF;
+    case pv^.VType of
+      VInt   : if pv^.Int<>LI then begin
+                 Int:=abs(pv^.Int);
+                 VType:=VInt;
+               end else begin
+                 Flo:=NLI;
                  VType:=VFloat;
-               end else Int:=abs(pv^.Int);
-      VFloat : Flo:=abs(pv^.Flo);
+               end;
+      VFloat : begin
+                 Flo:=abs(pv^.Flo);
+                 VType:=VFloat;
+               end;
       VCplex : begin
                  Flo:=Hypot2(pv^.Flo, pv^.Img)*2;
                  VType:=VFloat;
                end;
-      VChar  : Chr:=pv^.Chr;
+      VChar  : begin
+                 Int:=pv^.Chr;
+                 VType:=VInt;
+               end;
       VGap   : begin
-                 MinMaxGap(abs(pv^.Flo), abs(pv^.Img), Result);
+                 MinMax(Result, abs(pv^.Flo), abs(pv^.Img));
                  if (pv^.Flo<0) and (pv^.Img>0) then Flo:=0;
                end;
-      VIGap  : if pv^.Int>LI then begin
-                 al:=abs(pv^.Int);
-                 ar:=abs(pv^.IGap);
-                 Int:=0;
-                 if (pv^.Int>0) or (pv^.IGap<0) then begin
-                   if al<ar then Int:=al else Int:=ar;
-                 end;
-                 if al<ar then IGap:=ar else IGap:=al;
+      VIGap  : if pv^.Int<>LI then begin
+                 MinMax(Result, abs(pv^.Int), abs(pv^.IGap));
+                 if (pv^.Int<0) and (pv^.IGap>0) then Int:=0;
                end else begin
-                 if pv^.IGap<0 then Flo:=-TRFloat(pv^.IGap) else Flo:=0;
-                 Img:=HRF;
-                 VType:=VGap;
-               end
-      else
-        VType:=VNone;
-        RaiseError(InvalidType);
+                 MinMax(Result, abs(TRFloat(pv^.IGap)), NLI);
+                 if pv^.IGap>0 then Flo:=0;
+               end;
+      else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
-
-//        Чтобы максимально переиспользовать код и объединить логику abs и умножения, вам нужно сделать одну универсальную «низкоуровневую» функцию умножения, которая принимает не два интервала, а четыре отдельные границы.Вся интервальная арифметика (и умножение, и abs, и возведение в квадрат) под капотом сводится к перебору комбинаций произведений. Если вынести этот перебор в базовую функцию, вы получите идеальный повторный код.1. Единое «ядро» для вашего парсера (Псевдокод)text// Базовое ядро: считает экстремумы из 4-х комбинаций произведений
-//Функция _ядро_умножения_границ(a1, a2, b1, b2) {
-//    p1 = a1 * b1;
-//    p2 = a1 * b2;
-//    p3 = a2 * b1;
-//    p4 = a2 * b2;
-
-//    новый_мин = Найти_Минимум(p1, p2, p3, p4);
-//    новый_макс = Найти_Максимум(p1, p2, p3, p4);
-
-//    Возврат Новый Целый_Интервал(новый_мин, новый_макс);
-//}
-//Используйте код с осторожностью.2. Повторное использование для Умножения ИнтерваловСтандартное умножение двух интервалов теперь просто транслирует свои границы в ядро:textФункция умножить_интервалы(A, B) {
-//    // Прямой проброс границ в общее ядро
-//    Возврат _ядро_умножения_границ(A.min, A.max, B.min, B.max);
-//}
-//Используйте код с осторожностью.3. Повторное использование для функции ABSЧтобы применить это же ядро для abs (включая правильную обработку нуля), вам нужно передавать в него модули границ исходного интервала, но с одним хитрым переключателем знаков.Математически, модуль интервала — это умножение его абсолютных границ на специальный базис. Логика склеивается идеально:textФункция abs_интервала(X) {
-//    // 1. Отрезаем знаки у исходных границ
-//    abs_min = abs(X.min);
-//    abs_max = abs(X.max);
-
-//    // 2. Если интервал пересекает ноль, искусственно создаем ноль на левой границе
-//    //    Иначе просто умножаем абсолютные значения на 1
-//    Если (X.min < 0 и X.max > 0) {
-//        Возврат _ядро_умножения_границ(0, abs_max, 0, abs_min);
-//    } Иначе {
-//        Возврат _ядро_умножения_границ(abs_min, abs_max, 1, 1);
-//    }
-//}
-
 end;
 
 function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_CHAR

@@ -173,6 +173,17 @@ begin
   if Scl<0 then Result:=1/Result;
 end;
 
+function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Lib -cRev.2026.06.28: Func Hypot2
+var ax : TRFloat;
+begin
+  ax:=abs(X)*0.5;
+  if Y=0 then Exit(ax);
+  Result:=abs(Y)*0.5;
+  if X=0 then exit;                      // Smith's algorithm
+  if ax<Result then Result:=Result*sqrt(sqr(ax/Result)+1)
+    else Result:=ax*sqrt(sqr(Result/ax)+1);
+end;
+
 procedure CplexDiv(const FA, FB, FC, FD:TRFloat; out Re, Im:TRFloat);
 var f, t : TRFloat;                         //DONE -oRFla.Lib -cRev.2026.07.28: Proc CplexDiv
 begin
@@ -187,6 +198,46 @@ begin
    Re:=(FA*t+FB)/f;
    Im:=(FB*t-FA)/f;
  end;
+end;
+
+procedure MinMax(PV:PValRec; A, B:SizeInt);               //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Int
+begin
+  with PV^ do if VType<>VIGap then begin
+    if A<=B then begin
+      Int:=A; IGap:=B;
+    end else begin
+      Int:=B; IGap:=A;
+    end;
+    VType:=VIGap;
+  end else begin
+    if A<=B then begin
+      if A<Int then Int:=A;
+      if B>IGap then IGap:=B;
+    end else begin
+      if B<Int then Int:=B;
+      if A>IGap then IGap:=A;
+    end;
+  end;
+end;
+
+procedure MinMax(PV:PValRec; const A, B:TRFloat);         //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Float
+begin
+  with PV^ do if VType<>VGap then begin
+    if A<=B then begin
+      Flo:=A; Img:=B;
+    end else begin
+      Flo:=B; Img:=A;
+    end;
+    VType:=VGap;
+  end else begin
+    if A<=B then begin
+      if A<Flo then Flo:=A;
+      if B>Img then Img:=B;
+    end else begin
+      if B<Flo then Flo:=B;
+      if A>Img then Img:=A;
+    end;
+  end;
 end;
 
 procedure MinMaxGap(const F1, F2:TRFloat; PV:PValRec);
@@ -401,6 +452,18 @@ begin
   end;
 end;
 
+function AsMgin(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.08.23: Func AsMgin
+begin
+  with PV^ do case VType of
+    VNone  : raise EError.Create(IncompType_NG);
+    VInt, VFloat, VChar, VCplex : Result:=0;
+    VStr   : raise EError.Create(InvalidStrVal);
+    VGap   : Result:=Img*0.5-Flo*0.5;
+    VIGap  : Result:=IGap*0.5-Int*0.5;
+    VArr   : raise EError.Create(InvalidArrVal);
+  end;
+end;
+
 function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.04.25: Func AsIGapL
 begin
   with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
@@ -576,6 +639,34 @@ begin
   end;
   Result:=-1;
 end;
+
+{
+procedure MultIGap(PVGap, PV:PValRec; L, R:SizeInt);      //DONE -oRFla.Lib -cRev.2026.08.23: Func MultIGap
+var al, ar, m1, m2, m3, m4 : SizeInt;
+begin
+  al:=AsIGapL(PVGap);
+  ar:=AsIGapR(PVGap);
+  if OverMult(al, L, m1) or OverMult(al, R, m2) or
+    OverMult(ar, L, m3) or OverMult(ar, R, m4) then begin
+      MinMaxGap(AsLGap(PV), AsRGap(PV), L, R, PV);
+      PV^.VType:=VGap;
+  end else begin
+    if m1<m2 then begin
+      al:=m1; ar:=m2;
+    end else begin
+      al:=m2; ar:=m1;
+    end;
+    if m3<m4 then begin
+      L:=m3; R:=m4;
+    end else begin
+      L:=m4; R:=m3;
+    end;
+    with PV^ do begin
+      if al<L then Int:=al else Int:=L;
+      if ar<R then IGap:=ar else IGap:=R;
+    end;
+  end;
+end;                  }
 
 // ===== MemList routines =====
 
