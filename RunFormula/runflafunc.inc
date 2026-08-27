@@ -96,7 +96,7 @@ end;
 
 // ----- helper functions -----
 
-function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.06.20: Func FlArcTan
+function FlArcTan(const Y, X:TRFloat):TRFloat;             //DONE -oRFla.Func -cRev.2026.08.27: Func FlArcTan
 begin
   if X=0 then begin
     if Y>0 then Exit(Cpi/2);
@@ -688,72 +688,81 @@ begin
   PostParam(Context);
 end;
 
-function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.30: Func Fla_POW
+function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.27: Func Fla_POW
 var X, Y : PValRec;               // pow(X, Y) = X^Y
     f, fe, ft, m : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with Result^ do begin
-    Y:=Param(-1, Context);
-    X:=Param(-2, Context);
-    if (X^.VPhy<>0) or (Y^.VPhy<>0) then RaiseError(DimDisallow);
-    if (X^.VType=VCplex) or (Y^.VType=VCplex) then begin
-      ft:=AsIm(X);
-      fe:=AsRe(X);
-      m:=Hypot2(fe, ft);
-      if m>0 then begin
-        m:=ln(m)+ln(2);
-        f:=FlArcTan(ft, fe);
-        fe:=AsRe(Y);
-        ft:=fe*f+AsIm(Y)*m;
-        fe:=exp(fe*m-AsIm(Y)*f);
-        Flo:=fe*cos(ft);
-        Img:=fe*sin(ft);
-      end else begin
-        if AsRe(Y)<=0 then RaiseError(InvalidValue);
-        Flo:=0;
-        Img:=0;
-      end;
-      VType:=VCplex;
-    end else if (X^.VType in [VGap, VIGap]) or (Y^.VType in [VGap, VIGap]) then begin
-      m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
-      MinMax(RealPow(m, fe), RealPow(m, ft), Result);
-      MinMax(RealPow(f, fe), RealPow(f, ft), Result);
-    end else begin
+  Y:=Param(-1, Context);
+  if Y^.VPhy<>0 then RaiseError(DimDisallow);
+  X:=Param(-2, Context);
+  if X^.VPhy<>0 then RaiseError(DimDisallow);
+  with Result^ do case CaseType[X^.VType, Y^.VType] of
+    VCplex : begin
+               ft:=AsIm(X);
+               fe:=AsRe(X);
+               m:=Hypot2(fe, ft);
+               if m<>0 then begin
+                 m:=ln(m)+ln(2);
+                 f:=FlArcTan(ft, fe);
+                 fe:=AsRe(Y);
+                 ft:=fe*f+AsIm(Y)*m;
+                 fe:=exp(fe*m-AsIm(Y)*f);
+                 Flo:=fe*cos(ft);
+                 Img:=fe*sin(ft);
+               end else begin
+                 f:=AsRe(Y);
+                 if (f<0) or (AsIm(Y)<>0) then RaiseError(InvalidValue);
+                 if f=0 then Flo:=1 else Flo:=0;
+                 Img:=0;
+               end;
+               VType:=VCplex;
+             end;
+    VGap, VIGap : begin
+                    m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
+                    MinMax(RealPow(m, fe), RealPow(m, ft), Result);
+                    MinMax(RealPow(f, fe), RealPow(f, ft), Result);
+                  end;
+    else
       Flo:=RealPow(AsFloat(X), AsFloat(Y));
-      VType:=VFloat;
-    end;
+      VType:=VFloat;                 if Y^.VPhy<>0 then RaiseError(DimDisallow);
   end;
   PostParam(Context);
   PostParam(Y, Context);
 end;
 
-function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.30: Func Fla_LOG
+function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.27: Func Fla_LOG
 var X, Y : PValRec;               // log(X, Y) = logY(X)
     f, fe, ft, m : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with Result^ do begin
-    X:=Param(-2, Context);
-    Y:=Param(-1, Context);
-    if (Y^.VPhy<>0) or (X^.VPhy<>0) then RaiseError(DimDisallow);
-    if (X^.VType=VCplex) or (Y^.VType=VCplex) then begin
-      f:=AsIm(X);
-      m:=AsRe(X);
-      fe:=ln(Hypot2(m, f))+ln(2);
-      ft:=FlArcTan(f, m);
-      f:=AsIm(Y);
-      m:=AsRe(Y);
-      CplexDiv(fe, ft, ln(Hypot2(m, f))+ln(2), FlArcTan(f, m), Flo, Img);
-      VType:=VCplex;
-    end else if (X^.VType in [VGap, VIGap]) or (Y^.VType in [VGap, VIGap]) then begin
-      m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
-      if (fe<=1) and (ft>=1) then RaiseError(InvalidValue);
-      MinMaxGap(ln(m)/ln(fe), ln(m)/ln(ft), ln(f)/ln(fe), ln(f)/ln(ft), Result);
-      VType:=VGap;
-    end else begin
+  X:=Param(-2, Context);
+  if X^.VPhy<>0 then RaiseError(DimDisallow);
+  Y:=Param(-1, Context);
+  if Y^.VPhy<>0 then RaiseError(DimDisallow);
+  with Result^ do case CaseType[X^.VType, Y^.VType] of
+    VCplex : begin
+               f:=AsRe(Y);
+               m:=AsIm(Y);
+               fe:=ln(Hypot2(m, f))+ln(2);
+               ft:=FlArcTan(m, f);
+               f:=AsRe(X);
+               m:=AsIm(X);
+               CplexDiv(ln(Hypot2(m, f))+ln(2), FlArcTan(m, f), fe, ft, Flo, Img);
+               VType:=VCplex;
+             end;
+    VGap, VIGap : begin
+                    fe:=AsLGap(Y); ft:=AsRGap(Y);
+                    if (fe<=1) and (ft>=1) then RaiseError(InvalidValue);
+                    fe:=ln(fe);
+                    ft:=ln(ft);
+                    m:=ln(AsLGap(X)); f:=ln(AsRGap(X));
+                    MinMax(m/fe, m/ft, Result);
+                    MinMax(f/fe, f/ft, Result);
+                  end;
+    else begin
       Flo:=ln(AsFloat(X))/ln(AsFloat(Y));
       VType:=VFloat;
     end;

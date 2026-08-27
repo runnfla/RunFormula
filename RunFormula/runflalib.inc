@@ -173,7 +173,7 @@ begin
   if Scl<0 then Result:=1/Result;
 end;
 
-function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Lib -cRev.2026.06.28: Func Hypot2
+function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Lib -cRev.2026.08.27: Func Hypot2
 var ax : TRFloat;
 begin
   ax:=abs(X)*0.5;
@@ -185,19 +185,19 @@ begin
 end;
 
 procedure CplexDiv(const FA, FB, FC, FD:TRFloat; out Re, Im:TRFloat);
-var f, t : TRFloat;                         //DONE -oRFla.Lib -cRev.2026.07.28: Proc CplexDiv
+var f, t : TRFloat;                         //DONE -oRFla.Lib -cRev.2026.08.27: Proc CplexDiv
 begin
   if abs(FC)>=abs(FD) then begin            // Smith's algorithm
-   t:=FD/FC;
-   f:=FC+FD*t;
-   Re:=(FA+FB*t)/f;
-   Im:=(FB-FA*t)/f;
- end else begin
-   t:=FC/FD;
-   f:=FD+FC*t;
-   Re:=(FA*t+FB)/f;
-   Im:=(FB*t-FA)/f;
- end;
+    t:=FD/FC;
+    f:=FC+FD*t;
+    Re:=(FA+FB*t)/f;
+    Im:=(FB-FA*t)/f;
+  end else begin
+    t:=FC/FD;
+    f:=FD+FC*t;
+    Re:=(FA*t+FB)/f;
+    Im:=(FB*t-FA)/f;
+  end;
 end;
 
 procedure MinMax(A, B:SizeInt; PV:PValRec);               //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Int
