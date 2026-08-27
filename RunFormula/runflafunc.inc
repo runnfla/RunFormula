@@ -726,7 +726,7 @@ begin
                   end;
     else
       Flo:=RealPow(AsFloat(X), AsFloat(Y));
-      VType:=VFloat;                 if Y^.VPhy<>0 then RaiseError(DimDisallow);
+      VType:=VFloat;
   end;
   PostParam(Context);
   PostParam(Y, Context);
