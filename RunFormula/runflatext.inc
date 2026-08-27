@@ -365,6 +365,7 @@ begin
   end;
   with PV^ do begin
     case sig of
+      0       : if P=Fin then RaiseError(NoneDisallow);
       1       : if flg then begin             // 0
                   Int:=I;
                   VType:=VInt;
@@ -448,7 +449,7 @@ begin
                   Img:=FL*(1-F*0.01);
                   VType:=VGap;
                 end;
-      $81C19,                                 // (0,0) (0,") (",0) (",")
+      $81C19,                                  // (0,0) (0,") (",0) (",")
       $81C29,
       $82C19,
       $82C29  : begin

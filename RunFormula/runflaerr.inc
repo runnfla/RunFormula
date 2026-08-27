@@ -37,6 +37,7 @@ type
     IncompType_NF,     // Incompatible operand type: got None but expected Real
     IncompType_NC,     // Incompatible operand type: got None but expected Complex
     IncompType_NG,     // Incompatible operand type: got None but expected Interval
+    NoneDisallow,      // None or empty string value is not allowed
     InvalidStrVal,     // Invalid string operand
     InvalidArrVal,     // Invalid array operand
     DivZero,           // Division by Zero
@@ -58,7 +59,7 @@ type
     InvalidRange,      // Incorrect range bounds
     IllegalBreak,      // Illegal Break or Continue operation
     DimMismatch,       // Dimensioned quantities mismatch
-    IllegalDim,        // Operation not allowed on dimensioned quantity
+    DimDisallow,       // Operation not allowed on dimensioned quantity
     DimOver,           // Dimensional exponent overflow
     DimExists,         // Dimensioned quantities already assigned
     DimlessValue,      // Cannot assign units to None, String or Array value

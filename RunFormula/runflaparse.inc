@@ -518,6 +518,7 @@ begin
           if IsKey('e') then begin FloatToken(CElr); continue; end;
           if IsKey('j') then begin CplexToken(0, 1); continue; end;
           if IsKey('maxint') then begin IntToken(HI); continue; end;
+          if IsKey('minint') then begin IntToken(LI+1); continue; end;
           if IsKey('none') then begin NoneToken; continue; end;
           if IsKey('error') then raise EError.Create(Unsupported);
           if IsKey('const') then raise EError.Create(Unsupported);

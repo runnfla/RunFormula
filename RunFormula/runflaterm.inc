@@ -192,7 +192,7 @@ begin
       phy:=0;
       if (L^.VPhy or R^.VPhy)<>0 then case tag of
         TagOR, TagXOR, TagAND, TagSHL,
-        TagSHR, TagNOT    : raise EError.Create(IllegalDim);
+        TagSHR, TagNOT    : raise EError.Create(DimDisallow);
         TagPlus, TagMinus : begin
                               phy:=L^.VPhy;
                               if (phy<>R^.VPhy) then raise EError.Create(DimMismatch);

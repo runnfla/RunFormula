@@ -49,5 +49,8 @@ numeric format without backticks for units
 
 ===== Develop branch changes =====
 - Changed: Built-in functions value(), convert() are renamed to val(), conv()
+- Added: New constant - MinInt
 - Changed: Built-in function abs(char) returns an integer value
+NoneDisallow
+IllegalDim --> DimDisallow
 

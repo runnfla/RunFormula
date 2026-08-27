@@ -15,7 +15,8 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Func -cRev.2026.00.00:
+// TODO -oRFla.Func -cRev.2026.00.00: Make test_val()
+// TODO -oRFla.Func -cRev.2026.00.00: Make repeat timeout
 
 function BreakParam(ParamCount:SizeInt; var Context:TContext; F:TFlow):PValRec; inline;
 begin                                                      //DONE -oRFla.Func -cRev.2026.07.01: Inline BreakParam
@@ -157,7 +158,7 @@ begin
   end;
 end;
 
-function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.07.30: Func RealPow
+function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.08.26: Func RealPow
 begin
   if Base>0 then Exit(exp(ln(Base)*Scale));
   if Base=0 then begin
@@ -167,7 +168,7 @@ begin
   RaiseError(InvalidValue);
 end;
 
-function SCosGap(const L, R:TRFloat):integer;                             //DONE -oRFla.Func -cRev.2026.08.01: Func CosGap
+function SCosGap(const L, R:TRFloat):integer;              //DONE -oRFla.Func -cRev.2026.08.26: Func SCosGap
 var fl, d : TRFloat;
 begin
   fl:=FlaRound(L/Cpi, -1);
@@ -256,7 +257,7 @@ var md, ar : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   ar:=AsFloat(Param(-1, Context));
-  if Context.TermResult^.VPhy<>0 then RaiseError(IllegalDim);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
@@ -562,7 +563,7 @@ begin
     3 : begin
           ofs:=AsInt(Param(-1, Context));
           if ofs<0 then RaiseError(InvalidValue);
-          if Context.TermResult^.VPhy<>0 then RaiseError(IllegalDim);
+          if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
           PostParam(Context);
         end;
     else RaiseError(ParamNumber);
@@ -597,7 +598,7 @@ begin
   pv:=Param(-1, Context);
   with pv^ do begin
     if not (VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
-    if VPhy<>0 then RaiseError(IllegalDim);
+    if VPhy<>0 then RaiseError(DimDisallow);
   end;
   L:=AsIGapL(pv);
   R:=AsIGapR(pv)+1;
@@ -622,31 +623,27 @@ begin
   end;
 end;
 
-function Fla_VAL(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_VAL
+function Fla_VAL(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_VAL
 var s : string;
     p : PByte;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  s:=AsStr(Param(-1, Context));
-  PostParam(Context);
-  p:=PByte(s);
   Result:=NewLV(Context);
-  if p=nil then exit;
-  try
-    ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
-  except
-    Result^.VType:=VNone;
-  end;
+  s:=AsStr(Param(-1, Context));
+  p:=PByte(s);
+  if p=nil then RaiseError(NoneDisallow);
+  ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
+  PostParam(Context);
 end;
 
-function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_EXP
+function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_EXP
 var pv : PValRec;
     f : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
                f:=exp(pv^.Flo);
@@ -666,13 +663,13 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_LN
+function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_LN
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
                Flo:=ln(Hypot2(pv^.Flo, pv^.Img))+ln(2);
@@ -700,7 +697,7 @@ begin
   with Result^ do begin
     Y:=Param(-1, Context);
     X:=Param(-2, Context);
-    if (X^.VPhy<>0) or (Y^.VPhy<>0) then RaiseError(IllegalDim);
+    if (X^.VPhy<>0) or (Y^.VPhy<>0) then RaiseError(DimDisallow);
     if (X^.VType=VCplex) or (Y^.VType=VCplex) then begin
       ft:=AsIm(X);
       fe:=AsRe(X);
@@ -721,8 +718,8 @@ begin
       VType:=VCplex;
     end else if (X^.VType in [VGap, VIGap]) or (Y^.VType in [VGap, VIGap]) then begin
       m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
-      MinMaxGap(RealPow(m, fe), RealPow(m, ft), RealPow(f, fe), RealPow(f, ft), Result);
-      VType:=VGap;
+      MinMax(RealPow(m, fe), RealPow(m, ft), Result);
+      MinMax(RealPow(f, fe), RealPow(f, ft), Result);
     end else begin
       Flo:=RealPow(AsFloat(X), AsFloat(Y));
       VType:=VFloat;
@@ -741,7 +738,7 @@ begin
   with Result^ do begin
     X:=Param(-2, Context);
     Y:=Param(-1, Context);
-    if (Y^.VPhy<>0) or (X^.VPhy<>0) then RaiseError(IllegalDim);
+    if (Y^.VPhy<>0) or (X^.VPhy<>0) then RaiseError(DimDisallow);
     if (X^.VType=VCplex) or (Y^.VType=VCplex) then begin
       f:=AsIm(X);
       m:=AsRe(X);
@@ -765,14 +762,14 @@ begin
   PostParam(X, Context);
 end;
 
-function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_SIN
+function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_SIN
 var pv : PValRec;
     fa, fb : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
                fa:=exp(pv^.Img)*0.5;
@@ -784,13 +781,12 @@ begin
     VGap, VIGap : begin
                     fa:=AsLGap(pv);
                     fb:=AsRGap(pv);
-                    MinMaxGap(sin(fa), sin(fb), Result);
+                    MinMax(sin(fa), sin(fb), Result);
                     case SCosGap(fa-(Cpi/2), fb-(Cpi/2)) of
                       -1 : Flo:=-1;
                       1  : Img:=1;
                       2  : begin Flo:=-1; Img:=1; end;
                     end;
-                    VType:=VGap;
                   end;
     else
       Flo:=sin(AsFloat(pv));
@@ -799,14 +795,14 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.28: Func Fla_COS
+function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_COS
 var pv : PValRec;
     fa, fb : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
                fa:=exp(pv^.Img)*0.5;
@@ -818,13 +814,12 @@ begin
     VGap, VIGap : begin
                     fa:=AsLGap(pv);
                     fb:=AsRGap(pv);
-                    MinMaxGap(cos(fa), cos(fb), Result);
+                    MinMax(cos(fa), cos(fb), Result);
                     case SCosGap(fa, fb) of
                       -1 : Flo:=-1;
                       1  : Img:=1;
                       2  : begin Flo:=-1; Img:=1; end;
                     end;
-                    VType:=VGap;
                   end;
     else
       Flo:=cos(AsFloat(pv));
@@ -833,36 +828,35 @@ begin
   PostParam(Context);
 end;
 
-function Fla_TAN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_TAN
+function Fla_TAN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_TAN
 var pv : PValRec;
     f, fc, fx : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
-     // try
-               f:=exp(pv^.Img*2);
-               fx:=f+1/f;
-    // except
-
-               fc:=cos(pv^.Flo*2);
-               Flo:=sin(pv^.Flo*2)/(fx*0.5+fc);
-               Img:=(f-1/f)/(fc*2+fx);
-     //  except
-     //           Flo := 0.0;
-     //           if pv^.Img > 0 then Img := 1.0 else Img := -1.0;
-     //  end;
-
+               try
+                 f:=exp(pv^.Img*2);
+                 fx:=f+1/f;
+                 fc:=cos(pv^.Flo*2);
+                 Flo:=sin(pv^.Flo*2)/(fx*0.5+fc);
+                 Img:=(f-1/f)/(fc*2+fx);
+               except
+                 Flo:=0;
+                 if pv^.Img>0 then Img:=1 else if pv^.Img<0 then Img:=-1 else Img:=0;
+               end;
                VType:=VCplex;
              end;
     VGap, VIGap : begin
                     f:=AsLGap(pv);
                     fc:=AsRGap(pv);
                     if SCosGap(f-(Cpi/2), fc-(Cpi/2))<>0 then RaiseError(InvalidValue);
-                    MinMaxGap(sin(f)/cos(f), sin(fc)/cos(fc), Result);
+                    Flo:=sin(f)/cos(f);
+                    Img:=sin(fc)/cos(fc);
+                    if Img<Flo then RaiseError(InvalidValue);
                     VType:=VGap;
                   end;
     else
@@ -881,7 +875,7 @@ begin
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    if (pv^.VPhy and $0101010101010101)<>0 then RaiseError(IllegalDim);
+    if (pv^.VPhy and $0101010101010101)<>0 then RaiseError(DimDisallow);
     case pv^.VType of
       VCplex : begin
                  m:=Hypot2(pv^.Flo, pv^.Img);
@@ -914,7 +908,7 @@ begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   pv:=Param(-1, Context);
-  if pv^.VPhy<>0 then RaiseError(IllegalDim);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
                CplexDiv(pv^.Img+1, - pv^.Flo, 1-pv^.Img, pv^.Flo, f, m);
@@ -964,14 +958,14 @@ begin
                  VType:=VInt;
                end;
       VGap   : begin
-                 MinMax(Result, abs(pv^.Flo), abs(pv^.Img));
+                 MinMax(abs(pv^.Flo), abs(pv^.Img), Result);
                  if (pv^.Flo<0) and (pv^.Img>0) then Flo:=0;
                end;
       VIGap  : if pv^.Int<>LI then begin
-                 MinMax(Result, abs(pv^.Int), abs(pv^.IGap));
+                 MinMax(abs(pv^.Int), abs(pv^.IGap), Result);
                  if (pv^.Int<0) and (pv^.IGap>0) then Int:=0;
                end else begin
-                 MinMax(Result, abs(TRFloat(pv^.IGap)), NLI);
+                 MinMax(abs(TRFloat(pv^.IGap)), NLI, Result);
                  if pv^.IGap>0 then Flo:=0;
                end;
       else RaiseError(InvalidType);

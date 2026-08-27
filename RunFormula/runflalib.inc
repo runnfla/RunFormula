@@ -200,7 +200,7 @@ begin
  end;
 end;
 
-procedure MinMax(PV:PValRec; A, B:SizeInt);               //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Int
+procedure MinMax(A, B:SizeInt; PV:PValRec);               //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Int
 begin
   with PV^ do if VType<>VIGap then begin
     if A<=B then begin
@@ -220,7 +220,7 @@ begin
   end;
 end;
 
-procedure MinMax(PV:PValRec; const A, B:TRFloat);         //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Float
+procedure MinMax(const A, B:TRFloat; PV:PValRec);         //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Float
 begin
   with PV^ do if VType<>VGap then begin
     if A<=B then begin
@@ -410,7 +410,7 @@ end;
 function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsBool
 begin
   with PV^ do begin
-    if VPhy<>0 then raise EError.Create(IllegalDim);
+    if VPhy<>0 then raise EError.Create(DimDisallow);
     case VType of
       VNone  : Result:=false;
       VInt   : Result:=Int<>0;
