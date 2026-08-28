@@ -53,7 +53,7 @@ function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE 
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  ParamCount:= - ParamCount;
+  ParamCount:= -ParamCount;
   b:=AsBool(Param(ParamCount, Context));
   PostParam(Context);
   Result:=@CVNone;
@@ -245,7 +245,7 @@ begin
   with Result^ do begin
     pv:=Param(-1, Context);
     Flo:=AsRe(pv);
-    Img:= - AsIm(pv);
+    Img:= -AsIm(pv);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
@@ -357,7 +357,7 @@ begin
     L:=Param(-2, Context);
     R:=Param(-1, Context);
     if (not ((L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]))) or
-      OverPlus(AsInt(L), - AsInt(R), Int) or OverPlus(AsInt(L), AsInt(R), IGap) then begin
+      OverPlus(AsInt(L), -AsInt(R), Int) or OverPlus(AsInt(L), AsInt(R), IGap) then begin
         Flo:=AsFloat(L)-AsFloat(R);
         Img:=AsFloat(L)+AsFloat(R);
         if Img<Flo then RaiseError(InvalidRange);
@@ -573,7 +573,7 @@ begin
     VType:=VInt;
     Int:=-1;
   end;
-  ParamCount:= - ParamCount;
+  ParamCount:= -ParamCount;
   s:=AsStr(Param(ParamCount, Context));
   PostParam(Context);
   ps:=PByte(s);
@@ -817,7 +817,7 @@ begin
                fa:=exp(pv^.Img)*0.5;
                fb:=0.25/fa;
                Flo:=cos(pv^.Flo)*(fa+fb);
-               Img:= - sin(pv^.Flo)*(fa-fb);
+               Img:= -sin(pv^.Flo)*(fa-fb);
                VType:=VCplex;
              end;
     VGap, VIGap : begin
@@ -876,7 +876,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_SQRT
+function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.08.28: Func Fla_SQRT
 var pv : PValRec;
     f, m : TRFloat;
 begin
@@ -892,7 +892,7 @@ begin
                  if f>0 then Flo:=sqrt(f) else Flo:=0;
                  f:=m-pv^.Flo*0.5;
                  if f>0 then Img:=sqrt(f) else Img:=0;
-                 if pv^.Img<0 then Img:= - Img;
+                 if pv^.Img<0 then Img:= -Img;
                  VType:=VCplex;
                end;
       VGap, VIGap : begin
@@ -920,9 +920,9 @@ begin
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
-               CplexDiv(pv^.Img+1, - pv^.Flo, 1-pv^.Img, pv^.Flo, f, m);
-               Flo:= - FlArcTan(m, f)*0.5;
-               if (m=0) and (f<-1) then Flo:= - Flo;
+               CplexDiv(pv^.Img+1, -pv^.Flo, 1-pv^.Img, pv^.Flo, f, m);
+               Flo:= -FlArcTan(m, f)*0.5;
+               if (m=0) and (f<-1) then Flo:= -Flo;
                Img:=(ln(Hypot2(f, m))+ln(2))*0.5;
                VType:=VCplex;
              end;
@@ -939,7 +939,7 @@ begin
 end;
 
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_ABS
-const NLI = - TRFloat(LI);
+const NLI = -TRFloat(LI);
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
