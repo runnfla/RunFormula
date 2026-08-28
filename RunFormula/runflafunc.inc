@@ -910,7 +910,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.30: Func Fla_ARCTAN
+function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.08.28: Func Fla_ARCTAN
 var pv : PValRec;
     f, m : TRFloat;
 begin
@@ -920,7 +920,7 @@ begin
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
-               CplexDiv(pv^.Img+1, -pv^.Flo, 1-pv^.Img, pv^.Flo, f, m);
+               CplexDiv(pv^.Flo, pv^.Img+1, -pv^.Flo, 1-pv^.Img, f, m);
                Flo:= -FlArcTan(m, f)*0.5;
                if (m=0) and (f<-1) then Flo:= -Flo;
                Img:=(ln(Hypot2(f, m))+ln(2))*0.5;
