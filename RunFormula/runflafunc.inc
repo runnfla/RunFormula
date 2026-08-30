@@ -984,7 +984,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.29: Func Fla_CHAR
+function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.08.30: Func Fla_CHAR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -996,7 +996,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.06.30: Func Fla_COMPARE
+function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.08.30: Func Fla_COMPARE
 var pv : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -1010,7 +1010,7 @@ begin
   PostParam(pv, Context);
 end;
 
-function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.30: Func Fla_MATCH
+function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.08.30: Func Fla_MATCH
 var phy : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -1020,9 +1020,9 @@ begin
   PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VInt;
     Int:=-1;
     if phy<>0 then Int:=0;
+    VType:=VInt;
   end;
 end;
 
