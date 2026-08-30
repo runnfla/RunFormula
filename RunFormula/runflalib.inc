@@ -566,7 +566,16 @@ begin
     end;
   end;
 end;
-
+{
+procedure Ball(const C, M:TRFloat; PV:PValRec); inline;   //DONE -oRFla.Lib -cRev.2026.08.28: Inline Ball
+begin
+  with PV^ do begin
+    Flo:=C-M;
+    Img:=C+M;
+    VType:=VGap;
+  end;
+end;
+}
 function Compare(L, R:PValRec):SizeInt;                   //DONE -oRFla.Lib -cRev.2026.04.26: Func Compare
 var IL, IR, GL, GR : SizeInt;
     FL, FR, ML, MR : TRFloat;
