@@ -837,7 +837,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_TAN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_TAN
+function Fla_TAN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.26: Func Fla_TAN
 var pv : PValRec;
     f, fc, fx : TRFloat;
 begin
@@ -1026,74 +1026,66 @@ begin
   end;
 end;
 
-function SubQty(var Context:TContext; out Phy:SizeInt; out Scl, Offs:TRFloat):PValRec;
-var p, fin : PByte;                                                      //DONE -oRFla.Func -cRev.2026.07.02: Func SubQty
+function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.31: Func Fla_QTY
+var s : string;
+    p : PByte;
+    phy : SizeInt;
+    scl, ofs : TRFloat;
 begin
-  with Param(-1, Context)^ do case VType of
-    VChar : begin
-              p:=@Chr;
-              fin:=p+1;
-            end;
-    VStr  : begin
-              p:=Str;
-              fin:=p+Ansi[-1];
-            end;
-    else RaiseError(InvalidType);
-  end;
-  Phy:=PhyCapture(PChar(p), PChar(fin), Scl, Offs);
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  s:=AsStr(Param(-1, Context));
+  p:=PByte(s);
+  if p=nil then RaiseError(NoneDisallow);
+  phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
   PostParam(Context);
   Result:=NewLV(Context);
-  ValCopy(Param(-2, Context), Result);
+  ApplyPhyToPV(ValCopy(Param(-2, Context), Result), phy, scl, ofs);
   PostParam(Context);
 end;
 
-function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_QTY
-var phy : SizeInt;
-    scl, ofs : TRFloat;
+function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.08.31: Func Fla_CONV
+var s : string;
+    p : PByte;
+    phy : SizeInt;
+    f, scl, ofs : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  Result:=SubQty(Context, phy, scl, ofs);
-  ApplyPhyToPV(Result, phy, scl, ofs);
-end;
-
-function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.07.02: Func Fla_CONV
-var phy : SizeInt;
-    scl, ofs : TRFloat;
-begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  Result:=SubQty(Context, phy, scl, ofs);
-  with Result^ do begin
+  s:=AsStr(Param(-1, Context));
+  p:=PByte(s);
+  if p=nil then RaiseError(NoneDisallow);
+  phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
+  PostParam(Context);
+  Result:=NewLV(Context);
+  with ValCopy(Param(-2, Context), Result)^ do begin
     if VPhy<>phy then RaiseError(DimMismatch);
     if (scl<>1) or (ofs<>0) then case VType of
       VCplex : begin
                  Flo:=(Flo-ofs)/scl;
                  Img:=Img/scl;
                end;
-      VGap   : begin
-                 Flo:=(Flo-ofs)/scl;
-                 Img:=(Img-ofs)/scl;
-               end;
-      VIGap  : begin
-                 Flo:=(Int-ofs)/scl;
-                 Img:=(IGap-ofs)/scl;
-                 VType:=VGap;
-               end;
+      VGap, VIGap : begin
+                      f:=(AsLGap(Result)-ofs)/scl;
+                      Img:=(AsRGap(Result)-ofs)/scl;
+                      Flo:=f;
+                      VType:=VGap;
+                    end;
       else
         Flo:=(AsFloat(Result)-ofs)/scl;
         VType:=VFloat;
     end;
     VPhy:=0;
   end;
+  PostParam(Context);
 end;
 
-function Fla_UNITSTR(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.07.06: Func Fla_UNITSTR
-var f1, f2 : TRFloat;
+function Fla_UNITSTR(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.08.31: Func Fla_UNITSTR
+var f : TRFloat;
     t : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Str:=Str2Ptr(DecodePhy(Param(-1, Context)^.VPhy, f1, f2, t));
+    Str:=Str2Ptr(DecodePhy(Param(-1, Context)^.VPhy, f, f, t));
     if Str<>nil then VType:=VStr;
   end;
   PostParam(Context);
