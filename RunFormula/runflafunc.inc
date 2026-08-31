@@ -109,7 +109,7 @@ begin
   end;
 end;
 
-function FlaRound(const F:TRFloat; D:integer):TRFloat;     //DONE -oRFla.Func -cRev.2026.06.20: Func FlaRound
+function FlaRound(const F:TRFloat; D:integer):TRFloat;     //DONE -oRFla.Func -cRev.2026.08.31: Func FlaRound
 begin
   case D of
     -2 : begin                                       // math frac = X - floor(X)
@@ -121,8 +121,7 @@ begin
            Result:=int(F);
            if (F<0) and (F<>Result) then Result:=Result-1;
          end;
-     0 : if F<0 then Result:=int(F-0.5)              // math round
-           else Result:=int(F+0.5);
+     0 : if F<0 then Result:=int(F-0.5) else Result:=int(F+0.5);   // math round
      1 : begin                                       // ceil
            Result:=int(F);
            if (F>0) and (F<>Result) then Result:=Result+1;
@@ -175,7 +174,7 @@ begin
   d:=FlaRound(R/Cpi, -1)-fl;
   if d<1 then Exit(0);
   if d>=2 then Exit(2);
-  d:=frac(abs(fl)*0.5);
+  d:=FlaRound(abs(fl)*0.5, -2);
   Result:=-1;
   if (d>0.25) and (d<0.75) then Result:=1;
 end;
