@@ -83,7 +83,7 @@ begin
   until false;
 end;
 
-function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_TYPE
+function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_TYPE
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -181,7 +181,7 @@ end;
 
 // -----
 
-function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_RE
+function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_RE
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -193,7 +193,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_IM
+function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_IM
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -223,7 +223,7 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_ARG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_ARG
+function Fla_ARG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_ARG
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -236,7 +236,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CONJ(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.27: Func Fla_CONJ
+function Fla_CONJ(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_CONJ
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -495,7 +495,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.20: Func Fla_SIGN
+function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_SIGN
 var I : SizeInt = -1;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -526,23 +526,23 @@ begin
   end;
 end;
 
-function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.20: Func Fla_LENGTH
+function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_LENGTH
 var s : string;
     p : PSizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  s:=AsStr(Param(-1, Context));
-  PostParam(Context);
-  p:=PSizeInt(s);
   Result:=NewLV(Context);
   with Result^ do begin
-    VType:=VInt;
     Int:=0;
+    s:=AsStr(Param(-1, Context));
+    p:=PSizeInt(s);
     if p<>nil then Int:=p[-1];
+    VType:=VInt;
   end;
+  PostParam(Context);
 end;
 
-function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.06.20: Func Fla_STRING
+function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_STRING
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -553,7 +553,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_HEXSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.06: Func Fla_HEXSTR
+function Fla_HEXSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_HEXSTR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -991,7 +991,6 @@ begin
                  if pv^.IGap>0 then Flo:=0;
                end;
        VArr  : RaiseError(ArrDisallow);
-      else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
