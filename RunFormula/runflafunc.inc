@@ -372,40 +372,44 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_FRAC
+function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_FRAC
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    VType:=pv^.VType;
-    case VType of
+    case pv^.VType of
+      VNone : RaiseError(NoneDisallow);
       VInt, VChar : begin
-                      VType:=VFloat;                // frac always float
-                      Flo:=0;
+                      Flo:=0;                       // frac always float
+                      VType:=VFloat;
                     end;
-      VFloat      : Flo:=FlaRound(pv^.Flo, -2);
+      VFloat      : begin
+                      Flo:=FlaRound(pv^.Flo, -2);
+                      VType:=VFloat;
+                    end;
       VCplex      : begin
                       Flo:=FlaRound(pv^.Flo, -2);
                       Img:=FlaRound(pv^.Img, -2);
+                      VType:=VCplex;
                     end;
-      else
-        VType:=VNone;
-        RaiseError(InvalidType);
+      VStr : RaiseError(StrDisallow);
+      VArr : RaiseError(ArrDisallow);
+      else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_TRUNC
-var I : SizeInt;
+function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_TRUNC
+var t : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidType);
+    VNone  : RaiseError(NoneDisallow);
     VFloat : begin
                Flo:=System.int(Flo);
                if (Flo>LI) and (Flo<=HI) then begin
@@ -417,57 +421,63 @@ begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
              end;
+    VStr   : RaiseError(StrDisallow);
     VGap   : begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
                if (Flo>LI) and (Flo<=HI) and (Img>LI) and (Img<=HI) then begin
-                 I:=trunc(Img);
+                 t:=trunc(Img);
                  Int:=trunc(Flo);
-                 IGap:=I;
+                 IGap:=t;
                  VType:=VIGap;
                end;
              end;
+    VArr   : RaiseError(ArrDisallow);
   end;
   PostParam(Context);
 end;
 
-function Fla_FLOOR(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_FLOOR
+function Fla_FLOOR(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_FLOOR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidType);
-    VFloat            : Flo:=FlaRound(Flo, -1);
-    VCplex, VGap      : begin
-                          Flo:=FlaRound(Flo, -1);
-                          Img:=FlaRound(Img, -1);
-                        end;
+    VNone        : RaiseError(NoneDisallow);
+    VFloat       : Flo:=FlaRound(Flo, -1);
+    VCplex, VGap : begin
+                     Flo:=FlaRound(Flo, -1);
+                     Img:=FlaRound(Img, -1);
+                   end;
+    VStr         : RaiseError(StrDisallow);
+    VArr         : RaiseError(ArrDisallow);
   end;
   PostParam(Context);
 end;
 
-function Fla_CEIL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_CEIL
+function Fla_CEIL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_CEIL
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidType);
-    VFloat            : Flo:=FlaRound(Flo, 1);
-    VCplex, VGap      : begin
-                          Flo:=FlaRound(Flo, 1);
-                          Img:=FlaRound(Img, 1);
-                        end;
+    VNone        : RaiseError(NoneDisallow);
+    VFloat       : Flo:=FlaRound(Flo, 1);
+    VCplex, VGap : begin
+                     Flo:=FlaRound(Flo, 1);
+                     Img:=FlaRound(Img, 1);
+                   end;
+    VStr         : RaiseError(StrDisallow);
+    VArr         : RaiseError(ArrDisallow);
   end;
   PostParam(Context);
 end;
 
-function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.06.19: Func Fla_ROUND
+function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_ROUND
 var md, ar : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do case VType of
-    VNone, VStr, VArr : RaiseError(InvalidType);
+    VNone  : RaiseError(NoneDisallow);
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
                md:=FlaRound(Hypot2(Flo, Img)*2, 0);
@@ -475,10 +485,12 @@ begin
                Flo:=md*cos(ar);
                Img:=md*sin(ar);
              end;
+    VStr   : RaiseError(StrDisallow);
     VGap   : begin
                Flo:=FlaRound(Flo, -1);
                Img:=FlaRound(Img, 1);
              end;
+    VArr   : RaiseError(ArrDisallow);
   end;
   PostParam(Context);
 end;
@@ -504,7 +516,7 @@ begin
              end;
     VGap   : if (Flo<=0) and (Img>=0) then I:=0 else if Flo>0 then I:=1;
     VIGap  : if (Int<=0) and (IGap>=0) then I:=0 else if Int>0 then I:=1;
-    VArr   : RaiseError(InvalidArrVal);
+    VArr   : RaiseError(ArrDisallow);
   end;
   PostParam(Context);
   Result:=NewLV(Context);
@@ -946,6 +958,7 @@ begin
   with Result^ do begin
     pv:=Param(-1, Context);
     case pv^.VType of
+      VNone  : RaiseError(NoneDisallow);
       VInt   : if pv^.Int<>LI then begin
                  Int:=abs(pv^.Int);
                  VType:=VInt;
@@ -965,6 +978,7 @@ begin
                  Int:=pv^.Chr;
                  VType:=VInt;
                end;
+      VStr   : RaiseError(StrDisallow);
       VGap   : begin
                  MinMax(abs(pv^.Flo), abs(pv^.Img), Result);
                  if (pv^.Flo<0) and (pv^.Img>0) then Flo:=0;
@@ -976,6 +990,7 @@ begin
                  MinMax(abs(TRFloat(pv^.IGap)), NLI, Result);
                  if pv^.IGap>0 then Flo:=0;
                end;
+       VArr  : RaiseError(ArrDisallow);
       else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
@@ -1046,7 +1061,7 @@ function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE 
 var s : string;
     p : PByte;
     phy : SizeInt;
-    f, scl, ofs : TRFloat;
+    r, scl, ofs : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   s:=AsStr(Param(-1, Context));
@@ -1063,9 +1078,9 @@ begin
                  Img:=Img/scl;
                end;
       VGap, VIGap : begin
-                      f:=(AsLGap(Result)-ofs)/scl;
-                      Img:=(AsRGap(Result)-ofs)/scl;
-                      Flo:=f;
+                      r:=(AsRGap(Result)-ofs)/scl;
+                      Flo:=(AsLGap(Result)-ofs)/scl;
+                      Img:=r;
                       VType:=VGap;
                     end;
       else

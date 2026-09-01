@@ -361,9 +361,9 @@ begin
     VFloat : raise EError.Create(IncompType_FI);
     VCplex : raise EError.Create(IncompType_CI);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(InvalidStrVal);
+    VStr   : raise EError.Create(StrDisallow);
     VGap, VIGap : raise EError.Create(IncompType_GI);
-    VArr   : raise EError.Create(InvalidArrVal);
+    VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -375,10 +375,10 @@ begin
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CF);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(InvalidStrVal);
+    VStr   : raise EError.Create(StrDisallow);
     VGap   : Result:=(Flo+Img)/2;
     VIGap  : Result:=(Int+IGap)/2;
-    VArr   : raise EError.Create(InvalidArrVal);
+    VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -389,10 +389,10 @@ begin
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
     VChar : Result:=Chr;
-    VStr  : raise EError.Create(InvalidStrVal);
+    VStr  : raise EError.Create(StrDisallow);
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;
-    VArr  : raise EError.Create(InvalidArrVal);
+    VArr  : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -401,8 +401,8 @@ begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NC);
     VCplex : Result:=Img;
-    VStr   : raise EError.Create(InvalidStrVal);
-    VArr   : raise EError.Create(InvalidArrVal);
+    VStr   : raise EError.Create(StrDisallow);
+    VArr   : raise EError.Create(ArrDisallow);
     else Result:=0;
   end;
 end;
@@ -419,7 +419,7 @@ begin
       VChar  : Result:=Chr<>0;
       VStr   : Result:=Ansi[-1]<>0;
       VIGap  : Result:=(Int<>0) or (IGap<>0);
-      VArr   : raise EError.Create(InvalidArrVal);
+      VArr   : raise EError.Create(ArrDisallow);
     end;
   end;
 end;
@@ -432,8 +432,8 @@ begin
     VFloat, VGap : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CG);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(InvalidStrVal);
-    VArr   : raise EError.Create(InvalidArrVal);
+    VStr   : raise EError.Create(StrDisallow);
+    VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -445,10 +445,10 @@ begin
     VFloat : Result:=Flo;
     VCplex : raise EError.Create(IncompType_CG);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(InvalidStrVal);
+    VStr   : raise EError.Create(StrDisallow);
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
-    VArr   : raise EError.Create(InvalidArrVal);
+    VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -457,10 +457,10 @@ begin
   with PV^ do case VType of
     VNone  : raise EError.Create(IncompType_NG);
     VInt, VFloat, VChar, VCplex : Result:=0;
-    VStr   : raise EError.Create(InvalidStrVal);
+    VStr   : raise EError.Create(StrDisallow);
     VGap   : Result:=Img*0.5-Flo*0.5;
     VIGap  : Result:=IGap*0.5-Int*0.5;
-    VArr   : raise EError.Create(InvalidArrVal);
+    VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -492,7 +492,7 @@ begin
   with PV^ do case VType of
     VNone : PByte(Result):=nil;
     VStr  : Result:=string(Str);
-    VArr  : RaiseError(InvalidArrVal);
+    VArr  : RaiseError(ArrDisallow);
     else
       PByte(s):=nil;
       if VPhy<>0 then begin
@@ -537,7 +537,7 @@ begin
     VStr  : Result:=Str2Str(string(Str));
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;
-    VArr  : raise EError.Create(InvalidArrVal);
+    VArr  : raise EError.Create(ArrDisallow);
   end;
 end;
 
@@ -644,7 +644,7 @@ begin
                if (IL>=IR) and (GL<=GR) then exit;
                if (IL+GL)>=(IR+GR) then Exit(1);
              end;
-    VArr   : raise EError.Create(InvalidArrVal);
+    VArr   : raise EError.Create(ArrDisallow);
   end;
   Result:=-1;
 end;

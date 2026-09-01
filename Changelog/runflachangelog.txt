@@ -53,4 +53,6 @@ numeric format without backticks for units
 - Changed: Built-in function abs(char) returns an integer value
 NoneDisallow
 IllegalDim --> DimDisallow
+StrDisallow
+ArrDisallow
 

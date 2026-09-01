@@ -38,8 +38,8 @@ type
     IncompType_NC,     // Incompatible operand type: got None but expected Complex
     IncompType_NG,     // Incompatible operand type: got None but expected Interval
     NoneDisallow,      // None or empty string value is not allowed
-    InvalidStrVal,     // Invalid string operand
-    InvalidArrVal,     // Invalid array operand
+    StrDisallow,       // Invalid string operand
+    ArrDisallow,       // Invalid array operand
     DivZero,           // Division by Zero
     MissingBracket,    // One or more closing brackets or block terminators are missing
     IllegalBracket,    // Mismatched bracket or block terminator
