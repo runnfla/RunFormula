@@ -451,7 +451,7 @@ begin
     VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
-
+{
 function AsMgin(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.08.23: Func AsMgin
 begin
   with PV^ do case VType of
@@ -463,7 +463,7 @@ begin
     VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
-
+}
 function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.04.25: Func AsIGapL
 begin
   with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;

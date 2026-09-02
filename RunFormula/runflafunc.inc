@@ -205,22 +205,19 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.07.07: Func Fla_CPLEX
-var L, R : PValRec;
+function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_CPLEX
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    L:=Param(-2, Context);
-    Flo:=AsFloat(L);
-    R:=Param(-1, Context);
-    Img:=AsFloat(R);
+    Flo:=AsFloat(Param(-2, Context));
+    VPhy:=Context.TermResult^.VPhy;
+    PostParam(Context);
+    Img:=AsFloat(Param(-1, Context));
+    if VPhy<>Context.TermResult^.VPhy then RaiseError(DimMismatch);
     VType:=VCplex;
-    VPhy:=L^.VPhy;
-    if VPhy<>R^.VPhy then RaiseError(DimMismatch);
   end;
   PostParam(Context);
-  PostParam(L, Context);
 end;
 
 function Fla_ARG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_ARG
@@ -251,7 +248,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.15: Func Fla_RECT
+function Fla_RECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_RECT
 var md, ar : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
