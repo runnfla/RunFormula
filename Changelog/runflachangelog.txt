@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Changelog
-//  Rev. 4.08.2026
+//  Rev. 2.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -20,7 +20,7 @@
 
 ===== Version 0.1.b - 1.06.2026 =====
 - Changed: Error message structure is updated
-- Changed: In external function parameter Phy is renamed to Dim
+- Changed: Phy renamed to Dim in callback function parameters
 - Added: Physical dimension handling
 - Changed: Char value is converted to a Variant of type byte
 
@@ -38,9 +38,9 @@ separator required
 - Added: CGS and Astronomical units of measurement
 - Fixed: Memory access violation caused by certain errors
 - Added: Syntax validation for brackets in unit expressions
-- Added: New inteface function - RunFlaParamAsStr
+- Added: New interface function - RunFlaParamAsStr
 - Changed: Dimensions are passed by reference in interface functions
-- Changed: Number-to-string and string-to-number conversions use a Unified
+- Changed: Number-to-string and string-to-number conversions use a unified
 numeric format without backticks for units
 
 ===== Version 0.2a - 1.08.2026 =====
@@ -51,8 +51,10 @@ numeric format without backticks for units
 - Changed: Built-in functions value(), convert() are renamed to val(), conv()
 - Added: New constant - MinInt
 - Changed: Built-in function abs(char) returns an integer value
-NoneDisallow
-IllegalDim --> DimDisallow
-StrDisallow
-ArrDisallow
+- Changed: Error codes InvalidStrVal, InvalidArrVal, IllegalDim are ranamed to
+StrDisallow, ArrDisallow, DimDisallow
+- Added: New error code - NoneDisallow
+- Changed: The val() built-in function now raises an exception instead of
+returning None
+
 

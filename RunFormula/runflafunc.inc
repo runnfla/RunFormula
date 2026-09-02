@@ -50,11 +50,7 @@ end;
 
 function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_CONTINUE
 begin
-  case ParamCount of
-    0 : Result:=@CVNone;
-    1 : Result:=Param(-1, Context);
-    else RaiseError(ParamNumber);
-  end;
+  if ParamCount<>0 then RaiseError(ParamNumber);
   Context.Flow:=CON;
 end;
 
@@ -183,7 +179,7 @@ begin
   d:=FlaRound(R/Cpi, -1)-fl;
   if d<1 then Exit(0);
   if d>=2 then Exit(2);
-  d:=FlaRound(abs(fl)*0.5, -2);
+  d:=FlaRound(fl*0.5, -2);
   Result:=-1;
   if (d>0.25) and (d<0.75) then Result:=1;
 end;
