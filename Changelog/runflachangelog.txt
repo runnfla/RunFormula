@@ -54,7 +54,6 @@ numeric format without backticks for units
 - Changed: Error codes InvalidStrVal, InvalidArrVal, IllegalDim are ranamed to
 StrDisallow, ArrDisallow, DimDisallow
 - Added: New error code - NoneDisallow
-- Changed: The val() built-in function now raises an exception instead of
-returning None
+- Changed: Built-in function val() raises an exception instead of returning None
 
 

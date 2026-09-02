@@ -657,8 +657,8 @@
         <Filename Value="..\Changelog\runflachangelog.txt"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="17"/>
-        <TopLine Value="32"/>
-        <CursorPos Y="51"/>
+        <TopLine Value="33"/>
+        <CursorPos X="30" Y="54"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
