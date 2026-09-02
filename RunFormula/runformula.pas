@@ -79,6 +79,9 @@ var lst : PMemList;
 
 begin
   with Context, PToken(Pnt)^ do begin
+
+           TermResult:=@CVNone;       ///!!!?     for exception
+
     ProcToken:=Pnt;
     case Tag of
       TagValue : Result:=@ValRec;
