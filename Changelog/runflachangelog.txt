@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Changelog
-//  Rev. 2.09.2026
+//  Rev. 4.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -47,7 +47,7 @@ numeric format without backticks for units
 - Added: The ASCII character with code 0x7 can be used to define a string
 - Added: New built-in functions - pow(), log(), tan()
 
-===== Develop branch changes =====
+===== Version 0.2b - 4.09.2026 =====
 - Changed: Built-in functions value(), convert() are renamed to val(), conv()
 - Added: New constant - MinInt
 - Changed: Built-in function abs(char) returns an integer value
@@ -55,5 +55,7 @@ numeric format without backticks for units
 StrDisallow, ArrDisallow, DimDisallow
 - Added: New error code - NoneDisallow
 - Changed: Built-in function val() raises an exception instead of returning None
+
+===== Develop branch changes =====
 
 

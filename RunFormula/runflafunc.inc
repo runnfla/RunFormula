@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Embedded functions include file
-//  Rev. 1.08.2026
+//  Rev. 2.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -52,6 +52,7 @@ function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE 
 begin
   if ParamCount<>0 then RaiseError(ParamNumber);
   Context.Flow:=CON;
+  Result:=@CVNone;
 end;
 
 function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_IF
