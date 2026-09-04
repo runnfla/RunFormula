@@ -142,7 +142,7 @@ The following pre-defined constants are available:
   Pi         // 3.14159265358979323846
   E          // 2.71828182845904523536
   J          // imaginary unit (1*i)
-  MinInt     // minimum system integer
+  MinInt     // minimum integer
   MaxInt     // maximum system integer
 ```
 
