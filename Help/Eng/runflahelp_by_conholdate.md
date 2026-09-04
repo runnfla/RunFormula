@@ -1,8 +1,8 @@
-<pre>
+﻿```plaintext
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  RunFormula Help file
-//  Rev. 1.08.2026
+//  RunFormula Help File
+//  Revision: 4.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -10,376 +10,373 @@
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
 //  See the LICENSE file in the project root
-//  or a copy available at https://opensource.org
-//  for full license information.
+//  or obtain a copy at https://opensource.org
+//  for full license details.
 //******************************************************
 
 // TODO -oRFla.Help -cRev.2026.07.19: Description of interface functions
-</pre>
+```
 
-### 1. Brief Overview
+### 1. Brief Description
 
-The RunFormula module is designed for evaluating mathematical expressions and physical formulas provided as text, supporting a scripting language and processing physical dimensions.
+The RunFormula module is designed for evaluating mathematical expressions and physical formulas provided as text, supporting a scripting language and handling physical dimensions (units).
 
 Supported data types:
-  - integers in decimal, hexadecimal, and binary formats;
-  - floating-point numbers in decimal and scientific notation;
-  - complex numbers and operations on them;
-  - intervals and operations on them;
-  - strings and ASCII characters;
+  - Integers in decimal, hexadecimal, and binary formats;
+  - Floating-point numbers in decimal and scientific notation;
+  - Complex numbers and operations on them;
+  - Intervals and operations on them;
+  - Strings and ASCII characters;
 
-Arithmetic and logical operations: + - * / or and xor not shl (<<) shr (>>) mod (%) div == <> < <= >= > & (string concatenation) ** (integer exponentiation).  
-Variables are supported, with dynamic initialization at runtime via an external callback function.  
-A basic set of built-in functions is available, along with the ability to register and use additional user-defined functions.  
-Control flow functions: if(), repeat(), exit(), result(), continue(), break().  
-Ability to declare and subsequently use functions directly within the formula text (subroutines).  
-Support for physical dimensions, including dimension checking during operation execution, automatic calculation of result dimensions, and automatic conversion of values between different unit systems.  
-The `define` directive is supported.  
-Compilation of source formulas into bytecode for repeated execution.  
-Minimal dependencies (only SysUtils in the basic configuration).
+Arithmetic and logical operations: `+ - * / or and xor not shl (<<) shr (>>)` `mod (%)` `div` `==` `<>` `< <= > >=` `&` (string concatenation) `**` (integer exponentiation).\
+Variables are supported, with dynamic initialization at runtime via an external callback function.\
+A basic set of built-in functions is provided, along with the capability to register and use additional user-defined functions.\
+Control flow functions: `if()`, `repeat()`, `exit()`, `result()`, `continue()`, `break()`\
+Ability to define and subsequently use functions directly within the formula text (subroutines).\
+Support for physical dimensions, runtime checking of dimensional consistency, automatic calculation of result dimensions, and automatic unit conversion.\
+The `define` directive is supported.\
+Compilation of the source formula into bytecode for repeated execution.\
+Minimal dependencies (only `SysUtils` in the default configuration).
 
 #### 1.a. Integrating RunFormula into a Project
 
-  - Copy all files from the RunFormula directory (```runformula.pas``` and all ```.inc``` files) into your project or a separate directory;
-  - Add ```RunFormula``` to the ```uses``` section of the `interface` or `implementation`, for example:
-```
+  - Copy all files from the `RunFormula` directory (`runformula.pas` and all `.inc` files) into your project or into a separate directory;
+  - Add `RunFormula` to the `uses` clause in the `interface` or `implementation` section, for example:
+```pascal
   implementation
     uses RunFormula;
 ```
 or, if using a separate directory:
-```
+```pascal
   implementation
     uses RunFormula in 'RunFormula/runformula.pas';
 ```
-or specify the `RunFormula` directory path in the appropriate compiler option.
+Alternatively, specify the path to the `RunFormula` directory in the appropriate compiler setting.
 
-The simplest way to use RunFormula is to call `RunFlaParse` and pass its result to `RunFlaExecStr` or `RunFlaExecVrt`. For example:
-```
+The simplest way to use RunFormula is to call `RunFlaParse` and pass its result to either `RunFlaExecStr` or `RunFlaExecVrt`. For instance:
+```pascal
   ShowMessage( RunFlaExecStr( RunFlaParse('9 * 3') ) ); // displays 27
 ```
-The `RunFlaParse` function compiles the source formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. `RunFlaExecStr` returns a string, while `RunFlaExecVrt` returns a `Variant` type variable.  
-See the corresponding sections of the help for more details.
+The `RunFlaParse` function compiles the source formula into bytecode for execution by `RunFlaExecStr` or `RunFlaExecVrt`. `RunFlaExecStr` returns a string, while `RunFlaExecVrt` returns a `Variant`.\
+Refer to the respective sections of the help documentation for further information.
 
 ### 2. RunFormula Scripting Language Syntax
 
 #### 2.a. Language Format. Comments.
 
-The scripting language uses free-format notation. Spaces, tabs, and line breaks act as separators where required, and are otherwise ignored. Spaces are not allowed within identifiers, numbers, or constructs like "function(", "array[", "unit^exponent". Case is ignored, except where specified otherwise.  
-Comments can be written in curly braces or following double slashes. For example:
-```
+The scripting language uses free-form syntax. Spaces, tabs, and line breaks serve as separators where needed, and are otherwise ignored. Spaces are not allowed within identifiers, numbers, constructs like "function(", "array[", or "unit^exponent". Case sensitivity is ignored, except in specified cases.\
+Comments may be enclosed in curly braces `{}` or placed after double slashes `//`. For example:
+```pascal
   { comment text }
   // comment text
 ```
 
-#### 2.b. Integers
+#### 2.b. Integer Numbers
 
-An integer can be specified in decimal, hexadecimal, or binary format. For example:
+An integer may be specified in decimal, hexadecimal, or binary format. For example:
+```pascal
+  X = 12345;       // decimal integer
+  X = 0xA12B;      // hexadecimal integer
+  X = 0a12bH;      // hexadecimal integer
+  X = 10101b;      // binary integer
 ```
-  X = 12345;       // integer in decimal form
-  X = 0xA12B;      // integer in hexadecimal form
-  X = 0a12bH;      // integer in hexadecimal form
-  X = 10101b;      // integer in binary form
-```
-Case is ignored, except for the `0x` prefix.  
-Allowed integer ranges:
+Case insensitivity applies except for the `0x` prefix.\
+Integer value ranges:
 
-&nbsp;&nbsp; -9223372036854775807 : 9223372036854775807 — in 64-bit systems;\
-&nbsp;&nbsp; -2147483647 : 2147483647 — in 32-bit systems;\
-&nbsp;&nbsp; -32767 : 32767 — in 16-bit systems;
+  -9223372036854775807 : 9223372036854775807 — in 64-bit systems;\
+  -2147483647 : 2147483647 — in 32-bit systems;\
+  -32767 : 32767 — in 16-bit systems;
 
-The minimal system negative integer (-9223372036854775808 in 64-bit, -2147483648 in 32-bit, -32768 in 16-bit systems) can be used; however, in arithmetic operations it is considered out of range and converted to a floating-point number. If a decimal number outside the valid range is specified, it is automatically converted to a floating-point number; however, this check is *not* performed for hexadecimal and binary numbers.  
-The construct "- number" is interpreted as a positive number with a unary minus (applying the corresponding operator precedence). To specify a negative number explicitly, use the Unified Numeric Format (square brackets). For example:
-```
-  X = - 3 ** 2;       // result -9
-  X = -10 ** 2;       // result -100
-  X = [- 3] ** 2;     // result 9
-  X = [-10] ** 2;     // result 100
+The minimum system negative integer (-9223372036854775808 in 64-bit, -2147483648 in 32-bit, -32768 in 16-bit systems) may be used, but during arithmetic operations it is considered out of range and automatically converted to a floating-point type. If a decimal integer is outside the allowed range, it is converted to floating-point; however, such a check is not performed for hexadecimal and binary literals.\
+The expression `- number` is interpreted as a positive number preceded by a unary minus (respecting the corresponding operator precedence). To specify a negative number directly, use the Unified Numeric Format (square brackets). For example:
+```pascal
+  X = - 3 ** 2;       // result: -9
+  X = -10 ** 2;       // result: -100
+  X = [- 3] ** 2;     // result: 9
+  X = [-10] ** 2;     // result: 100
 ```
 
-#### 2.c. Floating-Point Numbers
+#### 2.c. Floating-point Numbers
 
-A floating-point number can be specified as a decimal number with a dot or in scientific notation. For example:
-```
+A floating-point number can be specified in decimal notation (with a point) or in scientific notation. For example:
+```pascal
   X = 12.34;
   Y = 0.12;
   X = 1E1;
   Y = 0.2e-4;
   Z = 23E+34;
 ```
-As with integers, the construct "- number" is interpreted as a positive number followed by a unary minus (applying operator precedence). To specify a negative number explicitly, use the Unified Numeric Format (square brackets). For example:
-```
-  X = - 3.5 ** 2;          // result -12.25
-  X = -10.2E20 ** 2;       // result -1.0404E42
-  X = [- 3.5] ** 2;        // result 12.25
-  X = [-10.2E20] ** 2;     // result 1.0404E42
+As with integers, `- number` is interpreted as a positive number preceded by a unary minus. To specify a negative floating-point number directly, use the Unified Numeric Format (square brackets). For example:
+```pascal
+  X = - 3.5 ** 2;          // result: -12.25
+  X = -10.2E20 ** 2;       // result: -1.0404E42
+  X = [- 3.5] ** 2;        // result: 12.25
+  X = [-10.2E20] ** 2;     // result: 1.0404E42
 ```
 
-#### 2.d. Text Strings
+#### 2.d. String Literals
 
-A text string can be specified in double or single quotes. If a string is enclosed in double quotes, it may contain single quotes, and vice versa. For example:
+A string may be enclosed in double quotes (`"`) or single quotes (`'`). If a string is enclosed in double quotes, it may contain single quotes, and vice versa. For example:
+```pascal
+  X = '"A"' & "'s'";       // result: "A"'s'
 ```
-  X = '"A"' & "'s'";       // result "A"'s'
-```
-An empty string can be specified as `""`, `''`, or by using the constant `None`.\
-An ASCII character with the code 0x7 can also be used to define a string.
+An empty string may be specified as `""`, `''`, or using the constant `None`.\
+Additionally, the ASCII character with code 0x7 may be used to represent a string.
 
 #### 2.e. ASCII Characters
 
-An ASCII character can be specified as a string containing that character. Unlike a string, an ASCII character is interpreted in arithmetic operations as a one-byte integer corresponding to its ASCII code. Additionally, control characters can be specified using the "^" prefix. For example:
-```
-  X = "B" - "A";       // result 1
-  X = "B" & "A";       // result BA
-  X = "One" & "^M" & "^J" & "Two";   // outputs One and Two on two lines
+An ASCII character may be represented as a string containing that single character. Unlike a string, an ASCII character is interpreted in arithmetic operations as a single-byte integer equal to its ASCII code. Furthermore, a control character may be specified using the `^` prefix. For example:
+```pascal
+  X = "B" - "A";       // result: 1
+  X = "B" & "A";       // result: "BA"
+  X = "One" & "^M" & "^J" & "Two";   // outputs "One" and "Two" on two lines
 ```
 
 #### 2.f. Constants
 
-Predefined constants:
-```
+The following pre-defined constants are available:
+```plaintext
   True       // -1 (integer)
   False      // 0 (integer)
   None       // empty string, undefined value
   Pi         // 3.14159265358979323846
   E          // 2.71828182845904523536
-  J          // imaginary unit (1j)
+  J          // imaginary unit (1*i)
+  MinInt     // minimum system integer
   MaxInt     // maximum system integer
 ```
 
 #### 2.g. Complex Numbers
 
-Complex numbers can be specified using the constant `j` (imaginary unit), the built-in function `cplex(R, I)`, or the Unified Numeric Format (square brackets). For example:
-```
-  X = [(-12.1, - 23.3)];      // result (-12.1, -23.3)
-  X = 4+5*j;                  // result (4, 5)
-  X = cplex(2, 3);            // result (2, 3)
+Complex numbers may be specified using the constant `j` (imaginary unit), the built-in function `cplex(R, I)`, or the Unified Numeric Format (square brackets). For example:
+```pascal
+  X = [(-12.1, - 23.3)];      // result: (-12.1, -23.3)
+  X = 4 + 5*j;                // result: (4, 5)
+  X = cplex(2, 3);            // result: (2, 3)
 ```
 
 #### 2.h. Intervals
 
-An interval can be specified using the Unified Numeric Format (square brackets) or the built-in functions `range(L, R)` and `ball(C, M)`. For example:
+An interval may be specified using the Unified Numeric Format (square brackets), or the built-in functions `range(L, R)` and `ball(C, M)`. For example:
+```pascal
+  X = [-1.1:23];              // result: [-1.1:23]
+  X = ["A":"Z"];              // result: [65:90]
+  X = range(19, 23.5);        // result: [19:23.5]
+  X = ball(10, 2);            // result: [8:12]
 ```
-  X = [-1.1:23];              // result [-1.1:23]
-  X = ["A":"Z"];              // result [65:90]
-  X = range(19, 23.5);        // result [19:23.5]
-  X = ball(10, 2);            // result [8:12]
-```
-The left bound must be less than or equal to the right bound.
+The left boundary must be less than or equal to the right boundary.
 
-#### 2.i. Operator Brackets
+#### 2.i. Parentheses and Block Constructs
 
-One or more expressions can be enclosed in parentheses. Expressions within parentheses are evaluated left to right. The result of the parentheses expression is the result of the last expression. Expressions within parentheses are separated by commas or semicolons. A digit cannot immediately follow a comma or semicolon; at least one space must be inserted. For example:
+One or more expressions may be enclosed in parentheses `(...)`. Expressions inside parentheses are evaluated left-to-right, and the overall result is that of the final expression. Multiple expressions are separated by commas or semicolons. A digit must not immediately follow a comma or semicolon; at least one space must intervene. For example:
+```pascal
+  5 * (4 - 7);                     // result: -15
+  5 * (21, 21 + 1; 21 + 2);        // result: 115
+  5 * (21 + 1; 21 + 2; 100);       // result: 500
 ```
-  5 * (4 - 7);                     // result -15
-  5 * (21, 21 + 1; 21 + 2);        // result 115
-  5 * (21 + 1; 21 + 2; 100);       // result 500
-```
-Nested parentheses are allowed. A trailing comma or semicolon after the final expression in parentheses is permitted.  
-Alternatively, the keywords `do` and `end` can be used instead of parentheses for the same purpose. For example:
-```
+Nested parentheses are allowed. A trailing comma or semicolon after the last expression inside parentheses is permitted.\
+Alternatively, blocks may be opened with the keyword `do` and closed with `end`. For example:
+```pascal
   do
     X = 10;
     Y = 20;
     X + Y
   end
 ```
-If an expression group starts with a parenthesis, it must end with a closing parenthesis; conversely, if it starts with `do`, it must end with `end`.
+Parentheses must be closed by a matching `)`, and `do` blocks must be closed by `end`.
 
 #### 2.j. Mathematical Operations
 
-The table below lists supported mathematical operations for different value types.
-```
-                               Integer  Floating-Point  Complex  Interval  ASCII Char  String
+The following table summarizes supported mathematical operations across different value types.
 
-== <> < > <= >=                  +         +             +          +       as integer      +
-+ - *                            +         +             +          +       as integer      -
-/                          floating-point   +             +          +     result       -
+```plaintext
+                               Integer  Float  Complex  Interval  ASCII Char  String
+
+== <> < > <= >=                  +         +       +       +           +         +
++ - *                            +         +       +       +           +         -
+/                                float     +       +       +           float     -
 or and xor div mod (%)
-shl (<<) shr (>>) not            +         -             -          -       as integer      -
-unary minus                      +         +             +          +       as integer      -
-**                               +         +             +          +       as integer      -
-&                              string    string        string     string        +          +
+shl (<<) shr (>>) not            +         -       -       -           +         -
+- (unary)                        +         +       +       +           +         -
+**                               +         +       +       +           +         -
+&                                string    string  string  string      +         +
 ```
-`**` — integer exponentiation (positive or negative)\
-`&` — string concatenation\
-Integer overflow in `+`, `-`, `*`, `**`, unary `-` operations converts the result to floating-point. For intervals, `==` and `<>` behave as `in` and `not in`, while `<`, `>`, `<=`, `>=` compare intervals by their midpoints.
+** — integer exponentiation (positive or negative)\
+& — string concatenation\
+Integer overflow in `+ - * **` (unary minus) operations results in automatic conversion to floating-point type. For intervals, `==` and `<>` behave like `in` and `not in`, while `< > <= >=` compare intervals by their midpoints.
 
 #### 2.k. Operator Precedence
 
-Within an expression, mathematical operations are performed in the following order of precedence:
-```
-  highest:       **                  // integer exponentiation
-                 - not               // unary operators
+Mathematical operations are performed in the following order of precedence (highest to lowest):
+
+```plaintext
+  highest:       **                 // exponentiation
+                 - not              // unary operators
                  * / shl (<<) shr (>>) div mod (%)
                  + -
-                 &                   // string concatenation
+                 &                  // string concatenation
                  == <> < > <= >=
                  and
                  or xor
-  lowest:        =                   // assignment
+  lowest:        =                  // assignment
 ```
-Assignment (`=`) and exponentiation (`**`) are right-associative and are evaluated from right to left.
+Assignment (`=`) and exponentiation (`**`) are right-associative, evaluated right-to-left.
 
-#### 2.l. Type Conversions
+#### 2.l. Type Conversion
 
-A value's type can be automatically converted according to the table below. The corresponding `Variant` type used for passing values to external functions is also indicated.
-```
-                    Integer  Floating-Point  Complex  Interval  ASCII Char  String  Variant
+Values may be automatically converted according to the following table. The `Variant` type column indicates the corresponding variant type used when passing values to external functions.
 
-Integer       -->     +         +           X+0*j      [X:X]         -          +        +
-Floating-Point -->     -         +           X+0*j      [X:X]         -          +        +
-Complex       -->     -         -             +          -           -        (R, I)     R
-Interval      -->     -      (L+R)/2     (L+R)/2+0*j     +           -        [L:R]   (L+R)/2
-ASCII Char    -->     +         +           X+0*j      [X:X]         +          +       byte
-String        -->     -         -             -          -           -          +        +
-Variant       -->     +         +             -          -      if string[1]    +
+```plaintext
+                    Integer  Float  Complex  Interval  ASCII Char  String  Variant
+
+Integer         -->     +         +       X+0*j    [X:X]       -         +       +
+Float           -->     -         +       X+0*j    [X:X]       -         +       +
+Complex         -->     -         -         +        -         -        (R,I)    R
+Interval        -->     -     (L+R)/2  (L+R)/2+0*j   +         -      [L:R]   (L+R)/2
+ASCII Char      -->     +         +       X+0*j    [X:X]       +         +       byte
+String          -->     -         -         -        -         -         +       +
+Variant         -->     +         -         -        -   if string[1] is    +
 ```
 
 #### 2.m. Variables and Assignment
 
-Variables may be used in expressions. Variable names may contain Latin letters, digits, dots (except as the first character), and underscores.  
-Variable values are assigned using the assignment operation:
+Variables may be used in expressions. A variable name may contain Latin letters, digits, underscores (`_`), and periods (`.`), but may not start with a period or digit.\
+Variable values are assigned using the assignment operator:
 
 &nbsp;&nbsp; `<variable> = <expression>`
 
-A variable must be defined by an assignment statement before use in an expression. The assignment operation returns the assigned value. For example:
-```
-  X=2+4;                     // result 6
-  abc=18/3;                  // result 6
-  ( X=4, Y=6.1;  Z=X+Y )     // result 10.1
+Before use in an expression, a variable must be defined via assignment. The result of an assignment expression equals the assigned value. For example:
+```pascal
+  X=2+4;                     // result: 6
+  abc=18/3;                  // result: 6
+  ( X=4, Y=6.1;  Z=X+Y )     // result: 10.1
 ```
 Since assignment is right-associative, multiple variables may be assigned in one expression. For example:
-```
-  X = Y = Z = 3, X * Y * Z   // result 27
+```pascal
+  X = Y = Z = 3, X * Y * Z   // result: 27
 ```
 
-### 3. Using Physical Dimensions
+### 3. Physical Dimensions (Units)
 
 #### 3.a. Units of Measurement
 
-A numeric value may be assigned a physical dimension, expressed as powers of base units. The exponent range for base units is from -127 to 127. In 64-bit systems, up to 8 base units are allowed; in 32-bit systems, up to 4; in 16-bit systems, up to 2. An unlimited number of derived units may be defined.
+A numerical value may be associated with a physical dimension, expressed as powers of base units. Exponents for base units may range from -127 to +127. Up to 8 base units are supported in 64-bit systems, up to 4 in 32-bit systems, and up to 2 in 16-bit systems. An unlimited number of derived units may be defined.
 
 #### 3.b. Dimension Syntax
 
-Dimensions are specified as strings composed of units and their exponents. Exponents are written directly after the unit using the format `^number`, with no spaces. Units must be separated from each other. Exponent `^1` may be omitted. Units with negative exponents appear after the `/` symbol with positive exponents (in the denominator). Only one `/` symbol is allowed. If all exponents are negative, they appear after the `1/` construct. Parentheses are allowed (and ignored) in numerators and denominators. For example:
-```
+A dimension is expressed as a string of unit names and their exponents. Exponents are written directly after the unit, in the form `^number`, with no spaces. Units must be separated from each other. The exponent `^1` may be omitted. Units with negative exponents appear after the `/` symbol, with positive exponents in the denominator. Only one `/` is permitted per dimension. If all exponents are negative, units appear after `1/`. Parentheses in the numerator or denominator are allowed but ignored. Examples:
+```pascal
   [10 m]; [10 m^3 kg]; [10 m/s]; [10 m / s^2]; [10 1/m^2]; [10 1/(m^2 kg)]
 ```
-Unit prefixes (e.g., `k`, `m`, `M`) may be attached directly to units (no spaces). For example:
-```
-  [10 m] + [100 cm]                  // result 11 m 
-  [10 m^2] + [1000 mm^2]             // result 10.001 m^2 
-  [10 cm/us^2] + [100 m/ms^2]        // result 100.1 Gm/s^2 
-```
-Case sensitivity applies to units and prefixes.
+Unit names and prefixes are case-sensitive.
 
 #### 3.c. Assigning Dimensions
 
-Dimensions may be assigned to integers, floating-point numbers, complex numbers, intervals, and ASCII characters. Dimensions can be assigned directly to numeric literals, variables within expressions (but not to the variable itself), expressions, grouped expressions in parentheses, or function results. To assign a dimension, append it in backticks (`) after the value. For example:
+Dimensions may be assigned to integers, floating-point numbers, complex numbers, intervals, and ASCII characters. In scripts, dimensions may be assigned directly to literal values, variable values (but not the variable name itself), expressions, parenthesized expression groups, or function results. To assign a dimension, append the dimension string in backticks (`` ` ``) after the value. For example:
+```pascal
+  X = 10 `m/s` + 20`mm/us`                  // result: 20.01 km/s 
+  X = 10; X`m` + X`mm`                      // result: 10.01 m 
+  X = 10; range(X, X+1)`mm`+1`mm`           // result: [0.011:0.012] m
+  X = 10; (X *2)`mm` + (X+2)`cm`            // result: 140 mm 
 ```
-  X = 10 `m/s` + 20`mm/us`                  // result 20.01 km/s 
-  X = 10; X`m` + X`mm`                      // result 10.01 m 
-  X = 10; range(X, X+1)`mm`+1`mm`           // result [0.011:0.012] m
-  X = 10; (X *2)`mm` + (X+2)`cm`            // 140 mm 
+Upon dimension assignment, the value is converted according to unit definitions, exponents, and prefixes. For example:
+```pascal
+  10 `km/h^2`   // result: 771.604938271605 um/s^2
 ```
-During dimension assignment, the value is converted according to unit parameters, exponents, and prefixes. For example:
-```
-  10 `km/h^2`   // result 771.604938271605 um/s^2
-```
-Reassigning dimensions is not allowed.
+Reassigning a dimension to an already dimensioned value is not allowed.
 
 ### 4. Unified Numeric Format
 
-The Unified Numeric Format is used for all conversions of numeric values to and from text strings (except ASCII characters) and may be used within scripts to specify numeric values. In this case, the value string is enclosed in square brackets.
+The Unified Numeric Format is used for all conversions of numeric values to strings (except ASCII characters) and vice versa. It may also be used directly in script text by enclosing numeric values in square brackets.
 
-#### 4.a. Integers and Floating-Point Numbers
+#### 4.a. Integers and Floats
 
-The format matches the script’s integer and floating-point number formats. Integers may be decimal, hexadecimal, or binary. Floating-point numbers may be decimal or scientific notation.  
-For negative numbers, a minus sign is placed before the number. As in the script, decimal integers undergo range checking and automatic conversion to floating-point. For example:
-```
-  X = [-0x10] + [ - 20.3 ]            // integers and floating-point
+Integer and floating-point formats follow those used in scripts. Integers may be decimal, hexadecimal, or binary; floats may be decimal or scientific. A minus sign precedes negative numbers. As in scripts, decimal integers outside the valid range are automatically converted to floats. For example:
+```pascal
+  X = [-0x10] + [ - 20.3 ]            // integers and floats
 ```
 
 #### 4.b. ASCII Characters
 
-An ASCII character may be specified in the same format as in the script. A minus sign before an ASCII character is not allowed. For example:
-```
+An ASCII character may be specified using the script syntax. A minus sign is not allowed before an ASCII character. For example:
+```pascal
   X = ["M"] + ['^C']                  // ASCII characters
 ```
 
 #### 4.c. Complex Numbers
 
 Format:
-```
+```plaintext
   (real_part, imaginary_part)
 ```
-Both parts may be integers, floating-point numbers (optionally signed), or ASCII characters. No digit may immediately follow a comma or semicolon; at least one space must be inserted. For example:
-```
+Real and imaginary parts may be integers, floats (optionally negative), or ASCII characters. A digit must not immediately follow a comma or semicolon; include at least one space. For example:
+```pascal
   X = [( - 12.1, -12.45)]            // complex number 
 ```
 
 #### 4.d. Intervals
 
 Format:
+```plaintext
+  [left_boundary:right_boundary]
 ```
-  [left_bound:right_bound]
-```
-Bounds may be integers, floating-point numbers (optionally signed), or ASCII characters. The left bound must be ≤ the right bound. Square brackets may be omitted when specifying intervals in script text. For example:
-```
+Boundaries may be integers, floats (optionally negative), or ASCII characters. The left boundary must be ≤ right boundary. Square brackets may be omitted when specifying intervals in scripts. For example:
+```pascal
   X = [ - 100:25 ]-[ "^A" : "^Z" ]+["A":200.4]      // intervals
 ```
 
-#### 4.e. Additional Interval Formats
+#### 4.e. Alternative Interval Formats
 
-An interval may be specified by midpoint and deviation:
-```
-  [midpoint +- deviation]
+An interval may also be specified as a midpoint and deviation:
+```plaintext
+  [midpoint ± deviation]
 ```  
 For example:
-```
+```pascal
   X = [10 +- 0.1]               // interval [9.9:10.1]
 ```
-Midpoint and deviation may be integers, floating-point numbers (midpoint optionally signed), or ASCII characters. Square brackets may be omitted in script text.  
-Alternatively, bounds may be defined using double colons (`::`) to represent minimum and maximum possible values:
-```
-  X = [::0] + [0::]    // result [-9223372036854775807:9223372036854775807]
+Midpoint and deviation may be integers, floats (midpoint optionally negative), or ASCII characters. Brackets are optional in scripts.\
+The `::` symbol may denote unbounded intervals. For example:
+```pascal
+  X = [::0] + [0::]    // result: [-9223372036854775807:9223372036854775807]
 ```
 
 #### 4.f. Physical Dimensions
 
-A physical dimension may be appended to numeric values. The dimension must be separated from the number by at least one space. For example:
-```
-  X = [10+-2 m/s]  // result [8:12] m/s
+After a numeric value, a physical dimension may be specified. The dimension must be separated from the preceding number by at least one space. For example:
+```pascal
+  X = [10+-2 m/s]  // result: [8:12] m/s
 ``` 
-Note: When assigning dimensions within the formula itself, use backticks (e.g., `` `m/s` ``):
-```
+Note: when assigning a dimension directly in a formula expression, use backticks (`` ` ``). For example:
+```pascal
   X = [10 +- 2]`m/s` + [3 +-1 km/h]
 ```
 
-### 5. Script-Defined Subroutine Functions
+### 5. Script-Defined Subroutines (Functions)
 
-#### 5.a. Defining Subroutine Functions
+#### 5.a. Defining Subroutines
 
-Subroutines can be defined directly in the script body. For example:
-```
+Subroutines may be defined directly in the script body. For example:
+```pascal
   (  func ABC(A, B, C);
        A+B+C
      endfunc;
 
      ABC(10, 20, 30)  )
 ```
-A subroutine must be defined before use. It may be placed anywhere an expression is allowed—including inside other subroutines—but all subroutine scopes are global, independent of definition location.  
-A subroutine is defined as:
-```
-  func <Name>( <formal parameters separated by [,;]> )[,;]
+Subroutines must be defined before use. They may be defined anywhere expressions are allowed—including inside other subroutines—but are globally scoped, regardless of definition location.\
+Subroutine definition syntax:
+```plaintext
+  func <Name>( <parameters separated by [,;]> )[,;]
     one or more expressions separated [,;]
-    function result = result of last expression
+    the subroutine's result is the final expression
   endfunc
 ```
 
-#### 5.b. Local Variables in Subroutines
+#### 5.b. Local Variables
 
-Each subroutine has its own local variable scope. Variable lookup proceeds hierarchically from local to global scope. The `local()` function creates variables in local scope (with optional initialization), bypassing the lookup mechanism. For example:
-```
+Each subroutine has its own local variable scope. Variable lookup follows an inner-to-outer (local → global) hierarchy. The `local()` function explicitly creates variables within the local scope. For example:
+```pascal
    (  func ABC(A, B, C);
          local(X, Y=10, Z=A);
          X=2;
@@ -388,12 +385,12 @@ Each subroutine has its own local variable scope. Variable lookup proceeds hiera
 
       ABC(1, 2, 3)   )
 ```
-Formal parameters are also created in local scope.
+Formal parameters are also created locally.
 
 #### 5.c. Default Parameter Values
 
-Default values can be specified for parameters and used when omitted during a call. For example:
-```
+Default values may be specified for parameters, used when not provided at call time. For example:
+```pascal
         (  func ABC(A, B=15, C=34+23);
               A+B+C
            endfunc;
@@ -403,78 +400,78 @@ Default values can be specified for parameters and used when omitted during a ca
 
 ### 6. Directives
 
-#### 6.a. define Directive
+#### 6.a. `define` Directive
 
-The `define <identifier> "text"` directive replaces the specified identifier in the formula with the given text. Identifiers may contain Latin letters, digits, dots (except first character), and underscores. Case is ignored. Prior to use in the script, an identifier must be defined. Defined text may itself contain other defined identifiers. For example:
-```
+The `define <identifier> "text"` directive substitutes the identifier with the specified text in the formula. Identifiers may contain Latin letters, digits, underscores, and periods (except as the first character). Case insensitivity applies. Before use, the identifier must be defined. Substituted text may reference other defined identifiers. For example:
+```pascal
   define MySum " 2 plus 7 "
   define plus  ' + '
-  MySum                        // result 9
+  MySum                        // result: 9
 ```
 
 ### 7. Functions
 
 #### 7.a. Built-in Functions
 
-RunFormula includes a predefined set of built-in functions. See below for descriptions. See the corresponding help files for additional functions provided by modules.
+RunFormula includes a set of predefined built-in functions (see below). Additional functions may be provided via optional modules; refer to their respective help files.
 
 #### 7.b. User-Defined Functions
 
-Additional user-defined functions can be registered and used. A user-defined function must be global and have the following prototype:
-```
+Additional user functions may be registered and used. A user function must be a global function with the following signature:
+```pascal
   function(const ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
 ```
-ParamCount — number of passed parameters;\
-Dim — encoded dimension (0 if not used);\
-Context — pointer required to retrieve parameter values.  
-Return type is `Variant`.
+`ParamCount` — number of arguments passed;\
+`Dim` — encoded dimension (0 if not used);\
+`Context` — pointer for retrieving argument values.\
+User function return type: `Variant`.
 
-#### 7.c. Registering User-Defined Functions
+#### 7.c. Registering User Functions
 
-User functions must be registered using `RunFlaFuncReg`. The `Name` parameter is the function name (in lowercase), and `Func` is the function pointer.  
-On registration failure, `RunFlaFuncReg` returns an error code from `TRunFlaErrCode`, or `OK` on success. The error code is also stored in the global variable `RunFlaErrCode` (if not already set).  
-Registration should occur once, after program startup and before calling `RunFlaParse` (and thus `RunFlaExecStr/RunFlaExecVrt`). Multiple registrations, re-registration with updated function addresses, and overriding of built-in functions are allowed. In case of override, `RunFlaFuncReg` returns `FuncExist` error, but the new information takes effect.
+Register user functions via `RunFlaFuncReg`. `Name` is the function's name (in lowercase), and `Func` is a pointer to the function.  
+On error, `RunFlaFuncReg` returns an error code from `TRunFlaErrCode`, or `OK` otherwise. It also sets the global variable `RunFlaErrCode` (if no prior error code exists).\
+Registration is required only once after program startup, before calling `RunFlaParse` (and thus `RunFlaExecStr/RunFlaExecVrt`). Multiple registrations, redefinitions, and overriding built-in functions are permitted. Overriding results in a `FuncExist` error code, but the new definition takes effect.
 
-#### 7.d. Retrieving Parameter Values
+#### 7.d. Retrieving Argument Values
 
-Use `RunFlaParam` to retrieve parameter values. The `Offset` argument is computed as `<0-based parameter index> - ParamCount`; `Context` must be passed from the user function’s prototype.  
-Note: Parameters (including built-in function parameters) are evaluated only when requested inside the function.  
-`RunFlaParamAsStr` retrieves a parameter as a string.
+Use `RunFlaParam` to retrieve argument values. `Offset` equals `<0-based parameter index> - ParamCount`, and `Context` is passed from the user function's header.  
+Note: argument values are computed only when requested within the function.  
+`RunFlaParamAsStr` returns the argument as a string.
 
 #### 7.e. Example User Function
 
-```
+```pascal
   function MyIFFunc(const ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
   begin
-    if ParamCount<>3 then RunFlaRaise(ParamNumber);     // check number of parameters
-    if RunFlaParam(-3, Context)>0                       // test first parameter
-      then Result:=RunFlaParam(-2, Context)             // return second if >0
+    if ParamCount<>3 then RunFlaRaise(ParamNumber);     // verify parameter count
+    if RunFlaParam(-3, Context)>0                       // test first argument
+      then Result:=RunFlaParam(-2, Context)             // return second if true
       else Result:=RunFlaParam(-1, Context);            // otherwise return third
   end;
 ```
-Registration with error check:
-```
+Registration with error checking:
+```pascal
   if RunFlaFuncReg('myiffunc', @MyIFFunc)<>OK then ShowMessage('Registration Error');
 ```
-Now, executing the script:
-```
+Now executing the script:
+```pascal
   ( X=10, Y=20, MyIfFunc(10, X+10, Y-20) )
 ```
-yields result `20`; the `Y-20` computation will not be executed.
+yields `20`. Note that `Y-20` is not evaluated in this case.
 
-### 8. Variable Initialization at Runtime
+### 8. Runtime Variable Initialization
 
-Variable values may be assigned at runtime via an external global callback function of this type:
-```
+Variable values may be set at runtime via an external callback function with the following signature:
+```pascal
   function(constref Name:string; out Save:boolean; var Dim:SizeInt):Variant;
 ```
-Function parameters:
+Parameters:
   `Name` — name (lowercase) of the requested variable;\
   `Dim` — encoded dimension (0 if unused);\
-  `Save` = `True` — store the value in the global variable list and do not request it again.
+  `Save` = `True` — store the value globally and do not request it again.
 
 For example, define a global function:
-```
+```pascal
   function MyRunFlaVar(constref Name:string; out Save:boolean; var Dim:SizeInt):Variant;
   begin
     Result:=InputBox('', 'Get value for variable '+Name, '');
@@ -482,52 +479,57 @@ For example, define a global function:
   end;
 ```
 Pass its address to `RunFlaExecStr/RunFlaExecVrt`:
-```
+```pascal
   ShowMessage( RunFlaExecStr(RunFlaParse('A & A'), Error, @MyRunFlaVar) );
 ```
-See the error handling section for details on the `Error` parameter.  
-The result will display two user-input strings concatenated.
+See the error-handling section for details on the `Error` parameter.  
+The result displays two user-input strings concatenated.
 
-Warning! The `Name` parameter is valid only during execution of `RunFlaExecStr/RunFlaExecVrt`. If needed later, copy it to a new string:
-```
+⚠️ Warning: the `Name` parameter is valid only during the callback execution. To retain its value after the callback, copy it:
+```pascal
   S:=Name;
   UniqueString(S);
 ```
 or
-```
+```pascal
   S:=StrPas(PChar(Name));
 ```
 
 ### 9. Error Handling
 
-#### 9.a. TRunFlaError Structure
+#### 9.a. The TRunFlaError Structure
 
-The `TRunFlaError` structure, defined in `runflaerr.inc`, provides error information during execution of `RunFlaParse` and `RunFlaExecStr/RunFlaExecVrt`. `Code` contains the error code from `TRunFlaErrCode`, `Position` gives the error position (0-based), and `Value` contains the result of the last operation as a string (populated by `RunFlaExecStr/RunFlaExecVrt`). A `TRunFlaError` variable must be passed to `RunFlaParse` and `RunFlaExecStr/RunFlaExecVrt`. `RunFlaParse` populates this structure. If no error occurs, `Code` is set to `OK`, and `Position` to 0. `RunFlaExecStr/RunFlaExecVrt` populate the structure only if `TRunFlaError.Code == OK`.
+The `TRunFlaError` structure (defined in `runflaerr.inc`) is used to obtain error details from `RunFlaParse`, `RunFlaExecStr`, and `RunFlaExecVrt`. It contains:
+- `Code` — error code from `TRunFlaErrCode`;
+- `Position` — error position (0-based index in the script);
+- `Value` — last operation result as a string, filled by `RunFlaExecStr/RunFlaExecVrt`.
 
-#### 9.b. Global Variable RunFlaErrCode
+Pass a `TRunFlaError` variable to `RunFlaParse` and `RunFlaExecStr/RunFlaExecVrt`. `RunFlaParse` populates the structure with error information; if none occurs, `Code` becomes `OK` and `Position` becomes `0`. `RunFlaExecStr/RunFlaExecVrt` fill the structure only if it currently contains `OK`.
 
-The error code from `RunFlaParse`, `RunFlaExecStr`, `RunFlaExecVrt`, and `RunFlaFuncReg` is also written to the global variable `RunFlaErrCode`, but only if it previously contained `OK`.
+#### 9.b. Global Variable `RunFlaErrCode`
 
-#### 7.c. Function Results on Error
+Error codes from `RunFlaParse`, `RunFlaExecStr`, `RunFlaExecVrt`, and `RunFlaFuncReg` are also written to the global variable `RunFlaErrCode`, but only if it previously contained `OK`.
 
-On error, `RunFlaParse` and `RunFlaExecStr/RunFlaExecVrt` return an empty string. Passing an empty string as `Fla` to these functions yields an empty string as well, *without* raising an error.  
-Note: Passing a non-empty, syntactically valid, but script-less `Fla` to `RunFlaParse` (e.g., containing only a comment) is equivalent to passing `None`.
+#### 9.c. Behavior of `RunFlaParse`, `RunFlaExecStr`, and `RunFlaExecVrt` on Errors
 
-#### 9.d. User-Defined Error Generation
+Upon error, `RunFlaParse` and `RunFlaExecStr/RunFlaExecVrt` return an empty string. Passing an empty string as `Fla` to `RunFlaParse` or `RunFlaExecStr/RunFlaExecVrt` also yields an empty string without error.  
+Note: Passing a non-empty but invalid (e.g., comment-only) `Fla` to `RunFlaParse` is equivalent to passing `None`.
 
-In `TRunFlaVar` (variable retrieval) and user-defined functions (`TRunFlaFunc`), the `RunFlaRaise` procedure can abort computation and generate an error with a code from `TRunFlaErrCode`. For example:
-```
+#### 9.d. User-Generated Errors
+
+In variable request callbacks (`TRunFlaVar`) and user-defined functions (`TRunFlaFunc`), errors may be raised using `RunFlaRaise`, specifying a code from `TRunFlaErrCode`. Example:
+```pascal
   function MySumFunc(const ParamCount:SizeInt; out Dim:SizeInt; Context:pointer):Variant;
   begin
-    if ParamCount<>2 then RunFlaRaise(ParamNumber);          // check parameter count
+    if ParamCount<>2 then RunFlaRaise(ParamNumber);          // verify parameters
     Result:=RunFlaParam(-2, Context)+RunFlaParam(-1, Context);
   end;
 ```
 
-#### 9.e. Error Message Text
+#### 9.e. Error Message Strings
 
-The `RunFlaErrorMsg` list (defined in `runflamsg.inc`) converts error codes to text messages. For example:
-```
+The list `RunFlaErrorMsg` (defined in `runflamsg.inc`) maps error codes to human-readable messages. Example:
+```pascal
   procedure TForm1.ExecButtonClick(Sender: TObject);
   var Error : TRunFlaError;
   begin
@@ -535,16 +537,16 @@ The `RunFlaErrorMsg` list (defined in `runflamsg.inc`) converts error codes to t
     ShowMessage( RunFlaErrorMsg[Error.Code].ErrMsg + ' at: ' + IntToStr( Error.Position ) +' "'+Error.Value+'"');
   end;
 ```
-This list and file may be customized by the user.
+This list and its source file may be customized by the user.
 
 9.f. It is recommended to disable exception generation in `MemGet`.
 
 ### 10. Executing Bytecode
 
-The result of `RunFlaParse` (bytecode) may be saved and reused in multiple `RunFlaExecStr/RunFlaExecVrt` calls without re-calling `RunFlaParse`, provided:
-  - user functions are registered in the same number and order as before;
-  - `TRunFlaError.Code` and global variable `RunFlaErrCode` are initialized to `OK`;
-  - if RunFormula source code has changed, re-run `RunFlaParse`.
+The result of `RunFlaParse` (bytecode) may be stored and reused by `RunFlaExecStr/RunFlaExecVrt` without re-invoking `RunFlaParse`, provided:
+  - User functions are registered in the same order and extent as before the initial `RunFlaParse`;
+  - The `Code` field of the `TRunFlaError` variable and the global variable `RunFlaErrCode` are both initialized to `OK`;
+  - If the RunFormula source code has been modified, `RunFlaParse` must be re-executed.
 
 ### 11. Built-in Functions
 
@@ -552,105 +554,111 @@ All functions support all valid parameter types unless otherwise noted.
 
 #### 11.a. Control Flow Functions
 
-`result([result])` — terminates script execution and returns the given result; if omitted, result is `None`.  
-`exit([result])` — prematurely exits a function with the given result; if omitted, result is `None`; if outside any function, exits the script.  
-`break([result])` — prematurely exits a loop; optional loop result may be specified.  
-`continue()` — skips to the next loop iteration.  
-`if(<condition>, <param1> [, <param2>])` — returns `param1` if `condition` is `True`; returns `param2` if provided and `condition` is `False`, otherwise `None`.  
-`repeat(<condition>, <parameter>)` — repeatedly evaluates `parameter` while `condition` is `True`; returns the last `parameter` value or `None` if no iterations occurred.  
-`type(<parameter>)` — returns an integer code for the parameter type:
-```
-    0 — no value, empty string, None
-    1 — integer
-    2 — floating-point number
-    3 — reserved
-    4 — complex number
-    5 — ASCII character
-    6 — string
-    7 — interval
-    8 — interval with integer bounds
-    9 — reserved for array
+`result([value])` — halts script execution. Optional `value` specifies the script's return value; if omitted, returns `None`.  
+`exit([value])` — exits the current function early. Optional `value` specifies the function's return value; if omitted, returns `None`. In the global scope, `exit([value])` halts the script.  
+`break([value])` — exits the current loop early. Optional `value` specifies the loop's result; if omitted, returns `None`.  
+`continue()` — skips to the next iteration of the current loop.  
+`if(<condition>, <arg1> [, arg2])` — returns `arg1` if `condition ≠ 0`; otherwise returns `arg2` (if provided) or `None`.  
+`repeat(<condition>, <arg>)` — evaluates `arg` while `condition ≠ 0`. Returns the last evaluated `arg`, or `None` if no iterations occurred.  
+`type(<arg>)` — returns an integer indicating the argument type:
+```plaintext
+  0 — no value, empty string, None
+  1 — integer
+  2 — float
+  3 — reserved
+  4 — complex number
+  5 — ASCII character
+  6 — string
+  7 — interval
+  8 — interval with integer boundaries
+  9 — reserved for arrays
 ```
 
 #### 11.b. Mathematical Functions
 
-`exp(<parameter>)` — computes the exponential of the parameter\
-`pow(<base>, <exponent>)` - raises the base to the power\
-`ln(<parameter>)` — computes the natural logarithm\
-`log(<argument>, <base>)` - calculates the logarithm of the argument to the given base\
-`sin(<parameter>)` — computes the sine\
-`cos(<parameter>)` — computes the cosine\
-`tan(<parameter>)` -  calculates the tangent of the given parameter\
-`sqrt(<parameter>)` — computes the square root\
-`arctan(<parameter>)` — computes the arctangent\
-`abs(<parameter>)` — returns the absolute value; for complex\ numbers, returns the modulus; for intervals, returns an interval of absolute values of all contained numbers
+`sqrt(<x>)` — square root of `x`.  
+`exp(<x>)` — exponential (e^x).  
+`pow(<base>, <exponent>)` — raises `base` to the power `exponent`.  
+`ln(<x>)` — natural logarithm of `x`.  
+`log(<x>, <base>)` — logarithm of `x` to the given `base`.  
+`sin(<x>)`, `cos(<x>)`, `tan(<x>)`, `arctan(<x>)` — trigonometric functions.  
+`abs(<x>)` — absolute value. For complex numbers, returns magnitude. For intervals, returns interval of absolute values. For ASCII characters, returns the character code.
 
 #### 11.c. Complex Number Functions
 
-`re(<complex>)` — returns the real part.  
-`im(<complex>)` — returns the imaginary part.  
-`cplex(<real>, <imag>)` — constructs a complex number from given real and imaginary parts.  
-`arg(<complex>)` — returns the dimensionless argument (phase). The modulus can be obtained via `abs()`.  
-`conj(<complex>)` — returns the complex conjugate.  
-`rect(<modulus>, <argument>)` — constructs a complex number from modulus and argument (dimensionless).
+`re(<z>)` — real part of complex number `z`.  
+`im(<z>)` — imaginary part of `z`.  
+`cplex(<real>, <imag>)` — constructs a complex number from its parts.  
+`arg(<z>)` — returns the dimensionless phase (argument) of `z`. Use `abs()` to obtain the magnitude.  
+`conj(<z>)` — complex conjugate of `z`.  
+`rect(<r>, <θ>)` — constructs a complex number from magnitude `r` and phase `θ` (dimensionless).
 
 #### 11.d. Interval Functions
 
-`left(<interval>)` — returns the left bound.  
-`right(<interval>)` — returns the right bound.  
-`range(<left>, <right>)` — constructs an interval; `left` ≤ `right`.  
-`ball(<center>, <radius>)` — constructs an interval centered at `center` with deviation `radius`.  
-`margin(<interval>)` — returns the interval’s half-width (deviation from center); the center can be obtained via `re()`. For example:
-```
-    X = [10:20]; re(X) & "+-" & margin(X)    // result 15+-5
+`left(<I>)` — left boundary of interval `I`.  
+`right(<I>)` — right boundary of `I`.  
+`range(<L>, <R>)` — interval `[L:R]` (`L ≤ R`).  
+`ball(<C>, <δ>)` — interval centered at `C` with half-width `δ`.  
+`margin(<I>)` — half-width (deviation) of `I`. Midpoint may be obtained via `re()`. Example:
+```pascal
+  X = [10:20]; re(X) & "+-" & margin(X)    // result: "15+-5"
 ```
 
 #### 11.e. Rounding Functions
 
-`frac(<parameter>)` — returns the fractional part (always non-negative); computed as mathematical fractional part (difference between number and floor). For complex numbers, applied separately to real and imaginary parts; for integers and ASCII chars, returns floating-point 0; not allowed for intervals.  
-`trunc(<parameter>)` — returns the integer part; for complex numbers and intervals, applied separately to real/imaginary parts and interval bounds; when possible, returns integer or integer-bounded interval.  
-`floor(<parameter>)` — rounds down to the nearest smaller integer; applied separately for complex/interval components.  
-`ceil(<parameter>)` — rounds up to the nearest larger integer; applied separately for complex/interval components.  
-`round(<parameter>)` — rounds to the nearest integer (mathematical rounding); for intervals, left bound rounds down, right up; complex numbers are rounded in polar coordinates (argument in degrees).
-
-#### 11.e. String and ASCII Character Functions
-
-`length(<string>)` — returns string length in bytes.  
-`string(<parameter>)` — converts parameter to string (equivalent to `<parameter> & ""`).  
-`find(<string>, <pattern>, [<offset>])` — finds `pattern` in `string` and returns its start index (0-based). Optional `offset` (positive) starts the search from that position; comparison is byte-wise and case-sensitive. Returns `-1` if not found, or if `string`/`pattern` is empty or `offset ≥ length(string)`.  
-`substr(<string>, <interval>)` — returns a substring whose start and end positions are given by the interval (0-based). Out-of-bounds bounds are clamped to the string edges; if entirely outside, returns `None`; single-character results are returned as ASCII characters.  
-`val(<string>)` — converts the string (in Unified Numeric Format) to a value; returns `None` on failure.  
-`char(<integer>)` — extracts the least significant byte and converts it to an ASCII character.  
-`hexstr(<integer>)` — converts integer to hexadecimal text.
-
-#### 11.e. Comparison Functions
-
-`compare(<arg1>, <arg2>)` — compares arguments, returns `-1`, `0`, or `+1`.  
-`sign(<parameter>)` — returns `-1`, `0`, or `+1` according to sign:
-&nbsp;&nbsp;&nbsp; — `None` → `0`\
-&nbsp;&nbsp;&nbsp; — Complex → sign determined by real part; if real=0, by imaginary part; if both zero, returns `0`\
-&nbsp;&nbsp;&nbsp; — String → `+1` if length > 0, otherwise `0`\
-&nbsp;&nbsp;&nbsp; — ASCII char → `0` if char code is `0` (`"^@"`), otherwise `+1`\
-&nbsp;&nbsp;&nbsp; — Interval → `0` if interval contains `0`; otherwise determined by left bound.
-
-#### 11.f. Physical Dimension Functions
-
-`match(<param1>, <param2>)` — compares dimensions, returns `True` if equal, otherwise `False`.  
-`qty(<parameter>, <dimension>)` — assigns a dimension (as a string) to a dimensionless parameter, converting it as needed. For example:
+`frac(<x>)` — fractional part of `x` (always non-negative). For complex numbers and intervals, applied component-wise. Returns `0.0` for integers and ASCII characters. Not allowed for intervals.  
+Examples:
+```pascal
+  X = frac(1.3)    // result: 0.3
+  X = frac(-1.3)   // result: 0.7
 ```
-  qty(20, "degC")        // result 293.15 K
-```
-`conv(<parameter>, <dimension>)` — converts a dimensional parameter to dimensionless, performing unit conversion if necessary. For example:
-```
-  conv(293.15 `K`, "degC")      // result 20
-```
-`unitstr(<parameter>)` — returns the parameter’s dimension as a string; returns `None` if dimensionless.
 
-### 12. Predefined Units of Measurement
+`trunc(<x>)` — integer part of `x`. For complex numbers and intervals, applied component-wise. Attempts type conversion to integer or integer-bounded interval.  
+`floor(<x>)`, `ceil(<x>)` — floor and ceiling, applied component-wise for complex and interval types.  
+`round(<x>)` — mathematical rounding to nearest integer. For intervals, left bound rounds down, right bound rounds up. Complex numbers are rounded in polar coordinates, with phase rounded in degrees.
 
-Units and their SI conversion factors are defined in `runflaunits.inc`:
+#### 11.f. String and ASCII Functions
 
+`length(<s>)` — length of string `s` in bytes.  
+`string(<x>)` — converts `x` to string (equivalent to `<x> & ""`).  
+`find(<s>, <pattern>, [offset])` — searches for `pattern` in `s`. Returns start position (0-based) or `-1` if not found. Optional `offset` specifies starting position (non-negative). Case-sensitive byte comparison.  
+`substr(<s>, <interval>)` — extracts substring indicated by integer-valued interval (positions are 0-based). Out-of-range boundaries are clamped; entirely out-of-range intervals return `None`. Single-character results are returned as ASCII characters.  
+`val(<s>)` — parses string `s` (in Unified Numeric Format) into a numeric value.  
+`char(<n>)` — converts the least significant byte of `n` into an ASCII character. Use `abs()` to get the ASCII code.  
+`hexstr(<n>)` — converts integer `n` to its hexadecimal string representation.
+
+#### 11.g. Comparison Functions
+
+`compare(<a>, <b>)` — compares `a` and `b`; returns `-1`, `0`, or `+1`.  
+`sign(<x>)` — returns `-1`, `0`, or `+1` according to the sign of `x`:
+```plaintext
+  - None → 0
+  - Complex: determined by real part; if real = 0, by imaginary part; if both zero → 0
+  - String: +1 if length > 0; else 0
+  - ASCII character: 0 if code = 0 (i.e., "^@"), else +1
+  - Interval: 0 if 0 ∈ interval; otherwise sign determined by left boundary
 ```
+
+#### 11.h. Unit Handling Functions
+
+`match((<a>, <b>)` — checks if `a` and `b` have identical dimensions; returns `-1` (True) if they match, `0` (False) otherwise.  
+`qty(<x>, <dim>)` — assigns dimension `dim` (as a string) to a dimensionless `x`; performs unit conversion if needed. Example:
+```pascal
+  qty(20, "degC")        // result: 293.15 K
+```
+
+`conv(<x>, <dim>)` — converts a dimensional `x` to a dimensionless value according to `dim`. Example:
+```pascal
+  conv(293.15 `K`, "degC")      // result: 20
+```
+
+`unitstr(<x>)` — returns the dimension of `x` as a string, or `None` if dimensionless.
+
+### 12. Predefined Units
+
+The file `runflaunits.inc` defines default units and their conversion factors relative to SI units.
+
+```plaintext
 // Electromagnetics
   F       // Capacitance (Farad)
   H       // Inductance (Henry)
@@ -665,7 +673,7 @@ Units and their SI conversion factors are defined in `runflaunits.inc`:
   Wh      // Watt-hour : 3600
   Ah      // Ampere-hour : 3600
 
-// Mass volume area
+// Mass, volume, area
   g       // Metric Gram : 1E-3
   t       // Metric Ton : 1E+3
   l       // Liter : 1E-3
@@ -687,7 +695,7 @@ Units and their SI conversion factors are defined in `runflaunits.inc`:
   lm      // Luminous Flux (Lumen)
   lx      // Illuminance (Lux)
 
-// Thermo
+// Thermodynamics
   degC    // Temperature (Celsius) : degC*1.0+273.15
   cal     // Calorie : 4.184
   Btu     // British Thermal Unit : 1055.05585262
@@ -722,7 +730,7 @@ Units and their SI conversion factors are defined in `runflaunits.inc`:
   ly      // Light Year : 9460730472580800
   pc      // Parsec : 30856775814913673
 
-// US units
+// US Customary Units
   psi     // Pound-force per Square Inch : 6894.757293168361
   hp      // Horsepower : 745.69987158227022
   lbf     // Pound-force : 4.4482216152605
@@ -741,7 +749,7 @@ Units and their SI conversion factors are defined in `runflaunits.inc`:
   pt      // Pint : 0.003785411784/8
   floz    // Fluid Ounce : 0.003785411784/128
 
-// CGS units
+// CGS Units
   Fr      // Franklin : 3.335640951981520737E-10
   Bi      // Biot : 10
   Mx      // Maxwell : 1E-8
@@ -758,7 +766,7 @@ Units and their SI conversion factors are defined in `runflaunits.inc`:
   sb      // Stilb : 10000
   Lb      // Lambert : 3183.098861837906715
 
-// SI units: J N Th I T M L
+// SI Base Units
   A       // Current (Ampere)
   K       // Temperature (Kelvin)
   kg      // Mass (Kilogram)
