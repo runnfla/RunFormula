@@ -359,7 +359,7 @@ begin
     L:=Param(-2, Context);
     R:=Param(-1, Context);
     if (not ((L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]))) or
-      OverPlus(AsInt(L), -AsInt(R), Int) or OverPlus(AsInt(L), AsInt(R), IGap) then begin
+      Plus(AsInt(L), -AsInt(R), Int) or Plus(AsInt(L), AsInt(R), IGap) then begin
         Flo:=AsFloat(L)-AsFloat(R);
         Img:=AsFloat(L)+AsFloat(R);
         if Img<Flo then RaiseError(InvalidRange);
@@ -415,7 +415,7 @@ begin
     VNone  : RaiseError(NoneDisallow);
     VFloat : begin
                Flo:=System.int(Flo);
-               if (Flo>LI) and (Flo<=HI) then begin
+               if (Flo>=LI) and (Flo<=HI) then begin
                  Int:=trunc(Flo);
                  VType:=VInt;
                end;
@@ -428,7 +428,7 @@ begin
     VGap   : begin
                Flo:=System.int(Flo);
                Img:=System.int(Img);
-               if (Flo>LI) and (Flo<=HI) and (Img>LI) and (Img<=HI) then begin
+               if (Flo>=LI) and (Flo<=HI) and (Img>=LI) and (Img<=HI) then begin
                  t:=trunc(Img);
                  Int:=trunc(Flo);
                  IGap:=t;

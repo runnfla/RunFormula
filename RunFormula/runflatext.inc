@@ -384,7 +384,7 @@ begin
       $B171D,                                 // [0+0] [0+"] ["+0] ["+"]
       $B172D,
       $B271D,
-      $B272D  : if (not flg) or OverPlus(IL, I, Int) or OverPlus(IL, -I, IGap) then begin
+      $B272D  : if (not flg) or Plus(IL, I, Int) or Plus(IL, -I, IGap) then begin
                   if F>0 then RaiseError(InvalidRange);
                   Flo:=FL+F;
                   Img:=FL-F;

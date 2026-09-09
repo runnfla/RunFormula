@@ -17,7 +17,7 @@
 
 // TODO -oRFla.Def -cRev.2026.04.16:
 
-type
+type        TRFloat = Double;             // or Extended... or Single...
   TTag = (
     TagValue,
     TagVar,

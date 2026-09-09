@@ -125,10 +125,10 @@ var L : PValRec = @CVNone;        // init VMode
     scl:=AsInt(R);
     if scl<0 then exit;
     repeat
-      if ((scl and 1)<>0) and OverMult(res, Base, res) then exit;
+      if ((scl and 1)<>0) and Mult(res, Base, res) then exit;
       scl:=scl shr 1;
       if scl=0 then break;
-      if OverMult(Base, Base, Base) then exit;
+      if Mult(Base, Base, Base) then exit;
     until false;
     RI:=res;
     Result:=false;
@@ -226,31 +226,31 @@ begin
         TagNotGreater : LVal(Compare(L, R)<=0);                              // <=
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
-                        VInt   : if OverPlus(AsInt(L), AsInt(R), I)
+                        VInt   : if Plus(AsInt(L), AsInt(R), I)
                                    then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)+AsFloat(R));
                         VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
                         VStr   : raise EError.Create(StrDisallow);
                         VGap   : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
-                        VIGap  : if OverPlus(AsIGapL(L), AsIGapL(R), I) or
-                                   OverPlus(AsIGapR(L), AsIGapR(R), J)
+                        VIGap  : if Plus(AsIGapL(L), AsIGapL(R), I) or
+                                   Plus(AsIGapR(L), AsIGapR(R), J)
                                    then LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R)) else LGap(I, J);
                         VArr   : raise EError.Create(ArrDisallow);
                       end;
         TagMinus    : case CaseType[L^.VType, R^.VType] of                   // -
-                        VInt   : if OverPlus(AsInt(L), -AsInt(R), I)
+                        VInt   : if Plus(AsInt(L), -AsInt(R), I)
                                    then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)-AsFloat(R));
                         VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
                         VStr   : raise EError.Create(StrDisallow);
                         VGap   : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
-                        VIGap  : if OverPlus(AsIGapL(L), -AsIGapR(R), I) or
-                                   OverPlus(AsIGapR(L), -AsIGapL(R), J)
+                        VIGap  : if Plus(AsIGapL(L), -AsIGapR(R), I) or
+                                   Plus(AsIGapR(L), -AsIGapL(R), J)
                                    then LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R)) else LGap(I, J);
                         VArr   : raise EError.Create(ArrDisallow);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
-                        VInt   : if OverMult(AsInt(L), AsInt(R), I)
+                        VInt   : if Mult(AsInt(L), AsInt(R), I)
                                    then LVal(AsFloat(L)*AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
                         VCplex : begin

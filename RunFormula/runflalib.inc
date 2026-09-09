@@ -132,33 +132,46 @@ end;
 
 // ===== Math =====
 
-function OverPlus(IntL, IntR:SizeInt; out RI:SizeInt):boolean;
-var n : SizeInt;                           //DONE -oRFla.Lib -cRev.2026.04.22: Func OverPlus
-begin
+function Plus(X, Y:SizeInt; out R:SizeInt):boolean; inline;
+begin                                     //DONE -oRFla.Lib -cRev.2026.09.08: Inline Plus
   Result:=true;
-  if (IntL=LI) or (IntR=LI) then exit;
-  n:=IntL+IntR;
-  if ((n xor IntL) and (n xor IntR))<0 then exit;
-  RI:=n;
+  if (X=LI) or (Y=LI) then exit;
+  R:=X+Y;
+  if (R xor X)<0 then if (X xor Y)>=0 then exit;
   Result:=false;
 end;
 
-function OverMult(IntL, IntR:SizeInt; out RI:SizeInt):boolean;
-const safe = trunc(sqrt(high(SizeInt)));    //DONE -oRFla.Lib -cRev.2026.04.22: Func OverMult
-var al, ar : SizeInt;
+function Mult(X, Y:SizeInt; out R:SizeInt):boolean; inline;
+const safe = trunc(sqrt(HI));             //DONE -oRFla.Lib -cRev.2026.09.08: Inline Mult
+var ax, ay : SizeInt;
 begin
   Result:=true;
-  if (IntL<>0) and (IntR<>0) then begin
-    if (IntL=LI) or (IntR=LI) then exit;
-    al:=abs(IntL);
-    ar:=abs(IntR);
-    if ((al>safe) or (ar>safe)) and ((high(SizeInt) div al)<ar) then exit;
+  if (X<>0) and (Y<>0) then begin
+    if (X=LI) or (Y=LI) then exit;
+    ax:=abs(X);
+    ay:=abs(Y);
+    if ((ax>safe) or (ay>safe)) and ((HI div ax)<ay) then exit;
   end;
-  RI:=IntL*IntR;
+  R:=X*Y;
   Result:=false;
 end;
 
-function Power(Base:TRFloat; Scl:SizeInt):TRFloat;        //DONE -oRFla.Lib -cRev.2026.04.23: Func Power
+function Power(Base, Scl:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Int
+var ir : SizeInt = 1;       // Base^Scl
+begin
+  Result:=true;
+  if Scl<0 then exit;
+  repeat
+    if (Scl and 1)<>0 then if Mult(Base, ir, ir) then exit;
+    Scl:=Scl shr 1;
+    if Scl=0 then break;
+    if Mult(Base, Base, Base) then exit;
+  until false;
+  R:=ir;
+  Result:=false;
+end;
+
+function Power(Base:TRFloat; Scl:SizeInt):TRFloat;         //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Float
 var i : SizeInt;            // Base^Scl
 begin
   if Scl=1 then Exit(Base);
@@ -376,8 +389,8 @@ begin
     VCplex : raise EError.Create(IncompType_CF);
     VChar  : Result:=Chr;
     VStr   : raise EError.Create(StrDisallow);
-    VGap   : Result:=(Flo+Img)/2;
-    VIGap  : Result:=(Int+IGap)/2;
+    VGap   : Result:=Flo*0.5+Img*0.5;
+    VIGap  : Result:=Int*0.5+IGap*0.5;
     VArr   : raise EError.Create(ArrDisallow);
   end;
 end;
@@ -390,8 +403,8 @@ begin
     VFloat, VCplex : Result:=Flo;
     VChar : Result:=Chr;
     VStr  : raise EError.Create(StrDisallow);
-    VGap  : Result:=(Flo+Img)/2;
-    VIGap : Result:=(Int+IGap)/2;
+    VGap  : Result:=Flo*0.5+Img*0.5;
+    VIGap : Result:=Int*0.5+IGap*0.5;
     VArr  : raise EError.Create(ArrDisallow);
   end;
 end;
@@ -502,7 +515,7 @@ begin
           VFloat : s:=SelectPref(Flo/scl, scl, flg)+s;
           VChar  : s:=SelectPref(Chr/scl, scl, flg)+s;
         end;
-        s:=#$20+s;
+        s:=#$20+s;                                   // Li должно выводиться как float
       end;
       if (scl<>1) or (ofs<>0) then case VType of
         VInt   : Result:=FloatToStr((Int-ofs)/scl, F);
