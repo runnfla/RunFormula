@@ -366,64 +366,64 @@ end;
 
 // ===== Data =====
 
-function AsInt(PV:PValRec):SizeInt;                       //DONE -oRFla.Lib -cRev.2026.04.21: Func AsInt
+function AsInt(PV:PValRec):SizeInt;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsInt
 begin
   with PV^ do case VType of
-    VNone  : raise EError.Create(IncompType_NI);
+    VNone  : RaiseError(IncompType_NI);
     VInt   : Result:=Int;
-    VFloat : raise EError.Create(IncompType_FI);
-    VCplex : raise EError.Create(IncompType_CI);
+    VFloat : RaiseError(IncompType_FI);
+    VCplex : RaiseError(IncompType_CI);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(StrDisallow);
-    VGap, VIGap : raise EError.Create(IncompType_GI);
-    VArr   : raise EError.Create(ArrDisallow);
+    VStr   : RaiseError(StrDisallow);
+    VGap, VIGap : RaiseError(IncompType_GI);
+    VArr   : RaiseError(ArrDisallow);
   end;
 end;
 
-function AsFloat(PV:PValRec):TRFloat;                     //DONE -oRFla.Lib -cRev.2026.04.21: Func AsFloat
+function AsFloat(PV:PValRec):TRFloat;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsFloat
 begin
   with PV^ do case VType of
-    VNone  : raise EError.Create(IncompType_NF);
+    VNone  : RaiseError(IncompType_NF);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
-    VCplex : raise EError.Create(IncompType_CF);
+    VCplex : RaiseError(IncompType_CF);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(StrDisallow);
+    VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Flo*0.5+Img*0.5;
     VIGap  : Result:=Int*0.5+IGap*0.5;
-    VArr   : raise EError.Create(ArrDisallow);
+    VArr   : RaiseError(ArrDisallow);
   end;
 end;
 
-function AsRe(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsRe
+function AsRe(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRe
 begin
   with PV^ do case VType of
-    VNone : raise EError.Create(IncompType_NC);
+    VNone : RaiseError(IncompType_NC);
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
     VChar : Result:=Chr;
-    VStr  : raise EError.Create(StrDisallow);
+    VStr  : RaiseError(StrDisallow);
     VGap  : Result:=Flo*0.5+Img*0.5;
     VIGap : Result:=Int*0.5+IGap*0.5;
-    VArr  : raise EError.Create(ArrDisallow);
+    VArr  : RaiseError(ArrDisallow);
   end;
 end;
 
-function AsIm(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.04.21: Func AsIm
+function AsIm(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIm
 begin
   with PV^ do case VType of
-    VNone  : raise EError.Create(IncompType_NC);
+    VNone  : RaiseError(IncompType_NC);
     VCplex : Result:=Img;
-    VStr   : raise EError.Create(StrDisallow);
-    VArr   : raise EError.Create(ArrDisallow);
+    VStr   : RaiseError(StrDisallow);
+    VArr   : RaiseError(ArrDisallow);
     else Result:=0;
   end;
 end;
 
-function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsBool
+function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsBool
 begin
   with PV^ do begin
-    if VPhy<>0 then raise EError.Create(DimDisallow);
+    if VPhy<>0 then RaiseError(DimDisallow);
     case VType of
       VNone  : Result:=false;
       VInt   : Result:=Int<>0;
@@ -432,36 +432,36 @@ begin
       VChar  : Result:=Chr<>0;
       VStr   : Result:=Ansi[-1]<>0;
       VIGap  : Result:=(Int<>0) or (IGap<>0);
-      VArr   : raise EError.Create(ArrDisallow);
+      VArr   : RaiseError(ArrDisallow);
     end;
   end;
 end;
 
-function AsLGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsLGap
+function AsLGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsLGap
 begin
   with PV^ do case VType of
-    VNone  : raise EError.Create(IncompType_NG);
+    VNone  : RaiseError(IncompType_NG);
     VInt, VIGap  : Result:=Int;
     VFloat, VGap : Result:=Flo;
-    VCplex : raise EError.Create(IncompType_CG);
+    VCplex : RaiseError(IncompType_CG);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(StrDisallow);
-    VArr   : raise EError.Create(ArrDisallow);
+    VStr   : RaiseError(StrDisallow);
+    VArr   : RaiseError(ArrDisallow);
   end;
 end;
 
-function AsRGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.04.21: Func AsRGap
+function AsRGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRGap
 begin
   with PV^ do case VType of
-    VNone  : raise EError.Create(IncompType_NG);
+    VNone  : RaiseError(IncompType_NG);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
-    VCplex : raise EError.Create(IncompType_CG);
+    VCplex : RaiseError(IncompType_CG);
     VChar  : Result:=Chr;
-    VStr   : raise EError.Create(StrDisallow);
+    VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
-    VArr   : raise EError.Create(ArrDisallow);
+    VArr   : RaiseError(ArrDisallow);
   end;
 end;
 {
@@ -477,12 +477,12 @@ begin
   end;
 end;
 }
-function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.04.25: Func AsIGapL
+function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapL
 begin
   with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
 end;
 
-function AsIGapR(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.04.25: Func AsIGapR
+function AsIGapR(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapR
 begin
   with PV^ do case VType of
     VInt  : Result:=Int;

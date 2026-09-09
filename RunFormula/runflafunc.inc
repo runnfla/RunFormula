@@ -772,7 +772,8 @@ begin
                     if (fe<=1) and (ft>=1) then RaiseError(InvalidValue);
                     fe:=ln(fe);
                     ft:=ln(ft);
-                    m:=ln(AsLGap(X)); f:=ln(AsRGap(X));
+                    m:=ln(AsLGap(X));
+                    f:=ln(AsRGap(X));
                     MinMax(m/fe, m/ft, Result);
                     MinMax(f/fe, f/ft, Result);
                   end;

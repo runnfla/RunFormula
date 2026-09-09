@@ -299,7 +299,7 @@ const
   10000);    // TagPhy must have highest priority
 
   CaseType : array[TVType, TVType] of TVType = (
-// ret. VInt VFloat VCplex VStr VGap VIGap VArr
+// results: VInt VFloat VCplex VStr VGap VIGap VArr
 //           VNone   VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
 { VNone  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
 { VInt   } ( VInt,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
