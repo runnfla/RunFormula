@@ -33,10 +33,6 @@ type
     IncompType_CF,     // Incompatible operand type: got Complex but expected Real
     IncompType_GI,     // Incompatible operand type: got Interval but expected Integer
     IncompType_CG,     // Incompatible operand type: got Complex but expected Interval
-    IncompType_NI,     // Incompatible operand type: got None but expected Integer
-    IncompType_NF,     // Incompatible operand type: got None but expected Real
-    IncompType_NC,     // Incompatible operand type: got None but expected Complex
-    IncompType_NG,     // Incompatible operand type: got None but expected Interval
     NoneDisallow,      // None or empty string value is not allowed
     StrDisallow,       // Invalid string operand
     ArrDisallow,       // Invalid array operand

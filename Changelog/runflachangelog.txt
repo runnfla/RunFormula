@@ -57,5 +57,5 @@ StrDisallow, ArrDisallow, DimDisallow
 - Changed: Built-in function val() raises an exception instead of returning None
 
 ===== Develop branch changes =====
-
+- Removed: Error codes: IncompType_NI, IncompType_NF, IncompType_NC, IncompType_NG
 

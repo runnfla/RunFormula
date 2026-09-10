@@ -1,7 +1,7 @@
-//*****************************************************
-//  RunFormula Expression Scripting Engine
+//******************************************************
+//  RunFormula Unit-aware Expression Scripting Engine
 //  Library include file
-//  Rev. 15.05.2026
+//  Rev. 10.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -13,7 +13,7 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
 // TODO -oRFla.Lib -cRev.2026.04.30: Smith algorithm in Compare
 
@@ -156,34 +156,34 @@ begin
   Result:=false;
 end;
 
-function Power(Base, Scl:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Int
+function Power(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Int
 var ir : SizeInt = 1;       // Base^Scl
 begin
   Result:=true;
-  if Scl<0 then exit;
+  if Scale<0 then exit;
   repeat
-    if (Scl and 1)<>0 then if Mult(Base, ir, ir) then exit;
-    Scl:=Scl shr 1;
-    if Scl=0 then break;
+    if (Scale and 1)<>0 then if Mult(Base, ir, ir) then exit;
+    Scale:=Scale shr 1;
+    if Scale=0 then break;
     if Mult(Base, Base, Base) then exit;
   until false;
   R:=ir;
   Result:=false;
 end;
 
-function Power(Base:TRFloat; Scl:SizeInt):TRFloat;         //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Float
+function Power(Base:TRFloat; Scale:SizeInt):TRFloat;       //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Float
 var i : SizeInt;            // Base^Scl
 begin
-  if Scl=1 then Exit(Base);
+  if Scale=1 then Exit(Base);
   Result:=1;
-  i:=abs(Scl);
+  i:=abs(Scale);
   repeat
     if (i and 1)<>0 then Result:=Result*Base;
     i:=i shr 1;
     if i=0 then break;
     Base:=sqr(Base);
   until false;
-  if Scl<0 then Result:=1/Result;
+  if Scale<0 then Result:=1/Result;
 end;
 
 function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Lib -cRev.2026.08.27: Func Hypot2
@@ -253,33 +253,12 @@ begin
   end;
 end;
 
-procedure MinMaxGap(const F1, F2:TRFloat; PV:PValRec);
-begin                                   //DONE -oRFla.Lib -cRev.2026.07.29: Proc MinMaxGap
-  with PV^ do if F1<F2 then begin
-    Flo:=F1;
-    Img:=F2;
-  end else begin
-    Flo:=F2;
-    Img:=F1;
-  end;
-end;
-
-procedure MinMaxGap(const F1, F2, F3, F4:TRFloat; PV:PValRec);
-var m1, m2, x1, x2 : TRFloat;               //DONE -oRFla.Lib -cRev.2026.07.29: Proc MinMaxGap
+procedure Ball(const C, M:TRFloat; PV:PValRec); inline;   //DONE -oRFla.Lib -cRev.2026.08.28: Inline Ball
 begin
-  if F1<F2 then begin
-    m1:=F1; x1:=F2;
-  end else begin
-    m1:=F2; x1:=F1;
-  end;
-  if F3<F4 then begin
-    m2:=F3; x2:=F4;
-  end else begin
-    m2:=F4; x2:=F3;
-  end;
   with PV^ do begin
-    if m1<m2 then Flo:=m1 else Flo:=m2;
-    if x1<x2 then Img:=x2 else Img:=x1;
+    Flo:=C-M;
+    Img:=C+M;
+    VType:=VGap;
   end;
 end;
 
@@ -369,7 +348,7 @@ end;
 function AsInt(PV:PValRec):SizeInt;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsInt
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(IncompType_NI);
+    VNone  : RaiseError(NoneDisallow);
     VInt   : Result:=Int;
     VFloat : RaiseError(IncompType_FI);
     VCplex : RaiseError(IncompType_CI);
@@ -383,7 +362,7 @@ end;
 function AsFloat(PV:PValRec):TRFloat;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsFloat
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(IncompType_NF);
+    VNone  : RaiseError(NoneDisallow);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : RaiseError(IncompType_CF);
@@ -398,7 +377,7 @@ end;
 function AsRe(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRe
 begin
   with PV^ do case VType of
-    VNone : RaiseError(IncompType_NC);
+    VNone : RaiseError(NoneDisallow);
     VInt  : Result:=Int;
     VFloat, VCplex : Result:=Flo;
     VChar : Result:=Chr;
@@ -412,7 +391,7 @@ end;
 function AsIm(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIm
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(IncompType_NC);
+    VNone  : RaiseError(NoneDisallow);
     VCplex : Result:=Img;
     VStr   : RaiseError(StrDisallow);
     VArr   : RaiseError(ArrDisallow);
@@ -440,7 +419,7 @@ end;
 function AsLGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsLGap
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(IncompType_NG);
+    VNone  : RaiseError(NoneDisallow);
     VInt, VIGap  : Result:=Int;
     VFloat, VGap : Result:=Flo;
     VCplex : RaiseError(IncompType_CG);
@@ -453,7 +432,7 @@ end;
 function AsRGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRGap
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(IncompType_NG);
+    VNone  : RaiseError(NoneDisallow);
     VInt   : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : RaiseError(IncompType_CG);
@@ -464,19 +443,20 @@ begin
     VArr   : RaiseError(ArrDisallow);
   end;
 end;
-{
-function AsMgin(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.08.23: Func AsMgin
+
+function AsMgin(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsMgin
 begin
   with PV^ do case VType of
-    VNone  : raise EError.Create(IncompType_NG);
-    VInt, VFloat, VChar, VCplex : Result:=0;
-    VStr   : raise EError.Create(StrDisallow);
+    VNone  : RaiseError(NoneDisallow);
+    VInt, VFloat, VChar : Result:=0;
+    VCplex : RaiseError(IncompType_CG);
+    VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Img*0.5-Flo*0.5;
     VIGap  : Result:=IGap*0.5-Int*0.5;
-    VArr   : raise EError.Create(ArrDisallow);
+    VArr   : RaiseError(ArrDisallow);
   end;
 end;
-}
+
 function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapL
 begin
   with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
@@ -579,16 +559,7 @@ begin
     end;
   end;
 end;
-{
-procedure Ball(const C, M:TRFloat; PV:PValRec); inline;   //DONE -oRFla.Lib -cRev.2026.08.28: Inline Ball
-begin
-  with PV^ do begin
-    Flo:=C-M;
-    Img:=C+M;
-    VType:=VGap;
-  end;
-end;
-}
+
 function Compare(L, R:PValRec):SizeInt;                   //DONE -oRFla.Lib -cRev.2026.04.26: Func Compare
 var IL, IR, GL, GR : SizeInt;
     FL, FR, ML, MR : TRFloat;
@@ -661,34 +632,6 @@ begin
   end;
   Result:=-1;
 end;
-
-{
-procedure MultIGap(PVGap, PV:PValRec; L, R:SizeInt);      //DONE -oRFla.Lib -cRev.2026.08.23: Func MultIGap
-var al, ar, m1, m2, m3, m4 : SizeInt;
-begin
-  al:=AsIGapL(PVGap);
-  ar:=AsIGapR(PVGap);
-  if OverMult(al, L, m1) or OverMult(al, R, m2) or
-    OverMult(ar, L, m3) or OverMult(ar, R, m4) then begin
-      MinMaxGap(AsLGap(PV), AsRGap(PV), L, R, PV);
-      PV^.VType:=VGap;
-  end else begin
-    if m1<m2 then begin
-      al:=m1; ar:=m2;
-    end else begin
-      al:=m2; ar:=m1;
-    end;
-    if m3<m4 then begin
-      L:=m3; R:=m4;
-    end else begin
-      L:=m4; R:=m3;
-    end;
-    with PV^ do begin
-      if al<L then Int:=al else Int:=L;
-      if ar<R then IGap:=ar else IGap:=R;
-    end;
-  end;
-end;                  }
 
 // ===== MemList routines =====
 
