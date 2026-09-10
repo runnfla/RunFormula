@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Embedded functions include file
-//  Rev. 2.09.2026
+//  Built-in functions include file
+//  Rev. 10.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -272,54 +272,55 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_LEFT
+function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.10: Func Fla_LEFT
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    if pv^.VType in [VInt, VChar, VIGap] then begin
-      Int:=AsIGapL(pv);
-      VType:=VInt;
-    end else begin
-      Flo:=AsLGap(pv);
-      VType:=VFloat;
+    VType:=VInt;
+    case pv^.VType of
+       VInt, VIGap : Int:=pv^.Int;
+       VChar       : Int:=pv^.Chr;
+       else
+         Flo:=AsLGap(pv);
+         VType:=VFloat;
     end;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_RIGHT
+function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.10: Func Fla_RIGHT
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    if pv^.VType in [VInt, VChar, VIGap] then begin
-      Int:=AsIGapR(pv);
-      VType:=VInt;
-    end else begin
-      Flo:=AsRGap(pv);
-      VType:=VFloat;
+    VType:=VInt;
+    case pv^.VType of
+       VInt  : Int:=pv^.Int;
+       VChar : Int:=pv^.Chr;
+       VIGap : Int:=pv^.IGap
+       else
+         Flo:=AsRGap(pv);
+         VType:=VFloat;
     end;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_MARGIN
-var pv : PValRec;
+function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.10: Func Fla_MARGIN
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
-    Flo:=AsRGap(pv)*0.5-AsLGap(pv)*0.5;
+    Flo:=AsMgin(Param(-1, Context));
     VType:=VFloat;
-    VPhy:=pv^.VPhy;
+    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
@@ -350,29 +351,27 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.07.14: Func Fla_BALL
-var L, R : PValRec;
+function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.10: Func Fla_BALL
+var C, M : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    L:=Param(-2, Context);
-    R:=Param(-1, Context);
-    if (not ((L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]))) or
-      Plus(AsInt(L), -AsInt(R), Int) or Plus(AsInt(L), AsInt(R), IGap) then begin
-        Flo:=AsFloat(L)-AsFloat(R);
-        Img:=AsFloat(L)+AsFloat(R);
+    C:=Param(-2, Context);
+    M:=Param(-1, Context);
+    if (not ((C^.VType in [VInt, VChar]) and (M^.VType in [VInt, VChar]))) or
+      Plus(AsInt(C), -AsInt(M), Int) or Plus(AsInt(C), AsInt(M), IGap) then begin
+        Ball(AsFloat(C), AsFloat(M), Result);
         if Img<Flo then RaiseError(InvalidRange);
-        VType:=VGap;
     end else begin
       if IGap<Int then RaiseError(InvalidRange);
       VType:=VIGap;
     end;
-    VPhy:=L^.VPhy;
-    if VPhy<>R^.VPhy then RaiseError(DimMismatch);
+    VPhy:=C^.VPhy;
+    if VPhy<>M^.VPhy then RaiseError(DimMismatch);
   end;
   PostParam(Context);
-  PostParam(L, Context);
+  PostParam(C, Context);
 end;
 
 function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_FRAC
@@ -954,7 +953,7 @@ begin
 end;
 
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_ABS
-const NLI = -TRFloat(LI);
+const ALI = abs(TRFloat(LI));
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -967,7 +966,7 @@ begin
                  Int:=abs(pv^.Int);
                  VType:=VInt;
                end else begin
-                 Flo:=NLI;
+                 Flo:=ALI;
                  VType:=VFloat;
                end;
       VFloat : begin
@@ -991,7 +990,7 @@ begin
                  MinMax(abs(pv^.Int), abs(pv^.IGap), Result);
                  if (pv^.Int<0) and (pv^.IGap>0) then Int:=0;
                end else begin
-                 MinMax(abs(TRFloat(pv^.IGap)), NLI, Result);
+                 MinMax(abs(TRFloat(pv^.IGap)), ALI, Result);
                  if pv^.IGap>0 then Flo:=0;
                end;
        VArr  : RaiseError(ArrDisallow);
