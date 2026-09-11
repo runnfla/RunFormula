@@ -118,17 +118,17 @@ var L : PValRec = @CVNone;        // init VMode
   end;
 
   function IntPower(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.09.08: Func IntPower
-  var ir : SizeInt = 1;       // Base^Scl
+  var re : SizeInt = 1;       // Base^Scl
   begin
     Result:=true;
     if Scale<0 then exit;
     repeat
-      if (Scale and 1)<>0 then if Mult(Base, ir, ir) then exit;
+      if (Scale and 1)<>0 then if Mult(Base, re, re) then exit;
       Scale:=Scale shr 1;
       if Scale=0 then break;
       if Mult(Base, Base, Base) then exit;
     until false;
-    R:=ir;
+    R:=re;
     Result:=false;
   end;
 
@@ -152,16 +152,12 @@ var L : PValRec = @CVNone;        // init VMode
       BIM:=BRE*BIM*2;
       BRE:=t;
     until false;
-    if scl<0 then begin
-      t:=sqr(re)+sqr(im);
-      re:=re/t;
-      im:=-im/t;
-    end;
+    if scl<0 then CplexDiv(1, 0, re, im, re, im);
     FreeLR;
     with L^ do begin
-      VType:=VCplex;
       Flo:=re;
       Img:=im;
+      VType:=VCplex;
     end
   end;
 
@@ -261,9 +257,9 @@ begin
                                    flg:=Mult(I, K, M) or Mult(J, K, Q);
                                    K:=AsIGapR(R);
                                    if flg or Mult(I, K, I) or Mult(J, K, J) then begin
-                                     fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=K;
-                                     MinMax(fa*fc, fa*fd, LNone);
-                                     MinMax(fb*fc, fb*fd, L);
+                                     fa:=AsLGap(L); fb:=AsRGap(L); M:=AsIGapL(R);
+                                     MinMax(fa*M, fa*K, LNone);
+                                     MinMax(fb*M, fb*K, L);
                                    end else begin
                                      MinMax(I, J, LNone);
                                      MinMax(M, Q, L);
