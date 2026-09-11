@@ -332,7 +332,7 @@ begin
       $2A2A : OpToken(TagPower);                // **
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
-      $3D3C : OpToken(TagNotGreater);           // <=
+      $3D3C : OpToken(TagNotGreat);             // <=
       $3D3D : OpToken(TagEqual);                // ==
       $3D3E : OpToken(TagNotLess);              // >=
       $3E3C : OpToken(TagNotEqual);             // <>

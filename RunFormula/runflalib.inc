@@ -156,22 +156,7 @@ begin
   Result:=false;
 end;
 
-function Power(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Int
-var ir : SizeInt = 1;       // Base^Scl
-begin
-  Result:=true;
-  if Scale<0 then exit;
-  repeat
-    if (Scale and 1)<>0 then if Mult(Base, ir, ir) then exit;
-    Scale:=Scale shr 1;
-    if Scale=0 then break;
-    if Mult(Base, Base, Base) then exit;
-  until false;
-  R:=ir;
-  Result:=false;
-end;
-
-function Power(Base:TRFloat; Scale:SizeInt):TRFloat;       //DONE -oRFla.Lib -cRev.2026.09.08: Func Power Float
+function Power(Base:TRFloat; Scale:SizeInt):TRFloat;       //DONE -oRFla.Lib -cRev.2026.09.08: Func Power
 var i : SizeInt;            // Base^Scl
 begin
   if Scale=1 then Exit(Base);

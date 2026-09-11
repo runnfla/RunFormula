@@ -953,7 +953,6 @@ begin
 end;
 
 function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_ABS
-const ALI = abs(TRFloat(LI));
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -966,7 +965,7 @@ begin
                  Int:=abs(pv^.Int);
                  VType:=VInt;
                end else begin
-                 Flo:=ALI;
+                 Flo:=FALI;
                  VType:=VFloat;
                end;
       VFloat : begin
@@ -990,7 +989,7 @@ begin
                  MinMax(abs(pv^.Int), abs(pv^.IGap), Result);
                  if (pv^.Int<0) and (pv^.IGap>0) then Int:=0;
                end else begin
-                 MinMax(abs(TRFloat(pv^.IGap)), ALI, Result);
+                 MinMax(abs(TRFloat(pv^.IGap)), FALI, Result);
                  if pv^.IGap>0 then Flo:=0;
                end;
        VArr  : RaiseError(ArrDisallow);

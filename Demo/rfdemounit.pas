@@ -95,7 +95,7 @@ const TagName : array[TTag] of string = (
   'Greater',
   'Less',
   'NotLess',
-  'NotGreater',
+  'NotGreat',
   'Concat',
   'Plus',
   'Minus',

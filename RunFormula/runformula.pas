@@ -26,8 +26,6 @@ unit RunFormula;
 interface
 
 type
-  //TRFloat = Double;             // or Extended... or Single...
-
   TRunFlaVar = function(constref Name:string; out Save:boolean; var Dim:SizeInt):Variant;
   TRunFlaFunc = function(const ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
 

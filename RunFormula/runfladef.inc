@@ -17,7 +17,9 @@
 
 // TODO -oRFla.Def -cRev.2026.04.16:
 
-type        TRFloat = Double;             // or Extended... or Single...
+type
+  TRFloat = Double;             // or Extended... or Single...
+
   TTag = (
     TagValue,
     TagVar,
@@ -43,7 +45,7 @@ type        TRFloat = Double;             // or Extended... or Single...
     TagGreater,           // >
     TagLess,              // <
     TagNotLess,           // >=
-    TagNotGreater,        // <=
+    TagNotGreat,          // <=
     TagConcat,            // &
     TagPlus,              // +
     TagMinus,             // -
@@ -90,12 +92,13 @@ type        TRFloat = Double;             // or Extended... or Single...
   end;
 
 const
-  SI = SizeOf(SizeInt);
-  HI = high(SizeInt);
   LI = low(SizeInt);
+  HI = high(SizeInt);
+  SI = SizeOf(SizeInt);
   Sint = SizeOf(integer);
   SPtr = SizeOf(pointer);
   SRFloat = SizeOf(TRFloat);
+  FALI = abs(TRFloat(LI));
   Cpi = 3.14159265358979323846;
   CElr = 2.71828182845904523536;
 
@@ -258,7 +261,7 @@ const
   UPF  = 4;                // prefix forbidden
   UCPP = 8;                // compounding prefix prohibited
 
-  OpTokenLevel : array[TTag] of integer = (
+  OpLevel : array[TTag] of byte = (
     0,       // TagValue
     0,       // TagVar
     0,       // TagArray
@@ -273,30 +276,30 @@ const
     0,       // TagDo
 
     0,       // TagExpr
-    101,     // TagAssign     =    right-associative, enable A = B = 10
+    11,      // TagAssign     =    right-associative, enable A = B = 10
 
-    200,     // TagOR         or
-    200,     // TagXOR        xor
-    300,     // TagAND        and
-    400,     // TagEqual      ==
-    400,     // TagNotEqual   <>
-    400,     // TagGreater    >
-    400,     // TagLess       <
-    400,     // TagNotLess    >=
-    400,     // TagNotGreater <=
-    500,     // TagConcat     &
-    600,     // TagPlus       +
-    600,     // TagMinus      -         10-5-2 = 3, not 7
-    700,     // TagMult       *
-    700,     // TagSlash      /
-    700,     // TagSHL        shl <<
-    700,     // TagSHR        shr >>
-    700,     // TagDIV        div
-    700,     // TagMOD        mod
-    800,     // TagNegative   - unary
-    800,     // TagNOT        not
-    901,     // TagPower      **   right-associative, 4**3**2 = 4**9
-  10000);    // TagPhy must have highest priority
+    20,      // TagOR         or
+    20,      // TagXOR        xor
+    30,      // TagAND        and
+    40,      // TagEqual      ==
+    40,      // TagNotEqual   <>
+    40,      // TagGreater    >
+    40,      // TagLess       <
+    40,      // TagNotLess    >=
+    40,      // TagNotGreat   <=
+    50,      // TagConcat     &
+    60,      // TagPlus       +
+    60,      // TagMinus      -         10-5-2 = 3, not 7
+    70,      // TagMult       *
+    70,      // TagSlash      /
+    70,      // TagSHL        shl <<
+    70,      // TagSHR        shr >>
+    70,      // TagDIV        div
+    70,      // TagMOD        mod
+    80,      // TagNegative   - unary
+    80,      // TagNOT        not
+    91,      // TagPower      **   right-associative, 4**3**2 = 4**9
+   120);     // TagPhy must have highest priority
 
   CaseType : array[TVType, TVType] of TVType = (
 // results: VInt VFloat VCplex VStr VGap VIGap VArr
