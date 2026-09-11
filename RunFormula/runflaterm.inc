@@ -25,58 +25,58 @@ begin                              // like PostParam
   end;
 end;
 
-function Expr(var P:PByte; Fin:PByte; Level:integer):PValRec;  //DONE -oRFla.Term -cRev.2026.05.18: Func Expr
+function Expr(var P:PByte; Fin:PByte; Level:SizeInt):PValRec;  //DONE -oRFla.Term -cRev.2026.05.18: Func Expr
 var L : PValRec = @CVNone;        // init VMode
     R : PValRec;
     tag : TTag;
     tkn : PByte;
-    lvl : integer;
     fa, fb, fc, fd : TRFloat;
-    phy, I, J : SizeInt;
+    phy, I, J, K, M, Q : SizeInt;
+    flg : boolean;
 
   procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
   begin                                            // LVal should be called singly
     FreeTerm(R);
     if L^.VAlloc<>LV then begin
-      L:=MemListAdd(Context.LVStack);             // like NewLV
+      L:=MemListAdd(Context.LVStack);              // like NewLV
       L^.VAlloc:=LV;
     end else FreeValue(L);
   end;
 
-  procedure LVal(N:SizeInt);                                 //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Int
+  procedure LVal(I:SizeInt);                                 //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Int
   begin
     FreeLR;
     with L^ do begin
+      Int:=I;
       VType:=VInt;
-      Int:=N;
     end;
   end;
 
-  procedure LVal(const F:TRFloat);                           //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Float
+  procedure LVal(const F:TRFloat);                           //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Float
   begin
     FreeLR;
     with L^ do begin
-      VType:=VFloat;
       Flo:=F;
+      VType:=VFloat;
     end;
   end;
 
-  procedure LVal(const Re, Im:TRFloat);                      //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Cplex
+  procedure LVal(const Re, Im:TRFloat);                      //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Cplex
   begin
     FreeLR;
     with L^ do begin
-      VType:=VCplex;
       Flo:=Re;
       Img:=Im;
+      VType:=VCplex;
     end;
   end;
 
-  procedure LVal(B:boolean);                                 //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Bool
+  procedure LVal(B:boolean);                                 //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Bool
   begin
     FreeLR;
     with L^ do begin
-      VType:=VInt;
       if B then Int:=-1 else Int:=0;
+      VType:=VInt;
     end;
   end;
 
@@ -84,57 +84,55 @@ var L : PValRec = @CVNone;        // init VMode
   begin
     FreeLR;
     with L^ do begin
-      VType:=VStr;
+      VType:=VNone;
       Str:=Str2Ptr(S);
-      if Str=nil then VType:=VNone;
+      if Str<>nil then VType:=VStr;
     end;
   end;          }
 
-  procedure LGap(const GL, GR:TRFloat);                      //DONE -oRFla.Term -cRev.2026.04.22: Proc LGap Float
+  procedure LGap(GL, GR:SizeInt);                            //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Int
   begin
     FreeLR;
     with L^ do begin
-      VType:=VGap;
-      Flo:=GL;
-      Img:=GR;
-    end;
-  end;
-
-  procedure LGap(GL, GR:SizeInt);                            //DONE -oRFla.Term -cRev.2026.04.25: Proc LGap Int
-  begin
-    FreeLR;
-    with L^ do begin
-      VType:=VIGap;
       Int:=GL;
       IGap:=GR;
+      VType:=VIGap;
     end;
   end;
 
-  function LGap:PValRec;                                     //DONE -oRFla.Term -cRev.2026.07.29: Func LGap
+  procedure LGap(const GL, GR:TRFloat);                      //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Float
   begin
     FreeLR;
-    L^.VType:=VGap;
-    Result:=L;
+    with L^ do begin
+      Flo:=GL;
+      Img:=GR;
+      VType:=VGap;
+    end;
   end;
 
-  function OverPower(Base:SizeInt; out RI:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.04.25: Func OverPower
-  var res : SizeInt = 1;
-      scl : SizeInt;
+  function LNone:PValRec;                                     //DONE -oRFla.Term -cRev.2026.09.09: Func LNone
+  begin
+    FreeLR;
+    Result:=L;
+    Result^.VType:=VNone;
+  end;
+
+  function IntPower(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.09.08: Func IntPower
+  var ir : SizeInt = 1;       // Base^Scl
   begin
     Result:=true;
-    scl:=AsInt(R);
-    if scl<0 then exit;
+    if Scale<0 then exit;
     repeat
-      if ((scl and 1)<>0) and Mult(res, Base, res) then exit;
-      scl:=scl shr 1;
-      if scl=0 then break;
+      if (Scale and 1)<>0 then if Mult(Base, ir, ir) then exit;
+      Scale:=Scale shr 1;
+      if Scale=0 then break;
       if Mult(Base, Base, Base) then exit;
     until false;
-    RI:=res;
+    R:=ir;
     Result:=false;
   end;
 
-  procedure PowerComplex(BRE, BIM:TRFloat);                  //DONE -oRFla.Term -cRev.2026.04.23: Proc PowerComplex
+  procedure CplexPower(BRE, BIM:TRFloat);                  //DONE -oRFla.Term -cRev.2026.04.23: Proc CplexPower
   var re : TRFloat = 1;
       im : TRFloat = 0;
       t : TRFloat;
@@ -183,33 +181,32 @@ begin
   while (P<Fin) and (Context.Flow=NML) do begin
     tag:=PToken(P)^.Tag;
     if tag>=TagAssign then begin
-      lvl:=OpTokenLevel[tag];
-      if (lvl<Level) or ((lvl=Level) and ((lvl and 1)=0)) then break;
+      I:=OpLevel[tag];
+      if (I<Level) or ((I=Level) and ((I and 1)=0)) then break;
       tkn:=P;
       inc(P, OpTokenSize);
-      R:=Expr(P, Fin, lvl);                      // R should be free on exit
+      R:=Expr(P, Fin, I);                      // R should be free on exit
       Context.ProcToken:=tkn;
       phy:=0;
       if (L^.VPhy or R^.VPhy)<>0 then case tag of
-        TagOR, TagXOR, TagAND, TagSHL,
-        TagSHR, TagNOT    : raise EError.Create(DimDisallow);
+        TagOR, TagXOR, TagAND, TagSHL, TagSHR, TagNOT : RaiseError(DimDisallow);
         TagPlus, TagMinus : begin
                               phy:=L^.VPhy;
-                              if (phy<>R^.VPhy) then raise EError.Create(DimMismatch);
+                              if (phy<>R^.VPhy) then RaiseError(DimMismatch);
                             end;
         TagNegative       : phy:=R^.VPhy;
         TagMult           : phy:=PhyPlus(L^.VPhy, R^.VPhy);
         TagSlash, TagDIV  : phy:=PhyMinus(L^.VPhy, R^.VPhy);
         TagMOD            : begin
                               phy:=R^.VPhy;
-                              if (phy<>0) and (phy<>L^.VPhy) then raise EError.Create(DimMismatch);
+                              if (phy<>0) and (phy<>L^.VPhy) then RaiseError(DimMismatch);
                               phy:=L^.VPhy;
                             end;
         TagPower          : phy:=PhyMult(L^.VPhy, AsInt(R));
       end;
       case tag of
         TagAssign   : begin                                                  // =
-                        if L^.VAlloc<>VP then raise EError.Create(VarExpected);
+                        if L^.VAlloc<>VP then RaiseError(VarExpected);
                         FreeValue(L);
                         ValCopy(R, L);
                         FreeTerm(R);
@@ -223,46 +220,56 @@ begin
         TagGreater  : LVal(Compare(L, R)>0);                                 // >
         TagLess     : LVal(Compare(L, R)<0);                                 // <
         TagNotLess  : LVal(Compare(L, R)>=0);                                // >=
-        TagNotGreater : LVal(Compare(L, R)<=0);                              // <=
+        TagNotGreat : LVal(Compare(L, R)<=0);                                // <=
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
-                        VInt   : if Plus(AsInt(L), AsInt(R), I)
-                                   then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
+                        VInt   : if Plus(AsInt(L), AsInt(R), I) then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)+AsFloat(R));
                         VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
-                        VStr   : raise EError.Create(StrDisallow);
+                        VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
-                        VIGap  : if Plus(AsIGapL(L), AsIGapL(R), I) or
-                                   Plus(AsIGapR(L), AsIGapR(R), J)
+                        VIGap  : if Plus(AsIGapL(L), AsIGapL(R), I) or Plus(AsIGapR(L), AsIGapR(R), J)
                                    then LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R)) else LGap(I, J);
-                        VArr   : raise EError.Create(ArrDisallow);
+                        VArr   : RaiseError(ArrDisallow);
                       end;
         TagMinus    : case CaseType[L^.VType, R^.VType] of                   // -
-                        VInt   : if Plus(AsInt(L), -AsInt(R), I)
-                                   then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
+                        VInt   : if Plus(AsInt(L), -AsInt(R), I) then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)-AsFloat(R));
                         VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
-                        VStr   : raise EError.Create(StrDisallow);
+                        VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
-                        VIGap  : if Plus(AsIGapL(L), -AsIGapR(R), I) or
-                                   Plus(AsIGapR(L), -AsIGapL(R), J)
+                        VIGap  : if Plus(AsIGapL(L), -AsIGapR(R), I) or Plus(AsIGapR(L), -AsIGapL(R), J)
                                    then LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R)) else LGap(I, J);
-                        VArr   : raise EError.Create(ArrDisallow);
+                        VArr   : RaiseError(ArrDisallow);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
-                        VInt   : if Mult(AsInt(L), AsInt(R), I)
-                                   then LVal(AsFloat(L)*AsFloat(R)) else LVal(I);
+                        VInt   : if Mult(AsInt(L), AsInt(R), I) then LVal(AsFloat(L)*AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
                         VCplex : begin
                                    fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
                                    LVal(fa*fc-fb*fd, fa*fd+fb*fc);
                                  end;
-                        VStr   : raise EError.Create(StrDisallow);
-                        VGap, VIGap : begin
-                                        fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
-                                        MinMaxGap(fa*fc, fa*fd, fb*fc, fb*fd, LGap);
-                                      end;
-                        VArr   : raise EError.Create(ArrDisallow);
+                        VStr   : RaiseError(StrDisallow);
+                        VGap   : begin
+                                   fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
+                                   MinMax(fa*fc, fa*fd, LNone);
+                                   MinMax(fb*fc, fb*fd, L);
+                                 end;
+                        VIGap  : begin
+                                   I:=AsIGapL(L); J:=AsIGapR(L);
+                                   K:=AsIGapL(R);
+                                   flg:=Mult(I, K, M) or Mult(J, K, Q);
+                                   K:=AsIGapR(R);
+                                   if flg or Mult(I, K, I) or Mult(J, K, J) then begin
+                                     fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=K;
+                                     MinMax(fa*fc, fa*fd, LNone);
+                                     MinMax(fb*fc, fb*fd, L);
+                                   end else begin
+                                     MinMax(I, J, LNone);
+                                     MinMax(M, Q, L);
+                                   end;
+                                 end;
+                        VArr   : RaiseError(ArrDisallow);
                       end;
         TagSlash    : case CaseType[L^.VType, R^.VType] of                   // /
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
@@ -270,51 +277,62 @@ begin
                                    CplexDiv(AsRe(L), AsIm(L), AsRe(R), AsIm(R), fa, fb);
                                    LVal(fa, fb);
                                  end;
-                        VStr   : raise EError.Create(StrDisallow);
+                        VStr   : RaiseError(StrDisallow);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
-                                        if (fc<=0) and (fd>=0) then raise EError.Create(DivZero);
-                                        MinMaxGap(fa/fc, fa/fd, fb/fc, fb/fd, LGap);
+                                        if (fc<=0) and (fd>=0) then RaiseError(DivZero);
+                                        MinMax(fa/fc, fa/fd, LNone);
+                                        MinMax(fb/fc, fb/fd, L);
                                       end;
-                        VArr   : raise EError.Create(ArrDisallow);
+                        VArr   : RaiseError(ArrDisallow);
                       end;
         TagSHL      : LVal(AsInt(L) shl AsInt(R));                           // shl <<
         TagSHR      : LVal(AsInt(L) shr AsInt(R));                           // shr >>
         TagDIV      : LVal(AsInt(L) div AsInt(R));                           // div
-        TagMOD      : LVal(AsInt(L) mod AsInt(R));                           // mod
+        TagMOD      : LVal(AsInt(L) mod AsInt(R));                           // mod %
         TagNegative : with R^ do case VType of                               // - unary
-                        VNone  : AsFloat(R);
-                        VInt   : if Int<>LI then LVal(-Int) else LVal(-TRFloat(Int));
+                        VNone  : RaiseError(NoneDisallow);
+                        VInt   : if Int<>LI then LVal(-Int) else LVal(FALI);
                         VFloat : LVal(-Flo);
                         VCplex : LVal(-Flo, -Img);
                         VChar  : LVal(-SizeInt(Chr));
-                        VStr   : raise EError.Create(StrDisallow);
+                        VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(-Img, -Flo);
-                        VIGap  : if (Int<>LI) and (IGap<>LI) then LGap(-IGap, -Int)
-                                   else LGap(-TRFloat(IGap), -TRFloat(Int));
-                        VArr   : raise EError.Create(ArrDisallow);
+                        VIGap  : if Int<>LI then LGap(-IGap, -Int) else LGap(-TRFloat(IGap), FALI);
+                        VArr   : RaiseError(ArrDisallow);
                       end;
         TagNOT      : LVal(not AsInt(R));                                    // not unary
         TagPower    : with L^ do case VType of                               // **
-                        VNone  : AsFloat(L);
-                        VInt   : if OverPower(Int, I) then LVal(Power(Int, AsInt(R)))
-                                   else LVal(I);
+                        VNone  : RaiseError(NoneDisallow);
+                        VInt   : if IntPower(Int, AsInt(R), I) then LVal(Power(Int, AsInt(R))) else LVal(I);
                         VFloat : LVal(Power(Flo, AsInt(R)));
-                        VCplex : PowerComplex(Flo, Img);
-                        VChar  : if OverPower(Chr, I) then LVal(Power(Chr, AsInt(R)))
-                                   else LVal(I);
-                        VStr   : raise EError.Create(StrDisallow);
-                        VGap, VIGap : begin
-                                        fa:=AsLGap(L); fb:=AsRGap(L); I:=AsInt(R);
-                                        fc:=Power(fa, I);
-                                        fd:=Power(fb, I);
-                                        if (fa<=0) and (fb>=0) and (I<>0) then begin
-                                          if I<0 then raise EError.Create(DivZero);
-                                          if (I and 1)=0 then MinMaxGap(fc, fd, 0, 0, LGap)
-                                            else LGap(fc, fd);
-                                          end else MinMaxGap(fc, fd, LGap);
-                                        end;
-                        VArr : raise EError.Create(ArrDisallow);
+                        VCplex : CplexPower(Flo, Img);
+                        VChar  : if IntPower(Chr, AsInt(R), I) then LVal(Power(Chr, AsInt(R))) else LVal(I);
+                        VStr   : RaiseError(StrDisallow);
+                        VGap   : begin
+                                   if not (R^.VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
+                                   K:=AsIGapL(R);
+                                   if (Flo<0) or ((Flo=0) and (K<0)) then RaiseError(InvalidValue);
+                                   M:=AsIGapR(R);
+                                   MinMax(Power(Flo, K), Power(Flo, M), LNone);
+                                   MinMax(Power(Img, K), Power(Img, M), L);
+                                 end;
+                        VIGap  : begin
+                                   if not (R^.VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
+                                   K:=AsIGapL(R);
+                                   if (Int<0) or ((Int=0) and (K<0)) then RaiseError(InvalidValue);
+                                   flg:=IntPower(Int, K, M) or IntPower(IGap, K, Q);
+                                   K:=AsIGapR(R);
+                                   if flg or IntPower(Int, K, I) or IntPower(IGap, K, J) then begin
+                                     M:=AsIGapL(R);
+                                     MinMax(Power(Int, K), Power(Int, M), LNone);
+                                     MinMax(Power(IGap, K), Power(IGap, M), L);
+                                   end else begin
+                                     MinMax(I, J, LNone);
+                                     MinMax(M, Q, L);
+                                   end;
+                                 end;
+                        VArr : RaiseError(ArrDisallow);
                       end;
         TagPhy      : begin                   // R always must be in BC so FreeTerm(R) is not needed
                         if L^.VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
