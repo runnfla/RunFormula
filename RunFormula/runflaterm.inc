@@ -32,7 +32,6 @@ var L : PValRec = @CVNone;        // init VMode
     tkn : PByte;
     fa, fb, fc, fd : TRFloat;
     phy, I, J, K, M, Q : SizeInt;
-    flg : boolean;
 
   procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
   begin                                            // LVal should be called singly
@@ -252,17 +251,15 @@ begin
                                    MinMax(fb*fc, fb*fd, L);
                                  end;
                         VIGap  : begin
-                                   I:=AsIGapL(L); J:=AsIGapR(L);
-                                   K:=AsIGapL(R);
-                                   flg:=Mult(I, K, M) or Mult(J, K, Q);
-                                   K:=AsIGapR(R);
-                                   if flg or Mult(I, K, I) or Mult(J, K, J) then begin
-                                     fa:=AsLGap(L); fb:=AsRGap(L); M:=AsIGapL(R);
-                                     MinMax(fa*M, fa*K, LNone);
-                                     MinMax(fb*M, fb*K, L);
-                                   end else begin
-                                     MinMax(I, J, LNone);
-                                     MinMax(M, Q, L);
+                                   I:=AsIGapL(L); J:=AsIGapR(L); K:=AsIGapL(R); M:=AsIGapR(R);
+                                   if Mult(I, K, Q) or Mult(J, K, K) or Mult(I, M, I) or Mult(J, M, J)
+                                     then begin
+                                       fa:=AsLGap(L); fb:=AsRGap(L); K:=AsIGapL(R);
+                                       MinMax(fa*K, fa*M, LNone);
+                                       MinMax(fb*K, fb*M, L);
+                                     end else begin
+                                       MinMax(I, J, LNone);
+                                       MinMax(K, Q, L);
                                    end;
                                  end;
                         VArr   : RaiseError(ArrDisallow);
@@ -317,15 +314,15 @@ begin
                                    if not (R^.VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
                                    K:=AsIGapL(R);
                                    if (Int<0) or ((Int=0) and (K<0)) then RaiseError(InvalidValue);
-                                   flg:=IntPower(Int, K, M) or IntPower(IGap, K, Q);
-                                   K:=AsIGapR(R);
-                                   if flg or IntPower(Int, K, I) or IntPower(IGap, K, J) then begin
-                                     M:=AsIGapL(R);
-                                     MinMax(Power(Int, K), Power(Int, M), LNone);
-                                     MinMax(Power(IGap, K), Power(IGap, M), L);
-                                   end else begin
-                                     MinMax(I, J, LNone);
-                                     MinMax(M, Q, L);
+                                   M:=AsIGapR(R);
+                                   if IntPower(Int, K, I) or IntPower(IGap, K, J) or IntPower(Int, M, K) or IntPower(IGap, M, Q)
+                                     then begin
+                                       K:=AsIGapL(R);
+                                       MinMax(Power(Int, K), Power(Int, M), LNone);
+                                       MinMax(Power(IGap, K), Power(IGap, M), L);
+                                     end else begin
+                                       MinMax(I, J, LNone);
+                                       MinMax(K, Q, L);
                                    end;
                                  end;
                         VArr : RaiseError(ArrDisallow);
