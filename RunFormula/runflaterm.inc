@@ -1,7 +1,7 @@
-//*****************************************************
-//  RunFormula Expression Scripting Engine
+//******************************************************
+//  RunFormula Unit-aware Expression Scripting Engine
 //  Evaluator include file
-//  Rev. 27.04.2026
+//  Rev. 12.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -13,7 +13,7 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
 // TODO -oRFla.Term -cRev.2026.07.10: Review Concal function
 
@@ -131,7 +131,7 @@ var L : PValRec = @CVNone;        // init VMode
     Result:=false;
   end;
 
-  procedure CplexPower(BRE, BIM:TRFloat);                  //DONE -oRFla.Term -cRev.2026.04.23: Proc CplexPower
+  procedure CplexPower(BRE, BIM:TRFloat);                  //DONE -oRFla.Term -cRev.2026.09.12: Proc CplexPower
   var re : TRFloat = 1;
       im : TRFloat = 0;
       t : TRFloat;
