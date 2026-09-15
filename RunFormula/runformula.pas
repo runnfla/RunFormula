@@ -1,4 +1,4 @@
-//*****************************************************
+//******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Version 0.2a
 //  Released at 1.08.2026
@@ -15,9 +15,9 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
-// TODO -oRFla.Main -cRev.2026.04.14:
+// TODO -oRFla.Main -cRev.2026.00.00:
 
 unit RunFormula;
 
@@ -423,6 +423,7 @@ begin
     on E:EDivByZero do FillError(DivZero);
     on E:EZeroDivide do FillError(DivZero);
     on E:EInvalidOp do FillError(InvalidValue);
+    on E:EStackOverflow do FillError(StackOver);
     on E:EHeapException do FillError(Malloc);
     else FillError(Unknown);
   end;

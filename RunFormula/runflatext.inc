@@ -1,5 +1,5 @@
-//*****************************************************
-//  RunFormula Expression Scripting Engine
+//******************************************************
+//  RunFormula Unit-aware Expression Scripting Engine
 //  Text functions include file
 //  Rev. 15.05.2026
 
@@ -13,7 +13,7 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
 // TODO -oRFla.Text -cRev.2026.07.14: Select HF for Extended
 
@@ -311,27 +311,27 @@ begin
   while P<Fin do begin
     c:=P^;
     case c of
-      #0..#$20  : ;
-      '"', #$27 : begin
-                    if mf then RaiseError(InvalidFormat);
-                    inc(P);
-                    case FindTextFin(P, c)-P of
-                      1 : I:=PByte(P)^;
-                      2 : if P^='^' then begin
-                            inc(P);
-                            I:=PByte(P)^-$40;
-                          end else raise EError.Create(InvalidFormat, P);
-                      else raise EError.Create(InvalidFormat, P);
-                    end;
-                    F:=I;
-                    sig:=(sig shl 4) or 2;
-                    inc(P);
-                  end;
+      #0..#6, #8..#$20 : ;
+      #7, '"', #$27 : begin
+                        if mf then RaiseError(InvalidFormat);
+                        inc(P);
+                        case FindTextFin(P, c)-P of
+                          1 : I:=PByte(P)^;
+                          2 : if P^='^' then begin
+                                inc(P);
+                                I:=PByte(P)^-$40;
+                              end else RaiseError(InvalidFormat, P);
+                          else RaiseError(InvalidFormat, P);
+                        end;
+                        F:=I;
+                        sig:=(sig shl 4) or 2;
+                        inc(P);
+                      end;
       '%', '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
       '+', ',', ':' : begin
                         case c of
                           '+' : c:=#7;
-                          ',' : if (P+1)^ in ['0'..'9'] then raise EError.Create(CommaDigit, P+1);
+                          ',' : if (P+1)^ in ['0'..'9'] then RaiseError(CommaDigit, P+1);
                         end;
                         IL:=I;
                         FL:=F;
@@ -339,7 +339,7 @@ begin
                         sig:=(sig shl 4) or (byte(c) and $F);
                       end;
       '-'       : begin
-                    if mf then raise EError.Create(InvalidChar, P);
+                    if mf then RaiseError(InvalidChar, P);
                     mf:=true;
                   end;
       '0'..'9'  : begin
@@ -347,19 +347,19 @@ begin
                     tf:=FindTextFin(P);
                     if flg then I:=IntCapture(P, tf, flg);
                     if flg then begin
-                      if mf then I:=-I;
+                      if mf then I:= -I;
                       F:=I;
                       P:=tf;
                     end else begin
                       F:=FloatCapture(P);
-                      if mf then F:=-F;
+                      if mf then F:= -F;
                     end;
                     sig:=(sig shl 4) or 1;
                     continue;
                   end;
       else
         if c in UnitChars then break;
-        raise EError.Create(InvalidChar, P);
+        RaiseError(InvalidChar, P);
     end;
     inc(P);                                 // 0=1 "=2 %=5 +=7 (=8 )=9 [=B ]=D ,=C :=A
   end;
@@ -377,14 +377,10 @@ begin
                   Chr:=byte(I);
                   VType:=VChar;
                 end;
-      $171,                                   // 0+0 0+" "+0 "+"
-      $172,
+      $171,                                   // 0+0 "+0
       $271,
-      $272,
-      $B171D,                                 // [0+0] [0+"] ["+0] ["+"]
-      $B172D,
-      $B271D,
-      $B272D  : if (not flg) or Plus(IL, I, Int) or Plus(IL, -I, IGap) then begin
+      $B171D,                                 // [0+0] ["+0]
+      $B271D  : if (not flg) or Plus(IL, I, Int) or Plus(IL, -I, IGap) then begin
                   if F>0 then RaiseError(InvalidRange);
                   Flo:=FL+F;
                   Img:=FL-F;
@@ -432,21 +428,17 @@ begin
                   IGap:=I;
                   VType:=VIGap;
                 end else begin
-                  Flo:=-HF.F;
+                  Flo:= -HF.F;
                   Img:=F;
                   VType:=VGap;
                 end;
-      $1715,                                   // 0+0% 0+"% "+0% "+"%
-      $1725,
+      $1715,                                   // 0+0% "+0%
       $2715,
-      $2725,
-      $B1715D,                                 // [0+0%] [0+"%] ["+0%] ["+"%]
-      $B1725D,
-      $B2715D,
-      $B2725D  : begin
+      $B1715D,                                 // [0+0%]  ["+0%]
+      $B2715D  : begin
                   if F>0 then RaiseError(InvalidRange);
-                  Flo:=FL*(F*0.01+1);
-                  Img:=FL*(1-F*0.01);
+                  Flo:=(F*0.01+1)*FL;
+                  Img:=(1-F*0.01)*FL;
                   VType:=VGap;
                 end;
       $81C19,                                  // (0,0) (0,") (",0) (",")

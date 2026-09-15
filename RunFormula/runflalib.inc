@@ -74,6 +74,11 @@ begin
   raise EError.Create(ErrCode);
 end;
 
+procedure RaiseError(ErrCode:TRunFlaErrCode; CharPos:PChar);     //DONE -oRFla.Lib -cRev.2026.09.13: Proc RaiseError Char
+begin
+  raise EError.Create(ErrCode, CharPos);
+end;
+
 // ===== Strings =====
 
 function Str2Ptr(constref S:string):PByte; inline;        //DONE -oRFla.Lib -cRev.2026.05.03: Inline Str2Ptr
@@ -545,17 +550,20 @@ begin
   end;
 end;
 
-function Compare(L, R:PValRec):SizeInt;                   //DONE -oRFla.Lib -cRev.2026.04.26: Func Compare
+function Compare(L, R:PValRec; None:boolean=true):SizeInt;      //DONE -oRFla.Lib -cRev.2026.04.26: Func Compare
 var IL, IR, GL, GR : SizeInt;
     FL, FR, ML, MR : TRFloat;
 
   function DiffStr:SizeInt;                               //DONE -oRFla.Lib -cRev.2026.04.26: Func DiffStr
   var lng : SizeInt = 0;                   // not inline, diffsize = 8
       px, py, fin : PByte;
+      sx, sy : string;
   begin                                    // should be ansistrings, null terminator is used
-    px:=PByte(AsStr(L));
+    sx:=AsStr(L);
+    px:=PByte(sx);
     if px<>nil then lng:=PSizeInt(px)[-1];
-    py:=PByte(AsStr(R));
+    sy:=AsStr(R);
+    py:=PByte(sy);
     if py=nil then Exit(lng);
     Result:=lng-PSizeInt(py)[-1];
     if Result<>0 then exit;
@@ -577,20 +585,27 @@ var IL, IR, GL, GR : SizeInt;
   end;
 
 begin
-  if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
+    VNone : begin
+              if (L^.VType=VNone) and (R^.VType=VNone) then exit;
+              if None then RaiseError(NoneDisallow);
+              if R^.VType=VNone then Exit(1);
+            end;
     VInt   : begin
+               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
                IL:=AsInt(L); IR:=AsInt(R);
                if IR=IL then exit;
                if IL>IR then Exit(1);
              end;
     VFloat : begin
+               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
                FL:=AsFloat(L); FR:=AsFloat(R);
                if FR=FL then exit;
                if FL>FR then Exit(1);
              end;
     VCplex : begin
+               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
                FL:=AsRe(L); ML:=AsIm(L);
                FR:=AsRe(R); MR:=AsIm(R);
                if (FL=FR) and (ML=MR) then exit;
@@ -602,12 +617,14 @@ begin
                if IL>0 then Exit(1);
              end;
     VGap   : begin
+               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
                FL:=AsLGap(L); ML:=AsRGap(L);
                FR:=AsLGap(R); MR:=AsRGap(R);
                if (FL>=FR) and (ML<=MR) then exit;
                if (FL+ML)>=(FR+MR) then Exit(1);
              end;
     VIGap  : begin
+               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
                IL:=AsIGapL(L); GL:=AsIGapR(L);
                IR:=AsIGapL(R); GR:=AsIGapR(R);
                if (IL>=IR) and (GL<=GR) then exit;

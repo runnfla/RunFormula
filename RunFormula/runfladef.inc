@@ -1,5 +1,5 @@
-//*****************************************************
-//  RunFormula Expression Scripting Engine
+//******************************************************
+//  RunFormula Unit-aware Expression Scripting Engine
 //  Definitions include file
 //  Rev. 15.05.2026
 
@@ -13,7 +13,7 @@
 //  See the LICENSE file in the project root
 //  or a copy available at https://opensource.org
 //  for full license information.
-//*****************************************************
+//******************************************************
 
 // TODO -oRFla.Def -cRev.2026.04.16:
 
@@ -227,7 +227,7 @@ type
 
   TUnitDesc = record
     Sig : SizeInt;
-    Scale : TRFloat;
+    Scale : TRFloat;              // Scale must be positive
     Offset : TRFloat;             // K = (C * 1.0) + 273.15
     Flag : integer;
     Abbr : string[AbbrMaxSize];
@@ -302,17 +302,17 @@ const
    120);     // TagPhy must have highest priority
 
   CaseType : array[TVType, TVType] of TVType = (
-// results: VInt VFloat VCplex VStr VGap VIGap VArr
+// results: VNone VInt VFloat VCplex VStr VGap VIGap VArr
 //           VNone   VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
-{ VNone  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
-{ VInt   } ( VInt,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
-{ VFloat } ( VFloat, VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
+{ VNone  } ( VNone,  VNone,  VNone,  VRsvd,  VNone,  VStr,   VStr,   VNone,  VNone,  VArr  ),
+{ VInt   } ( VNone,  VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
+{ VFloat } ( VNone,  VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
 { VRsvd  } ( VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
-{ VCplex } ( VCplex, VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
+{ VCplex } ( VNone,  VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
 { VChar  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
 { VStr   } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
-{ VGap   } ( VGap,   VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
-{ VIGap  } ( VGap,   VIGap,  VGap,   VRsvd,  VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
+{ VGap   } ( VNone,  VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VIGap  } ( VNone,  VIGap,  VGap,   VRsvd,  VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
 { VArr   } ( VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
 
 var

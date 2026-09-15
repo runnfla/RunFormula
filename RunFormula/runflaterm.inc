@@ -33,7 +33,7 @@ var L : PValRec = @CVNone;        // init VMode
     fa, fb, fc, fd : TRFloat;
     phy, I, J, K, M, Q : SizeInt;
 
-  procedure FreeLR; inline;                                         //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
+  procedure FreeLR; inline;                                    //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
   begin                                            // LVal should be called singly
     FreeTerm(R);
     if L^.VAlloc<>LV then begin
@@ -42,7 +42,7 @@ var L : PValRec = @CVNone;        // init VMode
     end else FreeValue(L);
   end;
 
-  procedure LVal(I:SizeInt);                                 //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Int
+  procedure LVal(I:SizeInt);                                   //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Int
   begin
     FreeLR;
     with L^ do begin
@@ -51,7 +51,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(const F:TRFloat);                           //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Float
+  procedure LVal(const F:TRFloat);                             //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Float
   begin
     FreeLR;
     with L^ do begin
@@ -60,7 +60,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(const Re, Im:TRFloat);                      //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Cplex
+  procedure LVal(const Re, Im:TRFloat);                        //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Cplex
   begin
     FreeLR;
     with L^ do begin
@@ -70,7 +70,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(B:boolean);                                 //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Bool
+  procedure LVal(B:boolean);                                   //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Bool
   begin
     FreeLR;
     with L^ do begin
@@ -79,7 +79,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-{  procedure LVal(constref S:string);                         //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Str
+{  procedure LVal(constref S:string);                          //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Str
   begin
     FreeLR;
     with L^ do begin
@@ -89,7 +89,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;          }
 
-  procedure LGap(GL, GR:SizeInt);                            //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Int
+  procedure LGap(GL, GR:SizeInt);                              //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Int
   begin
     FreeLR;
     with L^ do begin
@@ -99,7 +99,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LGap(const GL, GR:TRFloat);                      //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Float
+  procedure LGap(const GL, GR:TRFloat);                        //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Float
   begin
     FreeLR;
     with L^ do begin
@@ -109,7 +109,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  function LNone:PValRec;                                     //DONE -oRFla.Term -cRev.2026.09.09: Func LNone
+  function LNone:PValRec;                                      //DONE -oRFla.Term -cRev.2026.09.09: Func LNone
   begin
     FreeLR;
     Result:=L;
@@ -131,7 +131,7 @@ var L : PValRec = @CVNone;        // init VMode
     Result:=false;
   end;
 
-  procedure CplexPower(BRE, BIM:TRFloat);                  //DONE -oRFla.Term -cRev.2026.09.12: Proc CplexPower
+  procedure CplexPower(BRE, BIM:TRFloat);                      //DONE -oRFla.Term -cRev.2026.09.12: Proc CplexPower
   var re : TRFloat = 1;
       im : TRFloat = 0;
       t : TRFloat;
@@ -160,7 +160,7 @@ var L : PValRec = @CVNone;        // init VMode
     end
   end;
 
-  procedure Concat;                                          //DONE -oRFla.Term -cRev.2026.04.26: Proc Concat
+  procedure Concat;                                            //DONE -oRFla.Term -cRev.2026.04.26: Proc Concat
   var p : PByte;                             // not inline
   begin
     p:=Str2Ptr(AsStr(L)+AsStr(R));           // REVIEW !! строка с новым PTR может не собраться
@@ -210,14 +210,15 @@ begin
         TagOR       : LVal(AsInt(L) or AsInt(R));                            // or
         TagXOR      : LVal(AsInt(L) xor AsInt(R));                           // xor
         TagAND      : LVal(AsInt(L) and AsInt(R));                           // and
-        TagEqual    : LVal(Compare(L, R)=0);                                 // ==
-        TagNotEqual : LVal(Compare(L, R)<>0);                                // <>
+        TagEqual    : LVal(Compare(L, R, false)=0);                          // ==
+        TagNotEqual : LVal(Compare(L, R, false)<>0);                         // <>
         TagGreater  : LVal(Compare(L, R)>0);                                 // >
         TagLess     : LVal(Compare(L, R)<0);                                 // <
         TagNotLess  : LVal(Compare(L, R)>=0);                                // >=
         TagNotGreat : LVal(Compare(L, R)<=0);                                // <=
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
+                        VNone  : RaiseError(NoneDisallow);
                         VInt   : if Plus(AsInt(L), AsInt(R), I) then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)+AsFloat(R));
                         VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
@@ -228,6 +229,7 @@ begin
                         VArr   : RaiseError(ArrDisallow);
                       end;
         TagMinus    : case CaseType[L^.VType, R^.VType] of                   // -
+                        VNone  : RaiseError(NoneDisallow);
                         VInt   : if Plus(AsInt(L), -AsInt(R), I) then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)-AsFloat(R));
                         VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
@@ -238,6 +240,7 @@ begin
                         VArr   : RaiseError(ArrDisallow);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
+                        VNone  : RaiseError(NoneDisallow);
                         VInt   : if Mult(AsInt(L), AsInt(R), I) then LVal(AsFloat(L)*AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
                         VCplex : begin
@@ -265,6 +268,7 @@ begin
                         VArr   : RaiseError(ArrDisallow);
                       end;
         TagSlash    : case CaseType[L^.VType, R^.VType] of                   // /
+                        VNone  : RaiseError(NoneDisallow);
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                         VCplex : begin
                                    CplexDiv(AsRe(L), AsIm(L), AsRe(R), AsIm(R), fa, fb);
@@ -343,7 +347,7 @@ begin
   Result:=L;
 end;
 
-function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;     //DONE -oRFla.Term -cRev.2026.04.19: Func VarListFind
+function VarListFind(Lst:PMemList; ID:SizeInt):SizeInt;        //DONE -oRFla.Term -cRev.2026.04.19: Func VarListFind
 var L : SizeInt = 0;
     R, diff : SizeInt;
     vl : PPointer;
@@ -381,7 +385,7 @@ begin
   end;
 end;
 
-procedure InitVar(Exp:PByte; Pini:PValRec; Eflag:boolean);  //DONE -oRFla.Term -cRev.2026.04.20: Proc InitVar
+procedure InitVar(Exp:PByte; Pini:PValRec; Eflag:boolean);     //DONE -oRFla.Term -cRev.2026.04.20: Proc InitVar
 var p, fin : PByte;                // Exp --> ExprToken
     pv, t : PValRec;
 begin

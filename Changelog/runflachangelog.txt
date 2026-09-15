@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Changelog
-//  Rev. 4.09.2026
+//  Rev. 14.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com

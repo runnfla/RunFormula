@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Built-in functions include file
-//  Rev. 10.09.2026
+//  Rev. 15.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -15,7 +15,6 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Func -cRev.2026.00.00: Make test_val()
 // TODO -oRFla.Func -cRev.2026.00.00: Make repeat timeout
 
 function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_RESULT
@@ -281,11 +280,11 @@ begin
     pv:=Param(-1, Context);
     VType:=VInt;
     case pv^.VType of
-       VInt, VIGap : Int:=pv^.Int;
-       VChar       : Int:=pv^.Chr;
-       else
-         Flo:=AsLGap(pv);
-         VType:=VFloat;
+      VInt, VIGap : Int:=pv^.Int;
+      VChar       : Int:=pv^.Chr;
+      else
+        Flo:=AsLGap(pv);
+        VType:=VFloat;
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -301,12 +300,12 @@ begin
     pv:=Param(-1, Context);
     VType:=VInt;
     case pv^.VType of
-       VInt  : Int:=pv^.Int;
-       VChar : Int:=pv^.Chr;
-       VIGap : Int:=pv^.IGap
-       else
-         Flo:=AsRGap(pv);
-         VType:=VFloat;
+      VInt  : Int:=pv^.Int;
+      VChar : Int:=pv^.Chr;
+      VIGap : Int:=pv^.IGap
+      else
+        Flo:=AsRGap(pv);
+        VType:=VFloat;
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -325,7 +324,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_RANGE
+function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.15: Func Fla_RANGE
 var L, R : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -334,8 +333,8 @@ begin
     L:=Param(-2, Context);
     R:=Param(-1, Context);
     if (L^.VType in [VInt, VChar]) and (R^.VType in [VInt, VChar]) then begin
-      Int:=AsInt(L);
-      IGap:=AsInt(R);
+      Int:=AsIGapL(L);
+      IGap:=AsIGapL(R);
       if IGap<Int then RaiseError(InvalidRange);
       VType:=VIGap;
     end else begin
@@ -360,7 +359,7 @@ begin
     C:=Param(-2, Context);
     M:=Param(-1, Context);
     if (not ((C^.VType in [VInt, VChar]) and (M^.VType in [VInt, VChar]))) or
-      Plus(AsInt(C), -AsInt(M), Int) or Plus(AsInt(C), AsInt(M), IGap) then begin
+      Plus(AsIGapL(C), -AsIGapL(M), Int) or Plus(AsIGapL(C), AsIGapL(M), IGap) then begin
         Ball(AsFloat(C), AsFloat(M), Result);
         if Img<Flo then RaiseError(InvalidRange);
     end else begin
@@ -396,8 +395,8 @@ begin
                       Img:=FlaRound(pv^.Img, -2);
                       VType:=VCplex;
                     end;
-      VStr : RaiseError(StrDisallow);
-      VArr : RaiseError(ArrDisallow);
+      VStr  : RaiseError(StrDisallow);
+      VArr  : RaiseError(ArrDisallow);
       else RaiseError(InvalidType);
     end;
     VPhy:=pv^.VPhy;
@@ -646,6 +645,41 @@ begin
   p:=PByte(s);
   if p=nil then RaiseError(NoneDisallow);
   ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
+  PostParam(Context);
+end;
+
+function Fla_TEST(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.09.14: Func Fla_TEST
+var s : string;
+    p : PByte;
+    v : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
+    pv : PValRec;
+
+  procedure FillError(Err:TRunFlaErrCode; PPos:PByte=nil);   //DONE -oRFla.Func -cRev.2026.09.14: Proc Fla_TEST FillError
+  begin
+    with pv^ do begin
+      Int:=SizeInt(Err);
+      IGap:=Int;
+      if PPos<>nil then inc(IGap, PPos-p);
+      VType:=VIGap;
+    end;
+  end;
+
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  pv:=NewLV(Context);
+  s:=AsStr(Param(-1, Context));
+  p:=PByte(s);
+  try
+    if p=nil then RaiseError(NoneDisallow);
+    ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), @v);
+  except
+    on E:EError do FillError(E.FCode, E.FPos);
+    on E:EOverflow do FillError(Overflow);
+    on E:EDivByZero do FillError(DivZero);
+    on E:EZeroDivide do FillError(DivZero);
+    on E:EInvalidOp do FillError(InvalidValue);
+  end;
+  Result:=pv;
   PostParam(Context);
 end;
 
@@ -1143,6 +1177,7 @@ begin
   FuncReg('substr', @Fla_SUBSTR);
   FuncReg('value', @Fla_VAL);           // delete this
   FuncReg('val', @Fla_VAL);
+  FuncReg('test', @Fla_TEST);           /////
   FuncReg('exp', @Fla_EXP);
   FuncReg('ln', @Fla_LN);
   FuncReg('pow', @Fla_POW);

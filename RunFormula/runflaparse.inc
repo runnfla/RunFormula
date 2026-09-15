@@ -354,7 +354,7 @@ begin
       continue;
     end;
     case c of
-      #0..#6 : ;
+      #0..#6, #8..#$20: ;
       #7, '"', #$27 : begin
                         inc(P);
                         tf:=FindTextFin(P, c);
@@ -366,7 +366,6 @@ begin
                         end;
                         P:=tf;
                       end;
-      #8..#$20 : ;
       '%' : OpToken(TagMOD);
       '&' : OpToken(TagConcat);
       '(' : begin
