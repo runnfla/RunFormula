@@ -284,7 +284,7 @@ begin
   if brc<>0 then raise EError.Create(MissingBracket, P);
 end;
 
-procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.07.14: Proc ParseValue
+procedure ParseValue(P, Fin:PChar; PV:PValRec);           //DONE -oRFla.Text -cRev.2026.09.15: Proc ParseValue
 type THF = record
        case byte of
          0 : (F : TRFloat);
@@ -293,11 +293,11 @@ type THF = record
 const
 {$ifdef ENDIAN_LITTLE}
   {$if SRFloat = 4}  HF : THF = (H : ($FE, $FF, $7F, $7F)); {$endif}
-  {$if SRFloat = 8}  HF : THF = (H : ($E2, $FF, $FF, $FF, $FF, $FF, $EF, $7F)); {$endif}
+  {$if SRFloat = 8}  HF : THF = (H : ($E7, $FF, $FF, $FF, $FF, $FF, $EF, $7F)); {$endif}
   {$if SRFloat = 10} HF : THF = (H : ($00, $00, $00, $00, $00, $00, $00, $80, $FE, $7F)); {$endif}
 {$else}
   {$if SRFloat = 4}  HF : THF = (H : ($7F, $7F, $FF, $FE)); {$endif}
-  {$if SRFloat = 8}  HF : THF = (H : ($7F, $EF, $FF, $FF, $FF, $FF, $FF, $E2)); {$endif}
+  {$if SRFloat = 8}  HF : THF = (H : ($7F, $EF, $FF, $FF, $FF, $FF, $FF, $E7)); {$endif}
   {$if SRFloat = 10} HF : THF = (H : ($7F, $FE, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF)); {$endif}
 {$endif}
 var sig : SizeInt = 0;
@@ -313,7 +313,7 @@ begin
     case c of
       #0..#6, #8..#$20 : ;
       #7, '"', #$27 : begin
-                        if mf then RaiseError(InvalidFormat);
+                        if mf then RaiseError(InvalidFormat, P);
                         inc(P);
                         case FindTextFin(P, c)-P of
                           1 : I:=PByte(P)^;
@@ -325,7 +325,8 @@ begin
                         end;
                         F:=I;
                         sig:=(sig shl 4) or 2;
-                        inc(P);
+                        inc(P, 2);
+                        continue;
                       end;
       '%', '(', ')', '[', ']' : sig:=(sig shl 4) or (byte(c) and $F);
       '+', ',', ':' : begin
@@ -365,7 +366,7 @@ begin
   end;
   with PV^ do begin
     case sig of
-      0       : if P=Fin then RaiseError(NoneDisallow);
+      0       : if P=Fin then RaiseError(NoneDisallow) else RaiseError(InvalidFormat);
       1       : if flg then begin             // 0
                   Int:=I;
                   VType:=VInt;
@@ -381,12 +382,12 @@ begin
       $271,
       $B171D,                                 // [0+0] ["+0]
       $B271D  : if (not flg) or Plus(IL, I, Int) or Plus(IL, -I, IGap) then begin
-                  if F>0 then RaiseError(InvalidRange);
+                  if F>0 then RaiseError(InvalidFormat);
                   Flo:=FL+F;
                   Img:=FL-F;
                   VType:=VGap;
                 end else begin
-                  if I>0 then RaiseError(InvalidRange);
+                  if I>0 then RaiseError(InvalidFormat);
                   VType:=VIGap;
                 end;
       $1A1,                                   // 0:0 0:" ":0 ":"
@@ -436,7 +437,7 @@ begin
       $2715,
       $B1715D,                                 // [0+0%]  ["+0%]
       $B2715D  : begin
-                  if F>0 then RaiseError(InvalidRange);
+                  if F>0 then RaiseError(InvalidFormat);
                   Flo:=(F*0.01+1)*FL;
                   Img:=(1-F*0.01)*FL;
                   VType:=VGap;
