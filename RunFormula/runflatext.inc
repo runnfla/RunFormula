@@ -366,7 +366,7 @@ begin
   end;
   with PV^ do begin
     case sig of
-      0       : if P=Fin then RaiseError(NoneDisallow) else RaiseError(InvalidFormat);
+  ///    0       : if P=Fin then RaiseError(NoneDisallow) else RaiseError(InvalidFormat);
       1       : if flg then begin             // 0
                   Int:=I;
                   VType:=VInt;

@@ -33,7 +33,7 @@ type
     IncompType_CF,     // Incompatible operand type: got Complex but expected Real
     IncompType_GI,     // Incompatible operand type: got Interval but expected Integer
     IncompType_CG,     // Incompatible operand type: got Complex but expected Interval
-    NoneDisallow,      // None or empty string value is not allowed
+    NoneDisallow,      // Invalid None operand
     StrDisallow,       // Invalid string operand
     ArrDisallow,       // Invalid array operand
     DivZero,           // Division by Zero
@@ -58,7 +58,7 @@ type
     DimDisallow,       // Operation not allowed on dimensioned quantity
     DimOver,           // Dimensional exponent overflow
     DimExists,         // Dimensioned quantities already assigned
-    DimlessValue,      // Cannot assign units to None, String or Array value
+    DimlessValue,      // Cannot assign units to None, char, string or array value
     OffsetUnit,        // Unit with offset cannot be specified
     UnknownUnit,       // Unit is not found
     UnDecodeDim,       // Can not decode dimension, list of units is incomplete

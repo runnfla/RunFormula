@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Changelog
-//  Rev. 14.09.2026
+//  Rev. 17.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -59,4 +59,6 @@ StrDisallow, ArrDisallow, DimDisallow
 ===== Develop branch changes =====
 - Removed: Error codes - IncompType_NI, IncompType_NF, IncompType_NC, IncompType_NG
 - Fixed: The result type for integer-bounded interval multiplication and exponentiation
+- Changed: Assigning a physical dimension to a char value is disallowed
+- Changed: Built-in function sign() is disallowed for None and string values
 

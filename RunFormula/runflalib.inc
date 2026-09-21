@@ -300,7 +300,7 @@ procedure ApplyPhyToPV(PV:PValRec; Phy:SizeInt; const Scl, Offs:TRFloat);
 begin                                                    //DONE -oRFla.Lib -cRev.2026.05.30: Proc ApplyPhyToPV
   with PV^ do begin
     if VPhy<>0 then raise EError.Create(DimExists);
-    if VType in [VNone, VStr, VArr] then raise EError.Create(DimlessValue);
+    if VType in [VNone, VChar, VStr, VArr] then raise EError.Create(DimlessValue);
     if (Scl<>1) or (Offs<>0) then case VType of
       VInt   : begin
                  VType:=VFloat;
@@ -310,10 +310,6 @@ begin                                                    //DONE -oRFla.Lib -cRev
       VCplex : begin
                  Flo:=Flo*Scl+Offs;
                  Img:=Img*Scl;
-               end;
-      VChar  : begin
-                 VType:=VFloat;
-                 Flo:=Chr*Scl+Offs;
                end;
       VGap   : begin
                  Flo:=Flo*Scl+Offs;
@@ -473,7 +469,7 @@ var scl : TRFloat = 1;
     flg : SizeInt;
 begin
   with PV^ do case VType of
-    VNone : PByte(Result):=nil;
+    VNone : PByte(Result):=nil;  // ---> RaiseError(ArrDisallow); ????
     VStr  : Result:=string(Str);
     VArr  : RaiseError(ArrDisallow);
     else
@@ -588,8 +584,8 @@ begin
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
     VNone : begin
-              if (L^.VType=VNone) and (R^.VType=VNone) then exit;
               if None then RaiseError(NoneDisallow);
+              if (L^.VType=VNone) and (R^.VType=VNone) then exit;
               if R^.VType=VNone then Exit(1);
             end;
     VInt   : begin
@@ -609,7 +605,7 @@ begin
                FL:=AsRe(L); ML:=AsIm(L);
                FR:=AsRe(R); MR:=AsIm(R);
                if (FL=FR) and (ML=MR) then exit;
-               if (sqr(FL)+sqr(ML))>=(sqr(FR)+sqr(MR)) then Exit(1);
+               if Hypot2(FL, ML)>=Hypot2(FR, MR) then Exit(1);
              end;
     VStr   : begin
                IL:=DiffStr;

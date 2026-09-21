@@ -496,12 +496,12 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.01: Func Fla_SIGN
+function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.17: Func Fla_SIGN
 var I : SizeInt = -1;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   with Param(-1, Context)^ do case VType of
-    VNone  : I:=0;
+    VNone  : RaiseError(NoneDisallow);
     VInt   : if Int=0 then I:=0 else if Int>0 then I:=1;
     VFloat : if Flo=0 then I:=0 else if Flo>0 then I:=1;
     VCplex : if Flo=0 then begin
@@ -511,10 +511,7 @@ begin
                I:=1;
                if Chr=0 then I:=0;
              end;
-    VStr   : begin
-               I:=1;
-               if Ansi[-1]=0 then I:=0;
-             end;
+    VStr   : RaiseError(StrDisallow);
     VGap   : if (Flo<=0) and (Img>=0) then I:=0 else if Flo>0 then I:=1;
     VIGap  : if (Int<=0) and (IGap>=0) then I:=0 else if Int>0 then I:=1;
     VArr   : RaiseError(ArrDisallow);
@@ -1033,14 +1030,14 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.08.30: Func Fla_CHAR
+function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.17: Func Fla_CHAR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     Chr:=byte(AsInt(Param(-1, Context)));
+    if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
     VType:=VChar;
-    VPhy:=Context.TermResult^.VPhy;
   end;
   PostParam(Context);
 end;
