@@ -219,7 +219,7 @@ begin
     t:=Scale;
     if FindPref(P, t) then continue;
     Offs:=Offset;
-    if (Offs<>0) and ((L<SZ) or mf) then raise EError.Create(OffsetUnit, Fin-L);
+//    if (Offs<>0) and ((L<SZ) or mf) then raise EError.Create(OffsetUnit, Fin-L);
     if mf then begin
       Scl:=1/t;
       Result:=PhyMult(Sig, -1);
@@ -245,7 +245,7 @@ begin
           if L=0 then continue;
           t:=Scale;
           if FindPref(fp, t) then continue;
-          if Offset<>0 then raise EError.Create(OffsetUnit, P-L);
+  //        if Offset<>0 then raise EError.Create(OffsetUnit, P-L);
           exp:=1;
           if c='^' then begin
             fp:=P+1;
@@ -485,7 +485,7 @@ begin
   buf:=GetMem((L+1)*SI);
   for i:=0 to L do buf[i]:=0;
   for i:=0 to L do with PUnitDesc(UnitList.List[i])^ do begin
-    if ((Flag and (USG or UOP))<>0) or (Offset<>0) then continue;
+    if ((Flag and (USG or UOP))<>0) {or (Offset<>0)} then continue;
     dy.DI:=Sig;
     exp:=high(ShortInt);
     emns:=high(ShortInt);

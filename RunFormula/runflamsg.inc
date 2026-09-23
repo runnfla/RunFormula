@@ -62,7 +62,6 @@ const
       (ErrCode : DimOver; ErrMsg : 'Dimensional exponent overflow'),
       (ErrCode : DimExists; ErrMsg : 'Dimensioned quantities already assigned'),
       (ErrCode : DimlessValue; ErrMsg : 'Cannot assign units to None, char, string or array value'),
-      (ErrCode : OffsetUnit; ErrMsg : 'Unit with offset cannot be specified'),
       (ErrCode : UnknownUnit; ErrMsg : 'Unit is not found'),
       (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
       (ErrCode : RangeType; ErrMsg : 'Range bounds must be integers'),

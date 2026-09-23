@@ -81,6 +81,11 @@ end;
 
 // ===== Strings =====
 
+function PEmptyStr:PByte; inline;                         //DONE -oRFla.Lib -cRev.2026.09.22: Inline PEmptyStr
+begin
+  Result:=@CEmptyStr.Zero;
+end;
+
 function Str2Ptr(constref S:string):PByte; inline;        //DONE -oRFla.Lib -cRev.2026.05.03: Inline Str2Ptr
 begin
   Result:=PByte(S);

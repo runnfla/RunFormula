@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Definitions include file
-//  Rev. 15.05.2026
+//  Rev. 22.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -91,26 +91,6 @@ type
     CW8087 : word;
   end;
 
-const
-  LI = low(SizeInt);
-  HI = high(SizeInt);
-  SI = SizeOf(SizeInt);
-  Sint = SizeOf(integer);
-  SPtr = SizeOf(pointer);
-  SRFloat = SizeOf(TRFloat);
-  FALI = abs(TRFloat(LI));
-  Cpi = 3.14159265358979323846;
-  CElr = 2.71828182845904523536;
-
-{$ifdef ENDIAN_LITTLE}
-  Hex0x = $7830;     // 0x
-  Unt1s = $2F31      // 1/
-{$else}
-  Hex0x = $3078;
-  Unt1s = $312F;
-{$endif};
-
-type
   TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
 
   TValRec = record
@@ -137,8 +117,15 @@ type
   PVariable = ^TVariable;
 
 const
-  SAnsiRec = SizeOf(TAnsiRec);
-  SValRec = SizeOf(TValRec);
+  LI = low(SizeInt);
+  HI = high(SizeInt);
+  SI = SizeOf(SizeInt);
+  Sint = SizeOf(integer);
+  SPtr = SizeOf(pointer);
+  SRFloat = SizeOf(TRFloat);
+  FALI = abs(TRFloat(LI));
+  Cpi = 3.14159265358979323846;
+  CElr = 2.71828182845904523536;
 
   AbbrMaxSize = 15;       // maximum size of unit abbreviation in bytes
 
@@ -244,16 +231,38 @@ type
   PPrefAbbr = ^TPrefAbbr;
 
 const
-  CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
   TextChars : TCharSet = ['.', '0'..'9', 'A'..'Z', '_', 'a'..'z'];
   FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
   UnitChars : TCharSet = ['0'..'9', 'A'..'Z', 'a'..'z', #$80..#$FF];
+
+  CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
+  CEmptyStr : packed record
+      AnsiRec : TAnsiRec;
+      Zero    : byte;
+    end = (AnsiRec :
+      (CodePage : CP_ACP;
+       ElementSize : 1;
+{$ifdef CPU64}
+       Dummy : 0;
+{$endif CPU64}
+       Ref : -1;
+       Len : 0); Zero : 0);
 
   OpTokenSize = PtrUInt(@TToken(nil^).Size);
   ExprTokenSize = PtrUInt(@TToken(nil^).Index);
   IndexTokenSize = ExprTokenSize+SI;
 
+  SAnsiRec = SizeOf(TAnsiRec);
+  SValRec = SizeOf(TValRec);
   SFlaRec = SizeOf(TFlaRec);
+
+{$ifdef ENDIAN_LITTLE}
+  Hex0x = $7830;     // 0x
+  Unt1s = $2F31      // 1/
+{$else}
+  Hex0x = $3078;
+  Unt1s = $312F;
+{$endif};
 
   // Units control flags
   UOP  = 1;                // output prohibited
@@ -303,17 +312,17 @@ const
 
   CaseType : array[TVType, TVType] of TVType = (
 // results: VNone VInt VFloat VCplex VStr VGap VIGap VArr
-//           VNone   VInt    VFloat  VRsvd   VCplex  VChar   VStr    VGap    VIGap   VArr
-{ VNone  } ( VNone,  VNone,  VNone,  VRsvd,  VNone,  VStr,   VStr,   VNone,  VNone,  VArr  ),
-{ VInt   } ( VNone,  VInt,   VFloat, VRsvd,  VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
-{ VFloat } ( VNone,  VFloat, VFloat, VRsvd,  VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
-{ VRsvd  } ( VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
-{ VCplex } ( VNone,  VCplex, VCplex, VRsvd,  VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
-{ VChar  } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
-{ VStr   } ( VStr,   VInt,   VFloat, VRsvd,  VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
-{ VGap   } ( VNone,  VGap,   VGap,   VRsvd,  VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
-{ VIGap  } ( VNone,  VIGap,  VGap,   VRsvd,  VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
-{ VArr   } ( VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
+//           VNone  VInt    VFloat  VRsvd  VCplex  VChar   VStr    VGap    VIGap   VArr
+{ VNone  } ( VNone, VNone,  VNone,  VRsvd, VNone,  VNone,  VNone,  VNone,  VNone,  VArr  ),
+{ VInt   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
+{ VFloat } ( VNone, VFloat, VFloat, VRsvd, VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
+{ VRsvd  } ( VRsvd, VRsvd,  VRsvd,  VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
+{ VCplex } ( VNone, VCplex, VCplex, VRsvd, VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
+{ VChar  } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
+{ VStr   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VGap   } ( VNone, VGap,   VGap,   VRsvd, VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
+{ VIGap  } ( VNone, VIGap,  VGap,   VRsvd, VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
+{ VArr   } ( VArr,  VArr,   VArr,   VArr,  VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
 
 var
   FuncList : TMemList;      // list of TFlaRec

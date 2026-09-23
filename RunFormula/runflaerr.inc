@@ -59,7 +59,6 @@ type
     DimOver,           // Dimensional exponent overflow
     DimExists,         // Dimensioned quantities already assigned
     DimlessValue,      // Cannot assign units to None, char, string or array value
-    OffsetUnit,        // Unit with offset cannot be specified
     UnknownUnit,       // Unit is not found
     UnDecodeDim,       // Can not decode dimension, list of units is incomplete
     RangeType,         // Range bounds must be integers

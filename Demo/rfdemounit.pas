@@ -250,7 +250,7 @@ var T : TTag;
     Info, s : string;
     flg : boolean;
     i, j : SizeInt;
-    k : integer;                             XX : PAnsiRec;
+    k : integer;
     p : pointer;
     VT : TVType;
     MemList : TMemList;
