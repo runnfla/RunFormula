@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Version 0.2a
+//  Version 0.2c
 //  Released at 1.08.2026
 
 //  Author: Alexander Torubarov
@@ -48,10 +48,10 @@ var RunFlaErrCode : TRunFlaErrCode = OK;
 implementation
 
 {$B-}                           // do not complete boolean evaluation
-{$POINTERMATH ON}               // allow use of pointer math
 {$R-}                           // switch off range checking
 {$Q-}                           // switch off overflow checking
 {$T-}                           // untyped address operator
+{$POINTERMATH ON}               // allow use of pointer math
 {$inline on}
 
 {$define runfla_optuses}
