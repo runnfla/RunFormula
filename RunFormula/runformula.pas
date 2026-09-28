@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Version 0.2c
-//  Released at 1.08.2026
+//  Released at 28.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com

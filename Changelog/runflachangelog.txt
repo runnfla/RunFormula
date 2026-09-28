@@ -56,11 +56,13 @@ StrDisallow, ArrDisallow, DimDisallow
 - Added: New error code - NoneDisallow
 - Changed: Built-in function val() raises an exception instead of returning None
 
-===== Develop branch changes =====
+===== Version 0.2c - 4.09.2026 =====
 - Removed: Error codes - OffsetUnit, IncompType_NI, IncompType_NF, IncompType_NC,
 IncompType_NG
 - Fixed: The result type for integer-bounded interval multiplication and exponentiation
 - Changed: Assigning a physical dimension to a char is disallowed
 - Changed: Built-in function sign() is disallowed for None and string values
 - Fixed: Allowing units with offset in composite dimensions
+
+===== Develop branch changes =====
 
