@@ -32,8 +32,8 @@ ceil(), find(), substr(), hexstr(), unitstr()
 - Removed: Built-in function - int()
 - Added: New constant - MaxInt
 - Added: New error codes - RangeType, CommaDigit, InvalidType
-- Changed: Digit is not allowed immediately after a comma or semicolon, space or
-separator required
+- Changed: Digit is not allowed immediately after a comma or semicolon - space or
+separator is required
 - Fixed: Decimal separator is always a dot, regardless of system locale
 - Added: CGS and Astronomical units of measurement
 - Fixed: Memory access violation caused by certain errors
@@ -56,7 +56,7 @@ StrDisallow, ArrDisallow, DimDisallow
 - Added: New error code - NoneDisallow
 - Changed: Built-in function val() raises an exception instead of returning None
 
-===== Version 0.2c - 4.09.2026 =====
+===== Version 0.2c - 28.09.2026 =====
 - Removed: Error codes - OffsetUnit, IncompType_NI, IncompType_NF, IncompType_NC,
 IncompType_NG
 - Fixed: The result type for integer-bounded interval multiplication and exponentiation
