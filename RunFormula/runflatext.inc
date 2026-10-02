@@ -205,30 +205,39 @@ var mf : boolean = false;                                      //DONE -oRFla.Tex
 begin
   while (P<Fin) and (P^<=#$20) do inc(P);
   while (P<Fin) and ((Fin-1)^<=#$20) do dec(Fin);
-  if P=Fin then RaiseError(UnexpectedEnd);
-  if PWord(P)^=Unt1s then begin
-    inc(P, 2);
-    while (P<Fin) and (P^<=#$20) do inc(P);
-    mf:=true;
-  end;
+//  if P=Fin then RaiseError(UnexpectedEnd);
+//  if PWord(P)^=Unt1s then begin
+//    inc(P, 2);
+//    while (P<Fin) and (P^<=#$20) do inc(P);
+//    mf:=true;
+//  end;
   SZ:=Fin-P;
   if SZ=0 then RaiseError(UnexpectedEnd);
   for i:=0 to UnitList.Count-1 do with PUnitDesc(UnitList.List[i])^ do begin
-    L:=BackCompare(P, Fin, Abbr, (Flag and UPF)=0);
+    L:=BackCompare(P, Fin, Abbr, false); //(Flag and UPF)=0);
     if L=0 then continue;
-    t:=Scale;
-    if FindPref(P, t) then continue;
+
+    Scl:=Scale;
     Offs:=Offset;
+    Result:=Sig;
+
+
+//    t:=Scale;
+//    if FindPref(P, t) then continue;
+//    Offs:=Offset;
 //    if (Offs<>0) and ((L<SZ) or mf) then raise EError.Create(OffsetUnit, Fin-L);
-    if mf then begin
-      Scl:=1/t;
-      Result:=PhyMult(Sig, -1);
-    end else begin
-      Scl:=t;
-      Result:=Sig;
-    end;
+//    if mf then begin
+//      Scl:=1/t;
+//      Result:=PhyMult(Sig, -1);
+//    end else begin
+//      Scl:=t;
+//      Result:=Sig;
+//    end;
     exit;
   end;
+
+  if P^='1' then inc(P);
+
   Scl:=1;
   Offs:=0;
   Result:=0;
@@ -344,7 +353,11 @@ begin
                     mf:=true;
                   end;
       '0'..'9'  : begin
-                    if PWord(P)^=Unt1s then break;
+{$ifdef ENDIAN_LITTLE}
+                    if PWord(P)^=$2F31 then break;      // 1/
+{$else}
+                    if PWord(P)^=$312F then break;      // 1/
+{$endif};
                     tf:=FindTextFin(P);
                     if flg then I:=IntCapture(P, tf, flg);
                     if flg then begin

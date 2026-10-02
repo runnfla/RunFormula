@@ -258,11 +258,9 @@ const
 
 {$ifdef ENDIAN_LITTLE}
   Hex0x = $7830;     // 0x
-  Unt1s = $2F31      // 1/
 {$else}
   Hex0x = $3078;
-  Unt1s = $312F;
-{$endif};
+{$endif}
 
   // Units control flags
   UOP  = 1;                // output prohibited
