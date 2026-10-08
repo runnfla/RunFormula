@@ -210,12 +210,12 @@ begin
         TagOR       : LVal(AsInt(L) or AsInt(R));                            // or
         TagXOR      : LVal(AsInt(L) xor AsInt(R));                           // xor
         TagAND      : LVal(AsInt(L) and AsInt(R));                           // and
-        TagEqual    : LVal(Compare(L, R, false)=0);                          // ==
-        TagNotEqual : LVal(Compare(L, R, false)<>0);                         // <>
-        TagGreater  : LVal(Compare(L, R)>0);                                 // >
-        TagLess     : LVal(Compare(L, R)<0);                                 // <
-        TagNotLess  : LVal(Compare(L, R)>=0);                                // >=
-        TagNotGreat : LVal(Compare(L, R)<=0);                                // <=
+        TagEqual    : LVal(Compare(L, R)=0);                                 // ==
+        TagNotEqual : LVal(Compare(L, R)<>0);                                // <>
+        TagGreater  : LVal(Compare(L, R, true)>0);                           // >
+        TagLess     : LVal(Compare(L, R, true)<0);                           // <
+        TagNotLess  : LVal(Compare(L, R, true)>=0);                          // >=
+        TagNotGreat : LVal(Compare(L, R, true)<=0);                          // <=
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
                         VNone  : RaiseError(NoneDisallow);
@@ -292,7 +292,7 @@ begin
                         VInt   : if Int<>LI then LVal(-Int) else LVal(FALI);
                         VFloat : LVal(-Flo);
                         VCplex : LVal(-Flo, -Img);
-                        VChar  : LVal(-SizeInt(Chr));
+                        VChar  : LVal(-SizeInt(Int));
                         VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(-Img, -Flo);
                         VIGap  : if Int<>LI then LGap(-IGap, -Int) else LGap(-TRFloat(IGap), FALI);
@@ -304,7 +304,7 @@ begin
                         VInt   : if IntPower(Int, AsInt(R), I) then LVal(Power(Int, AsInt(R))) else LVal(I);
                         VFloat : LVal(Power(Flo, AsInt(R)));
                         VCplex : CplexPower(Flo, Img);
-                        VChar  : if IntPower(Chr, AsInt(R), I) then LVal(Power(Chr, AsInt(R))) else LVal(I);
+                        VChar  : if IntPower(Int, AsInt(R), I) then LVal(Power(Int, AsInt(R))) else LVal(I);
                         VStr   : RaiseError(StrDisallow);
                         VGap   : begin
                                    if not (R^.VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
@@ -426,7 +426,7 @@ begin
                                   VPhy:=0;
                                 end else begin
                                   VType:=VChar;
-                                  Chr:=PByte(S)^;
+                                  Int:=PByte(S)^;
                                 end;
                               end;
       varBoolean            : begin VType:=VInt; if V then Int:=-1 else Int:=0; end;

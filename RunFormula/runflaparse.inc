@@ -182,10 +182,9 @@ var vr : TValRec;
   begin
     case V.VType of
       VNone  : begin NoneToken; exit; end;
-      VInt   : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
+      VInt, VChar : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
       VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
-      VChar  : L:=PtrUint(@TToken(nil^).ValRec.Chr)+SizeOf(TValRec.Chr);
       VStr   : begin TextToken(PChar(V.Str), V.Ansi[-1]); exit; end;
       VIGap  : L:=PtrUint(@TToken(nil^).ValRec.IGap)+SI;
     end;
@@ -202,10 +201,9 @@ var vr : TValRec;
         VAlloc:=BC;
         VPhy:=Phy;
         case V.VType of
-          VInt   : Int:=V.Int;
+          VInt, VChar : Int:=V.Int;
           VFloat : Flo:=V.Flo;
           VCplex, VGap : begin Flo:=V.Flo; Img:=V.Img; end;
-          VChar  : Chr:=V.Chr;
           VIGap  : begin Int:=V.Int; IGap:=V.IGap; end;
         end;
       end;
@@ -242,35 +240,15 @@ var vr : TValRec;
     ValueToken(vr);
   end;
 
-  procedure CharToken(Ch:byte); inline;               //DONE -oRFla.Parse -cRev.2026.04.30: Inline CharToken
+  procedure CharToken(Chr:byte); inline;              //DONE -oRFla.Parse -cRev.2026.10.06: Inline CharToken
   begin
     with vr do begin
+      Int:=Chr;
       VType:=VChar;
-      Chr:=Ch;
-    end;
-    ValueToken(vr);
-  end;
-{
-  procedure GapToken(const L, R:TRFloat); inline;     //DONE -oRFla.Parse -cRev.2026.04.30: Inline GapToken
-  begin
-    with vr do begin
-      VType:=VGap;
-      Flo:=L;
-      Img:=R;
     end;
     ValueToken(vr);
   end;
 
-  procedure IGapToken(L, R:SizeInt);                  //DONE -oRFla.Parse -cRev.2026.04.30: Inline IGapToken
-  begin
-    with vr do begin
-      VType:=VIGap;
-      Int:=L;
-      IGap:=R;
-    end;
-    ValueToken(vr);
-  end;
-}
   procedure VarToken;                                 //DONE -oRFla.Parse -cRev.2026.05.01: Proc VarToken
   var i : SizeInt;
   begin

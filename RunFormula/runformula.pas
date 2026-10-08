@@ -43,6 +43,10 @@ function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
 
+{$define runfla_optface}
+{$include runflaopt.inc}
+{$undef runfla_optface}
+
 var RunFlaErrCode : TRunFlaErrCode = OK;
 
 implementation
@@ -51,6 +55,7 @@ implementation
 {$R-}                           // switch off range checking
 {$Q-}                           // switch off overflow checking
 {$T-}                           // untyped address operator
+{$Z4}                           // Minimum enumeration type size
 {$POINTERMATH ON}               // allow use of pointer math
 {$inline on}
 

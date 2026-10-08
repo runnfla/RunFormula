@@ -100,10 +100,9 @@ type
     case byte of
       0 : (Int, IGap : SizeInt);
       1 : (Flo, Img : TRFloat);
-      2 : (Chr : byte);
-      3 : (Str : PByte);
-      4 : (Ansi : PSizeInt);
-      5 : (Arr : PMemList);
+      2 : (Str : PByte);
+      3 : (Ansi : PSizeInt);
+      4 : (Arr : PMemList);
   end;
 
   PValRec = ^TValRec;
@@ -236,6 +235,7 @@ const
   UnitChars : TCharSet = ['0'..'9', 'A'..'Z', 'a'..'z', #$80..#$FF];
 
   CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
+
   CEmptyStr : packed record
       AnsiRec : TAnsiRec;
       Zero    : byte;
@@ -308,16 +308,19 @@ const
     91,      // TagPower      **   right-associative, 4**3**2 = 4**9
    120);     // TagPhy must have highest priority
 
+  IntTypes = [VInt, VChar];
+  IGapTypes = [VInt, VChar, VIGap];
+
   CaseType : array[TVType, TVType] of TVType = (
 // results: VNone VInt VFloat VCplex VStr VGap VIGap VArr
 //           VNone  VInt    VFloat  VRsvd  VCplex  VChar   VStr    VGap    VIGap   VArr
 { VNone  } ( VNone, VNone,  VNone,  VRsvd, VNone,  VNone,  VNone,  VNone,  VNone,  VArr  ),
-{ VInt   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VInt,   VGap,   VIGap,  VArr  ),
+{ VInt   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
 { VFloat } ( VNone, VFloat, VFloat, VRsvd, VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
 { VRsvd  } ( VRsvd, VRsvd,  VRsvd,  VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
 { VCplex } ( VNone, VCplex, VCplex, VRsvd, VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
 { VChar  } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
-{ VStr   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VStr   } ( VNone, VStr,   VFloat, VRsvd, VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
 { VGap   } ( VNone, VGap,   VGap,   VRsvd, VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
 { VIGap  } ( VNone, VIGap,  VGap,   VRsvd, VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
 { VArr   } ( VArr,  VArr,   VArr,   VArr,  VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));

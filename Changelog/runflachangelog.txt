@@ -65,4 +65,9 @@ IncompType_NG
 - Fixed: Allowing units with offset in composite dimensions
 
 ===== Develop branch changes =====
+- подчеркивание в числах
+- возможность добавления своих интерфейсных функций
+- Fix - выбор приставки для комплексных и интервалов
+- новые функции - tick(), for()
+- ощибки CplexDisallow RangeDisallow
 

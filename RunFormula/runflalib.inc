@@ -15,9 +15,9 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Lib -cRev.2026.04.30: Smith algorithm in Compare
+// TODO -oRFla.Lib -cRev.2026.00.00:
 
-procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);        //DONE -oRFla.Lib -cRev.2026.04.28: Proc DataCopy
+procedure DataCopy(Src, Dst:pointer; Lng:SizeInt);         //DONE -oRFla.Lib -cRev.2026.04.28: Proc DataCopy
 var ps, pd : PByte;
 begin
   if Lng<=0 then exit;        // avoid illegal Lng
@@ -37,7 +37,7 @@ begin
   end;
 end;
 
-function BufZ(Lng:SizeInt):PByte; inline;                 //DONE -oRFla.Lib -cRev.2026.06.25: Inline BufZ
+function BufZ(Lng:SizeInt):PByte; inline;                  //DONE -oRFla.Lib -cRev.2026.06.25: Inline BufZ
 begin
   Result:=GetMem(Lng+1);
   Result[Lng]:=0;
@@ -79,12 +79,31 @@ begin
   raise EError.Create(ErrCode, CharPos);
 end;
 
+procedure TypeDisallow(VT:TVType);             //DONE -oRFla.Lib -cRev.2026.10.08: Proc TypeDisallow TVType
+var c : TRunFlaErrCode = InvalidType;
+begin
+  case VT of
+    VNone  : c:=NoneDisallow;
+    VCplex : c:=CplexDisallow;
+    VStr   : c:=StrDisallow;
+    VGap, VIGap : c:=RangeDisallow;
+    VArr   : c:=ArrDisAllow;
+  end;
+  RaiseError(c);
+end;
+
+procedure TypeDisallow(PV:PValRec);            //DONE -oRFla.Lib -cRev.2026.10.08: Proc TypeDisallow PValRec
+begin
+  TypeDisallow(PV^.VType);
+end;
+
 // ===== Strings =====
 
-function Str2Ptr(constref S:string):PByte; inline;        //DONE -oRFla.Lib -cRev.2026.05.03: Inline Str2Ptr
+function Str2Ptr(constref S:string):PByte; inline;         //DONE -oRFla.Lib -cRev.2026.10.06: Inline Str2Ptr
 begin
   Result:=PByte(S);
-  if (Result=nil) or (PSizeInt(Result)[-2]<0) then exit;
+  if Result=nil then Exit(@CEmptyStr.Zero);
+  if PSizeInt(Result)[-2]<0 then exit;
 {$if SI = 8}
   InterlockedIncrement64(PSizeInt(Result)[-2]);
 {$else}
@@ -92,7 +111,7 @@ begin
 {$endif}
 end;
 
-procedure DecStrRef(PS:PByte); inline;                    //DONE -oRFla.Lib -cRev.2026.05.03: Inline DecStrRef
+procedure DecStrRef(PS:PByte); inline;                     //DONE -oRFla.Lib -cRev.2026.05.03: Inline DecStrRef
 begin
   if PSizeInt(PS)[-2]<0 then exit;
   if PSizeInt(PS)[-2]>1 then
@@ -104,7 +123,7 @@ begin
     else FreeMem(PS-SAnsiRec);
 end;
 
-function MakeStrPtr(Lng:SizeInt; PS:PByte=nil):PByte;     //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
+function MakeStrPtr(Lng:SizeInt; PS:PByte=nil):PByte;      //DONE -oRFla.Lib -cRev.2026.06.26: Func MakeStrPtr
 var cp : TSystemCodePage = CP_ACP;
 begin
   if PS<>nil then cp:=PAnsiRec(PS-SAnsiRec)^.CodePage;
@@ -117,7 +136,7 @@ begin
   end;
 end;
 
-function Str2Str(constref S:string):string;               //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str
+function Str2Str(constref S:string):string;                //DONE -oRFla.Lib -cRev.2026.03.29: Func Str2Str
 var p, d : PByte;
 begin
   PByte(Result):=nil;
@@ -203,7 +222,7 @@ begin
   end;
 end;
 
-procedure MinMax(A, B:SizeInt; PV:PValRec);               //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Int
+procedure MinMax(A, B:SizeInt; PV:PValRec);                //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Int
 begin
   with PV^ do if VType<>VIGap then begin
     if A<=B then begin
@@ -223,7 +242,7 @@ begin
   end;
 end;
 
-procedure MinMax(const A, B:TRFloat; PV:PValRec);         //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Float
+procedure MinMax(const A, B:TRFloat; PV:PValRec);          //DONE -oRFla.Lib -cRev.2026.08.25: Proc MinMax Float
 begin
   with PV^ do if VType<>VGap then begin
     if A<=B then begin
@@ -243,8 +262,9 @@ begin
   end;
 end;
 
-procedure Ball(const C, M:TRFloat; PV:PValRec); inline;   //DONE -oRFla.Lib -cRev.2026.08.28: Inline Ball
+procedure Ball(const C, M:TRFloat; PV:PValRec); inline;    //DONE -oRFla.Lib -cRev.2026.10.07: Inline Ball
 begin
+  if M<0 then RaiseError(InvalidRange);
   with PV^ do begin
     Flo:=C-M;
     Img:=C+M;
@@ -297,7 +317,7 @@ begin
 end;
 
 procedure ApplyPhyToPV(PV:PValRec; Phy:SizeInt; const Scl, Offs:TRFloat);
-begin                                                    //DONE -oRFla.Lib -cRev.2026.05.30: Proc ApplyPhyToPV
+begin                                                      //DONE -oRFla.Lib -cRev.2026.05.30: Proc ApplyPhyToPV
   with PV^ do begin
     if VPhy<>0 then raise EError.Create(DimExists);
     if VType in [VNone, VChar, VStr, VArr] then raise EError.Create(DimlessValue);
@@ -331,33 +351,26 @@ end;
 
 // ===== Data =====
 
-function GetInt(PV:PValRec):SizeInt; inline;              //DONE -oRFla.Lib -cRev.2026.09.23: Inline GetInt
-begin
-  with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
-end;
-
-function AsInt(PV:PValRec):SizeInt;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsInt
+function AsInt(PV:PValRec):SizeInt;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsInt
 begin
   with PV^ do case VType of
     VNone  : RaiseError(NoneDisallow);
-    VInt   : Result:=Int;
+    VInt, VChar : Result:=Int;
     VFloat : RaiseError(IncompType_FI);
     VCplex : RaiseError(IncompType_CI);
-    VChar  : Result:=Chr;
     VStr   : RaiseError(StrDisallow);
     VGap, VIGap : RaiseError(IncompType_GI);
     VArr   : RaiseError(ArrDisallow);
   end;
 end;
 
-function AsFloat(PV:PValRec):TRFloat;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsFloat
+function AsFloat(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsFloat
 begin
   with PV^ do case VType of
     VNone  : RaiseError(NoneDisallow);
-    VInt   : Result:=Int;
+    VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : RaiseError(IncompType_CF);
-    VChar  : Result:=Chr;
     VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Flo*0.5+Img*0.5;
     VIGap  : Result:=Int*0.5+IGap*0.5;
@@ -365,13 +378,12 @@ begin
   end;
 end;
 
-function AsRe(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRe
+function AsRe(PV:PValRec):TRFloat;                         //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRe
 begin
   with PV^ do case VType of
     VNone : RaiseError(NoneDisallow);
-    VInt  : Result:=Int;
+    VInt, VChar : Result:=Int;
     VFloat, VCplex : Result:=Flo;
-    VChar : Result:=Chr;
     VStr  : RaiseError(StrDisallow);
     VGap  : Result:=Flo*0.5+Img*0.5;
     VIGap : Result:=Int*0.5+IGap*0.5;
@@ -379,7 +391,7 @@ begin
   end;
 end;
 
-function AsIm(PV:PValRec):TRFloat;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIm
+function AsIm(PV:PValRec):TRFloat;                         //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIm
 begin
   with PV^ do case VType of
     VNone  : RaiseError(NoneDisallow);
@@ -390,16 +402,15 @@ begin
   end;
 end;
 
-function AsBool(PV:PValRec):boolean;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsBool
+function AsBool(PV:PValRec):boolean;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsBool
 begin
   with PV^ do begin
     if VPhy<>0 then RaiseError(DimDisallow);
     case VType of
       VNone  : Result:=false;
-      VInt   : Result:=Int<>0;
+      VInt, VChar : Result:=Int<>0;
       VFloat : Result:=Flo<>0;
       VCplex, VGap : Result:=(Flo<>0) or (Img<>0);
-      VChar  : Result:=Chr<>0;
       VStr   : Result:=Ansi[-1]<>0;
       VIGap  : Result:=(Int<>0) or (IGap<>0);
       VArr   : RaiseError(ArrDisallow);
@@ -407,27 +418,25 @@ begin
   end;
 end;
 
-function AsLGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsLGap
+function AsLGap(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsLGap
 begin
   with PV^ do case VType of
     VNone  : RaiseError(NoneDisallow);
-    VInt, VIGap  : Result:=Int;
+    VInt, VChar, VIGap  : Result:=Int;
     VFloat, VGap : Result:=Flo;
     VCplex : RaiseError(IncompType_CG);
-    VChar  : Result:=Chr;
     VStr   : RaiseError(StrDisallow);
     VArr   : RaiseError(ArrDisallow);
   end;
 end;
 
-function AsRGap(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRGap
+function AsRGap(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRGap
 begin
   with PV^ do case VType of
     VNone  : RaiseError(NoneDisallow);
-    VInt   : Result:=Int;
+    VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : RaiseError(IncompType_CG);
-    VChar  : Result:=Chr;
     VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
@@ -435,7 +444,7 @@ begin
   end;
 end;
 
-function AsMgin(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsMgin
+function AsMgin(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsMgin
 begin
   with PV^ do case VType of
     VNone  : RaiseError(NoneDisallow);
@@ -448,21 +457,17 @@ begin
   end;
 end;
 
-function AsIGapL(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapL
+function AsIGapL(PV:PValRec):SizeInt;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapL
 begin
-  with PV^ do if VType<>VChar then Result:=Int else Result:=Chr;
+  with PV^ do if VType<>VChar then Result:=Int else Result:=Int;
 end;
 
-function AsIGapR(PV:PValRec):SizeInt;                     //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapR
+function AsIGapR(PV:PValRec):SizeInt; inline;              //DONE -oRFla.Lib -cRev.2026.09.09: Inline AsIGapR
 begin
-  with PV^ do case VType of
-    VInt  : Result:=Int;
-    VChar : Result:=Chr;
-    VIGap : Result:=IGap;
-  end;
+  with PV^ do if VType in [VInt, VChar] then Result:=Int else Result:=IGap;
 end;
 
-function AsStr(PV:PValRec):string;                        //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
+function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
 const F : TFormatSettings =
         (CurrencyFormat : 0;
          NegCurrFormat : 0;
@@ -482,24 +487,29 @@ begin
       if VPhy<>0 then begin
         s:=DecodePhy(VPhy, scl, ofs, flg);
         if (flg and UPF)=0 then case VType of
-          VInt   : s:=SelectPref(Int/scl, scl, flg)+s;
-          VFloat : s:=SelectPref(Flo/scl, scl, flg)+s;
-          VChar  : s:=SelectPref(Chr/scl, scl, flg)+s;
+          VInt   : s:=SelectPref(Int/scl, 0, scl, flg)+s;
+          VFloat : s:=SelectPref(Flo/scl, 0, scl, flg)+s;
+          VCplex : s:=SelectPref(Hypot2(Flo, Img)/scl*2, 0, scl, flg)+s;
+          VGap   : s:=SelectPref(Flo/scl, Img/scl, scl, flg)+s;
+          VIGap  : s:=SelectPref(Int/scl, IGap/scl, scl, flg)+s;
         end;
+
+
+
+
         s:=#$20+s;                                   // Li должно выводиться как float
       end;
       if (scl<>1) or (ofs<>0) then case VType of
-        VInt   : Result:=FloatToStr((Int-ofs)/scl, F);
+        VInt, VChar : Result:=FloatToStr((Int-ofs)/scl, F);
         VFloat : Result:=FloatToStr((Flo-ofs)/scl, F);
         VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+', '+FloatToStr(Img/scl, F)+')';
-        VChar  : Result:=FloatToStr((Chr-ofs)/scl, F);
         VGap   : Result:='['+FloatToStr((Flo-ofs)/scl, F)+':'+FloatToStr((Img-ofs)/scl, F)+']';
         VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IGap-ofs)/scl, F)+']';
       end else case VType of
         VInt   : Result:=IntToStr(Int);
         VFloat : Result:=FloatToStr(Flo, F);
         VCplex : Result:='('+FloatToStr(Flo, F)+', '+FloatToStr(Img, F)+')';
-        VChar  : if VPhy=0 then Result:=char(Chr) else Result:=IntToStr(Chr);
+        VChar  : if VPhy=0 then Result:=char(Int) else Result:=IntToStr(Int);
         VGap   : Result:='['+FloatToStr(Flo, F)+':'+FloatToStr(Img, F)+']';
         VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
       end;
@@ -508,16 +518,15 @@ begin
   end;
 end;
 
-function AsVrt(PV:PValRec):Variant;                       //DONE -oRFla.Lib -cRev.2026.03.30: Func AsVrt
+function AsVrt(PV:PValRec):Variant;                        //DONE -oRFla.Lib -cRev.2026.03.30: Func AsVrt
 begin
   with PV^ do case VType of
     VNone : with PVarData(@Result)^ do begin
               vtype:=varString;
               vstring:=nil;
             end;
-    VInt  : Result:=Int;
+    VInt, VChar : Result:=Int;
     VFloat, VCplex : Result:=Flo;
-    VChar : Result:=Chr;
     VStr  : Result:=Str2Str(string(Str));
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;
@@ -525,7 +534,7 @@ begin
   end;
 end;
 
-function ValCopy(Src, Dst:PValRec):PValRec;               //DONE -oRFla.Lib -cRev.2026.05.10: Func ValCopy
+function ValCopy(Src, Dst:PValRec):PValRec;                //DONE -oRFla.Lib -cRev.2026.05.10: Func ValCopy
 begin
   Result:=Dst;
   with Result^ do begin
@@ -533,10 +542,9 @@ begin
     VPhy:=Src^.VPhy;
     case VType of
     //  VNone  : Str:=nil;
-      VInt   : Int:=Src^.Int;
+      VInt, VChar : Int:=Src^.Int;
       VFloat : Flo:=Src^.Flo;
       VCplex, VGap : begin Flo:=Src^.Flo; Img:=Src^.Img; end;
-      VChar  : Chr:=Src^.Chr;
       VStr   : begin
                  Str:=Src^.Str;
                  if Ansi[-2]>0 then
@@ -551,11 +559,11 @@ begin
   end;
 end;
 
-function Compare(L, R:PValRec; None:boolean=true):SizeInt;      //DONE -oRFla.Lib -cRev.2026.04.26: Func Compare
-var IL, IR, GL, GR : SizeInt;
+function Compare(L, R:PValRec; Ineq:boolean=false):SizeInt;      //DONE -oRFla.Lib -cRev.2026.00.00: Func Compare
+var IL, IR : SizeInt;
     FL, FR, ML, MR : TRFloat;
 
-  function DiffStr:SizeInt;                               //DONE -oRFla.Lib -cRev.2026.04.26: Func DiffStr
+  function DiffStr:SizeInt;                                //DONE -oRFla.Lib -cRev.2026.04.26: Func DiffStr
   var lng : SizeInt = 0;                   // not inline, diffsize = 8
       px, py, fin : PByte;
       sx, sy : string;
@@ -589,28 +597,28 @@ begin
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
     VNone : begin
-              if None then RaiseError(NoneDisallow);
+              if Ineq then RaiseError(NoneDisallow);
+
+
               if (L^.VType=VNone) and (R^.VType=VNone) then exit;
               if R^.VType=VNone then Exit(1);
             end;
     VInt   : begin
-               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
+               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
                IL:=AsInt(L); IR:=AsInt(R);
                if IR=IL then exit;
                if IL>IR then Exit(1);
              end;
     VFloat : begin
-               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
+               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
                FL:=AsFloat(L); FR:=AsFloat(R);
                if FR=FL then exit;
                if FL>FR then Exit(1);
              end;
     VCplex : begin
-               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
-               FL:=AsRe(L); ML:=AsIm(L);
-               FR:=AsRe(R); MR:=AsIm(R);
-               if (FL=FR) and (ML=MR) then exit;
-               if Hypot2(FL, ML)>=Hypot2(FR, MR) then Exit(1);
+               if Ineq then RaiseError(CplexDisallow);
+               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
+               if (AsRe(L)=AsRe(R)) and (AsIm(L)=AsIm(R)) then exit;
              end;
     VStr   : begin
                IL:=DiffStr;
@@ -618,20 +626,20 @@ begin
                if IL>0 then Exit(1);
              end;
     VGap   : begin
-               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
-               FL:=AsLGap(L); ML:=AsRGap(L);
-               FR:=AsLGap(R); MR:=AsRGap(R);
-               if (FL>=FR) and (ML<=MR) then exit;
-               if (FL+ML)>=(FR+MR) then Exit(1);
+               if Ineq then RaiseError(RangeDisallow);
+               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
+               FL:=AsLGap(L); FR:=AsLGap(R); ML:=AsRGap(L); MR:=AsRGap(L);
+               if (MR=ML) and (FR=FL) then exit;
+               if (FL<FL) or (ML<MR) then Exit(1);
              end;
     VIGap  : begin
-               if (L^.VPhy<>R^.VPhy) then raise EError.Create(DimMismatch);
-               IL:=AsIGapL(L); GL:=AsIGapR(L);
-               IR:=AsIGapL(R); GR:=AsIGapR(R);
-               if (IL>=IR) and (GL<=GR) then exit;
-               if (IL+GL)>=(IR+GR) then Exit(1);
+               if Ineq then RaiseError(RangeDisallow);
+               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
+               IL:=AsIGapR(L); IR:=AsIGapR(R);
+               if (IR=IL) and (L^.Int=R^.Int) then exit;
+               if (IL<IR) or (L^.Int<R^.Int) then Exit(1);
              end;
-    VArr   : raise EError.Create(ArrDisallow);
+    VArr   : RaiseError(ArrDisallow);
   end;
   Result:=-1;
 end;
@@ -707,7 +715,7 @@ begin
   until p=nil;
 end;
 
-procedure MemListClear(var MemList:TMemList);        //DONE -oRFla.Lib -cRev.2026.04.18: Proc MemListClear
+procedure MemListClear(var MemList:TMemList);       //DONE -oRFla.Lib -cRev.2026.04.18: Proc MemListClear
 var p, q : PByte;                      // clear sorted list
     L : SizeInt;
 begin

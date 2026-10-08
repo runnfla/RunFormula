@@ -34,7 +34,9 @@ type
     IncompType_GI,     // Incompatible operand type: got Interval but expected Integer
     IncompType_CG,     // Incompatible operand type: got Complex but expected Interval
     NoneDisallow,      // Invalid None operand
+    CplexDisallow,     // Invalid Complex operand
     StrDisallow,       // Invalid string operand
+    RangeDisallow,     // Invalid Range operand
     ArrDisallow,       // Invalid array operand
     DivZero,           // Division by Zero
     MissingBracket,    // One or more closing brackets or block terminators are missing
@@ -63,7 +65,7 @@ type
     UnDecodeDim,       // Can not decode dimension, list of units is incomplete
     RangeType,         // Range bounds must be integers
     CommaDigit,        // Space required between number and comma/semicolon
-    InvalidType        // Invalid parameter type
+    InvalidType        // Invalid parameter type // --> rename or remove
   );
 
   TRunFlaError = packed record

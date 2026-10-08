@@ -172,8 +172,8 @@ begin
                    VCplex : S:=': Complex = ('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
                    VChar  : begin
                               S:=': Char = ';
-                              if (Chr>$20) and (Chr<$7F) then S:=S+'"'+char(Chr)+'" ';
-                              S:=S+'[0x'+IntToHex(Chr)+']';
+                              if (Int>$20) and (Int<$7F) then S:=S+'"'+char(Int)+'" ';
+                              S:=S+'[0x'+IntToHex(Int)+']';
                             end;
                    VGap   : S:=': Range = ['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
                    VIGap  : S:=': Integer Range = ['+IntToStr(Int)+':'+IntToStr(IGap)+']';

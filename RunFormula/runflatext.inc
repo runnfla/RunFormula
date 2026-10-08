@@ -105,6 +105,10 @@ begin
                  end;
       '0'..'9' : dec(c, $30);
       'A'..'F' : dec(c, $37);
+      '_'      : begin
+                   inc(P);
+                   continue;
+                 end;
       'a'..'f' : dec(c, $57);
       else raise EError.Create(InvalidChar, P);
     end;
@@ -167,6 +171,7 @@ begin
                    if Z='-' then scl:=-scl;
                    break;
                  end;
+      '_'      : ;
       else
         if c in TextChars then raise EError.Create(InvalidChar, P);
         break;
@@ -388,7 +393,7 @@ begin
                   VType:=VFloat;
                 end;
       2       : begin                         // "
-                  Chr:=byte(I);
+                  Int:=byte(I);
                   VType:=VChar;
                 end;
       $171,                                   // 0+0 "+0
@@ -452,7 +457,7 @@ begin
       $B2715D  : begin
                   if F>0 then RaiseError(InvalidFormat);
                   Flo:=(F*0.01+1)*FL;
-                  Img:=(1-F*0.01)*FL;
+                  Img:=(1-F*0.01)*FL;       // test img>flo
                   VType:=VGap;
                 end;
       $81C19,                                  // (0,0) (0,") (",0) (",")
@@ -561,14 +566,15 @@ begin
   FreeMem(buf);
 end;
 
-function SelectPref(const F:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
-var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.05.19: Func SelectPref
-    t : TRFloat;
+function SelectPref(const X, Y:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
+var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.10.07: Func SelectPref
+    f, t : TRFloat;
 begin
+  if Y=0 then f:=X else if X=0 then f:=Y else f:=abs(X)*0.5+abs(Y)*0.5;
   PByte(Result):=nil;
   for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do begin
     if (Flag and (Flg or UOP))<>0 then continue;
-    t:=F/Scale;
+    t:=f/Scale;
     if (t>=1) and (t<1000) then begin
       Scl:=Scl*Scale;
       Result:=Abbr;
