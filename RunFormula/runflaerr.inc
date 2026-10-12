@@ -26,7 +26,7 @@ type
     Overflow,          // Float Overflow Error
     FuncExists,        // Function already exists
     InvalidChar,       // Invalid character
-    InvalidFormat,     // Invalid format
+    InvalidFormat,     // Invalid string format
     UnexpectedEnd,     // Unexpected End
     IncompType_FI,     // Incompatible operand type: got Real but expected Integer
     IncompType_CI,     // Incompatible operand type: got Complex but expected Integer
@@ -65,7 +65,8 @@ type
     UnDecodeDim,       // Can not decode dimension, list of units is incomplete
     RangeType,         // Range bounds must be integers
     CommaDigit,        // Space required between number and comma/semicolon
-    InvalidType        // Invalid parameter type // --> rename or remove
+    InvalidType,       // Invalid parameter type // --> rename or remove
+    EmptyString
   );
 
   TRunFlaError = packed record

@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Changelog
-//  Rev. 21.09.2026
+//  Rev. 28.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -68,6 +68,7 @@ IncompType_NG
 - подчеркивание в числах
 - возможность добавления своих интерфейсных функций
 - Fix - выбор приставки для комплексных и интервалов
-- новые функции - tick(), for()
-- ощибки CplexDisallow RangeDisallow
+- новые функции - tick(), for(), cbrt()
+- ощибки CplexDisallow RangeDisallow EmptyString
+- точка как разделитель в размерностях
 

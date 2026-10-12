@@ -29,7 +29,7 @@ const
       (ErrCode : Overflow; ErrMsg : 'Float Overflow Error'),
       (ErrCode : FuncExists; ErrMsg : 'Function already exists'),
       (ErrCode : InvalidChar; ErrMsg : 'Invalid character'),
-      (ErrCode : InvalidFormat; ErrMsg : 'Invalid format'),
+      (ErrCode : InvalidFormat; ErrMsg : 'Invalid string format'),
       (ErrCode : UnexpectedEnd; ErrMsg : 'Unexpected End'),
       (ErrCode : IncompType_FI; ErrMsg : 'Incompatible operand type: got Real but expected Integer'),
       (ErrCode : IncompType_CI; ErrMsg : 'Incompatible operand type: got Complex but expected Integer'),
@@ -68,6 +68,7 @@ const
       (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
       (ErrCode : RangeType; ErrMsg : 'Range bounds must be integers'),
       (ErrCode : CommaDigit; ErrMsg : 'Space required between number and comma/semicolon'),
-      (ErrCode : InvalidType; ErrMsg : 'Invalid parameter type')
+      (ErrCode : InvalidType; ErrMsg : 'Invalid parameter type'),
+      (ErrCode : EmptyString; ErrMsg : 'Empty String disallow')
     );
 

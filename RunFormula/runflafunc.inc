@@ -58,7 +58,7 @@ function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE 
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  ParamCount:= -ParamCount;
+  ParamCount:= - ParamCount;
   b:=AsBool(Param(ParamCount, Context));
   PostParam(Context);
   Result:=@CVNone;
@@ -216,8 +216,8 @@ end;
 function SCosGap(const L, R:TRFloat):integer;              //DONE -oRFla.Func -cRev.2026.10.06: Func SCosGap
 var fl, d : TRFloat;
 begin
-  fl:=FlaRound(L/Cpi, -1);
-  d:=FlaRound(R/Cpi, -1)-fl;
+  fl:=FlaRound(L*(1/Cpi), -1);
+  d:=FlaRound(R*(1/Cpi), -1)-fl;
   if d<1 then Exit(0);
   if d>=2 then Exit(2);
   d:=FlaRound(fl*0.5, -2);
@@ -287,7 +287,7 @@ begin
   with Result^ do begin
     pv:=Param(-1, Context);
     Flo:=AsRe(pv);
-    Img:= -AsIm(pv);
+    Img:= - AsIm(pv);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
@@ -607,7 +607,7 @@ begin
     VType:=VInt;
     Int:=-1;
   end;
-  ParamCount:= -ParamCount;
+  ParamCount:= - ParamCount;
   s:=AsStr(Param(ParamCount, Context));
   PostParam(Context);
   ps:=PByte(s);
@@ -657,7 +657,7 @@ begin
   end;
 end;
 
-function Fla_VAL(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_VAL
+function Fla_VAL(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_VAL
 var s : string;
     p : PByte;
 begin
@@ -665,7 +665,7 @@ begin
   Result:=NewLV(Context);
   s:=AsStr(Param(-1, Context));
   p:=PByte(s);
-  if p=nil then RaiseError(NoneDisallow);
+  if p=nil then RaiseError(EmptyString);
   ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
   PostParam(Context);
 end;
@@ -722,7 +722,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.27: Func Fla_POW
+function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_POW
 var X, Y : PValRec;               // pow(X, Y) = X^Y
     f, fe, ft, m : TRFloat;
 begin
@@ -766,7 +766,7 @@ begin
   PostParam(Y, Context);
 end;
 
-function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.27: Func Fla_LOG
+function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_LOG
 var X, Y : PValRec;               // log(X, Y) = logY(X)
     f, fe, ft, m : TRFloat;
 begin
@@ -852,7 +852,7 @@ begin
                fa:=exp(pv^.Img)*0.5;
                fb:=0.25/fa;
                Flo:=cos(pv^.Flo)*(fa+fb);
-               Img:= -sin(pv^.Flo)*(fa-fb);
+               Img:= - sin(pv^.Flo)*(fa-fb);
                VType:=VCplex;
              end;
     VGap, VIGap : begin
@@ -911,15 +911,15 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.08.28: Func Fla_SQRT
+function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_SQRT
 var pv : PValRec;
     f, m : TRFloat;
+    phy : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    if (pv^.VPhy and $0101010101010101)<>0 then RaiseError(DimDisallow);
     case pv^.VType of
       VCplex : begin
                  m:=Hypot2(pv^.Flo, pv^.Img);
@@ -927,7 +927,7 @@ begin
                  if f>0 then Flo:=sqrt(f) else Flo:=0;
                  f:=m-pv^.Flo*0.5;
                  if f>0 then Img:=sqrt(f) else Img:=0;
-                 if pv^.Img<0 then Img:= -Img;
+                 if pv^.Img<0 then Img:= - Img;
                  VType:=VCplex;
                end;
       VGap, VIGap : begin
@@ -940,7 +940,61 @@ begin
         Flo:=sqrt(AsFloat(pv));
         VType:=VFloat;
     end;
-    VPhy:=(pv^.VPhy shr 1) or (pv^.VPhy and $8080808080808080);
+    if pv^.VPhy<>0 then begin
+      phy:=pv^.VPhy;
+      if (phy and $0101010101010101)<>0 then RaiseError(DimDisallow);
+      VPhy:=(phy shr 1) or (phy and $8080808080808080);
+    end;
+  end;
+  PostParam(Context);
+end;
+
+function Fla_CBRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_CBRT
+var pv : PValRec;
+    f, m : TRFloat;
+    phy : TDPhy;
+    i : integer;
+    t : ShortInt;
+
+  function Fcbrt(const F:TRFloat):TRFloat;                               //DONE -oRFla.Func -cRev.2026.10.12: Func Fcbrt
+  begin
+    if F<>0 then begin
+      Result:=exp(ln(abs(F))*(1/3));
+      if F<0 then Result:= - Result;
+    end else Result:=0;
+  end;
+
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    pv:=Param(-1, Context);
+    case pv^.VType of
+      VCplex : begin
+                 m:=Fcbrt(Hypot2(pv^.Flo, pv^.Img))*1.25992104989487316477;
+                 f:=FlArcTan(pv^.Img, pv^.Flo)*(1/3);
+                 Flo:=m*cos(f);
+                 Img:=m*sin(f);
+                 VType:=VCplex;
+               end;
+      VGap, VIGap : begin
+                      Flo:=Fcbrt(AsLGap(pv));
+                      Img:=Fcbrt(AsRGap(pv));
+                      VType:=VGap;
+                    end;
+      else
+        Flo:=Fcbrt(AsFloat(pv));
+        VType:=VFloat;
+    end;
+    if pv^.VPhy<>0 then begin
+      phy.DI:=pv^.VPhy;
+      for i:=0 to SI-1 do begin
+        t:=phy.DB[i] div 3;
+        if (t*3)<>phy.DB[i] then RaiseError(DimDisallow);
+        phy.DB[i]:=t;
+      end;
+      VPhy:=phy.DI;
+    end;
   end;
   PostParam(Context);
 end;
@@ -956,8 +1010,8 @@ begin
   with Result^ do case pv^.VType of
     VCplex : begin
                CplexDiv(pv^.Flo, pv^.Img+1, -pv^.Flo, 1-pv^.Img, f, m);
-               Flo:= -FlArcTan(m, f)*0.5;
-               if (m=0) and (f<-1) then Flo:= -Flo;
+               Flo:= - FlArcTan(m, f)*0.5;
+               if (m=0) and (f<-1) then Flo:= - Flo;
                Img:=(ln(Hypot2(f, m))+ln(2))*0.5;
                VType:=VCplex;
              end;
@@ -1062,7 +1116,7 @@ begin
   end;
 end;
 
-function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.31: Func Fla_QTY
+function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_QTY
 var s : string;
     p : PByte;
     phy : SizeInt;
@@ -1071,7 +1125,7 @@ begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   s:=AsStr(Param(-1, Context));
   p:=PByte(s);
-  if p=nil then RaiseError(NoneDisallow);
+  if p=nil then RaiseError(EmptyString);
   phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
   PostParam(Context);
   Result:=NewLV(Context);
@@ -1079,7 +1133,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.08.31: Func Fla_CONV
+function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_CONV
 var s : string;
     p : PByte;
     phy : SizeInt;
@@ -1088,7 +1142,7 @@ begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   s:=AsStr(Param(-1, Context));
   p:=PByte(s);
-  if p=nil then RaiseError(NoneDisallow);
+  if p=nil then RaiseError(EmptyString);
   phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
   PostParam(Context);
   Result:=NewLV(Context);
@@ -1173,6 +1227,7 @@ begin
   FuncReg('cos', @Fla_COS);
   FuncReg('tan', @Fla_TAN);
   FuncReg('sqrt', @Fla_SQRT);
+  FuncReg('cbrt', @Fla_CBRT);
   FuncReg('arctan', @Fla_ARCTAN);
   FuncReg('abs', @Fla_ABS);
   FuncReg('char', @Fla_CHAR);

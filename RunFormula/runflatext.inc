@@ -278,7 +278,7 @@ begin
         fp:=nil;
       end;
       case c of
-        #0..#$20 : ;
+        #0..#$20, '.' : ;
         '(' : inc(brc);
         ')' : begin
                 if brc=0 then raise EError.Create(IllegalBracket, P);
