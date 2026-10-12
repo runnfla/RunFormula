@@ -54,7 +54,7 @@ begin
   Result:=@CVNone;
 end;
 
-function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_IF
+function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_IF
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
@@ -431,7 +431,7 @@ begin
                       Img:=FlaRound(pv^.Img, -2);
                       VType:=VCplex;
                     end;
-      else TypeDisallow(pv);
+      else TypeDisallow(pv^.VType);
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -1027,7 +1027,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.08.25: Func Fla_ABS
+function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_ABS
 var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -1035,8 +1035,7 @@ begin
   with Result^ do begin
     pv:=Param(-1, Context);
     case pv^.VType of
-      VNone  : RaiseError(NoneDisallow);
-      VInt   : if pv^.Int<>LI then begin
+      VInt   : if pv^.Int>LI then begin
                  Int:=abs(pv^.Int);
                  VType:=VInt;
                end else begin
@@ -1055,19 +1054,18 @@ begin
                  Int:=pv^.Int;
                  VType:=VInt;
                end;
-      VStr   : RaiseError(StrDisallow);
       VGap   : begin
                  MinMax(abs(pv^.Flo), abs(pv^.Img), Result);
                  if (pv^.Flo<0) and (pv^.Img>0) then Flo:=0;
                end;
-      VIGap  : if pv^.Int<>LI then begin
+      VIGap  : if pv^.Int>LI then begin
                  MinMax(abs(pv^.Int), abs(pv^.IGap), Result);
                  if (pv^.Int<0) and (pv^.IGap>0) then Int:=0;
                end else begin
                  MinMax(abs(TRFloat(pv^.IGap)), FALI, Result);
                  if pv^.IGap>0 then Flo:=0;
                end;
-       VArr  : RaiseError(ArrDisallow);
+      else TypeDisallow(VType);
     end;
     VPhy:=pv^.VPhy;
   end;
