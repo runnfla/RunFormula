@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Built-in functions include file
+//  Built-in functions
 //  Rev. 15.09.2026
 
 //  Author: Alexander Torubarov
@@ -607,7 +607,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.06.22: Func Fla_FIND
+function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_FIND
 var ofs : SizeInt = 0;
     s, sb : string;
     ps, psub : PByte;
@@ -622,23 +622,22 @@ begin
         end;
     else RaiseError(ParamNumber);
   end;
-  Result:=NewLV(Context);
-  with Result^ do begin
-    VType:=VInt;
-    Int:=-1;
-  end;
   ParamCount:= - ParamCount;
   s:=AsStr(Param(ParamCount, Context));
-  PostParam(Context);
   ps:=PByte(s);
-  if ps=nil then exit;
-  sb:=AsStr(Param(ParamCount+1, Context));
   PostParam(Context);
-  psub:=PByte(sb);
-  if psub=nil then exit;
+  Result:=NewLV(Context);
   with Result^ do begin
-    Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub);
-    if (ofs>0) and (Int<>-1) then inc(Int, ofs);
+    Int:=-1;
+    VType:=VInt;
+    if ps=nil then exit;
+    sb:=AsStr(Param(ParamCount+1, Context));
+    psub:=PByte(sb);
+    PostParam(Context);
+    if psub<>nil then begin
+      Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub);
+      if (ofs>0) and (Int<>-1) then inc(Int, ofs);
+    end else Int:=ofs;
   end;
 end;
 
@@ -664,19 +663,19 @@ begin
   with Result^ do begin
     Str:=@CEmptyStr.Zero;
     VType:=VStr;
-  end;
-  if p=nil then exit;
-  lng:=PSizeInt(p)[-1]-1;          // lng = max index
-  if (lng<L) or (R<0) then exit;
-  if L<0 then L:=0;
-  if R>lng then R:=lng;
-  lng:=R-L+1;
-  with Result^ do if lng>1 then begin
-    Str:=MakeStrPtr(lng, p);
-    DataCopy(p+L, Str, lng);
-  end else begin
-    Int:=p[L];
-    VType:=VChar;
+    if p=nil then exit;
+    lng:=PSizeInt(p)[-1]-1;          // lng = max index
+    if (lng<L) or (R<0) then exit;
+    if L<0 then L:=0;
+    if R>lng then R:=lng;
+    lng:=R-L+1;
+    if lng>1 then begin
+      Str:=MakeStrPtr(lng, p);
+      DataCopy(p+L, Str, lng);
+    end else begin
+      Int:=p[L];
+      VType:=VChar;
+    end;
   end;
 end;
 
