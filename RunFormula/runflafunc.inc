@@ -66,6 +66,26 @@ begin
     else if ParamCount=-3 then Result:=Param(-1, Context);
 end;
 
+function Fla_IN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_IN
+var pv : PValRec;
+    b, i : SizeInt;
+begin
+  if ParamCount<2 then RaiseError(ParamNumber);
+  ParamCount:= - ParamCount;
+  pv:=Param(ParamCount, Context);
+  for i:=ParamCount+1 to -1 do begin
+    b:=Compare(pv, Param(ParamCount+i, Context)) and 1;
+    PostParam(Context);
+    if b=0 then break;
+  end;
+  PostParam(pv, Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    Int:=b-1;
+    VType:=VInt;
+  end;
+end;
+
 function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_REPEAT
 var b : boolean;
 begin
@@ -622,7 +642,7 @@ begin
   end;
 end;
 
-function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.07.15: Func Fla_SUBSTR
+function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_SUBSTR
 var s : string;
     pv : PValRec;
     p : PByte;
@@ -631,25 +651,28 @@ begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   pv:=Param(-1, Context);
   with pv^ do begin
-    if not (VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
+    if not (VType in IGapTypes) then RaiseError(RangeType);
     if VPhy<>0 then RaiseError(DimDisallow);
+    L:=Int;
+    R:=AsIGapR(pv);
   end;
-  L:=AsIGapL(pv);
-  R:=AsIGapR(pv)+1;
   PostParam(Context);
   s:=AsStr(Param(-2, Context));
-  PostParam(Context);
   p:=PByte(s);
+  PostParam(Context);
   Result:=NewLV(Context);
-  if p=nil then exit;
-  lng:=PSizeInt(p)[-1];
-  if L<0 then L:=0;
-  if (R>lng) or (R=LI) then R:=lng;
-  if (R<=0) or (L>=lng) then exit;
-  lng:=R-L;
-  with Result^ do if lng>1 then begin
-    Str:=MakeStrPtr(lng, PByte(s));
+  with Result^ do begin
+    Str:=@CEmptyStr.Zero;
     VType:=VStr;
+  end;
+  if p=nil then exit;
+  lng:=PSizeInt(p)[-1]-1;          // lng = max index
+  if (lng<L) or (R<0) then exit;
+  if L<0 then L:=0;
+  if R>lng then R:=lng;
+  lng:=R-L+1;
+  with Result^ do if lng>1 then begin
+    Str:=MakeStrPtr(lng, p);
     DataCopy(p+L, Str, lng);
   end else begin
     Int:=p[L];
@@ -1190,6 +1213,7 @@ begin
   FuncReg('break', @Fla_BREAK);
   FuncReg('continue', @Fla_CONTINUE);
   FuncReg('if', @Fla_IF);
+  FuncReg('in', @Fla_IN);
   FuncReg('repeat', @Fla_REPEAT);
   FuncReg('for', @Fla_FOR);
   FuncReg('type', @Fla_TYPE);
