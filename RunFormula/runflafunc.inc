@@ -195,17 +195,15 @@ begin
   end;
 end;
 
-function SubPos(PS, Fin, PSub:PByte):SizeInt;              //DONE -oRFla.Func -cRev.2026.06.22: Func SubPos
+function SubPos(PS, Fin, PSub:PByte):SizeInt;              //DONE -oRFla.Func -cRev.2026.10.15: Func SubPos
 var p, pl, plook, subf : PByte;
     L : SizeInt;
     b : byte;
 begin
-  Result:=-1;
-  L:=PSizeInt(PSub)[-1];
-  if L=0 then exit;
   b:=PSub^;
+  L:=PSizeInt(PSub)[-1];
   subf:=PSub+L;
-  dec(Fin, L);
+  dec(Fin, L);                   // Fin - max checked address
   plook:=PS;
   while plook<=Fin do begin
     if b=plook^ then begin
@@ -216,11 +214,11 @@ begin
         inc(pl, 2);
         inc(p, 2);
       end;
-      if ((p+1)=subf) and (p^=pl^) then inc(p);
-      if p>=subf then Exit(plook-ps);
+      if (p>=subf) or (((p+1)=subf) and (p^=pl^)) then Exit(plook-PS);
     end;
     inc(plook);
   end;
+  Result:=-1;
 end;
 
 function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.10.06: Func RealPow
