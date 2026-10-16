@@ -28,12 +28,10 @@ type
     InvalidChar,       // Invalid character
     InvalidFormat,     // Invalid string format
     UnexpectedEnd,     // Unexpected End
-    IncompType_FI,     // Incompatible operand type: got Real but expected Integer
-    IncompType_CI,     // Incompatible operand type: got Complex but expected Integer
     IncompType_CF,     // Incompatible operand type: got Complex but expected Real
-    IncompType_GI,     // Incompatible operand type: got Interval but expected Integer
     IncompType_CG,     // Incompatible operand type: got Complex but expected Interval
     NoneDisallow,      // Invalid None operand
+    FloatDisallow,     // Invalid Float operand
     CplexDisallow,     // Invalid Complex operand
     StrDisallow,       // Invalid string operand
     RangeDisallow,     // Invalid Range operand
@@ -65,7 +63,6 @@ type
     UnDecodeDim,       // Can not decode dimension, list of units is incomplete
     RangeType,         // Range bounds must be integers
     CommaDigit,        // Space required between number and comma/semicolon
-    InvalidType,       // Invalid parameter type // --> rename or remove
     EmptyString
   );
 

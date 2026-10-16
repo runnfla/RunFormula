@@ -69,7 +69,8 @@ IncompType_NG
 - возможность добавления своих интерфейсных функций
 - Fix - выбор приставки для комплексных и интервалов
 - новые функции - tick(), for(), cbrt(), in()
-- ощибки CplexDisallow RangeDisallow EmptyString
+- ощибки FloatDisallow CplexDisallow RangeDisallow EmptyString
+- удалены InvalidType IncompType_FI IncompType_CI IncompType_GI
 - точка как разделитель в размерностях
 - find(X, "") возвращает 0 (offset), not -1
 

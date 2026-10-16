@@ -73,6 +73,18 @@ type
 
   PAnsiRec = ^TAnsiRec;
 
+{$Z2}
+  TVrtRec = packed record
+    VrType : (VrEmpty=0, VrNull=1, VrSmallInt=2, VrInteger=3, VrSingle=4,
+              VrDouble=5, VrShortInt=16, VrByte=17, VrWord=18, VrLongWord=19,
+              VrInt64=20, VrQWord=21, VrString=$100);
+    Dummy : array [1..3] of word;
+    VrData : byte;
+  end;
+
+  PVrtRec = ^TVrtRec;
+{$Z4}
+
   TMemList = record
     List : PPointer;          // list of pointers, must be first !!!
     Tail : PPointer;          // tail of last block

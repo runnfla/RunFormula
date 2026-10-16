@@ -27,7 +27,7 @@ begin
   raise EResult.Create('');
 end;
 
-function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_EXIT
+function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_EXIT
 begin
   case ParamCount of
     0 : Result:=@CVNone;
@@ -37,7 +37,7 @@ begin
   Context.Flow:=EXT;
 end;
 
-function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_BREAK
+function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_BREAK
 begin
   case ParamCount of
     0 : Result:=@CVNone;
@@ -47,7 +47,7 @@ begin
   Context.Flow:=BRK;
 end;
 
-function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_CONTINUE
+function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_CONTINUE
 begin
   if ParamCount<>0 then RaiseError(ParamNumber);
   Context.Flow:=CON;
@@ -203,7 +203,7 @@ begin
   b:=PSub^;
   L:=PSizeInt(PSub)[-1];
   subf:=PSub+L;
-  dec(Fin, L);                   // Fin - max checked address
+  dec(Fin, L);                   // Fin - max look address
   plook:=PS;
   while plook<=Fin do begin
     if b=plook^ then begin

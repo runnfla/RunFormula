@@ -31,12 +31,10 @@ const
       (ErrCode : InvalidChar; ErrMsg : 'Invalid character'),
       (ErrCode : InvalidFormat; ErrMsg : 'Invalid string format'),
       (ErrCode : UnexpectedEnd; ErrMsg : 'Unexpected End'),
-      (ErrCode : IncompType_FI; ErrMsg : 'Incompatible operand type: got Real but expected Integer'),
-      (ErrCode : IncompType_CI; ErrMsg : 'Incompatible operand type: got Complex but expected Integer'),
       (ErrCode : IncompType_CF; ErrMsg : 'Incompatible operand type: got Complex but expected Real'),
-      (ErrCode : IncompType_GI; ErrMsg : 'Incompatible operand type: got Interval but expected Integer'),
       (ErrCode : IncompType_CG; ErrMsg : 'Incompatible operand type: got Complex but expected Interval'),
       (ErrCode : NoneDisallow; ErrMsg : 'Invalid None operand'),
+      (ErrCode : FloatDisallow; ErrMsg : 'Invalid Float operand'),
       (ErrCode : CplexDisallow; ErrMsg : 'Invalid Complex operand'),
       (ErrCode : StrDisallow; ErrMsg : 'Invalid string operand'),
       (ErrCode : RangeDisallow; ErrMsg : 'Invalid Range operand'),
@@ -68,7 +66,6 @@ const
       (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
       (ErrCode : RangeType; ErrMsg : 'Range bounds must be integers'),
       (ErrCode : CommaDigit; ErrMsg : 'Space required between number and comma/semicolon'),
-      (ErrCode : InvalidType; ErrMsg : 'Invalid parameter type'),
       (ErrCode : EmptyString; ErrMsg : 'Empty String disallow')
     );
 

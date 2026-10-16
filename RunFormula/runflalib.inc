@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Library include file
+//  Library functions
 //  Rev. 10.09.2026
 
 //  Author: Alexander Torubarov
@@ -80,10 +80,11 @@ begin
 end;
 
 procedure TypeDisallow(VT:TVType);             //DONE -oRFla.Lib -cRev.2026.10.08: Proc TypeDisallow TVType
-var c : TRunFlaErrCode = InvalidType;
+var c : TRunFlaErrCode;
 begin
   case VT of
     VNone  : c:=NoneDisallow;
+    VFloat : c:=FloatDisallow;
     VCplex : c:=CplexDisallow;
     VStr   : c:=StrDisallow;
     VGap, VIGap : c:=RangeDisallow;
@@ -351,58 +352,44 @@ end;
 
 // ===== Data =====
 
-function AsInt(PV:PValRec):SizeInt;                        //DONE -oRFla.Lib -cRev.2026.09.09: Func AsInt
+function AsInt(PV:PValRec):SizeInt; inline;                //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsInt
 begin
-  with PV^ do case VType of
-    VNone  : RaiseError(NoneDisallow);
-    VInt, VChar : Result:=Int;
-    VFloat : RaiseError(IncompType_FI);
-    VCplex : RaiseError(IncompType_CI);
-    VStr   : RaiseError(StrDisallow);
-    VGap, VIGap : RaiseError(IncompType_GI);
-    VArr   : RaiseError(ArrDisallow);
-  end;
+  with PV^ do if VType in IntTypes then Result:=Int else TypeDisallow(VType);
 end;
 
-function AsFloat(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsFloat
+function AsFloat(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.10.16: Func AsFloat
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(NoneDisallow);
     VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : RaiseError(IncompType_CF);
-    VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Flo*0.5+Img*0.5;
     VIGap  : Result:=Int*0.5+IGap*0.5;
-    VArr   : RaiseError(ArrDisallow);
+    else TypeDisallow(VType);
   end;
 end;
 
-function AsRe(PV:PValRec):TRFloat;                         //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRe
+function AsRe(PV:PValRec):TRFloat;                         //DONE -oRFla.Lib -cRev.2026.10.16: Func AsRe
 begin
   with PV^ do case VType of
-    VNone : RaiseError(NoneDisallow);
     VInt, VChar : Result:=Int;
     VFloat, VCplex : Result:=Flo;
-    VStr  : RaiseError(StrDisallow);
     VGap  : Result:=Flo*0.5+Img*0.5;
     VIGap : Result:=Int*0.5+IGap*0.5;
-    VArr  : RaiseError(ArrDisallow);
+    else TypeDisallow(VType);
   end;
 end;
 
-function AsIm(PV:PValRec):TRFloat;                         //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIm
+function AsIm(PV:PValRec):TRFloat;                         //DONE -oRFla.Lib -cRev.2026.10.16: Func AsIm
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(NoneDisallow);
+    VNone, VStr, VArr : TypeDisallow(VType);
     VCplex : Result:=Img;
-    VStr   : RaiseError(StrDisallow);
-    VArr   : RaiseError(ArrDisallow);
     else Result:=0;
   end;
 end;
 
-function AsBool(PV:PValRec):boolean;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsBool
+function AsBool(PV:PValRec):boolean;                       //DONE -oRFla.Lib -cRev.2026.10.16: Func AsBool
 begin
   with PV^ do begin
     if VPhy<>0 then RaiseError(DimDisallow);
@@ -418,42 +405,36 @@ begin
   end;
 end;
 
-function AsLGap(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsLGap
+function AsLGap(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.10.16: Func AsLGap
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(NoneDisallow);
-    VInt, VChar, VIGap  : Result:=Int;
+    VInt, VChar, VIGap : Result:=Int;
     VFloat, VGap : Result:=Flo;
     VCplex : RaiseError(IncompType_CG);
-    VStr   : RaiseError(StrDisallow);
-    VArr   : RaiseError(ArrDisallow);
+    else TypeDisallow(VType);
   end;
 end;
 
-function AsRGap(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsRGap
+function AsRGap(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.10.16: Func AsRGap
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(NoneDisallow);
     VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
     VCplex : RaiseError(IncompType_CG);
-    VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
-    VArr   : RaiseError(ArrDisallow);
+    else TypeDisallow(VType);
   end;
 end;
 
-function AsMgin(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.09.09: Func AsMgin
+function AsMgin(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.10.16: Func AsMgin
 begin
   with PV^ do case VType of
-    VNone  : RaiseError(NoneDisallow);
     VInt, VFloat, VChar : Result:=0;
     VCplex : RaiseError(IncompType_CG);
-    VStr   : RaiseError(StrDisallow);
     VGap   : Result:=Img*0.5-Flo*0.5;
     VIGap  : Result:=IGap*0.5-Int*0.5;
-    VArr   : RaiseError(ArrDisallow);
+    else TypeDisallow(VType);
   end;
 end;
 
@@ -462,9 +443,9 @@ begin
   with PV^ do if VType<>VChar then Result:=Int else Result:=Int;
 end;
 
-function AsIGapR(PV:PValRec):SizeInt; inline;              //DONE -oRFla.Lib -cRev.2026.09.09: Inline AsIGapR
+function AsIGapR(PV:PValRec):SizeInt; inline;              //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsIGap
 begin
-  with PV^ do if VType in [VInt, VChar] then Result:=Int else Result:=IGap;
+  with PV^ do if VType in IntTypes then Result:=Int else Result:=IGap;
 end;
 
 function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
@@ -539,23 +520,28 @@ begin
   Result:=Dst;
   with Result^ do begin
     VType:=Src^.VType;
-    VPhy:=Src^.VPhy;
     case VType of
-    //  VNone  : Str:=nil;
       VInt, VChar : Int:=Src^.Int;
       VFloat : Flo:=Src^.Flo;
-      VCplex, VGap : begin Flo:=Src^.Flo; Img:=Src^.Img; end;
-      VStr   : begin
-                 Str:=Src^.Str;
-                 if Ansi[-2]>0 then
+      VCplex, VGap : begin
+                       Flo:=Src^.Flo;
+                       Img:=Src^.Img;
+                     end;
+      VStr  : begin
+                Str:=Src^.Str;
+                if Ansi[-2]>0 then
 {$if SI = 8}
-                   InterlockedIncrement64(Ansi[-2]);
+                  InterlockedIncrement64(Ansi[-2]);
 {$else}
-                   InterlockedIncrement(Ansi[-2]);
+                  InterlockedIncrement(Ansi[-2]);
 {$endif}
-               end;
-      VIGap  : begin Int:=Src^.Int; IGap:=Src^.IGap; end;
+              end;
+      VIGap : begin
+                Int:=Src^.Int;
+                IGap:=Src^.IGap;
+              end;
     end;
+    VPhy:=Src^.VPhy;
   end;
 end;
 
@@ -598,26 +584,24 @@ begin
   case CaseType[L^.VType, R^.VType] of
     VNone : begin
               if Ineq then RaiseError(NoneDisallow);
-
-
-              if (L^.VType=VNone) and (R^.VType=VNone) then exit;
-              if R^.VType=VNone then Exit(1);
+              if (L^.VType=VNone) and (R^.VType=VNone) then begin
+                if L^.VPhy=R^.VPhy then exit;
+              end else if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
             end;
     VInt   : begin
-               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
-               IL:=AsInt(L); IR:=AsInt(R);
-               if IR=IL then exit;
-               if IL>IR then Exit(1);
+               if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
+               if L^.Int=R^.Int then exit;
+               if L^.Int>R^.Int then Exit(1);
              end;
     VFloat : begin
-               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
+               if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
                FL:=AsFloat(L); FR:=AsFloat(R);
                if FR=FL then exit;
                if FL>FR then Exit(1);
              end;
     VCplex : begin
                if Ineq then RaiseError(CplexDisallow);
-               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
+               if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
                if (AsRe(L)=AsRe(R)) and (AsIm(L)=AsIm(R)) then exit;
              end;
     VStr   : begin
@@ -627,17 +611,17 @@ begin
              end;
     VGap   : begin
                if Ineq then RaiseError(RangeDisallow);
-               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
-               FL:=AsLGap(L); FR:=AsLGap(R); ML:=AsRGap(L); MR:=AsRGap(L);
+               if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
+               FL:=AsLGap(L); FR:=AsLGap(R); ML:=AsRGap(L); MR:=AsRGap(R);
                if (MR=ML) and (FR=FL) then exit;
-               if (FL<FL) or (ML<MR) then Exit(1);
+               if (FL>=FR) and (ML<=MR) then Exit(2);
              end;
     VIGap  : begin
                if Ineq then RaiseError(RangeDisallow);
-               if (L^.VPhy<>R^.VPhy) then RaiseError(DimMismatch);
+               if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
                IL:=AsIGapR(L); IR:=AsIGapR(R);
                if (IR=IL) and (L^.Int=R^.Int) then exit;
-               if (IL<IR) or (L^.Int<R^.Int) then Exit(1);
+               if (IL<=IR) and (L^.Int>=R^.Int) then Exit(2);
              end;
     VArr   : RaiseError(ArrDisallow);
   end;

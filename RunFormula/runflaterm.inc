@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Evaluator include file
+//  Evaluator
 //  Rev. 12.09.2026
 
 //  Author: Alexander Torubarov
@@ -42,7 +42,7 @@ var L : PValRec = @CVNone;        // init VMode
     end else FreeValue(L);
   end;
 
-  procedure LVal(I:SizeInt);                                   //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Int
+  procedure LVal(I:SizeInt);                                   //DONE -oRFla.Term -cRev.2026.10.16: Proc LVal Int
   begin
     FreeLR;
     with L^ do begin
@@ -51,7 +51,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(const F:TRFloat);                             //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Float
+  procedure LVal(const F:TRFloat);                             //DONE -oRFla.Term -cRev.2026.10.16: Proc LVal Float
   begin
     FreeLR;
     with L^ do begin
@@ -60,7 +60,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(const Re, Im:TRFloat);                        //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Cplex
+  procedure LVal(const Re, Im:TRFloat);                        //DONE -oRFla.Term -cRev.2026.10.16: Proc LVal Cplex
   begin
     FreeLR;
     with L^ do begin
@@ -70,7 +70,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LVal(B:boolean);                                   //DONE -oRFla.Term -cRev.2026.09.09: Proc LVal Bool
+  procedure LVal(B:boolean);                                   //DONE -oRFla.Term -cRev.2026.10.16: Proc LVal Bool
   begin
     FreeLR;
     with L^ do begin
@@ -79,17 +79,16 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-{  procedure LVal(constref S:string);                          //DONE -oRFla.Term -cRev.2026.04.22: Proc LVal Str
+{  procedure LVal(constref S:string);                          //DONE -oRFla.Term -cRev.2026.10.16: Proc LVal Str
   begin
     FreeLR;
     with L^ do begin
-      VType:=VNone;
       Str:=Str2Ptr(S);
-      if Str<>nil then VType:=VStr;
+      VType:=VStr;
     end;
   end;          }
 
-  procedure LGap(GL, GR:SizeInt);                              //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Int
+  procedure LGap(GL, GR:SizeInt);                              //DONE -oRFla.Term -cRev.2026.10.16: Proc LGap Int
   begin
     FreeLR;
     with L^ do begin
@@ -99,7 +98,7 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  procedure LGap(const GL, GR:TRFloat);                        //DONE -oRFla.Term -cRev.2026.09.09: Proc LGap Float
+  procedure LGap(const GL, GR:TRFloat);                        //DONE -oRFla.Term -cRev.2026.10.16: Proc LGap Float
   begin
     FreeLR;
     with L^ do begin
@@ -109,11 +108,17 @@ var L : PValRec = @CVNone;        // init VMode
     end;
   end;
 
-  function LNone:PValRec;                                      //DONE -oRFla.Term -cRev.2026.09.09: Func LNone
+  function LNone:PValRec;                                      //DONE -oRFla.Term -cRev.2026.10.16: Func LNone
   begin
     FreeLR;
     Result:=L;
     Result^.VType:=VNone;
+  end;
+
+  procedure Ichk(I:SizeInt); inline;                           //DONE -oRFla.Term -cRev.2026.10.16: Inline Ichk
+  begin
+    if CaseType[L^.VType, R^.VType]<>VInt then TypeDisallow(L, R);
+    LVal(I);
   end;
 
   function IntPower(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.09.08: Func IntPower
@@ -207,9 +212,9 @@ begin
                         FreeTerm(R);
                         continue;
                       end;
-        TagOR       : LVal(AsInt(L) or AsInt(R));                            // or
-        TagXOR      : LVal(AsInt(L) xor AsInt(R));                           // xor
-        TagAND      : LVal(AsInt(L) and AsInt(R));                           // and
+        TagOR       : Ichk(L^.Int or R^.Int);                                // or
+        TagXOR      : Ichk(L^.Int xor R^.Int);                               // xor
+        TagAND      : Ichk(L^.Int and R^.Int);                               // and
         TagEqual    : LVal(Compare(L, R)=0);                                 // ==
         TagNotEqual : LVal(Compare(L, R)<>0);                                // <>
         TagGreater  : LVal(Compare(L, R, true)>0);                           // >
@@ -218,26 +223,22 @@ begin
         TagNotGreat : LVal(Compare(L, R, true)<=0);                          // <=
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
-                        VNone  : RaiseError(NoneDisallow);
-                        VInt   : if Plus(AsInt(L), AsInt(R), I) then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
+                        VInt   : if Plus(L^.Int, R^.Int, I) then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)+AsFloat(R));
                         VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
-                        VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
-                        VIGap  : if Plus(AsIGapL(L), AsIGapL(R), I) or Plus(AsIGapR(L), AsIGapR(R), J)
+                        VIGap  : if Plus(L^.Int, R^.Int, I) or Plus(AsIGapR(L), AsIGapR(R), J)
                                    then LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R)) else LGap(I, J);
-                        VArr   : RaiseError(ArrDisallow);
+                        else TypeDisallow(L, R);
                       end;
         TagMinus    : case CaseType[L^.VType, R^.VType] of                   // -
-                        VNone  : RaiseError(NoneDisallow);
-                        VInt   : if Plus(AsInt(L), -AsInt(R), I) then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
+                        VInt   : if Plus(L^.Int, -R^.Int, I) then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
                         VFloat : LVal(AsFloat(L)-AsFloat(R));
                         VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
-                        VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
-                        VIGap  : if Plus(AsIGapL(L), -AsIGapR(R), I) or Plus(AsIGapR(L), -AsIGapL(R), J)
+                        VIGap  : if Plus(L^.Int, -AsIGapR(R), I) or Plus(AsIGapR(L), -R^.Int, J)
                                    then LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R)) else LGap(I, J);
-                        VArr   : RaiseError(ArrDisallow);
+                        else TypeDisallow(L, R);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
                         VNone  : RaiseError(NoneDisallow);
@@ -283,10 +284,16 @@ begin
                                       end;
                         VArr   : RaiseError(ArrDisallow);
                       end;
-        TagSHL      : LVal(AsInt(L) shl AsInt(R));                           // shl <<
-        TagSHR      : LVal(AsInt(L) shr AsInt(R));                           // shr >>
-        TagDIV      : LVal(AsInt(L) div AsInt(R));                           // div
-        TagMOD      : LVal(AsInt(L) mod AsInt(R));                           // mod %
+        TagSHL      : Ichk(L^.Int shl R^.Int);                               // shl <<
+        TagSHR      : Ichk(L^.Int shr R^.Int);                               // shr >>
+        TagDIV      : begin                                                  // div
+                        if CaseType[L^.VType, R^.VType]<>VInt then TypeDisallow(L, R);
+                        LVal(L^.Int div R^.Int);
+                      end;
+        TagMOD      : begin                                                  // mod %
+                        if CaseType[L^.VType, R^.VType]<>VInt then TypeDisallow(L, R);
+                        LVal(L^.Int mod R^.Int);
+                      end;
         TagNegative : with R^ do case VType of                               // - unary
                         VNone  : RaiseError(NoneDisallow);
                         VInt   : if Int<>LI then LVal(-Int) else LVal(FALI);
@@ -407,34 +414,27 @@ end;
 
 procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
 var S : string;
+    p : PVrtRec;
 begin
-  try
-  //  if PV = nil then ............ !!!
-    with PV^ do case PVarData(@V)^.vtype of
-      varEmpty, varNull     : begin
-                                VType:=VNone;
-                                VPhy:=0;
-                              end;
-      varSmallInt, varInteger, varShortInt, varByte, varWord, varLongWord,
-        varInt64, varQWord  : begin VType:=VInt; Int:=V; end;
-      varSingle, varDouble  : begin VType:=VFloat; Flo:=V; end;
-      varString, varUString : begin
-                                S:=V;
-                                if length(S)<>1 then begin
-                                  Str:=Str2Ptr(S);
-                                  if Str<>nil then VType:=VStr;
-                                  VPhy:=0;
-                                end else begin
-                                  VType:=VChar;
-                                  Int:=PByte(S)^;
-                                end;
-                              end;
-      varBoolean            : begin VType:=VInt; if V then Int:=-1 else Int:=0; end;
-      else raise EError.Create(VariantError);
-    end;
-  except
-// on E:EConvertError do raise EError.Create(VariantError);
-    raise EError.Create(VariantError);
+  p:=@V;
+  with PV^ do case p^.VrType of
+    VrEmpty, VrNull : VType:=VNone;
+    VrSmallInt : begin Int:=PSmallInt(@p^.VrData)^; VType:=VInt; end;
+    VrInteger  : begin Int:=PInteger(@p^.VrData)^; VType:=VInt; end;
+    VrSingle   : begin Flo:=PSingle(@p^.VrData)^; VType:=VFloat; end;
+    VrDouble   : begin Flo:=PDouble(@p^.VrData)^; VType:=VFloat; end;
+    VrShortInt : begin Int:=PShortInt(@p^.VrData)^; VType:=VInt; end;
+    VrByte     : begin Int:=PByte(@p^.VrData)^; VType:=VInt; end;
+    VrWord     : begin Int:=PWord(@p^.VrData)^; VType:=VInt; end;
+    VrLongWord : begin Int:=PLongWord(@p^.VrData)^; VType:=VInt; end;
+    VrInt64    : begin Int:=PInt64(@p^.VrData)^; VType:=VInt; end;
+    VrQWord    : begin Int:=PQWord(@p^.VrData)^; VType:=VInt; end;
+    VrString   : begin
+                   Str:=Str2Ptr(string(@p^.VrData));
+                   VType:=VStr;
+                   VPhy:=0;
+                 end;
+    else RaiseError(VariantError);
   end;
 end;
 
