@@ -29,7 +29,7 @@ const
       (ErrCode : Overflow; ErrMsg : 'Float Overflow Error'),
       (ErrCode : FuncExists; ErrMsg : 'Function already exists'),
       (ErrCode : InvalidChar; ErrMsg : 'Invalid character'),
-      (ErrCode : InvalidFormat; ErrMsg : 'Invalid string format'),
+      (ErrCode : InvalidFormat; ErrMsg : 'Invalid format'),
       (ErrCode : UnexpectedEnd; ErrMsg : 'Unexpected End'),
       (ErrCode : IncompType_CF; ErrMsg : 'Incompatible operand type: got Complex but expected Real'),
       (ErrCode : IncompType_CG; ErrMsg : 'Incompatible operand type: got Complex but expected Interval'),

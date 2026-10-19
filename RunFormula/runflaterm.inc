@@ -168,12 +168,11 @@ var L : PValRec = @CVNone;        // init VMode
   procedure Concat;                                            //DONE -oRFla.Term -cRev.2026.04.26: Proc Concat
   var p : PByte;                             // not inline
   begin
-    p:=Str2Ptr(AsStr(L)+AsStr(R));           // REVIEW !! строка с новым PTR может не собраться
+    p:=Str2Ptr(AsStr(L)+AsStr(R));
     FreeLR;
     with L^ do begin
-      VType:=VStr;
       Str:=p;
-      if Str=nil then VType:=VNone;
+      VType:=VStr;
     end;
   end;
 
@@ -223,21 +222,21 @@ begin
         TagNotGreat : LVal(Compare(L, R, true)<=0);                          // <=
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
-                        VInt   : if Plus(L^.Int, R^.Int, I) then LVal(AsFloat(L)+AsFloat(R)) else LVal(I);
+                        VInt   : if Plus(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)+TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)+AsFloat(R));
                         VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
                         VGap   : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
                         VIGap  : if Plus(L^.Int, R^.Int, I) or Plus(AsIGapR(L), AsIGapR(R), J)
-                                   then LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R)) else LGap(I, J);
+                                   then LGap(TRFloat(L^.Int)+TRFloat(R^.Int), AsRGap(L)+AsRGap(R)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
         TagMinus    : case CaseType[L^.VType, R^.VType] of                   // -
-                        VInt   : if Plus(L^.Int, -R^.Int, I) then LVal(AsFloat(L)-AsFloat(R)) else LVal(I);
+                        VInt   : if Plus(L^.Int, -R^.Int, I) then LVal(TRFloat(L^.Int)-TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)-AsFloat(R));
                         VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
                         VGap   : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
                         VIGap  : if Plus(L^.Int, -AsIGapR(R), I) or Plus(AsIGapR(L), -R^.Int, J)
-                                   then LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R)) else LGap(I, J);
+                                   then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *

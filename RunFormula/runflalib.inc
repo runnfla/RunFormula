@@ -445,7 +445,7 @@ end;
 
 function AsIGapR(PV:PValRec):SizeInt; inline;              //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsIGap
 begin
-  with PV^ do if VType in IntTypes then Result:=Int else Result:=IGap;
+  with PV^ do if VType=VIGap then Result:=IGap else Result:=Int;
 end;
 
 function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
