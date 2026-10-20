@@ -438,12 +438,7 @@ begin
   end;
 end;
 
-function AsIGapL(PV:PValRec):SizeInt;                      //DONE -oRFla.Lib -cRev.2026.09.09: Func AsIGapL
-begin
-  with PV^ do if VType<>VChar then Result:=Int else Result:=Int;
-end;
-
-function AsIGapR(PV:PValRec):SizeInt; inline;              //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsIGap
+function AsIGap(PV:PValRec):SizeInt; inline;               //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsIGap
 begin
   with PV^ do if VType=VIGap then Result:=IGap else Result:=Int;
 end;
@@ -619,7 +614,7 @@ begin
     VIGap  : begin
                if Ineq then RaiseError(RangeDisallow);
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
-               IL:=AsIGapR(L); IR:=AsIGapR(R);
+               IL:=AsIGap(L); IR:=AsIGap(R);
                if (IR=IL) and (L^.Int=R^.Int) then exit;
                if (IL<=IR) and (L^.Int>=R^.Int) then Exit(2);
              end;

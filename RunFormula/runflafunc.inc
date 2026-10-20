@@ -118,7 +118,7 @@ begin
     if VAlloc<>VP then RaiseError(VarExpected);
     if not (VType in IGapTypes) then RaiseError(RangeType);
 
-    r:=AsIGapR(pv);
+    r:=AsIGap(pv);
     VType:=VInt;
 
     Result:=@CVNone;
@@ -650,7 +650,7 @@ begin
     if not (VType in IGapTypes) then RaiseError(RangeType);
     if VPhy<>0 then RaiseError(DimDisallow);
     L:=Int;
-    R:=AsIGapR(pv);
+    R:=AsIGap(pv);
   end;
   PostParam(Context);
   s:=AsStr(Param(-2, Context));

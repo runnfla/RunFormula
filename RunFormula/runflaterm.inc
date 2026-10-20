@@ -31,7 +31,7 @@ var L : PValRec = @CVNone;        // init VMode
     tag : TTag;
     tkn : PByte;
     fa, fb, fc, fd : TRFloat;
-    phy, I, J, K, M, Q : SizeInt;
+    phy, I, J, K, Q : SizeInt;
 
   procedure FreeLR; inline;                                    //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
   begin                                            // LVal should be called singly
@@ -226,7 +226,7 @@ begin
                         VFloat : LVal(AsFloat(L)+AsFloat(R));
                         VCplex : LVal(AsRe(L)+AsRe(R), AsIm(L)+AsIm(R));
                         VGap   : LGap(AsLGap(L)+AsLGap(R), AsRGap(L)+AsRGap(R));
-                        VIGap  : if Plus(L^.Int, R^.Int, I) or Plus(AsIGapR(L), AsIGapR(R), J)
+                        VIGap  : if Plus(L^.Int, R^.Int, I) or Plus(AsIGap(L), AsIGap(R), J)
                                    then LGap(TRFloat(L^.Int)+TRFloat(R^.Int), AsRGap(L)+AsRGap(R)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
@@ -235,7 +235,7 @@ begin
                         VFloat : LVal(AsFloat(L)-AsFloat(R));
                         VCplex : LVal(AsRe(L)-AsRe(R), AsIm(L)-AsIm(R));
                         VGap   : LGap(AsLGap(L)-AsRGap(R), AsRGap(L)-AsLGap(R));
-                        VIGap  : if Plus(L^.Int, -AsIGapR(R), I) or Plus(AsIGapR(L), -R^.Int, J)
+                        VIGap  : if Plus(L^.Int, -AsIGap(R), I) or Plus(AsIGap(L), -R^.Int, J)
                                    then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
@@ -252,7 +252,7 @@ begin
                                    MinMax(fb*fc, fb*fd, L);
                                  end;
                         VIGap  : begin
-                                   K:=AsIGapR(L); Q:=AsIGapR(R);
+                                   K:=AsIGap(L); Q:=AsIGap(R);
                                    if Mult(K, R^.Int, I) or Mult(K, Q, J) or Mult(L^.Int, Q, K) or Mult(L^.Int, R^.Int, Q)
                                      then begin
                                        fa:=L^.Int; fb:=AsRGap(L); fc:=R^.Int; fd:=AsRGap(R);
@@ -295,40 +295,35 @@ begin
                         VCplex : LVal(-Flo, -Img);
                         VGap   : LGap(-Img, -Flo);
                         VIGap  : if Int<>LI then LGap(-IGap, -Int) else LGap(-TRFloat(IGap), FALI);
-                        else TypeDisallow(L, R);
+                        else TypeDisallow(VType);
                       end;
         TagNOT      : LVal(not AsInt(R));                                    // not unary
-        TagPower    : with L^ do case VType of                               // **
-                        VNone  : RaiseError(NoneDisallow);
-                        VInt   : if IntPower(Int, AsInt(R), I) then LVal(Power(Int, AsInt(R))) else LVal(I);
-                        VFloat : LVal(Power(Flo, AsInt(R)));
-                        VCplex : CplexPower(Flo, Img);
-                        VChar  : if IntPower(Int, AsInt(R), I) then LVal(Power(Int, AsInt(R))) else LVal(I);
-                        VStr   : RaiseError(StrDisallow);
+        TagPower    : case CaseType[L^.VType, R^.VType] of                   // **
+                        VInt   : if IntPower(L^.Int, R^.Int, I) then LVal(Power(L^.Int, R^.Int)) else LVal(I);
+                        VFloat : LVal(Power(L^.Flo, AsInt(R)));
+                        VCplex : CplexPower(L^.Flo, L^.Img);
                         VGap   : begin
-                                   if not (R^.VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
-                                   K:=AsIGapL(R);
-                                   if (Flo<0) or ((Flo=0) and (K<0)) then RaiseError(InvalidValue);
-                                   M:=AsIGapR(R);
-                                   MinMax(Power(Flo, K), Power(Flo, M), LNone);
-                                   MinMax(Power(Img, K), Power(Img, M), L);
+                                   if not (R^.VType in IGapTypes) then RaiseError(RangeType);
+                                   fa:=AsLGap(L); fb:=AsRGap(L); I:=R^.Int;
+                                   if (fa<0) or ((fa=0) and (I<0)) then RaiseError(InvalidValue);
+                                   J:=AsIGap(R);
+                                   MinMax(Power(fa, I), Power(fa, J), LNone);
+                                   MinMax(Power(fb, I), Power(fb, J), L);
                                  end;
                         VIGap  : begin
-                                   if not (R^.VType in [VInt, VChar, VIGap]) then RaiseError(RangeType);
-                                   K:=AsIGapL(R);
-                                   if (Int<0) or ((Int=0) and (K<0)) then RaiseError(InvalidValue);
-                                   M:=AsIGapR(R);
-                                   if IntPower(Int, K, I) or IntPower(IGap, K, J) or IntPower(Int, M, K) or IntPower(IGap, M, Q)
-                                     then begin
-                                       K:=AsIGapL(R);
-                                       MinMax(Power(Int, K), Power(Int, M), LNone);
-                                       MinMax(Power(IGap, K), Power(IGap, M), L);
-                                     end else begin
-                                       MinMax(I, J, LNone);
-                                       MinMax(K, Q, L);
+                                   if (L^.Int<0) or ((L^.Int=0) and (R^.Int<0)) then RaiseError(InvalidValue);
+                                   K:=AsIGap(L); Q:=AsIGap(R);
+                                   if IntPower(K, R^.Int, I) or IntPower(K, Q, J) or IntPower(L^.Int, Q, K) or IntPower(L^.Int, R^.Int, Q)
+                                    then begin
+                                      fa:=L^.Int; fb:=AsRGap(L); I:=R^.Int; J:=AsIGap(R);
+                                      MinMax(Power(fa, I), Power(fa, J), LNone);
+                                      MinMax(Power(fb, I), Power(fb, J), L);
+                                    end else begin
+                                      MinMax(I, J, LNone);
+                                      MinMax(K, Q, L);
                                    end;
                                  end;
-                        VArr : RaiseError(ArrDisallow);
+                        else TypeDisallow(L, R);
                       end;
         TagPhy      : begin                   // R always must be in BC so FreeTerm(R) is not needed
                         if L^.VAlloc<>LV then L:=ValCopy(L, NewLV(Context));
