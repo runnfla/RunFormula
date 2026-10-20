@@ -240,48 +240,44 @@ begin
                         else TypeDisallow(L, R);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
-                        VNone  : RaiseError(NoneDisallow);
-                        VInt   : if Mult(AsInt(L), AsInt(R), I) then LVal(AsFloat(L)*AsFloat(R)) else LVal(I);
+                        VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
                         VCplex : begin
                                    fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
                                    LVal(fa*fc-fb*fd, fa*fd+fb*fc);
                                  end;
-                        VStr   : RaiseError(StrDisallow);
                         VGap   : begin
                                    fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
                                    MinMax(fa*fc, fa*fd, LNone);
                                    MinMax(fb*fc, fb*fd, L);
                                  end;
                         VIGap  : begin
-                                   I:=AsIGapL(L); J:=AsIGapR(L); K:=AsIGapL(R); M:=AsIGapR(R);
-                                   if Mult(I, K, Q) or Mult(J, K, K) or Mult(I, M, I) or Mult(J, M, J)
+                                   K:=AsIGapR(L); Q:=AsIGapR(R);
+                                   if Mult(K, R^.Int, I) or Mult(K, Q, J) or Mult(L^.Int, Q, K) or Mult(L^.Int, R^.Int, Q)
                                      then begin
-                                       fa:=AsLGap(L); fb:=AsRGap(L); K:=AsIGapL(R);
-                                       MinMax(fa*K, fa*M, LNone);
-                                       MinMax(fb*K, fb*M, L);
+                                       fa:=L^.Int; fb:=AsRGap(L); fc:=R^.Int; fd:=AsRGap(R);
+                                       MinMax(fa*fc, fa*fd, LNone);
+                                       MinMax(fb*fc, fb*fd, L);
                                      end else begin
                                        MinMax(I, J, LNone);
                                        MinMax(K, Q, L);
                                    end;
                                  end;
-                        VArr   : RaiseError(ArrDisallow);
+                        else TypeDisallow(L, R);
                       end;
         TagSlash    : case CaseType[L^.VType, R^.VType] of                   // /
-                        VNone  : RaiseError(NoneDisallow);
                         VInt, VFloat : LVal(AsFloat(L)/AsFloat(R));
                         VCplex : begin
                                    CplexDiv(AsRe(L), AsIm(L), AsRe(R), AsIm(R), fa, fb);
                                    LVal(fa, fb);
                                  end;
-                        VStr   : RaiseError(StrDisallow);
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
                                         if (fc<=0) and (fd>=0) then RaiseError(DivZero);
                                         MinMax(fa/fc, fa/fd, LNone);
                                         MinMax(fb/fc, fb/fd, L);
                                       end;
-                        VArr   : RaiseError(ArrDisallow);
+                        else TypeDisallow(L, R);
                       end;
         TagSHL      : Ichk(L^.Int shl R^.Int);                               // shl <<
         TagSHR      : Ichk(L^.Int shr R^.Int);                               // shr >>
@@ -294,15 +290,12 @@ begin
                         LVal(L^.Int mod R^.Int);
                       end;
         TagNegative : with R^ do case VType of                               // - unary
-                        VNone  : RaiseError(NoneDisallow);
-                        VInt   : if Int<>LI then LVal(-Int) else LVal(FALI);
+                        VInt, VChar : if Int<>LI then LVal(-Int) else LVal(FALI);
                         VFloat : LVal(-Flo);
                         VCplex : LVal(-Flo, -Img);
-                        VChar  : LVal(-SizeInt(Int));
-                        VStr   : RaiseError(StrDisallow);
                         VGap   : LGap(-Img, -Flo);
                         VIGap  : if Int<>LI then LGap(-IGap, -Int) else LGap(-TRFloat(IGap), FALI);
-                        VArr   : RaiseError(ArrDisallow);
+                        else TypeDisallow(L, R);
                       end;
         TagNOT      : LVal(not AsInt(R));                                    // not unary
         TagPower    : with L^ do case VType of                               // **

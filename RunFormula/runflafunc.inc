@@ -549,12 +549,11 @@ var t : SizeInt = 1;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   with Param(-1, Context)^ do case VType of
-    VInt   : if Int=0 then t:=0 else if Int<0 then t:=-1;
+    VInt, VChar : if Int=0 then t:=0 else if Int<0 then t:=-1;
     VFloat : if Flo=0 then t:=0 else if Flo<0 then t:=-1;
     VCplex : if Flo=0 then begin
                if Img=0 then t:=0 else if Img<0 then t:=-1;
              end else if Flo<0 then t:=-1;
-    VChar  : if Int=0 then t:=0;
     VGap   : if (Flo<=0) and (Img>=0) then t:=0 else if Flo<0 then t:=-1;
     VIGap  : if (Int<=0) and (IGap>=0) then t:=0 else if Int<0 then t:=-1;
     else TypeDisallow(VType);
