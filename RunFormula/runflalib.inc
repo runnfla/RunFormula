@@ -181,19 +181,18 @@ begin
   Result:=false;
 end;
 
-function Power(Base:TRFloat; Scale:SizeInt):TRFloat;       //DONE -oRFla.Lib -cRev.2026.09.08: Func Power
-var i : SizeInt;            // Base^Scl
-begin
+function Power(Base:TRFloat; Scale:SizeInt):TRFloat;       //DONE -oRFla.Lib -cRev.2026.10.21: Func Power
+begin                        // Base^Scl
   if Scale=1 then Exit(Base);
+  if Scale<0 then Base:=1/Base;
+  Scale:=abs(Scale);
   Result:=1;
-  i:=abs(Scale);
   repeat
-    if (i and 1)<>0 then Result:=Result*Base;
-    i:=i shr 1;
-    if i=0 then break;
+    if (Scale and 1)<>0 then Result:=Result*Base;
+    Scale:=Scale shr 1;
+    if Scale=0 then break;
     Base:=sqr(Base);
   until false;
-  if Scale<0 then Result:=1/Result;
 end;
 
 function Hypot2(const X, Y:TRFloat):TRFloat;               //DONE -oRFla.Lib -cRev.2026.08.27: Func Hypot2
@@ -205,6 +204,12 @@ begin
   if X=0 then exit;                      // Smith's algorithm
   if ax<Result then Result:=Result*sqrt(sqr(ax/Result)+1)
     else Result:=ax*sqrt(sqr(Result/ax)+1);
+end;
+
+procedure CplexMult(const FA, FB, FC, FD:TRFloat; out Re, Im:TRFloat); inline;
+begin                                       //DONE -oRFla.Lib -cRev.2026.10.21: Inline CplexMult
+  Re:=FA*FC-FB*FD;
+  Im:=FA*FD+FB*FC;
 end;
 
 procedure CplexDiv(const FA, FB, FC, FD:TRFloat; out Re, Im:TRFloat);

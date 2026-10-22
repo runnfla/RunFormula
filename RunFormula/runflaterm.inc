@@ -121,48 +121,19 @@ var L : PValRec = @CVNone;        // init VMode
     LVal(I);
   end;
 
-  function IntPower(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.09.08: Func IntPower
-  var re : SizeInt = 1;       // Base^Scl
+  function IntPower(Base, Scale:SizeInt; out R:SizeInt):boolean;  //DONE -oRFla.Term -cRev.2026.10.21: Func IntPower
+  var rt : SizeInt = 1;       // Base^Scl
   begin
     Result:=true;
     if Scale<0 then exit;
     repeat
-      if (Scale and 1)<>0 then if Mult(Base, re, re) then exit;
+      if (Scale and 1)<>0 then if Mult(Base, rt, rt) then exit;
       Scale:=Scale shr 1;
       if Scale=0 then break;
       if Mult(Base, Base, Base) then exit;
     until false;
-    R:=re;
+    R:=rt;
     Result:=false;
-  end;
-
-  procedure CplexPower(BRE, BIM:TRFloat);                      //DONE -oRFla.Term -cRev.2026.09.12: Proc CplexPower
-  var re : TRFloat = 1;
-      im : TRFloat = 0;
-      t : TRFloat;
-      scl, i : SizeInt;
-  begin
-    scl:=AsInt(R);
-    i:=abs(scl);
-    repeat
-      if (i and 1)<>0 then begin
-        t:=re*BRE-im*BIM;
-        im:=re*BIM+im*BRE;
-        re:=t;
-      end;
-      i:=i shr 1;
-      if i=0 then break;
-      t:=sqr(BRE)-sqr(BIM);
-      BIM:=BRE*BIM*2;
-      BRE:=t;
-    until false;
-    if scl<0 then CplexDiv(1, 0, re, im, re, im);
-    FreeLR;
-    with L^ do begin
-      Flo:=re;
-      Img:=im;
-      VType:=VCplex;
-    end
   end;
 
   procedure Concat;                                            //DONE -oRFla.Term -cRev.2026.04.26: Proc Concat
@@ -243,8 +214,8 @@ begin
                         VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
                         VCplex : begin
-                                   fa:=AsRe(L); fb:=AsIm(L); fc:=AsRe(R); fd:=AsIm(R);
-                                   LVal(fa*fc-fb*fd, fa*fd+fb*fc);
+                                   CplexMult(AsRe(L), AsIm(L), AsRe(R), AsIm(R), fa, fb);
+                                   LVal(fa, fb);
                                  end;
                         VGap   : begin
                                    fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
@@ -273,7 +244,7 @@ begin
                                  end;
                         VGap, VIGap : begin
                                         fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
-                                        if (fc<=0) and (fd>=0) then RaiseError(DivZero);
+                                        if (fd>=0) and (fc<=0) then RaiseError(DivZero);
                                         MinMax(fa/fc, fa/fd, LNone);
                                         MinMax(fb/fc, fb/fd, L);
                                       end;
@@ -301,10 +272,23 @@ begin
         TagPower    : case CaseType[L^.VType, R^.VType] of                   // **
                         VInt   : if IntPower(L^.Int, R^.Int, I) then LVal(Power(L^.Int, R^.Int)) else LVal(I);
                         VFloat : LVal(Power(L^.Flo, AsInt(R)));
-                        VCplex : CplexPower(L^.Flo, L^.Img);
+                        VCplex : begin
+                                   with L^ do begin fa:=Flo; fb:=Img; end;
+                                   I:=AsInt(R);
+                                   if I<0 then CplexDiv(1, 0, fa, fb, fa, fb);
+                                   fc:=1; fd:=0;
+                                   I:=abs(I);
+                                   repeat
+                                     if (I and 1)<>0 then CplexMult(fa, fb, fc, fd, fc, fd);
+                                     I:=I shr 1;
+                                     if I=0 then break;
+                                     CplexMult(fa, fb, fa, fb, fa, fb);
+                                   until false;
+                                   LVal(fc, fd);
+                                 end;
                         VGap   : begin
                                    if not (R^.VType in IGapTypes) then RaiseError(RangeType);
-                                   fa:=AsLGap(L); fb:=AsRGap(L); I:=R^.Int;
+                                   I:=R^.Int; fb:=AsRGap(L); fa:=AsLGap(L);
                                    if (fa<0) or ((fa=0) and (I<0)) then RaiseError(InvalidValue);
                                    J:=AsIGap(R);
                                    MinMax(Power(fa, I), Power(fa, J), LNone);
@@ -314,13 +298,13 @@ begin
                                    if (L^.Int<0) or ((L^.Int=0) and (R^.Int<0)) then RaiseError(InvalidValue);
                                    K:=AsIGap(L); Q:=AsIGap(R);
                                    if IntPower(K, R^.Int, I) or IntPower(K, Q, J) or IntPower(L^.Int, Q, K) or IntPower(L^.Int, R^.Int, Q)
-                                    then begin
-                                      fa:=L^.Int; fb:=AsRGap(L); I:=R^.Int; J:=AsIGap(R);
-                                      MinMax(Power(fa, I), Power(fa, J), LNone);
-                                      MinMax(Power(fb, I), Power(fb, J), L);
-                                    end else begin
-                                      MinMax(I, J, LNone);
-                                      MinMax(K, Q, L);
+                                     then begin
+                                       fa:=L^.Int; fb:=AsRGap(L); I:=R^.Int; J:=AsIGap(R);
+                                       MinMax(Power(fa, I), Power(fa, J), LNone);
+                                       MinMax(Power(fb, I), Power(fb, J), L);
+                                     end else begin
+                                       MinMax(I, J, LNone);
+                                       MinMax(K, Q, L);
                                    end;
                                  end;
                         else TypeDisallow(L, R);

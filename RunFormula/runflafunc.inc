@@ -337,12 +337,16 @@ begin
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    if pv^.VType in IGapTypes then begin
-      Int:=pv^.Int;
-      VType:=VInt;
-    end else begin
-      Flo:=AsLGap(pv);
-      VType:=VFloat;
+    case pv^.VType of
+      VInt, VChar, VIGap : begin
+                             Int:=pv^.Int;
+                             VType:=VInt;
+                           end;
+      VFloat, VGap : begin
+                       Flo:=pv^.Flo;
+                       VType:=VFloat;
+                      end;
+      else TypeDisallow(pv^.VType);
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -356,13 +360,24 @@ begin
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-1, Context);
-    VType:=VInt;
     case pv^.VType of
-      VInt, VChar : Int:=pv^.Int;
-      VIGap       : Int:=pv^.IGap;
-      else
-        Flo:=AsRGap(pv);
-        VType:=VFloat;
+      VInt, VChar : begin
+                      Int:=pv^.Int;
+                      VType:=VInt;
+                    end;
+      VFloat : begin
+                 Flo:=pv^.Flo;
+                 VType:=VFloat;
+               end;
+      VGap   : begin
+                 Flo:=pv^.Img;
+                 VType:=VFloat;
+               end;
+      VIGap  : begin
+                 Int:=pv^.IGap;
+                 VType:=VInt;
+               end;
+      else TypeDisallow(pv^.VType);
     end;
     VPhy:=pv^.VPhy;
   end;
