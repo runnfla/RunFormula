@@ -72,7 +72,7 @@ end;
 function AlignString(Lng:SizeInt):SizeInt; inline;        //DONE -oRFla.Parse -cRev.2026.05.01: Inline AlignString
 begin
   Result:=Lng+(SAnsiRec+1);                                      // with trailing null
-  if (Result and (SI-1))>0 then Result:=(Result or (SI-1))+1;    // aligning to SizeInt
+  if (Result and SIm1)>0 then Result:=(Result or (SI-1))+1;    // aligning to SizeInt
 end;
 
 procedure WriteString(P:PByte; Lng, Size:SizeInt; Mask:integer=$20202020);
@@ -153,6 +153,13 @@ begin
 end;
 
 procedure DoParse(P:PChar);                           //DONE -oRFla.Parse -cRev.2026.05.03: Proc DoParse
+const CVtrue   : TValRec = (VType : VInt;   VAlloc : BC; VPhy : 0; Int : -1);
+      CVfalse  : TValRec = (VType : VInt;   VAlloc : BC; VPhy : 0; Int : 0);
+      CVpi     : TValRec = (VType : VFloat; VAlloc : BC; VPhy : 0; Flo : Cpi);
+      CVelr    : TValRec = (VType : VFloat; VAlloc : BC; VPhy : 0; Flo : Celr);
+      CVmaxint : TValRec = (VType : VInt;   VAlloc : BC; VPhy : 0; Int : HI);
+      CVminint : TValRec = (VType : VInt;   VAlloc : BC; VPhy : 0; Int : LI+1);
+      CVcplexj : TValRec = (VType : VCplex; VAlloc : BC; VPhy : 0; Flo : 0; Img : 1);
 var vr : TValRec;
     tf : PChar;                     // textfin
     S : string;
@@ -176,68 +183,38 @@ var vr : TValRec;
     WriteString(PByte(P), Lng, sz, 0);
   end;
 
-  procedure ValueToken(constref V:TValRec; Phy:SizeInt=0);   //DONE -oRFla.Parse -cRev.2026.05.10: Proc ValueToken
+  procedure ValueToken(var V:TValRec);                //DONE -oRFla.Parse -cRev.2026.05.10: Proc ValueToken
   var L : SizeInt;
-      pv : PValRec;
   begin
     case V.VType of
-      VNone  : begin NoneToken; exit; end;
-      VInt, VChar : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
-      VFloat : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
+      VNone        : L:=PtrUint(@TToken(nil^).ValRec.Int);
+      VInt, VChar  : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
+      VFloat       : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
-      VStr   : begin TextToken(PChar(V.Str), V.Ansi[-1]); exit; end;
-      VIGap  : L:=PtrUint(@TToken(nil^).ValRec.IGap)+SI;
+  //    VStr   : begin TextToken(PChar(V.Str), V.Ansi[-1]); exit; end;
+      VIGap        : L:=PtrUint(@TToken(nil^).ValRec.IGap)+SI;
     end;
-    if (L and (SI-1))>0 then L:=(L or (SI-1))+1;         // aligning to SizeInt
+    L:=(L+SIm1) and (not SIm1);                          // aligning to SizeInt
     Sequence(TagValue);
     RequestBuf(L);
     with PToken(BufP)^ do begin
       Tag:=TagValue;
       Source:=FlaPos;
       Size:=L;
-      pv:=@ValRec;
-      with pv^ do begin
+      with ValRec do begin
         VType:=V.VType;
         VAlloc:=BC;
-        VPhy:=Phy;
         case V.VType of
-          VInt, VChar : Int:=V.Int;
-          VFloat : Flo:=V.Flo;
+          VInt, VChar  : Int:=V.Int;
+          VFloat       : Flo:=V.Flo;
           VCplex, VGap : begin Flo:=V.Flo; Img:=V.Img; end;
-          VIGap  : begin Int:=V.Int; IGap:=V.IGap; end;
+          VIGap        : begin Int:=V.Int; IGap:=V.IGap; end;
         end;
+        VPhy:=V.VPhy;
       end;
     end;
     TokenAddr:=BufP;
     inc(BufP, L);
-  end;
-
-  procedure IntToken(I:SizeInt); inline;              //DONE -oRFla.Parse -cRev.2026.04.30: Inline IntToken
-  begin
-    with vr do begin
-      VType:=VInt;
-      Int:=I;
-    end;
-    ValueToken(vr);
-  end;
-
-  procedure FloatToken(const F:TRFloat); inline;      //DONE -oRFla.Parse -cRev.2026.04.30: Inline FloatToken
-  begin
-    with vr do begin
-      VType:=VFloat;
-      Flo:=F;
-    end;
-    ValueToken(vr);
-  end;
-
-  procedure CplexToken(const Re, Im:TRFloat); inline; //DONE -oRFla.Parse -cRev.2026.04.30: Inline CplexToken
-  begin
-    with vr do begin
-      VType:=VCplex;
-      Flo:=Re;
-      Img:=Im;
-    end;
-    ValueToken(vr);
   end;
 
   procedure CharToken(Chr:byte); inline;              //DONE -oRFla.Parse -cRev.2026.10.06: Inline CharToken
@@ -366,13 +343,18 @@ begin
                 end;
       '-' : if PreTag>=TagOp then OpToken(TagNegative, true) else OpToken(TagMinus);
       '/' : OpToken(TagSlash);
-      '0'..'9' : begin
+      '0'..'9' : with vr do begin
                    tf:=FindTextFin(P);
-                   I:=IntCapture(P, tf, flg);
+                   Int:=IntCapture(P, tf, flg);
                    if flg then begin
-                     IntToken(I);
+                     VType:=VInt;
                      P:=tf;
-                   end else FloatToken(FloatCapture(P));
+                   end else begin
+                     Flo:=FloatCapture(P);
+                     VType:=VFloat;
+                   end;
+                   VPhy:=0;
+                   ValueToken(vr);
                    continue;
                  end;
       '<' : OpToken(TagLess);
@@ -385,7 +367,7 @@ begin
               inc(P);
               tf:=FindTextFin(P, ']');
               ParseValue(P, tf, @vr);
-              ValueToken(vr, vr.VPhy);
+              ValueToken(vr);
               P:=tf;
             end;
       ']' : begin
@@ -402,7 +384,7 @@ begin
                                   ApplyPhyToPV(ValCopy(@PToken(TokenAddr)^.ValRec, @vr), I, scl, ofs);
                                   BufP:=TokenAddr;
                                   PreTag:=TagOp;
-                                  ValueToken(vr, vr.VPhy);
+                                  ValueToken(vr);
                                 end else with PToken(TokenAddr)^.ValRec do begin
                                   if VPhy<>0 then raise EError.Create(DimExists);
                                   VPhy:=I;
@@ -411,14 +393,14 @@ begin
                 TagVar,
                 TagArray,
                 TagBracket,
-                TagDo       : begin
+                TagDo       : with vr do begin
                                 OpToken(TagPhy);
-                                with vr do begin
-                                  VType:=VCplex;
-                                  Flo:=scl;
-                                  Img:=ofs;
-                                  ValueToken(vr, I);
-                                end;
+                                VType:=VCplex;
+                                Flo:=scl;
+                                Img:=ofs;
+                                VType:=VCplex;
+                                VPhy:=I;
+                                ValueToken(vr);
                               end;
                 TagText,
                 TagNone     : raise EError.Create(DimlessValue);
@@ -469,7 +451,7 @@ begin
             with PFlaRec(MemListInsert(DefList, not I))^ do begin
               ID:=PByte(P);
               Lng:=tf-P;
-              P:=FirstChar(tf, [#$22, #$27])+1;
+              P:=FirstChar(tf, [#$7, #$22, #$27])+1;
               tf:=FindTextFin(P, (P-1)^);
               I:=tf-P;
               if I=0 then begin                         // avoid ""
@@ -484,19 +466,20 @@ begin
             P:=tf+1;
             continue;
           end;
-          if IsKey('true') then begin IntToken(-1); continue; end;
-          if IsKey('false') then begin IntToken(0); continue; end;
+          if IsKey('true') then begin ValueToken(CVtrue); continue; end;
+          if IsKey('false') then begin ValueToken(CVfalse); continue; end;
           if IsKey('shl') then begin OpToken(TagSHL); continue; end;
           if IsKey('shr') then begin OpToken(TagSHR); continue; end;
           if IsKey('div') then begin OpToken(TagDIV); continue; end;
           if IsKey('mod') then begin OpToken(TagMOD); continue; end;
           if IsKey('xor') then begin OpToken(TagXOR); continue; end;
-          if IsKey('pi') then begin FloatToken(Cpi); continue; end;
-          if IsKey('e') then begin FloatToken(CElr); continue; end;
-          if IsKey('j') then begin CplexToken(0, 1); continue; end;
-          if IsKey('maxint') then begin IntToken(HI); continue; end;
-          if IsKey('minint') then begin IntToken(LI+1); continue; end;
-          if IsKey('none') then begin NoneToken; continue; end;
+          if IsKey('pi') then begin ValueToken(CVpi); continue; end;
+          if IsKey('e') then begin ValueToken(CVelr); continue; end;
+          if IsKey('j') then begin ValueToken(CVcplexj); continue; end;
+          if IsKey('maxint') then begin ValueToken(CVmaxint); continue; end;
+          if IsKey('minint') then begin ValueToken(CVminint); continue; end;
+          if IsKey('none') then begin ValueToken(CVnone); continue; end;
+
           if IsKey('error') then raise EError.Create(Unsupported);
           if IsKey('const') then raise EError.Create(Unsupported);
           if IsKey('global') then raise EError.Create(Unsupported);

@@ -20,7 +20,7 @@
 function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_RESULT
 begin
   case ParamCount of
-    0 : Context.TermResult:=@CVNone;
+    0 : Context.TermResult:=@CVnone;
     1 : Context.TermResult:=Param(-1, Context);
     else RaiseError(ParamNumber);
   end;
@@ -30,7 +30,7 @@ end;
 function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_EXIT
 begin
   case ParamCount of
-    0 : Result:=@CVNone;
+    0 : Result:=@CVnone;
     1 : Result:=Param(-1, Context);
     else RaiseError(ParamNumber);
   end;
@@ -40,7 +40,7 @@ end;
 function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_BREAK
 begin
   case ParamCount of
-    0 : Result:=@CVNone;
+    0 : Result:=@CVnone;
     1 : Result:=Param(-1, Context);
     else RaiseError(ParamNumber);
   end;
@@ -51,7 +51,7 @@ function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE 
 begin
   if ParamCount<>0 then RaiseError(ParamNumber);
   Context.Flow:=CON;
-  Result:=@CVNone;
+  Result:=@CVnone;
 end;
 
 function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_IF
@@ -61,7 +61,7 @@ begin
   ParamCount:= - ParamCount;
   b:=AsBool(Param(ParamCount, Context));
   PostParam(Context);
-  Result:=@CVNone;
+  Result:=@CVnone;
   if b then Result:=Param(ParamCount+1, Context)
     else if ParamCount=-3 then Result:=Param(-1, Context);
 end;
@@ -90,7 +90,7 @@ function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE 
 var b : boolean;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  Result:=@CVNone;
+  Result:=@CVnone;
   repeat
     b:=AsBool(Param(-2, Context));
     PostParam(Context);
@@ -121,7 +121,7 @@ begin
     r:=AsIGap(pv);
     VType:=VInt;
 
-    Result:=@CVNone;
+    Result:=@CVnone;
     repeat
       PostParam(Result, Context);
       Result:=Param(-1, Context);
@@ -1022,7 +1022,7 @@ begin
     end;
     if pv^.VPhy<>0 then begin
       phy.DI:=pv^.VPhy;
-      for i:=0 to SI-1 do begin
+      for i:=0 to SIm1 do begin
         t:=phy.DB[i] div 3;
         if (t*3)<>phy.DB[i] then RaiseError(DimDisallow);
         phy.DB[i]:=t;

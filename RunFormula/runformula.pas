@@ -82,7 +82,7 @@ var lst : PMemList;
 begin
   with Context, PToken(Pnt)^ do begin
 
-           TermResult:=@CVNone;       ///!!!?     for exception
+           TermResult:=@CVnone;       ///!!!?     for exception
 
     ProcToken:=Pnt;
     case Tag of
@@ -111,7 +111,7 @@ begin
       TagBracket, TagCode : begin
                               fin:=Pnt+Size;
                               p:=Pnt+ExprTokenSize;
-                              Result:=@CVNone;
+                              Result:=@CVnone;
                               while (p<fin) and (Flow=NML) do begin
                                 FreeTerm(Result);
                                 fn:=p+PToken(p)^.Size;
@@ -158,7 +158,7 @@ begin
                    if i<FuncArg.Count then raise EError.Create(ParamNumber, Pnt);
                    for i:=FuncArg.Count-1 downto idx do FreeTerm(PPValRec(FuncArg.List[i])^);
                    FuncArg.Count:=idx;
-                   Result:=@CVNone;
+                   Result:=@CVnone;
                    while (p<fin) and (Flow=NML) do begin
                      FreeTerm(Result);
                      fn:=p+PToken(p)^.Size;
@@ -188,9 +188,9 @@ begin
                      InitVar(p, nil, false);
                      inc(p, PToken(p)^.Size);
                    end;
-                   Result:=@CVNone;
+                   Result:=@CVnone;
                  end;
-      TagSubr, TagNone : Result:=@CVNone;
+      TagSubr, TagNone : Result:=@CVnone;
       TagExpr  : begin
                    p:=Pnt+ExprTokenSize;
                    Result:=Expr(p, Pnt+Size, 0);
@@ -270,14 +270,14 @@ var Context : TContext;
   end;
 
 begin
-  Result:=@CVNone;
+  Result:=@CVnone;
   p:=PByte(Fla);
   with Context do begin
     MemListInit(LVStack, SValRec, LVStackGrow);
     MemListInit(VarPool, SizeOf(TMemList), VarPoolGrow);
     MemListInit(FuncArg, SPtr, ParamGrow);
     RunFlaVar:=FlaVar;
-    TermResult:=@CVNone;
+    TermResult:=@CVnone;
     ProcToken:=@InitProc;
     ByteCode:=p;
     Flow:=NML;

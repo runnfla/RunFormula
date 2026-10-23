@@ -26,7 +26,7 @@ begin                              // like PostParam
 end;
 
 function Expr(var P:PByte; Fin:PByte; Level:SizeInt):PValRec;  //DONE -oRFla.Term -cRev.2026.05.18: Func Expr
-var L : PValRec = @CVNone;        // init VMode
+var L : PValRec = @CVnone;        // init VMode
     R : PValRec;
     tag : TTag;
     tkn : PByte;
@@ -288,7 +288,8 @@ begin
                                  end;
                         VGap   : begin
                                    if not (R^.VType in IGapTypes) then RaiseError(RangeType);
-                                   I:=R^.Int; fb:=AsRGap(L); fa:=AsLGap(L);
+                                   I:=R^.Int;
+                                   fb:=AsRGap(L); fa:=AsLGap(L);
                                    if (fa<0) or ((fa=0) and (I<0)) then RaiseError(InvalidValue);
                                    J:=AsIGap(R);
                                    MinMax(Power(fa, I), Power(fa, J), LNone);
@@ -299,7 +300,8 @@ begin
                                    K:=AsIGap(L); Q:=AsIGap(R);
                                    if IntPower(K, R^.Int, I) or IntPower(K, Q, J) or IntPower(L^.Int, Q, K) or IntPower(L^.Int, R^.Int, Q)
                                      then begin
-                                       fa:=L^.Int; fb:=AsRGap(L); I:=R^.Int; J:=AsIGap(R);
+                                       fa:=L^.Int; fb:=AsRGap(L);
+                                       I:=R^.Int; J:=AsIGap(R);
                                        MinMax(Power(fa, I), Power(fa, J), LNone);
                                        MinMax(Power(fb, I), Power(fb, J), L);
                                      end else begin
@@ -387,7 +389,16 @@ procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Ter
 var S : string;
     p : PVrtRec;
 begin
+
+  exit;
+
   p:=@V;
+
+  if p=nil then begin
+    PV^.VType:=Vnone;
+    exit;
+  end;
+
   with PV^ do case p^.VrType of
     VrEmpty, VrNull : VType:=VNone;
     VrSmallInt : begin Int:=PSmallInt(@p^.VrData)^; VType:=VInt; end;

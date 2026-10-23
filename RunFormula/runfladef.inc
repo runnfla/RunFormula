@@ -131,12 +131,13 @@ const
   LI = low(SizeInt);
   HI = high(SizeInt);
   SI = SizeOf(SizeInt);
+  SIm1 = SI-1;
   Sint = SizeOf(integer);
   SPtr = SizeOf(pointer);
   SRFloat = SizeOf(TRFloat);
   FALI = abs(TRFloat(LI));
   Cpi = 3.14159265358979323846;
-  CElr = 2.71828182845904523536;
+  Celr = 2.71828182845904523536;
 
   AbbrMaxSize = 15;       // maximum size of unit abbreviation in bytes
 
@@ -207,7 +208,7 @@ type
   TDPhy = packed record
     case byte of
       0 : (DI : SizeInt);
-      1 : (DB : array[0..SI-1] of ShortInt);
+      1 : (DB : array[0..SIm1] of ShortInt);
   end;
 
   EError = class(Exception)
@@ -246,7 +247,7 @@ const
   FirstChars : TCharSet = ['A'..'Z', '_', 'a'..'z'];
   UnitChars : TCharSet = ['0'..'9', 'A'..'Z', 'a'..'z', #$80..#$FF];
 
-  CVNone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
+  CVnone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
 
   CEmptyStr : packed record
       AnsiRec : TAnsiRec;

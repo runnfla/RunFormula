@@ -28,8 +28,8 @@ begin
     dec(pd, SI);
     dec(ps, SI);
   end;
-  inc(pd, SI-1);
-  inc(ps, SI-1);
+  inc(pd, SIm1);
+  inc(ps, SIm1);
   while ps>=Src do begin
     pd^:=ps^;
     dec(pd);
@@ -286,7 +286,7 @@ var dx, dy, dr : TDPhy;
 begin
   dx.DI:=X;
   dy.DI:=Y;
-  for i:=0 to SI-1 do begin
+  for i:=0 to SIm1 do begin
     t:=dx.DB[i]+dy.DB[i];
     if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(DimOver);
     dr.DB[i]:=ShortInt(t);
@@ -300,7 +300,7 @@ var dx, dy, dr : TDPhy;
 begin
   dx.DI:=X;
   dy.DI:=Y;
-  for i:=0 to SI-1 do begin
+  for i:=0 to SIm1 do begin
     t:=dx.DB[i]-dy.DB[i];
     if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(DimOver);
     dr.DB[i]:=ShortInt(t);
@@ -314,7 +314,7 @@ var dx, dr : TDPhy;
 begin
   if (M>high(ShortInt)) or (M<=low(ShortInt)) then raise EError.Create(DimOver);
   dx.DI:=X;
-  for i:=0 to SI-1 do begin
+  for i:=0 to SIm1 do begin
     t:=dx.DB[i]*M;
     if (t>high(ShortInt)) or (t<=low(ShortInt)) then raise EError.Create(DimOver);
     dr.DB[i]:=ShortInt(t);

@@ -507,7 +507,7 @@ begin
     dy.DI:=Sig;
     exp:=high(ShortInt);
     emns:=high(ShortInt);
-    for b:=0 to SI-1 do if dy.DB[b]<>0 then begin
+    for b:=0 to SIm1 do if dy.DB[b]<>0 then begin
       if dx.DB[b]=0 then begin
         exp:=0;
         emns:=0;

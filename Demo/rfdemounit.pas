@@ -165,7 +165,8 @@ begin
       ', Position '+IntToStr(Source)+', Token size '+IntToStr(sz);
     if Tag<TagAssign then info:=info+', Next '+IntToStr(p-PByte(cod)+Size);
     case Tag of
-      TagValue : with ValRec do case VType of
+      TagValue : begin
+                   with ValRec do case VType of
                    VNone  : S:=': None';
                    VInt   : S:=': Int = '+IntToStr(Int)+' [0x'+IntToHex(Int)+']';
                    VFloat : S:=': Float = '+FloatToStr(Flo);
@@ -177,6 +178,10 @@ begin
                             end;
                    VGap   : S:=': Range = ['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
                    VIGap  : S:=': Integer Range = ['+IntToStr(Int)+':'+IntToStr(IGap)+']';
+                   end;
+
+                   S:=S+' Phy: '+IntToHex(ValRec.VPhy);
+
                  end;
       TagVar : S:=': ID '+IntToStr(Index)+' <'+
                  string(fin+PSizeInt(fin+Index*SI+OpTokenSize)^+OpTokenSize)+'>';
