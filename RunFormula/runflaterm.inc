@@ -191,6 +191,7 @@ begin
         TagLess     : LVal(Compare(L, R, true)<0);                           // <
         TagNotLess  : LVal(Compare(L, R, true)>=0);                          // >=
         TagNotGreat : LVal(Compare(L, R, true)<=0);                          // <=
+        TagIN       : LVal((Compare(L, R) and 1)=0);                         // in
         TagConcat   : Concat;                                                // &
         TagPlus     : case CaseType[L^.VType, R^.VType] of                   // +
                         VInt   : if Plus(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)+TRFloat(R^.Int)) else LVal(I);

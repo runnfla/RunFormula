@@ -326,7 +326,7 @@ procedure ApplyPhyToPV(PV:PValRec; Phy:SizeInt; const Scl, Offs:TRFloat);
 begin                                                      //DONE -oRFla.Lib -cRev.2026.05.30: Proc ApplyPhyToPV
   with PV^ do begin
     if VPhy<>0 then raise EError.Create(DimExists);
-    if VType in [VNone, VChar, VStr, VArr] then raise EError.Create(DimlessValue);
+    if VType in [VChar, VStr, VArr] then raise EError.Create(DimlessValue);
     if (Scl<>1) or (Offs<>0) then case VType of
       VInt   : begin
                  VType:=VFloat;
@@ -545,15 +545,15 @@ begin
   end;
 end;
 
-function Compare(L, R:PValRec; Ineq:boolean=false):SizeInt;      //DONE -oRFla.Lib -cRev.2026.00.00: Func Compare
+function Compare(L, R:PValRec; Ineq:boolean=false):SizeInt;      //DONE -oRFla.Lib -cRev.2026.10.26: Func Compare
 var IL, IR : SizeInt;
-    FL, FR, ML, MR : TRFloat;
+    fa, fb, fc, fd : TRFloat;
 
-  function DiffStr:SizeInt;                                //DONE -oRFla.Lib -cRev.2026.04.26: Func DiffStr
+  function DiffStr:SizeInt;                                //DONE -oRFla.Lib -cRev.2026.10.26: Func DiffStr
   var lng : SizeInt = 0;                   // not inline, diffsize = 8
       px, py, fin : PByte;
-      sx, sy : string;
-  begin                                    // should be ansistrings, null terminator is used
+      sx, sy : string;                     // ansistrings, null terminator is used
+  begin
     sx:=AsStr(L);
     px:=PByte(sx);
     if px<>nil then lng:=PSizeInt(px)[-1];
@@ -582,12 +582,12 @@ var IL, IR : SizeInt;
 begin
   Result:=0;
   case CaseType[L^.VType, R^.VType] of
-    VNone : begin
-              if Ineq then RaiseError(NoneDisallow);
-              if (L^.VType=VNone) and (R^.VType=VNone) then begin
-                if L^.VPhy=R^.VPhy then exit;
-              end else if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
-            end;
+    VNone  : begin
+               if Ineq then RaiseError(NoneDisallow);
+               if (L^.VType=VNone) and (R^.VType=VNone) then begin
+                 if L^.VPhy=R^.VPhy then exit;
+               end else if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
+             end;
     VInt   : begin
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
                if L^.Int=R^.Int then exit;
@@ -595,9 +595,9 @@ begin
              end;
     VFloat : begin
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
-               FL:=AsFloat(L); FR:=AsFloat(R);
-               if FR=FL then exit;
-               if FL>FR then Exit(1);
+               fa:=AsFloat(L); fb:=AsFloat(R);
+               if fa=fb then exit;
+               if fa>fb then Exit(1);
              end;
     VCplex : begin
                if Ineq then RaiseError(CplexDisallow);
@@ -612,16 +612,16 @@ begin
     VGap   : begin
                if Ineq then RaiseError(RangeDisallow);
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
-               FL:=AsLGap(L); FR:=AsLGap(R); ML:=AsRGap(L); MR:=AsRGap(R);
-               if (MR=ML) and (FR=FL) then exit;
-               if (FL>=FR) and (ML<=MR) then Exit(2);
+               fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
+               if (fa=fc) and (fb=fd) then exit;
+               if (fa>=fc) and (fb<=fd) then Exit(2);
              end;
     VIGap  : begin
                if Ineq then RaiseError(RangeDisallow);
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
                IL:=AsIGap(L); IR:=AsIGap(R);
                if (IR=IL) and (L^.Int=R^.Int) then exit;
-               if (IL<=IR) and (L^.Int>=R^.Int) then Exit(2);
+               if (L^.Int>=R^.Int) and (IL<=IR) then Exit(2);
              end;
     VArr   : RaiseError(ArrDisallow);
   end;

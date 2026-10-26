@@ -222,6 +222,7 @@ var vr : TValRec;
     with vr do begin
       Int:=Chr;
       VType:=VChar;
+      VPhy:=0;
     end;
     ValueToken(vr);
   end;
@@ -415,6 +416,7 @@ begin
           if IsKey('and') then begin OpToken(TagAND); continue; end;
           if IsKey('or') then begin OpToken(TagOR); continue; end;
           if IsKey('not') then begin OpToken(TagNOT, true); continue; end;
+          if IsKey('in') then begin OpToken(TagIN); continue; end;
           if IsKey('func') then begin
             FirstChar(tf, FirstChars);                // check first char
             ExprToken(TagSubr, TagSubr);

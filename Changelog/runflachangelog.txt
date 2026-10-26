@@ -73,4 +73,6 @@ IncompType_NG
 - удалены InvalidType IncompType_FI IncompType_CI IncompType_GI
 - точка как разделитель в размерностях
 - find(X, "") возвращает 0 (offset), not -1
+- new binary ops - in
+- fix  integer-bounded interval exponentiation
 

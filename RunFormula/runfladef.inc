@@ -46,6 +46,7 @@ type
     TagLess,              // <
     TagNotLess,           // >=
     TagNotGreat,          // <=
+    TagIN,                // in
     TagConcat,            // &
     TagPlus,              // +
     TagMinus,             // -
@@ -307,6 +308,7 @@ const
     40,      // TagLess       <
     40,      // TagNotLess    >=
     40,      // TagNotGreat   <=
+    40,      // TagIN         in
     50,      // TagConcat     &
     60,      // TagPlus       +
     60,      // TagMinus      -         10-5-2 = 3, not 7
@@ -328,12 +330,12 @@ const
 // results: VNone VInt VFloat VCplex VStr VGap VIGap VArr
 //           VNone  VInt    VFloat  VRsvd  VCplex  VChar   VStr    VGap    VIGap   VArr
 { VNone  } ( VNone, VNone,  VNone,  VRsvd, VNone,  VNone,  VNone,  VNone,  VNone,  VArr  ),
-{ VInt   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
+{ VInt   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VFloat, VGap,   VIGap,  VArr  ),
 { VFloat } ( VNone, VFloat, VFloat, VRsvd, VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
 { VRsvd  } ( VRsvd, VRsvd,  VRsvd,  VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
 { VCplex } ( VNone, VCplex, VCplex, VRsvd, VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
 { VChar  } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
-{ VStr   } ( VNone, VStr,   VFloat, VRsvd, VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
+{ VStr   } ( VNone, VFloat, VFloat, VRsvd, VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
 { VGap   } ( VNone, VGap,   VGap,   VRsvd, VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
 { VIGap  } ( VNone, VIGap,  VGap,   VRsvd, VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
 { VArr   } ( VArr,  VArr,   VArr,   VArr,  VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
