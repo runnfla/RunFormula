@@ -284,7 +284,7 @@ begin
     if InDef=0 then FlaPos:=P-pointer(Fla);
     flg:=true;
     case PWord(P)^ of
-  {$ifdef ENDIAN_LITTLE}
+{$ifdef ENDIAN_LITTLE}
       $2A2A : OpToken(TagPower);                // **
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
@@ -293,16 +293,24 @@ begin
       $3D3E : OpToken(TagNotLess);              // >=
       $3E3C : OpToken(TagNotEqual);             // <>
       $3E3E : OpToken(TagSHR);                  // >>
-  {$else}
+      $712A : OpToken(TagMultQD);               // *q
+      $712B : OpToken(TagPlusQD);               // +q
+      $712D : OpToken(TagMinusQD);              // -q
+      $712F : OpToken(TagSlashQD);              // /q
+{$else}
       $2A2A : OpToken(TagPower);                // **
+      $2A71 : OpToken(TagMultQD);               // *q
+      $2B71 : OpToken(TagPlusQD);               // +q
+      $2D71 : OpToken(TagMinusQD);              // -q
       $2F2F : Comment:=#$A;                     // // comment
+      $2F71 : OpToken(TagSlashQD);              // /q
       $3C3C : OpToken(TagSHL);                  // <<
       $3C3D : OpToken(TagNotGreater);           // <=
       $3C3E : OpToken(TagNotEqual);             // <>
       $3D3D : OpToken(TagEqual);                // ==
       $3E3D : OpToken(TagNotLess);              // >=
       $3E3E : OpToken(TagSHR);                  // >>
-  {$endif}
+{$endif}
       else flg:=false;
     end;
     if flg then begin

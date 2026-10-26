@@ -422,8 +422,9 @@ begin
   PostParam(L, Context);
 end;
 
-function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_BALL
+function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.26: Func Fla_BALL
 var C, M : PValRec;
+    fc, fm : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -431,10 +432,15 @@ begin
     C:=Param(-2, Context);
     M:=Param(-1, Context);
     if (CaseType[C^.VType, M^.VType]<>VInt) or Plus(C^.Int, -M^.Int, Int)
-      or Plus(C^.Int, M^.Int, IGap) then Ball(AsFloat(C), AsFloat(M), Result)
-    else begin
-      if M^.Int<0 then RaiseError(InvalidRange);
-      VType:=VIGap;
+      or Plus(C^.Int, M^.Int, IGap) then begin
+        fc:=AsFloat(C); fm:=AsFloat(M);
+        if fm<0 then RaiseError(InvalidRange);
+        Flo:=fc-fm;
+        Img:=fc+fm;
+        VType:=VGap;
+      end else begin
+        if M^.Int<0 then RaiseError(InvalidRange);
+        VType:=VIGap;
     end;
     VPhy:=C^.VPhy;
     if VPhy<>M^.VPhy then RaiseError(DimMismatch);

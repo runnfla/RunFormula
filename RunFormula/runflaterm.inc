@@ -108,6 +108,16 @@ var L : PValRec = @CVnone;        // init VMode
     end;
   end;
 
+  procedure LBall(const C, M:TRFloat);                         //DONE -oRFla.Term -cRev.2026.10.26: Proc LBall
+  begin
+    FreeLR;
+    with L^ do begin
+      Flo:=C-M;
+      Img:=C+M;
+      VType:=VGap;
+    end;
+  end;
+
   function LNone:PValRec;                                      //DONE -oRFla.Term -cRev.2026.10.16: Func LNone
   begin
     FreeLR;
@@ -160,19 +170,19 @@ begin
       phy:=0;
       if (L^.VPhy or R^.VPhy)<>0 then case tag of
         TagOR, TagXOR, TagAND, TagSHL, TagSHR, TagNOT : RaiseError(DimDisallow);
-        TagPlus, TagMinus : begin
-                              phy:=L^.VPhy;
-                              if (phy<>R^.VPhy) then RaiseError(DimMismatch);
-                            end;
-        TagNegative       : phy:=R^.VPhy;
-        TagMult           : phy:=PhyPlus(L^.VPhy, R^.VPhy);
-        TagSlash, TagDIV  : phy:=PhyMinus(L^.VPhy, R^.VPhy);
-        TagMOD            : begin
-                              phy:=R^.VPhy;
-                              if (phy<>0) and (phy<>L^.VPhy) then RaiseError(DimMismatch);
-                              phy:=L^.VPhy;
-                            end;
-        TagPower          : phy:=PhyMult(L^.VPhy, AsInt(R));
+        TagPlus, TagMinus, TagPlusQD, TagMinusQD : begin
+                                                     phy:=L^.VPhy;
+                                                     if (phy<>R^.VPhy) then RaiseError(DimMismatch);
+                                                   end;
+        TagNegative        : phy:=R^.VPhy;
+        TagMult, TagMultQD : phy:=PhyPlus(L^.VPhy, R^.VPhy);
+        TagSlash, TagSlashQD, TagDIV : phy:=PhyMinus(L^.VPhy, R^.VPhy);
+        TagMOD             : begin
+                               phy:=R^.VPhy;
+                               if (phy<>0) and (phy<>L^.VPhy) then RaiseError(DimMismatch);
+                               phy:=L^.VPhy;
+                             end;
+        TagPower           : phy:=PhyMult(L^.VPhy, AsInt(R));
       end;
       case tag of
         TagAssign   : begin                                                  // =
@@ -211,6 +221,8 @@ begin
                                    then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
+        TagPlusQD   : LBall(AsRe(L)+AsRe(R), Hypot2(AsMgin(L), AsMgin(R))*2);   // +q
+        TagMinusQD  : LBall(AsRe(L)-AsRe(R), Hypot2(AsMgin(L), AsMgin(R))*2);   // -q
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
                         VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
@@ -250,6 +262,14 @@ begin
                                         MinMax(fb/fc, fb/fd, L);
                                       end;
                         else TypeDisallow(L, R);
+                      end;
+        TagMultQD   : begin                                                  // *q
+                        fb:=AsRe(R); fa:=AsRe(L);
+                        LBall(fa*fb, Hypot2(fa*AsMgin(R), fb*AsMgin(L))*2);
+                      end;
+        TagSlashQD  : begin                                                  // /q
+                        fb:=AsRe(R); fa:=AsRe(L);
+                        LBall(fa/fb, Hypot2(fa*AsMgin(R), fb*AsMgin(L))/sqr(fb)*2);
                       end;
         TagSHL      : Ichk(L^.Int shl R^.Int);                               // shl <<
         TagSHR      : Ichk(L^.Int shr R^.Int);                               // shr >>

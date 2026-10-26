@@ -50,8 +50,12 @@ type
     TagConcat,            // &
     TagPlus,              // +
     TagMinus,             // -
+    TagPlusQD,            // +q
+    TagMinusQD,           // -q
     TagMult,              // *
     TagSlash,             // /
+    TagMultQD,            // *q
+    TagSlashQD,           // /q
     TagSHL,               // shl <<
     TagSHR,               // shr >>
     TagDIV,               // div
@@ -161,7 +165,7 @@ const
 type
   TToken = packed record
     Tag : TTag;
-{$if (SizeOf(TTag) and (Sint-1)) > 0}
+{$if (SizeOf(TTag) and (Sint - 1)) > 0}
     Dummy : array[0..(SizeOf(TTag) or (Sint-1))] of byte;
 {$endif}
     Source : integer;                   //aligning to Size of Integer
@@ -312,8 +316,12 @@ const
     50,      // TagConcat     &
     60,      // TagPlus       +
     60,      // TagMinus      -         10-5-2 = 3, not 7
+    60,      // TagPlusQD,    +q
+    60,      // TagMinusQD,   -q
     70,      // TagMult       *
     70,      // TagSlash      /
+    70,      // TagMultQD     *q
+    70,      // TagSlashQD    /q
     70,      // TagSHL        shl <<
     70,      // TagSHR        shr >>
     70,      // TagDIV        div

@@ -268,16 +268,6 @@ begin
   end;
 end;
 
-procedure Ball(const C, M:TRFloat; PV:PValRec); inline;    //DONE -oRFla.Lib -cRev.2026.10.07: Inline Ball
-begin
-  if M<0 then RaiseError(InvalidRange);
-  with PV^ do begin
-    Flo:=C-M;
-    Img:=C+M;
-    VType:=VGap;
-  end;
-end;
-
 // ===== Dimentions =====
 
 function PhyPlus(X, Y:SizeInt):SizeInt;                    //DONE -oRFla.Lib -cRev.2026.05.09: Func PhyPlus
