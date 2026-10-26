@@ -108,12 +108,14 @@ var L : PValRec = @CVnone;        // init VMode
     end;
   end;
 
-  procedure LBall(const C, M:TRFloat);                         //DONE -oRFla.Term -cRev.2026.10.26: Proc LBall
+  procedure QBall(const C, X, Y:TRFloat);                      //DONE -oRFla.Term -cRev.2026.10.26: Proc LBall
+  var m : TRFloat;
   begin
+    m:=Hypot2(X, Y)*2;
     FreeLR;
     with L^ do begin
-      Flo:=C-M;
-      Img:=C+M;
+      Flo:=C-m;
+      Img:=C+m;
       VType:=VGap;
     end;
   end;
@@ -221,8 +223,8 @@ begin
                                    then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
-        TagPlusQD   : LBall(AsRe(L)+AsRe(R), Hypot2(AsMgin(L), AsMgin(R))*2);   // +q
-        TagMinusQD  : LBall(AsRe(L)-AsRe(R), Hypot2(AsMgin(L), AsMgin(R))*2);   // -q
+        TagPlusQD   : QBall(AsRe(L)+AsRe(R), AsMgin(L), AsMgin(R));          // +q
+        TagMinusQD  : QBall(AsRe(L)-AsRe(R), AsMgin(L), AsMgin(R));          // -q
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
                         VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
@@ -265,11 +267,11 @@ begin
                       end;
         TagMultQD   : begin                                                  // *q
                         fb:=AsRe(R); fa:=AsRe(L);
-                        LBall(fa*fb, Hypot2(fa*AsMgin(R), fb*AsMgin(L))*2);
+                        QBall(fa*fb, AsMgin(L)*fb, AsMgin(R)*fa);
                       end;
         TagSlashQD  : begin                                                  // /q
-                        fb:=AsRe(R); fa:=AsRe(L);
-                        LBall(fa/fb, Hypot2(fa*AsMgin(R), fb*AsMgin(L))/sqr(fb)*2);
+                        fb:=AsRe(R); fa:=AsRe(L); fc:=fa/fb;
+                        QBall(fc, AsMgin(L)/fb, AsMgin(R)/fb*fc);
                       end;
         TagSHL      : Ichk(L^.Int shl R^.Int);                               // shl <<
         TagSHR      : Ichk(L^.Int shr R^.Int);                               // shr >>
