@@ -121,7 +121,7 @@ begin
   Save:=false;
 end;
 
-function AppendResult(const ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
+function AppendResult(ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
 begin
   DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParamAsStr(-1, Context);
   Result:='';

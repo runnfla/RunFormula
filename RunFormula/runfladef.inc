@@ -18,8 +18,6 @@
 // TODO -oRFla.Def -cRev.2026.04.16:
 
 type
-  TRFloat = Double;             // or Extended... or Single...
-
   TTag = (
     TagValue,
     TagVar,
@@ -50,12 +48,12 @@ type
     TagConcat,            // &
     TagPlus,              // +
     TagMinus,             // -
-    TagPlusQD,            // +q
-    TagMinusQD,           // -q
+    TagPlusQD,            // +~ quadrature
+    TagMinusQD,           // -~ quadrature
     TagMult,              // *
     TagSlash,             // /
-    TagMultQD,            // *q
-    TagSlashQD,           // /q
+    TagMultQD,            // *~ quadrature
+    TagSlashQD,           // /~ quadrature
     TagSHL,               // shl <<
     TagSHR,               // shr >>
     TagDIV,               // div
@@ -84,7 +82,7 @@ type
               VrDouble=5, VrShortInt=16, VrByte=17, VrWord=18, VrLongWord=19,
               VrInt64=20, VrQWord=21, VrString=$100);
     Dummy : array [1..3] of word;
-    VrData : byte;
+    VrtData : byte;
   end;
 
   PVrtRec = ^TVrtRec;
@@ -316,12 +314,12 @@ const
     50,      // TagConcat     &
     60,      // TagPlus       +
     60,      // TagMinus      -         10-5-2 = 3, not 7
-    60,      // TagPlusQD,    +q
-    60,      // TagMinusQD,   -q
+    60,      // TagPlusQD,    +~
+    60,      // TagMinusQD,   -~
     70,      // TagMult       *
     70,      // TagSlash      /
-    70,      // TagMultQD     *q
-    70,      // TagSlashQD    /q
+    70,      // TagMultQD     *~
+    70,      // TagSlashQD    /~
     70,      // TagSHL        shl <<
     70,      // TagSHR        shr >>
     70,      // TagDIV        div

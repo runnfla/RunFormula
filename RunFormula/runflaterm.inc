@@ -223,8 +223,8 @@ begin
                                    then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
-        TagPlusQD   : QBall(AsRe(L)+AsRe(R), AsMgin(L), AsMgin(R));          // +q
-        TagMinusQD  : QBall(AsRe(L)-AsRe(R), AsMgin(L), AsMgin(R));          // -q
+        TagPlusQD   : QBall(AsRe(L)+AsRe(R), AsMgin(L), AsMgin(R));          // +~
+        TagMinusQD  : QBall(AsRe(L)-AsRe(R), AsMgin(L), AsMgin(R));          // -~
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
                         VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
@@ -265,11 +265,11 @@ begin
                                       end;
                         else TypeDisallow(L, R);
                       end;
-        TagMultQD   : begin                                                  // *q
+        TagMultQD   : begin                                                  // *~
                         fb:=AsRe(R); fa:=AsRe(L);
                         QBall(fa*fb, AsMgin(L)*fb, AsMgin(R)*fa);
                       end;
-        TagSlashQD  : begin                                                  // /q
+        TagSlashQD  : begin                                                  // /~
                         fb:=AsRe(R); fa:=AsRe(L); fc:=fa/fb;
                         QBall(fc, AsMgin(L)/fb, AsMgin(R)/fb*fc);
                       end;
@@ -409,34 +409,31 @@ begin
 end;
 
 procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
-var S : string;
-    p : PVrtRec;
+var p : PVrtRec;
+    ptr : pointer;
 begin
-
-  exit;
-
   p:=@V;
-
-  if p=nil then begin
-    PV^.VType:=Vnone;
-    exit;
-  end;
-
   with PV^ do case p^.VrType of
     VrEmpty, VrNull : VType:=VNone;
-    VrSmallInt : begin Int:=PSmallInt(@p^.VrData)^; VType:=VInt; end;
-    VrInteger  : begin Int:=PInteger(@p^.VrData)^; VType:=VInt; end;
-    VrSingle   : begin Flo:=PSingle(@p^.VrData)^; VType:=VFloat; end;
-    VrDouble   : begin Flo:=PDouble(@p^.VrData)^; VType:=VFloat; end;
-    VrShortInt : begin Int:=PShortInt(@p^.VrData)^; VType:=VInt; end;
-    VrByte     : begin Int:=PByte(@p^.VrData)^; VType:=VInt; end;
-    VrWord     : begin Int:=PWord(@p^.VrData)^; VType:=VInt; end;
-    VrLongWord : begin Int:=PLongWord(@p^.VrData)^; VType:=VInt; end;
-    VrInt64    : begin Int:=PInt64(@p^.VrData)^; VType:=VInt; end;
-    VrQWord    : begin Int:=PQWord(@p^.VrData)^; VType:=VInt; end;
+    VrSmallInt : begin Int:=PSmallInt(@p^.VrtData)^; VType:=VInt; end;
+    VrInteger  : begin Int:=PInteger(@p^.VrtData)^; VType:=VInt; end;
+    VrSingle   : begin Flo:=PSingle(@p^.VrtData)^; VType:=VFloat; end;
+    VrDouble   : begin Flo:=PDouble(@p^.VrtData)^; VType:=VFloat; end;
+    VrShortInt : begin Int:=PShortInt(@p^.VrtData)^; VType:=VInt; end;
+    VrByte     : begin Int:=PByte(@p^.VrtData)^; VType:=VInt; end;
+    VrWord     : begin Int:=PWord(@p^.VrtData)^; VType:=VInt; end;
+    VrLongWord : begin Int:=PLongWord(@p^.VrtData)^; VType:=VInt; end;
+    VrInt64    : begin Int:=PInt64(@p^.VrtData)^; VType:=VInt; end;
+    VrQWord    : begin Int:=PQWord(@p^.VrtData)^; VType:=VInt; end;
     VrString   : begin
-                   Str:=Str2Ptr(string(@p^.VrData));
-                   VType:=VStr;
+                   ptr:=PPointer(@p^.VrtData)^;
+                   if (ptr<>nil) and (PSizeInt(ptr)[-1]=1) then begin
+                     Int:=PByte(ptr)^;
+                     VType:=VChar;
+                   end else begin
+                     Str:=Str2Ptr(string(ptr));
+                     VType:=VStr;
+                   end;
                    VPhy:=0;
                  end;
     else RaiseError(VariantError);

@@ -293,17 +293,17 @@ begin
       $3D3E : OpToken(TagNotLess);              // >=
       $3E3C : OpToken(TagNotEqual);             // <>
       $3E3E : OpToken(TagSHR);                  // >>
-      $712A : OpToken(TagMultQD);               // *q
-      $712B : OpToken(TagPlusQD);               // +q
-      $712D : OpToken(TagMinusQD);              // -q
-      $712F : OpToken(TagSlashQD);              // /q
+      $7E2A : OpToken(TagMultQD);               // *~
+      $7E2B : OpToken(TagPlusQD);               // +~
+      $7E2D : OpToken(TagMinusQD);              // -~
+      $7E2F : OpToken(TagSlashQD);              // /~
 {$else}
       $2A2A : OpToken(TagPower);                // **
-      $2A71 : OpToken(TagMultQD);               // *q
-      $2B71 : OpToken(TagPlusQD);               // +q
-      $2D71 : OpToken(TagMinusQD);              // -q
+      $2A7E : OpToken(TagMultQD);               // *~
+      $2B7E : OpToken(TagPlusQD);               // +~
+      $2D7E : OpToken(TagMinusQD);              // -~
       $2F2F : Comment:=#$A;                     // // comment
-      $2F71 : OpToken(TagSlashQD);              // /q
+      $2F7E : OpToken(TagSlashQD);              // /~
       $3C3C : OpToken(TagSHL);                  // <<
       $3C3D : OpToken(TagNotGreater);           // <=
       $3C3E : OpToken(TagNotEqual);             // <>
