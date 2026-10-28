@@ -1219,10 +1219,6 @@ begin
   PostParam(Context);
 end;
 
-{$define runfla_optfunc}
-{$include runflaopt.inc}
-{$undef runfla_optfunc}
-
 procedure FuncRegister;
 begin
   FuncReg('result', @Fla_RESULT);
@@ -1275,9 +1271,4 @@ begin
   FuncReg('qty', @Fla_QTY);
   FuncReg('conv', @Fla_CONV);
   FuncReg('unitstr', @Fla_UNITSTR);
-
-{$define runfla_optreg}
-{$include runflaopt.inc}
-{$undef runfla_optreg}
-
 end;

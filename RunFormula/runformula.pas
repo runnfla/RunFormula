@@ -63,7 +63,7 @@ implementation
 {$Q-}                           // switch off overflow checking
 {$T-}                           // untyped address operator
 {$Z4}                           // Minimum enumeration type size
-{$POINTERMATH ON}               // allow use of pointer math
+{$pointermath on}               // allow use of pointer math
 {$inline on}
 
 {$define runfla_optuses}
@@ -493,6 +493,10 @@ end;
 {$include runflafunc.inc}
 {$include runflaunits.inc}
 
+{$define runfla_optfunc}
+{$include runflaopt.inc}
+{$undef runfla_optfunc}
+
 procedure Init;
 var UnitDesc : TUnitDesc;
     PrefAbbr : TPrefAbbr;
@@ -508,6 +512,10 @@ initialization
 
   Init;
   FuncRegister;
+
+{$define runfla_optinit}
+{$include runflaopt.inc}
+{$undef runfla_optinit}
 
 finalization
 

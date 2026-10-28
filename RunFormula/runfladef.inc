@@ -299,7 +299,7 @@ const
     0,       // TagDo
 
     0,       // TagExpr
-    11,      // TagAssign     =    right-associative, enable A = B = 10
+    11,      // TagAssign     =    right-associative, allow A = B = 10
 
     20,      // TagOR         or
     20,      // TagXOR        xor
