@@ -176,15 +176,15 @@ begin
                                                      phy:=L^.VPhy;
                                                      if (phy<>R^.VPhy) then RaiseError(DimMismatch);
                                                    end;
-        TagNegative        : phy:=R^.VPhy;
-        TagMult, TagMultQD : phy:=PhyPlus(L^.VPhy, R^.VPhy);
+        TagNegative : phy:=R^.VPhy;
+        TagMult, TagMultQD, TagVectDot : phy:=PhyPlus(L^.VPhy, R^.VPhy);
         TagSlash, TagSlashQD, TagDIV : phy:=PhyMinus(L^.VPhy, R^.VPhy);
-        TagMOD             : begin
-                               phy:=R^.VPhy;
-                               if (phy<>0) and (phy<>L^.VPhy) then RaiseError(DimMismatch);
-                               phy:=L^.VPhy;
-                             end;
-        TagPower           : phy:=PhyMult(L^.VPhy, AsInt(R));
+        TagMOD : begin
+                   phy:=R^.VPhy;
+                   if (phy<>0) and (phy<>L^.VPhy) then RaiseError(DimMismatch);
+                   phy:=L^.VPhy;
+                 end;
+        TagPower : phy:=PhyMult(L^.VPhy, AsInt(R));
       end;
       case tag of
         TagAssign   : begin                                                  // =
@@ -273,6 +273,7 @@ begin
                         fb:=AsRe(R); fa:=AsRe(L); fc:=fa/fb;
                         QBall(fc, AsMgin(L)/fb, AsMgin(R)/fb*fc);
                       end;
+        TagVectDot  : LVal(AsRe(L)*AsRe(R)+AsIm(L)*AsIm(R));                 // *.
         TagSHL      : Ichk(L^.Int shl R^.Int);                               // shl <<
         TagSHR      : Ichk(L^.Int shr R^.Int);                               // shr >>
         TagDIV      : begin                                                  // div

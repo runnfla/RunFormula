@@ -54,6 +54,7 @@ type
     TagSlash,             // /
     TagMultQD,            // *~ quadrature
     TagSlashQD,           // /~ quadrature
+    TagVectDot,           // *.
     TagSHL,               // shl <<
     TagSHR,               // shr >>
     TagDIV,               // div
@@ -320,6 +321,7 @@ const
     70,      // TagSlash      /
     70,      // TagMultQD     *~
     70,      // TagSlashQD    /~
+    70,      // TagVectDot    *.
     70,      // TagSHL        shl <<
     70,      // TagSHR        shr >>
     70,      // TagDIV        div

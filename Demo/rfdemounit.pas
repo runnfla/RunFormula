@@ -106,6 +106,7 @@ const TagName : array[TTag] of string = (
   'Slash',
   'MultQD',
   'SlashQD',
+  'TagVectDot',
   'SHL',
   'SHR',
   'DIV',

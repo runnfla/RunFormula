@@ -286,6 +286,7 @@ begin
     case PWord(P)^ of
 {$ifdef ENDIAN_LITTLE}
       $2A2A : OpToken(TagPower);                // **
+      $2E2A : OpToken(TagVectDot);              // *.
       $2F2F : Comment:=#$A;                     // // comment
       $3C3C : OpToken(TagSHL);                  // <<
       $3D3C : OpToken(TagNotGreat);             // <=
@@ -299,6 +300,7 @@ begin
       $7E2F : OpToken(TagSlashQD);              // /~
 {$else}
       $2A2A : OpToken(TagPower);                // **
+      $2A2E : OpToken(TagVectDot);              // *.
       $2A7E : OpToken(TagMultQD);               // *~
       $2B7E : OpToken(TagPlusQD);               // +~
       $2D7E : OpToken(TagMinusQD);              // -~
