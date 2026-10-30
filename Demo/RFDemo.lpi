@@ -84,6 +84,9 @@
     </Parsing>
     <CodeGeneration>
       <SmartLinkUnit Value="True"/>
+      <Optimizations>
+        <OptimizationLevel Value="4"/>
+      </Optimizations>
     </CodeGeneration>
     <Linking>
       <Debugging>

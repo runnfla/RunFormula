@@ -93,9 +93,9 @@ begin
   RaiseError(c);
 end;
 
-procedure TypeDisallow(PX, PY:PValRec);        //DONE -oRFla.Lib -cRev.2026.10.08: Proc TypeDisallow PValRec
+procedure TypeDisallow(X, Y:PValRec);          //DONE -oRFla.Lib -cRev.2026.10.08: Proc TypeDisallow PValRec
 begin
-  TypeDisallow(CaseType[PX^.VType, PY^.VType]);
+  TypeDisallow(CaseType[X^.VType, Y^.VType]);
 end;
 
 // ===== Strings =====

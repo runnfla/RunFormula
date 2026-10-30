@@ -79,11 +79,15 @@ type
 
 {$Z2}
   TVrtRec = packed record
-    VrType : (VrEmpty=0, VrNull=1, VrSmallInt=2, VrInteger=3, VrSingle=4,
-              VrDouble=5, VrShortInt=16, VrByte=17, VrWord=18, VrLongWord=19,
-              VrInt64=20, VrQWord=21, VrString=$100);
+    VrType : (VrEmpty = 0, VrNull = 1, VrSmallInt = 2, VrInteger = 3, VrSingle = 4,
+              VrDouble = 5, VrShortInt = 16, VrByte = 17, VrWord = 18, VrLongWord = 19,
+              VrInt64 = 20, VrQWord = 21, VrString = $100, VrCplex = CRFVrtCplex,
+              VrGap = CRFVrtRange, VrIGap = CRFVrtIntRange);
     Dummy : array [1..3] of word;
-    VrtData : byte;
+    case byte of
+      0 : (VrtData : byte);
+      1 : (VrtPGap : ^TRFloat);
+      2 : (VrtLGap, VrtRGap : PtrInt);
   end;
 
   PVrtRec = ^TVrtRec;
@@ -254,16 +258,9 @@ const
   CVnone : TValRec = (VType : VNone; VAlloc : BC; VPhy : 0);
 
   CEmptyStr : packed record
-      AnsiRec : TAnsiRec;
-      Zero    : byte;
-    end = (AnsiRec :
-      (CodePage : CP_ACP;
-       ElementSize : 1;
-{$ifdef CPU64}
-       Dummy : 0;
-{$endif CPU64}
-       Ref : -1;
-       Len : 0); Zero : 0);
+      Ref, Len : SizeInt;
+      Zero     : byte;
+    end = (Ref : -1; Len : 0; Zero : 0);
 
   OpTokenSize = PtrUInt(@TToken(nil^).Size);
   ExprTokenSize = PtrUInt(@TToken(nil^).Index);

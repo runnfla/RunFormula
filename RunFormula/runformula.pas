@@ -39,7 +39,7 @@ const
 {$include runflaerr.inc}
 {$include runflamsg.inc}
 
-function RunFlaParse(constref Fla:string; var Error:TRunFlaError):string;
+function RunFlaParse(constref Fla:string; out Error:TRunFlaError):string;
 function RunFlaParse(constref Fla:string):string;
 function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):string;
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
@@ -234,7 +234,7 @@ begin
   PostParam(PContext(Context)^);
 end;
 
-procedure SetRegFPU(var Reg:TRegFPU); inline;              //DONE -oRFla.Main -cRev.2026.07.04: Inline SetRegFPU
+procedure SetRegFPU(out Reg:TRegFPU); inline;              //DONE -oRFla.Main -cRev.2026.07.04: Inline SetRegFPU
 begin
   with Reg do begin
     MXCSR:=GetMXCSR;
@@ -364,7 +364,7 @@ begin
   raise EError.Create(ErrCode);
 end;
 
-function RunFlaParse(constref Fla:string; var Error:TRunFlaError):string;
+function RunFlaParse(constref Fla:string; out Error:TRunFlaError):string;
 const TagOp = TagExpr;                     //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaParse
 type TCls = record
        ClsTag : TTag;

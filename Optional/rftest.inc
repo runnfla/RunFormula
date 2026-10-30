@@ -1,12 +1,12 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Built-in functions include file
+//  Optional test function
 //  Rev. 15.09.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
 
-//  Filename: runflafunc.inc
+//  Filename: rftest.inc
 
 //  Copyright (C) 2026 Alexander Torubarov
 //  Licensed under the MIT License.
@@ -16,6 +16,16 @@
 //******************************************************
 
 // TODO -oRFla.Func -cRev.2026.00.00: Make repeat timeout
+
+{$ifdef runfla_optface}
+
+{$endif}
+
+{$ifdef runfla_optuses}
+
+{$endif}
+
+{$ifdef runfla_optfunc}
 
 function Fla_TEST(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.09.14: Func Fla_TEST
 var s : string;
@@ -52,6 +62,11 @@ begin
   PostParam(Context);
 end;
 
+{$endif}
 
+{$ifdef runfla_optinit}
 
-  FuncReg('test', @Fla_TEST);           /////
+FuncReg('test', @Fla_TEST);
+
+{$endif}
+

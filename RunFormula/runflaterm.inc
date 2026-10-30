@@ -108,7 +108,7 @@ var L : PValRec = @CVnone;        // init VMode
     end;
   end;
 
-  procedure QBall(const C, X, Y:TRFloat);                      //DONE -oRFla.Term -cRev.2026.10.26: Proc LBall
+  procedure QBall(const C, X, Y:TRFloat);                      //DONE -oRFla.Term -cRev.2026.10.26: Proc QBall
   var m : TRFloat;
   begin
     m:=Hypot2(X, Y)*2;
@@ -139,7 +139,7 @@ var L : PValRec = @CVnone;        // init VMode
     Result:=true;
     if Scale<0 then exit;
     repeat
-      if (Scale and 1)<>0 then if Mult(Base, rt, rt) then exit;
+      if (Scale and 1)<>0 then if Mult(rt, Base, rt) then exit;
       Scale:=Scale shr 1;
       if Scale=0 then break;
       if Mult(Base, Base, Base) then exit;
@@ -412,6 +412,7 @@ end;
 procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
 var p : PVrtRec;
     ptr : pointer;
+    fc, fm : TRFloat;
 begin
   p:=@V;
   with PV^ do case p^.VrType of
@@ -436,6 +437,24 @@ begin
                      VType:=VStr;
                    end;
                    VPhy:=0;
+                 end;
+    VrCplex    : begin
+                   Flo:=p^.VrtPGap[0];
+                   Img:=p^.VrtPGap[1];
+                   VType:=VCplex;
+                 end;
+    VrGap      : begin
+                   fm:=p^.VrtPGap[1];
+                   if fm<0 then RaiseError(InvalidRange);
+                   fc:=p^.VrtPGap[1];
+                   Flo:=fc-fm;
+                   Img:=fc+fm;
+                   VType:=VGap;
+                 end;
+    VrIGap     : begin
+                   Int:=p^.VrtLGap;
+                   IGap:=p^.VrtRGap;
+                   VType:=VIGap;
                  end;
     else RaiseError(VariantError);
   end;
