@@ -570,7 +570,7 @@ function SelectPref(const X, Y:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
 var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.10.07: Func SelectPref
     f, t : TRFloat;
 begin
-  if Y=0 then f:=X else if X=0 then f:=Y else f:=abs(X)*0.5+abs(Y)*0.5;
+  if Y=0 then f:=abs(X) else if X=0 then f:=abs(Y) else f:=abs(X)*0.5+abs(Y)*0.5;
   PByte(Result):=nil;
   for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do begin
     if (Flag and (Flg or UOP))<>0 then continue;

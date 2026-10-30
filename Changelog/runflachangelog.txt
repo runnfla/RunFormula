@@ -76,4 +76,5 @@ IncompType_NG
 - new binary ops - in +~ -~ *~ /~ *.
 - fix  integer-bounded interval exponentiation
 - const убран из TRunFlaFunc
+- fix приставка для отрицательных значений
 

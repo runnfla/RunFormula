@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Optional 2D Radius-Vector functions
-//  Rev. 15.09.2026
+//  Rev. 30.10.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -27,7 +27,7 @@
 
 {$ifdef runfla_optfunc}
 
-function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.07: Func Fla_CROSS
+function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CROSS
 var X, Y : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -40,68 +40,58 @@ begin
     if (X^.VPhy or Y^.VPhy)<>0 then VPhy:=PhyPlus(X^.VPhy, Y^.VPhy);
   end;
   PostParam(Context);
-  PostParam(Y, Context);
+  PostParam(X, Context);
 end;
 
-function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.07: Func Fla_ROTATE
+function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ROTATE
 var pv : PValRec;
-    fs, fc, re, im : TRFloat;
+    f : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  fs:=AsFloat(Param(-1, Context));
+  f:=AsFloat(Param(-1, Context));
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
-  fc:=cos(fs);
-  fs:=sin(fs);
   Result:=NewLV(Context);
   with Result^ do begin
     pv:=Param(-2, Context);
-    re:=AsRe(pv);
-    im:=AsIm(pv);
- //   Flo:=re*fc-im*fs;        Use CplexMult
- //   Img:=re*fs+im*fc;
+    CplexMult(AsRe(pv), AsIm(pv), cos(f), sin(f), Flo, Img);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_NORMALIZE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.07: Func Fla_NORMALIZE
-var pv : PValRec;
-    re, im : TRFloat;
+function Fla_NORMALIZE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_NORMALIZE
+var f, re, im : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
+  re:=AsRe(Param(-1, Context));
+  im:=AsIm(Context.TermResult);
+  PostParam(Context);
+  f:=Hypot2(re, im)*2;
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-2, Context);
-    re:=AsRe(pv);
-    im:=AsIm(pv);
-    f:=Hypot2(re, im)*2;
     Flo:=re/f;
     Img:=im/f;
     VType:=VCplex;
-    VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
 end;
 
-function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.07: Func Fla_ANGLE
+function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ANGLE
 var X, Y : PValRec;
-    rex, rey, imx, imy : TRFloat;
+    re, im : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   X:=Param(-2, Context);
   Y:=Param(-1, Context);
-  if X^.VPhy<>Y^.VPhy then RaiseError(DimMismatch);
-  rex:=AsRe(X); imx:=AsIm(X);
-  rey:=AsRe(Y); imy:=AsIm(Y);
-  PostParam(Context);
-  PostParam(Y, Context);
   Result:=NewLV(Context);
   with Result^ do begin
-  //  Flo:=FlArcTan(rex*imy-imx*rey, rex*rey+imx*imy);   Use CplexMult
+    CplexMult(AsRe(X), -AsIm(X), AsRe(Y), AsIm(Y), re, im);
+    Flo:=FlArcTan(im, re);
     VType:=VFloat;
   end;
+  PostParam(Context);
+  PostParam(X, Context);
 end;
 
 {$endif}
