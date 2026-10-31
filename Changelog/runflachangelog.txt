@@ -77,4 +77,6 @@ IncompType_NG
 - fix  integer-bounded interval exponentiation
 - const убран из TRunFlaFunc
 - fix приставка для отрицательных значений
+- реализовано получение результат в виде комплексного числа и интервала (detailed in help)
+- реализована передача с скрипт комплексных чисел и интервалов (detailed in help)
 

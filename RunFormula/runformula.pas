@@ -34,7 +34,8 @@ type
 const
   CRFVrtCplex = $D50;
   CRFVrtRange = $D51;
-  CRFVrtIntRange = $D52;
+  CRFVrtMginRange = $D52;
+  CRFVrtIntRange = $D53;
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}
@@ -327,6 +328,27 @@ begin
     MemListFree(LVStack);
     MemListFree(FuncArg);
   end;
+
+  with Error do begin
+    Phy:=Result^.VPhy;
+    Cplex:=0;
+    Mgin:=0;
+    LeftBound:=0;
+    RightBound:=0;
+
+    case Result^.VType of
+      VCplex : Cplex:=Result^.Img;
+      VGap   : Mgin:=Result^.Img*0.5-Result^.Flo*0.5;
+      VIGap  : begin
+                 Mgin:=Result^.IGap*0.5-Result^.Int*0.5;
+                 LeftBound:=Result^.Int;
+                 RightBound:=Result^.IGap;
+               end;
+    end;
+
+  end;
+
+
 end;
 
 function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):string;

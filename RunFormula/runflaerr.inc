@@ -70,5 +70,8 @@ type
     Code : TRunFlaErrCode;
     Position : integer;
     Value : string;
+    Phy : SizeInt;
+    Cplex, Mgin : TRFloat;
+    LeftBound, RightBound : SizeInt;
   end;
 

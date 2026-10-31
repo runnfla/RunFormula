@@ -27,7 +27,7 @@
 
 {$ifdef runfla_optfunc}
 
-function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CROSS
+function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CROSS
 var X, Y : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -43,7 +43,7 @@ begin
   PostParam(X, Context);
 end;
 
-function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ROTATE
+function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ROTATE
 var pv : PValRec;
     f : TRFloat;
 begin
@@ -77,18 +77,91 @@ begin
   end;
 end;
 
-function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ANGLE
+function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ANGLE
 var X, Y : PValRec;
     re, im : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  X:=Param(-2, Context);
-  Y:=Param(-1, Context);
   Result:=NewLV(Context);
   with Result^ do begin
+    X:=Param(-2, Context);
+    Y:=Param(-1, Context);
     CplexMult(AsRe(X), -AsIm(X), AsRe(Y), AsIm(Y), re, im);
     Flo:=FlArcTan(im, re);
     VType:=VFloat;
+  end;
+  PostParam(Context);
+  PostParam(X, Context);
+end;
+
+function Fla_PROJECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_PROJECT
+var pv : PValRec;
+    re, im, f, t : TRFloat;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  re:=AsRe(Param(-1, Context));
+  im:=AsIm(Context.TermResult);
+  PostParam(Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    pv:=Param(-2, Context);
+    CplexDiv(AsRe(pv), AsIm(pv), re, im, f, t);
+    Flo:=f*re;
+    Img:=f*im;
+    VType:=VCplex;
+    VPhy:=pv^.VPhy;
+  end;
+  PostParam(Context);
+end;
+
+function Fla_DISTSQ(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_DISTSQ
+var X, Y : PValRec;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    X:=Param(-2, Context);
+    Y:=Param(-1, Context);
+    Flo:=sqr(AsRe(Y)-AsRe(X))+sqr(AsIm(Y)-AsIm(X));
+    VType:=VFloat;
+    VPhy:=X^.VPhy;
+    if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
+  end;
+  PostParam(Context);
+  PostParam(X, Context);
+end;
+
+function Fla_PERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_PERP
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    Flo:=AsIm(Param(-1, Context));
+    Img:= -AsRe(Context.TermResult);
+    VType:=VCplex;
+    VPhy:=Context.TermResult^.VPhy;
+  end;
+  PostParam(Context);
+end;
+
+function Fla_LERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_LERP
+var X, Y : PValRec;
+    t, t1 : TRFloat;
+begin
+  if ParamCount<>3 then RaiseError(ParamNumber);
+  t:=AsFloat(Param(-1, Context));
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
+  t1:=1-t;
+  Result:=NewLV(Context);
+  with Result^ do begin
+    X:=Param(-2, Context);
+    Y:=Param(-1, Context);
+    Flo:=AsRe(X)*t1+AsRe(Y)*t;
+    Img:=AsIm(X)*t1+AsIm(Y)*t;
+    VType:=VCplex;
+    VPhy:=X^.VPhy;
+    if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
   end;
   PostParam(Context);
   PostParam(X, Context);
@@ -102,7 +175,21 @@ FuncReg('cross', @Fla_CROSS);
 FuncReg('rotate', @Fla_ROTATE);
 FuncReg('normalize', @Fla_NORMALIZE);
 FuncReg('angle', @Fla_ANGLE);
+FuncReg('project', @Fla_PROJECT);
+FuncReg('distsq', @Fla_DISTSQ);
+FuncReg('perp', @Fla_PERP);
+FuncReg('lerp', @Fla_LERP);
 
 {$endif}
-
+  {
++reflect(V, N) = V - 2 * (V *. N) * N            = V-2*projct
++  project(A, B) =  ((A *. B) / (B *. B)) * B
++  slide(V, N) = V - (V *. N) * N                  = V-projct
+  lerp(A, B, t) = A + (B - A) * t [t-0..1]
++ mirror(V, C) \(= 2 \cdot C - V\).      = C*2 - V
++ center(V, C) = (V+C)/2
++  distanceSq
+  perpCW(V) \(= [(AsIm(V), -AsRe(V))]\)
++  perpCCW(V) \(= [(-AsIm(V), AsRe(V))]\) — п   = perp(-V)
+   }
 

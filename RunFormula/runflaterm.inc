@@ -410,50 +410,55 @@ begin
 end;
 
 procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
-var p : PVrtRec;
-    ptr : pointer;
-    fc, fm : TRFloat;
+type PRFloat = ^TRFloat;
+var p : pointer;
+    m : TRFloat;
 begin
-  p:=@V;
-  with PV^ do case p^.VrType of
+  p:=@PVrtRec(@V)^.VrtData;
+  with PV^ do case VrtCode(PVrtRec(@V)^.VrType) of
     VrEmpty, VrNull : VType:=VNone;
-    VrSmallInt : begin Int:=PSmallInt(@p^.VrtData)^; VType:=VInt; end;
-    VrInteger  : begin Int:=PInteger(@p^.VrtData)^; VType:=VInt; end;
-    VrSingle   : begin Flo:=PSingle(@p^.VrtData)^; VType:=VFloat; end;
-    VrDouble   : begin Flo:=PDouble(@p^.VrtData)^; VType:=VFloat; end;
-    VrShortInt : begin Int:=PShortInt(@p^.VrtData)^; VType:=VInt; end;
-    VrByte     : begin Int:=PByte(@p^.VrtData)^; VType:=VInt; end;
-    VrWord     : begin Int:=PWord(@p^.VrtData)^; VType:=VInt; end;
-    VrLongWord : begin Int:=PLongWord(@p^.VrtData)^; VType:=VInt; end;
-    VrInt64    : begin Int:=PInt64(@p^.VrtData)^; VType:=VInt; end;
-    VrQWord    : begin Int:=PQWord(@p^.VrtData)^; VType:=VInt; end;
+    VrSmallInt : begin Int:=PSmallInt(p)^; VType:=VInt; end;
+    VrInteger  : begin Int:=PInteger(p)^; VType:=VInt; end;
+    VrSingle   : begin Flo:=PSingle(p)^; VType:=VFloat; end;
+    VrDouble   : begin Flo:=PDouble(p)^; VType:=VFloat; end;
+    VrShortInt : begin Int:=PShortInt(p)^; VType:=VInt; end;
+    VrByte     : begin Int:=PByte(p)^; VType:=VInt; end;
+    VrWord     : begin Int:=PWord(p)^; VType:=VInt; end;
+    VrLongWord : begin Int:=PLongWord(p)^; VType:=VInt; end;
+    VrInt64    : begin Int:=PInt64(p)^; VType:=VInt; end;
+    VrQWord    : begin Int:=PQWord(p)^; VType:=VInt; end;
     VrString   : begin
-                   ptr:=PPointer(@p^.VrtData)^;
-                   if (ptr<>nil) and (PSizeInt(ptr)[-1]=1) then begin
-                     Int:=PByte(ptr)^;
+                   p:=PPointer(p)^;
+                   if (p<>nil) and (PSizeInt(p)[-1]=1) then begin
+                     Int:=PByte(p)^;
                      VType:=VChar;
                    end else begin
-                     Str:=Str2Ptr(string(ptr));
+                     Str:=Str2Ptr(string(p));
                      VType:=VStr;
                    end;
                    VPhy:=0;
                  end;
     VrCplex    : begin
-                   Flo:=p^.VrtPGap[0];
-                   Img:=p^.VrtPGap[1];
+                   Flo:=PRFloat(p)[0];
+                   Img:=PRFloat(p)[1];
                    VType:=VCplex;
                  end;
     VrGap      : begin
-                   fm:=p^.VrtPGap[1];
-                   if fm<0 then RaiseError(InvalidRange);
-                   fc:=p^.VrtPGap[1];
-                   Flo:=fc-fm;
-                   Img:=fc+fm;
+                   Flo:=PRFloat(p)[0];
+                   Img:=PRFloat(p)[1];
+                   if Img<Flo then RaiseError(InvalidRange);
+                   VType:=VGap;
+                 end;
+    VrMGap     : begin
+                   m:=PRFloat(p)[1];
+                   if m<0 then RaiseError(InvalidRange);
+                   Flo:=PRFloat(p)[0]-m;
+                   Img:=PRFloat(p)[0]+m;
                    VType:=VGap;
                  end;
     VrIGap     : begin
-                   Int:=p^.VrtLGap;
-                   IGap:=p^.VrtRGap;
+                   Int:=PVrtRec(@V)^.VrtLInt;
+                   IGap:=PVrtRec(@V)^.VrtRInt;
                    VType:=VIGap;
                  end;
     else RaiseError(VariantError);

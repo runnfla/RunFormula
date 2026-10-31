@@ -77,21 +77,20 @@ type
 
   PAnsiRec = ^TAnsiRec;
 
-{$Z2}
-  TVrtRec = packed record
-    VrType : (VrEmpty = 0, VrNull = 1, VrSmallInt = 2, VrInteger = 3, VrSingle = 4,
+  VrtCode = (VrEmpty = 0, VrNull = 1, VrSmallInt = 2, VrInteger = 3, VrSingle = 4,
               VrDouble = 5, VrShortInt = 16, VrByte = 17, VrWord = 18, VrLongWord = 19,
               VrInt64 = 20, VrQWord = 21, VrString = $100, VrCplex = CRFVrtCplex,
-              VrGap = CRFVrtRange, VrIGap = CRFVrtIntRange);
+              VrGap = CRFVrtRange, VrMGap = CRFVrtMginRange, VrIGap = CRFVrtIntRange);
+
+  TVrtRec = packed record
+    VrType : word;
     Dummy : array [1..3] of word;
     case byte of
       0 : (VrtData : byte);
-      1 : (VrtPGap : ^TRFloat);
-      2 : (VrtLGap, VrtRGap : PtrInt);
+      1 : (VrtLInt, VrtRInt : PtrInt);
   end;
 
   PVrtRec = ^TVrtRec;
-{$Z4}
 
   TMemList = record
     List : PPointer;          // list of pointers, must be first !!!

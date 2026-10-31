@@ -58,7 +58,7 @@ function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE 
 var b : boolean;
 begin
   if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  ParamCount:= - ParamCount;
+  ParamCount:= -ParamCount;
   b:=AsBool(Param(ParamCount, Context));
   PostParam(Context);
   Result:=@CVnone;
@@ -71,7 +71,7 @@ var pv : PValRec;
     b, i : SizeInt;
 begin
   if ParamCount<2 then RaiseError(ParamNumber);
-  ParamCount:= - ParamCount;
+  ParamCount:= -ParamCount;
   pv:=Param(ParamCount, Context);
   for i:=ParamCount+1 to -1 do begin
     b:=Compare(pv, Param(ParamCount+i, Context)) and 1;
@@ -305,7 +305,7 @@ begin
   with Result^ do begin
     pv:=Param(-1, Context);
     Flo:=AsRe(pv);
-    Img:= - AsIm(pv);
+    Img:= -AsIm(pv);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
@@ -640,7 +640,7 @@ begin
         end;
     else RaiseError(ParamNumber);
   end;
-  ParamCount:= - ParamCount;
+  ParamCount:= -ParamCount;
   s:=AsStr(Param(ParamCount, Context));
   ps:=PByte(s);
   PostParam(Context);
@@ -661,17 +661,15 @@ end;
 
 function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_SUBSTR
 var s : string;
-    pv : PValRec;
     p : PByte;
     L, R, lng : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  pv:=Param(-1, Context);
-  with pv^ do begin
+  with Param(-1, Context)^ do begin
     if not (VType in IGapTypes) then RaiseError(RangeType);
     if VPhy<>0 then RaiseError(DimDisallow);
     L:=Int;
-    R:=AsIGap(pv);
+    R:=AsIGap(Context.TermResult);
   end;
   PostParam(Context);
   s:=AsStr(Param(-2, Context));
@@ -892,7 +890,7 @@ begin
                fa:=exp(pv^.Img)*0.5;
                fb:=0.25/fa;
                Flo:=cos(pv^.Flo)*(fa+fb);
-               Img:= - sin(pv^.Flo)*(fa-fb);
+               Img:= -sin(pv^.Flo)*(fa-fb);
                VType:=VCplex;
              end;
     VGap, VIGap : begin
@@ -967,7 +965,7 @@ begin
                  if f>0 then Flo:=sqrt(f) else Flo:=0;
                  f:=m-pv^.Flo*0.5;
                  if f>0 then Img:=sqrt(f) else Img:=0;
-                 if pv^.Img<0 then Img:= - Img;
+                 if pv^.Img<0 then Img:= -Img;
                  VType:=VCplex;
                end;
       VGap, VIGap : begin
@@ -1000,7 +998,7 @@ var pv : PValRec;
   begin
     if F<>0 then begin
       Result:=exp(ln(abs(F))*(1/3));
-      if F<0 then Result:= - Result;
+      if F<0 then Result:= -Result;
     end else Result:=0;
   end;
 
@@ -1050,8 +1048,8 @@ begin
   with Result^ do case pv^.VType of
     VCplex : begin
                CplexDiv(pv^.Flo, pv^.Img+1, -pv^.Flo, 1-pv^.Img, f, m);
-               Flo:= - FlArcTan(m, f)*0.5;
-               if (m=0) and (f<-1) then Flo:= - Flo;
+               Flo:= -FlArcTan(m, f)*0.5;
+               if (m=0) and (f<-1) then Flo:= -Flo;
                Img:=(ln(Hypot2(f, m))+ln(2))*0.5;
                VType:=VCplex;
              end;
