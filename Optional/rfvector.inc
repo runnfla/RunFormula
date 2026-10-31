@@ -33,17 +33,17 @@ begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
     Y:=Param(-1, Context);
+    X:=Param(-2, Context);
     Flo:=AsRe(X)*AsIm(Y)-AsIm(X)*AsRe(Y);
     VType:=VFloat;
     if (X^.VPhy or Y^.VPhy)<>0 then VPhy:=PhyPlus(X^.VPhy, Y^.VPhy);
   end;
   PostParam(Context);
-  PostParam(X, Context);
+  PostParam(Y, Context);
 end;
 
-function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ROTATE
+function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ROTATE
 var pv : PValRec;
     f : TRFloat;
 begin
@@ -61,7 +61,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_NORMALIZE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_NORMALIZE
+function Fla_NORMALIZE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_NORMALIZE
 var f, re, im : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -77,21 +77,21 @@ begin
   end;
 end;
 
-function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_ANGLE
+function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ANGLE
 var X, Y : PValRec;
     re, im : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
     Y:=Param(-1, Context);
+    X:=Param(-2, Context);
     CplexMult(AsRe(X), -AsIm(X), AsRe(Y), AsIm(Y), re, im);
     Flo:=FlArcTan(im, re);
     VType:=VFloat;
   end;
   PostParam(Context);
-  PostParam(X, Context);
+  PostParam(Y, Context);
 end;
 
 function Fla_PROJECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_PROJECT
@@ -116,6 +116,7 @@ end;
 
 function Fla_DISTSQ(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_DISTSQ
 var X, Y : PValRec;
+    phy : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
@@ -124,22 +125,27 @@ begin
     Y:=Param(-1, Context);
     Flo:=sqr(AsRe(Y)-AsRe(X))+sqr(AsIm(Y)-AsIm(X));
     VType:=VFloat;
-    VPhy:=X^.VPhy;
-    if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
+    if (X^.VPhy or Y^.VPhy)<>0 then begin
+      phy:=Y^.VPhy;
+      if phy<>X^.VPhy then RaiseError(DimMismatch);
+      VPhy:=PhyPlus(phy, phy);
+    end;
   end;
   PostParam(Context);
   PostParam(X, Context);
 end;
 
-function Fla_PERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_PERP
+function Fla_PERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PERP
+var pv : PValRec;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Flo:=AsIm(Param(-1, Context));
-    Img:= -AsRe(Context.TermResult);
+    pv:=Param(-1, Context);
+    Flo:= -AsIm(pv);
+    Img:=AsRe(pv);
     VType:=VCplex;
-    VPhy:=Context.TermResult^.VPhy;
+    VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
@@ -167,6 +173,29 @@ begin
   PostParam(X, Context);
 end;
 
+function Fla_CMPVECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CMPVECT
+var X, Y : PValRec;
+    fa, fb, t : TRFloat;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  X:=Param(-2, Context);
+  Y:=Param(-1, Context);
+  if Y^.VPhy<>X^.VPhy then RaiseError(DimMismatch);
+  fa:=AsRe(X); fb:=AsRe(Y);
+  t:=(fb+fa)*(fa-fb);
+  fa:=AsIm(X); fb:=AsIm(Y);
+  t:=(fb+fa)*(fa-fb)+t;
+  PostParam(Context);
+  PostParam(X, Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VType:=VInt;
+    Int:=1;
+    if t>0 then exit;
+    if t=0 then Int:=0 else Int:=-1;
+  end;
+end;
+
 {$endif}
 
 {$ifdef runfla_optinit}
@@ -179,6 +208,7 @@ FuncReg('project', @Fla_PROJECT);
 FuncReg('distsq', @Fla_DISTSQ);
 FuncReg('perp', @Fla_PERP);
 FuncReg('lerp', @Fla_LERP);
+FuncReg('cmpvect', @Fla_CMPVECT);
 
 {$endif}
   {
