@@ -515,7 +515,7 @@
       <Unit>
         <Filename Value="..\RunFormula\runflaopt.inc"/>
         <EditorIndex Value="18"/>
-        <CursorPos X="68" Y="17"/>
+        <CursorPos X="66" Y="8"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -779,8 +779,8 @@
         <Filename Value="..\Optional\rfvector.inc"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="20"/>
-        <TopLine Value="43"/>
-        <CursorPos X="14" Y="94"/>
+        <TopLine Value="91"/>
+        <CursorPos X="21" Y="97"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit>

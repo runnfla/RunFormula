@@ -27,7 +27,7 @@
 
 {$ifdef runfla_optfunc}
 
-function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CROSS
+function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_CROSS
 var X, Y : PValRec;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -94,7 +94,7 @@ begin
   PostParam(Y, Context);
 end;
 
-function Fla_PROJECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_PROJECT
+function Fla_PROJECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PROJECT
 var pv : PValRec;
     re, im, f, t : TRFloat;
 begin
@@ -106,8 +106,8 @@ begin
   with Result^ do begin
     pv:=Param(-2, Context);
     CplexDiv(AsRe(pv), AsIm(pv), re, im, f, t);
-    Flo:=f*re;
-    Img:=f*im;
+    Flo:=re*f;
+    Img:=im*f;
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
