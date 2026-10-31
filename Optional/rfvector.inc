@@ -114,7 +114,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_DISTSQ(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_DISTSQ
+function Fla_DISTSQ(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_DISTSQ
 var X, Y : PValRec;
     phy : SizeInt;
 begin
@@ -150,7 +150,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_LERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_LERP
+function Fla_LERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_LERP
 var X, Y : PValRec;
     t, t1 : TRFloat;
 begin
@@ -161,8 +161,8 @@ begin
   t1:=1-t;
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
-    Y:=Param(-1, Context);
+    Y:=Param(-2, Context);
+    X:=Param(-3, Context);
     Flo:=AsRe(X)*t1+AsRe(Y)*t;
     Img:=AsIm(X)*t1+AsIm(Y)*t;
     VType:=VCplex;
@@ -170,7 +170,7 @@ begin
     if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
   end;
   PostParam(Context);
-  PostParam(X, Context);
+  PostParam(Y, Context);
 end;
 
 function Fla_CMPVECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CMPVECT
