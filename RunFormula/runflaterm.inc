@@ -410,12 +410,10 @@ begin
 end;
 
 procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
-type PRFloat = ^TRFloat;
 var p : pointer;
-    m : TRFloat;
 begin
   p:=@PVrtRec(@V)^.VrtData;
-  with PV^ do case VrtCode(PVrtRec(@V)^.VrType) of
+  with PV^ do case VrCodes(PVrtRec(@V)^.VrtCode) of
     VrEmpty, VrNull : VType:=VNone;
     VrSmallInt : begin Int:=PSmallInt(p)^; VType:=VInt; end;
     VrInteger  : begin Int:=PInteger(p)^; VType:=VInt; end;
@@ -439,22 +437,19 @@ begin
                    VPhy:=0;
                  end;
     VrCplex    : begin
-                   Flo:=PRFloat(p)[0];
-                   Img:=PRFloat(p)[1];
+                   Flo:=PVrtRec(@V)^.VrtPFlo^;
+                   Img:=PVrtRec(@V)^.VrtPImg^;
                    VType:=VCplex;
                  end;
     VrGap      : begin
-                   Flo:=PRFloat(p)[0];
-                   Img:=PRFloat(p)[1];
+                   Flo:=PVrtRec(@V)^.VrtPFlo^;
+                   Img:=PVrtRec(@V)^.VrtPImg^;
                    if Img<Flo then RaiseError(InvalidRange);
                    VType:=VGap;
                  end;
     VrMGap     : begin
-                   m:=PRFloat(p)[1];
-                   if m<0 then RaiseError(InvalidRange);
-                   Flo:=PRFloat(p)[0]-m;
-                   Img:=PRFloat(p)[0]+m;
-                   VType:=VGap;
+                   Ball(PVrtRec(@V)^.VrtPFlo^, PVrtRec(@V)^.VrtPImg^, PV);
+                   if Img<Flo then RaiseError(InvalidRange);
                  end;
     VrIGap     : begin
                    Int:=PVrtRec(@V)^.VrtLInt;

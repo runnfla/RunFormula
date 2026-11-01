@@ -32,10 +32,10 @@ type
   TRunFlaFunc = function(ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
 
 const
-  CRFVrtCplex = $D50;
-  CRFVrtRange = $D51;
-  CRFVrtMginRange = $D52;
-  CRFVrtIntRange = $D53;
+  RFVrtCplex = $D50;
+  RFVrtRange = $D51;
+  RFVrtMginRange = $D52;
+  RFVrtIntRange = $D53;
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}

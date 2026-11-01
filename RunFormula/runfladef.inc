@@ -77,17 +77,18 @@ type
 
   PAnsiRec = ^TAnsiRec;
 
-  VrtCode = (VrEmpty = 0, VrNull = 1, VrSmallInt = 2, VrInteger = 3, VrSingle = 4,
+  VrCodes = (VrEmpty = 0, VrNull = 1, VrSmallInt = 2, VrInteger = 3, VrSingle = 4,
               VrDouble = 5, VrShortInt = 16, VrByte = 17, VrWord = 18, VrLongWord = 19,
-              VrInt64 = 20, VrQWord = 21, VrString = $100, VrCplex = CRFVrtCplex,
-              VrGap = CRFVrtRange, VrMGap = CRFVrtMginRange, VrIGap = CRFVrtIntRange);
+              VrInt64 = 20, VrQWord = 21, VrString = $100, VrCplex = RFVrtCplex,
+              VrGap = RFVrtRange, VrMGap = RFVrtMginRange, VrIGap = RFVrtIntRange);
 
   TVrtRec = packed record
-    VrType : word;
+    VrtCode : word;
     Dummy : array [1..3] of word;
     case byte of
       0 : (VrtData : byte);
-      1 : (VrtLInt, VrtRInt : PtrInt);
+      1 : (VrtPFlo, VrtPImg : ^TRFloat);
+      2 : (VrtLInt, VrtRInt : PtrInt);
   end;
 
   PVrtRec = ^TVrtRec;
