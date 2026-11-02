@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Optional module/s connector
-//  Rev. 28.10.2026
+//  Optional modules connector
+//  Rev. 2.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -17,5 +17,5 @@
 
 // TODO -oRFla.Opt -cRev.2026.00.00:
 
-{$include ../Optional/rfvector.inc}       // 2D Radius-Vector functions
+{$include ../Optional/rfvector.inc}          // 2D Radius-Vector functions
 

@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Optional 2D Radius-Vector functions
-//  Rev. 30.10.2026
+//  Rev. 2.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -173,26 +173,25 @@ begin
   PostParam(Y, Context);
 end;
 
-function Fla_CMPVECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.30: Func Fla_CMPVECT
+function Fla_CMPVECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.11.02: Func Fla_CMPVECT
 var X, Y : PValRec;
     fa, fb, t : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
-  X:=Param(-2, Context);
   Y:=Param(-1, Context);
-  if Y^.VPhy<>X^.VPhy then RaiseError(DimMismatch);
-  fa:=AsRe(X); fb:=AsRe(Y);
-  t:=(fb+fa)*(fa-fb);
-  fa:=AsIm(X); fb:=AsIm(Y);
-  t:=(fb+fa)*(fa-fb)+t;
+  X:=Param(-2, Context);
+  if X^.VPhy<>Y^.VPhy then RaiseError(DimMismatch);
+  fb:=AsRe(Y); fa:=AsRe(X);
+  t:=(fa+fb)*(fa-fb);
+  fb:=AsIm(Y); fa:=AsIm(X);
+  t:=(fa+fb)*(fa-fb)+t;
   PostParam(Context);
-  PostParam(X, Context);
+  PostParam(Y, Context);
   Result:=NewLV(Context);
   with Result^ do begin
+    Int:=-1;
+    if t>0 then Int:=1 else if t=0 then Int:=0;
     VType:=VInt;
-    Int:=1;
-    if t>0 then exit;
-    if t=0 then Int:=0 else Int:=-1;
   end;
 end;
 
@@ -211,15 +210,4 @@ FuncReg('lerp', @Fla_LERP);
 FuncReg('cmpvect', @Fla_CMPVECT);
 
 {$endif}
-  {
-+reflect(V, N) = V - 2 * (V *. N) * N            = V-2*projct
-+  project(A, B) =  ((A *. B) / (B *. B)) * B
-+  slide(V, N) = V - (V *. N) * N                  = V-projct
-  lerp(A, B, t) = A + (B - A) * t [t-0..1]
-+ mirror(V, C) \(= 2 \cdot C - V\).      = C*2 - V
-+ center(V, C) = (V+C)/2
-+  distanceSq
-  perpCW(V) \(= [(AsIm(V), -AsRe(V))]\)
-+  perpCCW(V) \(= [(-AsIm(V), AsRe(V))]\) — п   = perp(-V)
-   }
 
