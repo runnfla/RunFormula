@@ -500,6 +500,7 @@ begin
           if IsKey('inline') then raise EError.Create(Unsupported);
           if IsKey('branch') then raise EError.Create(Unsupported);
           if IsKey('debug') then raise EError.Create(Unsupported);
+          if IsKey('result') then raise EError.Create(Unsupported);
           if IsKey('is') then raise EError.Create(Unsupported);
           if IsKey('ref') then raise EError.Create(Unsupported);
           case tf^ of

@@ -499,8 +499,28 @@ begin
 end;
 
 function AsVrt(PV:PValRec):Variant;                        //DONE -oRFla.Lib -cRev.2026.03.30: Func AsVrt
+var p : pointer;
 begin
+//  p:=@PVrtRec(@Result)^.VrtData;
   with PV^ do case VType of
+//    VNone : PVrtRec(@Result)^.VrtCode:=word(VrNull);
+//    VInt  : begin
+//              PSizeInt(p)^:=Int;
+//{$if SI = 8}  PVrtRec(@Result)^.VrtCode:=word(VrInt64); {$endif}
+//{$if SI = 4}  PVrtRec(@Result)^.VrtCode:=word(VrInt64); {$endif}
+//{$if SI = 2}  PVrtRec(@Result)^.VrtCode:=word(VrInt64); {$endif}
+//            end;
+//    VFloat, VCplex : begin
+
+
+//             end;
+//    VChar, VStr : begin
+
+//                  end;
+//    VGap  :
+//    VIGap :
+
+
     VNone : with PVarData(@Result)^ do begin
               vtype:=varString;
               vstring:=nil;

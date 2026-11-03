@@ -228,7 +228,7 @@ type
     constructor Create(Code:TRunFlaErrCode; Token:PByte);
   end;
 
-  EResult = class(Exception);
+  EAbortScript = class(Exception);
 
   TCharSet = set of char;
 

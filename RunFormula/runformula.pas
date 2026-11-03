@@ -32,10 +32,10 @@ type
   TRunFlaFunc = function(ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
 
 const
-  RFVrtCplex = $D50;
-  RFVrtRange = $D51;
-  RFVrtMginRange = $D52;
-  RFVrtIntRange = $D53;
+  RFVrtCplex = $D50;           // Variant contains pointers to a complex number
+  RFVrtRange = $D51;           // Variant contains pointers to range bounds
+  RFVrtMginRange = $D52;       // Variant contains pointers to center and margin
+  RFVrtIntRange = $D53;        // Variant contains integer range bounds
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}
@@ -300,7 +300,7 @@ begin
     FillError(OK);
   except
     on E:EError do FillError(E.FCode, E.FToken);
-    on E:EResult do begin
+    on E:EAbortScript do begin
       Result:=Context.TermResult;
       FillError(OK);
     end;

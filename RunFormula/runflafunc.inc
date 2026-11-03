@@ -17,14 +17,14 @@
 
 // TODO -oRFla.Func -cRev.2026.00.00: Make repeat timeout
 
-function Fla_RESULT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_RESULT
+function Fla_ABORT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_ABORT
 begin
   case ParamCount of
     0 : Context.TermResult:=@CVnone;
     1 : Context.TermResult:=Param(-1, Context);
     else RaiseError(ParamNumber);
   end;
-  raise EResult.Create('');
+  raise EAbortScript.Create('');
 end;
 
 function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_EXIT
@@ -1215,7 +1215,7 @@ end;
 
 procedure FuncRegister;
 begin
-  FuncReg('result', @Fla_RESULT);
+  FuncReg('abort', @Fla_ABORT);
   FuncReg('exit', @Fla_EXIT);
   FuncReg('break', @Fla_BREAK);
   FuncReg('continue', @Fla_CONTINUE);

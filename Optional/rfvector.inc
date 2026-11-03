@@ -61,7 +61,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_NORMALIZE(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_NORMALIZE
+function Fla_NORM(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_NORM
 var f, re, im : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -94,7 +94,7 @@ begin
   PostParam(Y, Context);
 end;
 
-function Fla_PROJECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PROJECT
+function Fla_PROJ(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PROJECT
 var pv : PValRec;
     re, im, f, t : TRFloat;
 begin
@@ -201,9 +201,9 @@ end;
 
 FuncReg('cross', @Fla_CROSS);
 FuncReg('rotate', @Fla_ROTATE);
-FuncReg('normalize', @Fla_NORMALIZE);
+FuncReg('norm', @Fla_NORM);
 FuncReg('angle', @Fla_ANGLE);
-FuncReg('project', @Fla_PROJECT);
+FuncReg('proj', @Fla_PROJ);
 FuncReg('distsq', @Fla_DISTSQ);
 FuncReg('perp', @Fla_PERP);
 FuncReg('lerp', @Fla_LERP);

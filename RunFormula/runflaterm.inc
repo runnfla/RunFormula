@@ -416,7 +416,7 @@ begin
   with PV^ do case VrCodes(PVrtRec(@V)^.VrtCode) of
     VrEmpty, VrNull : VType:=VNone;
     VrSmallInt : begin Int:=PSmallInt(p)^; VType:=VInt; end;
-    VrInteger  : begin Int:=PInteger(p)^; VType:=VInt; end;
+    VrInteger  : begin Int:=PInteger(p)^; VType:=VInt; end;    ///????
     VrSingle   : begin Flo:=PSingle(p)^; VType:=VFloat; end;
     VrDouble   : begin Flo:=PDouble(p)^; VType:=VFloat; end;
     VrShortInt : begin Int:=PShortInt(p)^; VType:=VInt; end;
