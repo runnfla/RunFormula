@@ -445,6 +445,39 @@ begin
   PostParam(C, Context);
 end;
 
+function Fla_SPAN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_SPAN
+var pv : PValRec;
+    t, i : SizeInt;
+begin
+  if ParamCount<2 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with ValCopy(Param(-1, Context), Result)^ do begin
+    case VType of
+      VInt, VChar : begin IGap:=Int; VType:=VIGap; end;
+      VFloat : begin Img:=Flo; VType:=VGap; end;
+      VGap, VIGap : ;
+      else TypeDisallow(VType);
+    end;
+    PostParam(Context);
+    for i:=-2 downto -ParamCount do begin
+      pv:=Param(i, Context);
+      if VType=VIGap then begin
+        if pv^.VType in IGapTypes
+          then MinMax(pv^.Int, AsIGap(pv), Result)
+          else begin
+            t:=IGap;
+            Flo:=Int;
+            Img:=t;
+            VType:=VGap;
+            MinMax(AsLGap(pv), AsRGap(pv), Result);
+          end;
+      end else MinMax(AsLGap(pv), AsRGap(pv), Result);
+      if VPhy<>pv^.VPhy then RaiseError(DimMismatch);
+      PostParam(Context);
+    end;
+  end;
+end;
+
 function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_FRAC
 var pv : PValRec;
 begin
@@ -762,39 +795,41 @@ var X, Y : PValRec;               // pow(X, Y) = X^Y
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  Y:=Param(-1, Context);
-  if Y^.VPhy<>0 then RaiseError(DimDisallow);
-  X:=Param(-2, Context);
-  if X^.VPhy<>0 then RaiseError(DimDisallow);
-  with Result^ do case CaseType[X^.VType, Y^.VType] of
-    VCplex : begin
-               ft:=AsIm(X);
-               fe:=AsRe(X);
-               m:=Hypot2(fe, ft);
-               if m<>0 then begin
-                 m:=ln(m)+ln(2);
-                 f:=FlArcTan(ft, fe);
-                 fe:=AsRe(Y);
-                 ft:=fe*f+AsIm(Y)*m;
-                 fe:=exp(fe*m-AsIm(Y)*f);
-                 Flo:=fe*cos(ft);
-                 Img:=fe*sin(ft);
-               end else begin
-                 f:=AsRe(Y);
-                 if (f<0) or (AsIm(Y)<>0) then RaiseError(InvalidValue);
-                 if f=0 then Flo:=1 else Flo:=0;
-                 Img:=0;
+  with Result^ do begin
+    Y:=Param(-1, Context);
+    if Y^.VPhy<>0 then RaiseError(DimDisallow);
+    X:=Param(-2, Context);
+    if X^.VPhy<>0 then RaiseError(DimDisallow);
+    case CaseType[X^.VType, Y^.VType] of
+      VCplex : begin
+                 ft:=AsIm(X);
+                 fe:=AsRe(X);
+                 m:=Hypot2(fe, ft);
+                 if m<>0 then begin
+                   m:=ln(m)+ln(2);
+                   f:=FlArcTan(ft, fe);
+                   fe:=AsRe(Y);
+                   ft:=fe*f+AsIm(Y)*m;
+                   fe:=exp(fe*m-AsIm(Y)*f);
+                   Flo:=fe*cos(ft);
+                   Img:=fe*sin(ft);
+                 end else begin
+                   f:=AsRe(Y);
+                   if (f<0) or (AsIm(Y)<>0) then RaiseError(InvalidValue);
+                   if f=0 then Flo:=1 else Flo:=0;
+                   Img:=0;
+                 end;
+                 VType:=VCplex;
                end;
-               VType:=VCplex;
-             end;
-    VGap, VIGap : begin
-                    m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
-                    MinMax(RealPow(m, fe), RealPow(m, ft), Result);
-                    MinMax(RealPow(f, fe), RealPow(f, ft), Result);
-                  end;
-    else
-      Flo:=RealPow(AsFloat(X), AsFloat(Y));
-      VType:=VFloat;
+      VGap, VIGap : begin
+                      m:=AsLGap(X); f:=AsRGap(X); fe:=AsLGap(Y); ft:=AsRGap(Y);
+                      MinMax(RealPow(m, fe), RealPow(m, ft), Result);
+                      MinMax(RealPow(f, fe), RealPow(f, ft), Result);
+                    end;
+      else
+        Flo:=RealPow(AsFloat(X), AsFloat(Y));
+        VType:=VFloat;
+    end;
   end;
   PostParam(Context);
   PostParam(Y, Context);
@@ -806,34 +841,35 @@ var X, Y : PValRec;               // log(X, Y) = logY(X)
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  X:=Param(-2, Context);
-  if X^.VPhy<>0 then RaiseError(DimDisallow);
-  Y:=Param(-1, Context);
-  if Y^.VPhy<>0 then RaiseError(DimDisallow);
-  with Result^ do case CaseType[X^.VType, Y^.VType] of
-    VCplex : begin
-               f:=AsRe(Y);
-               m:=AsIm(Y);
-               fe:=ln(Hypot2(m, f))+ln(2);
-               ft:=FlArcTan(m, f);
-               f:=AsRe(X);
-               m:=AsIm(X);
-               CplexDiv(ln(Hypot2(m, f))+ln(2), FlArcTan(m, f), fe, ft, Flo, Img);
-               VType:=VCplex;
-             end;
-    VGap, VIGap : begin
-                    fe:=AsLGap(Y); ft:=AsRGap(Y);
-                    if (fe<=1) and (ft>=1) then RaiseError(InvalidValue);
-                    fe:=ln(fe);
-                    ft:=ln(ft);
-                    m:=ln(AsLGap(X));
-                    f:=ln(AsRGap(X));
-                    MinMax(m/fe, m/ft, Result);
-                    MinMax(f/fe, f/ft, Result);
-                  end;
-    else begin
-      Flo:=ln(AsFloat(X))/ln(AsFloat(Y));
-      VType:=VFloat;
+  with Result^ do begin
+    X:=Param(-2, Context);
+    if X^.VPhy<>0 then RaiseError(DimDisallow);
+    Y:=Param(-1, Context);
+    if Y^.VPhy<>0 then RaiseError(DimDisallow);
+    case CaseType[X^.VType, Y^.VType] of
+      VCplex : begin
+                 f:=AsRe(Y);
+                 m:=AsIm(Y);
+                 fe:=ln(Hypot2(m, f))+ln(2);
+                 ft:=FlArcTan(m, f);
+                 f:=AsRe(X);
+                 m:=AsIm(X);
+                 CplexDiv(ln(Hypot2(m, f))+ln(2), FlArcTan(m, f), fe, ft, Flo, Img);
+                 VType:=VCplex;
+               end;
+      VGap, VIGap : begin
+                      fe:=AsLGap(Y); ft:=AsRGap(Y);
+                      if (fe<=1) and (ft>=1) then RaiseError(InvalidValue);
+                      fe:=ln(fe);
+                      ft:=ln(ft);
+                      m:=ln(AsLGap(X));
+                      f:=ln(AsRGap(X));
+                      MinMax(m/fe, m/ft, Result);
+                      MinMax(f/fe, f/ft, Result);
+                    end;
+      else
+        Flo:=ln(AsFloat(X))/ln(AsFloat(Y));
+        VType:=VFloat;
     end;
   end;
   PostParam(Context);
@@ -1106,6 +1142,46 @@ begin
   PostParam(Context);
 end;
 
+function Fla_HYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_HYPOT
+var X, Y : PValRec;
+    fa, fb, fc, fd : TRFloat;
+    flg : boolean;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    X:=Param(-2, Context);
+    Y:=Param(-1, Context);
+    case CaseType[X^.VType, Y^.VType] of
+      VCplex : begin
+                 Flo:=Hypot2(Hypot2(AsRe(X), AsIm(X)), Hypot2(AsRe(Y), AsIm(Y)))*4;
+                 VType:=VFloat;
+               end;
+      VGap, VIGap : begin
+                      fa:=AsLGap(X); fb:=AsRGap(X); fc:=AsLGap(Y); fd:=AsRGap(Y);
+                      MinMax(Hypot2(fa, fc)*2, Hypot2(fa, fd)*2, Result);
+                      MinMax(Hypot2(fb, fc)*2, Hypot2(fb, fd)*2, Result);
+                      flg:=(fa<=0) and (fb>=0);
+                      if (fc<=0) and (fd>=0) then begin
+                        if flg then begin
+                          Flo:=0;
+                          flg:=false;
+                        end else MinMax(abs(fa), abs(fb), Result);
+                      end;
+                      if flg then MinMax(abs(fc), abs(fd), Result);
+                      VType:=VGap;
+                    end;
+      else
+        Flo:=Hypot2(AsFloat(X), AsFloat(Y))*2;
+        VType:=VFloat;
+    end;
+    VPhy:=X^.VPhy;
+    if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
+  end;
+  PostParam(Context);
+  PostParam(X, Context);
+end;
+
 function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_CHAR
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -1236,6 +1312,7 @@ begin
   FuncReg('margin', @Fla_MARGIN);
   FuncReg('range', @Fla_RANGE);
   FuncReg('ball', @Fla_BALL);
+  FuncReg('span', @Fla_SPAN);
   FuncReg('frac', @Fla_FRAC);
   FuncReg('trunc', @Fla_TRUNC);
   FuncReg('floor', @Fla_FLOOR);
@@ -1259,6 +1336,7 @@ begin
   FuncReg('cbrt', @Fla_CBRT);
   FuncReg('arctan', @Fla_ARCTAN);
   FuncReg('abs', @Fla_ABS);
+  FuncReg('hypot', @Fla_HYPOT);
   FuncReg('char', @Fla_CHAR);
   FuncReg('compare', @Fla_COMPARE);
   FuncReg('match', @Fla_MATCH);

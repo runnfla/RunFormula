@@ -68,7 +68,7 @@ IncompType_NG
 - подчеркивание в числах
 - возможность добавления своих интерфейсных функций
 - Fix - выбор приставки для комплексных и интервалов
-- новые функции - tick(), for(), cbrt(), in()
+- новые функции - tick(), for(), cbrt(), in(), hypot(), span()
 - ощибки FloatDisallow CplexDisallow RangeDisallow EmptyString
 - удалены InvalidType IncompType_FI IncompType_CI IncompType_GI
 - точка как разделитель в размерностях
