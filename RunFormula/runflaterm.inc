@@ -409,66 +409,51 @@ begin
   end else ValCopy(Pini, pv);
 end;
 
-procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
-var p : pointer;
+function Vrt2Val(constref V:TRFVariant):PValRec;               //DONE -oRFla.Term -cRev.2026.03.30: Func Vrt2Val
+var p : PSizeInt;
 begin
- { p:=@PVrtRec(@V)^.VrtData;
-  with PV^ do case VrCodes(PVrtRec(@V)^.VrtCode) of
-    VrEmpty, VrNull : VType:=VNone;
-    VrSmallInt : begin Int:=PSmallInt(p)^; VType:=VInt; end;
-    VrInteger  : begin Int:=PInteger(p)^; VType:=VInt; end;    ///????
-    VrSingle   : begin Flo:=PSingle(p)^; VType:=VFloat; end;
-    VrDouble   : begin Flo:=PDouble(p)^; VType:=VFloat; end;
-    VrShortInt : begin Int:=PShortInt(p)^; VType:=VInt; end;
-    VrByte     : begin Int:=PByte(p)^; VType:=VInt; end;
-    VrWord     : begin Int:=PWord(p)^; VType:=VInt; end;
-    VrLongWord : begin Int:=PLongWord(p)^; VType:=VInt; end;
-    VrInt64    : begin Int:=PInt64(p)^; VType:=VInt; end;
-    VrQWord    : begin Int:=PQWord(p)^; VType:=VInt; end;
-    VrString   : begin
-                   p:=PPointer(p)^;
-                   if (p<>nil) and (PSizeInt(p)[-1]=1) then begin
-                     Int:=PByte(p)^;
-                     VType:=VChar;
-                   end else begin
-                     Str:=Str2Ptr(string(p));
-                     VType:=VStr;
-                   end;
-                   VPhy:=0;
-                 end;
-    VrCplex    : begin
-                   Flo:=PVrtRec(@V)^.VrtPFlo^;
-                   Img:=PVrtRec(@V)^.VrtPImg^;
-                   VType:=VCplex;
-                 end;
-    VrGap      : begin
-                   Flo:=PVrtRec(@V)^.VrtPFlo^;
-                   Img:=PVrtRec(@V)^.VrtPImg^;
-                   if Img<Flo then RaiseError(InvalidRange);
-                   VType:=VGap;
-                 end;
-    VrMGap     : begin
-                   Ball(PVrtRec(@V)^.VrtPFlo^, PVrtRec(@V)^.VrtPImg^, PV);
-                   if Img<Flo then RaiseError(InvalidRange);
-                 end;
-    VrIGap     : begin
-                   Int:=PVrtRec(@V)^.VrtLInt;
-                   IGap:=PVrtRec(@V)^.VrtRInt;
-                   VType:=VIGap;
-                 end;
-    else RaiseError(VariantError);
-  end;    }
+  Result:=NewLV(Context);
+  with Result^ do begin
+    VPhy:=V.Dim;
+    VType:=TVType(V.VrType);
+    case VType of
+      VNone  : ;
+      VInt   : Int:=V.Int;
+      VFloat : Flo:=V.Float;
+      VCplex : begin Flo:=V.Float; Img:=V.Image; end;
+      VStr   : begin
+                 p:=PSizeInt(V.Str);
+                 if (p<>nil) and (p[-1]=1) then begin
+                   Int:=PByte(p)^;
+                   VType:=VChar;
+                 end else Str:=Str2Ptr(V.Str);
+                 VPhy:=0;
+               end;
+      VGap   : begin
+                 Flo:=V.Float; Img:=V.Image;
+                 if Img>Flo then RaiseError(InvalidRange);
+               end;
+      VIGap  : begin
+                 Int:=V.Int; IGap:=V.RIntBnd;
+                 if IGap<Int then RaiseError(InvalidRange);
+               end;
+    //  else RaiseError(////////);
+    end;
+  end;
 end;
 
 function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;          //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar
+var V : TRFVariant = (VrType : VrNone; Dummy : 0; Dim : 0; Str : '');
 begin                                                   // not inline
-  Result:=NewLV(Context);
-  with Context do Vrt2Val(RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), flg, Result^.VPhy), Result);
+  flg:=false;
+  with Context do RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), V, flg);
+  Result:=Vrt2Val(V);
 end;
 
 function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;   //DONE -oRFla.Term -cRev.2026.04.25: Func DoUserFunc
+var V : TRFVariant = (VrType : VrNone; Dummy : 0; Dim : 0; Str : '');
 begin                                                   // not inline
-  Result:=NewLV(Context);
-  Vrt2Val(UFunc(I, P, Result^.VPhy), Result);
+  UFunc(I, P, V);
+  Result:=Vrt2Val(V);
 end;
 

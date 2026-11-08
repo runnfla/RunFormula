@@ -61,7 +61,7 @@ var
 implementation
 
 uses
-  RunFormula, Variants;
+  RunFormula;
 
 {$R *.lfm}
 
@@ -116,16 +116,17 @@ const TagName : array[TTag] of string = (
   'Power',
   'Phy');
 
-function MyRunFlaVar(constref Name:string; out Save:boolean; var Dim:SizeInt):Variant;
+procedure MyRunFlaVar(constref Name:string; var VrtResult:TRFVariant; var Save:boolean);
 begin
-  Result:=StrToFloat(InputBox('', 'Get value for variable <'+Name+'>', ''));
-  Save:=false;
+  with VrtResult do begin
+    Float:=StrToFloat(InputBox('', 'Get value for variable <'+Name+'>', ''));
+    VrType:=VrFloat;
+  end;
 end;
 
-function AppendResult(ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
+procedure AppendResult(ParamCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);
 begin
   DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParamAsStr(-1, Context);
-  Result:='';
 end;
 
 procedure TDemoForm.ParseButtonClick(Sender: TObject);
@@ -239,11 +240,12 @@ end;
 procedure TDemoForm.ExecButtonClick(Sender: TObject);
 var FlaError : TRunFlaError;
     Exec : string;
+    Vrt : TRFVariant;
 begin
   ResultMemo.Clear;
   RunFlaFuncReg('appendresult', @AppendResult);
   if VrtCheckBox.Checked
-  then Exec:=RunFlaExecVrt(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar)
+  then RunFlaExecVrt(RunFlaParse(FlaSynEdit.Text, FlaError), Vrt, FlaError, @MyRunFlaVar)
   else Exec:=RunFlaExecStr(RunFlaParse(FlaSynEdit.Text, FlaError), FlaError, @MyRunFlaVar);
   with FlaError do if Code<>OK then begin
     ResultMemo.Text:='ERROR at Position '+IntToStr(Position)+': '+RunFlaErrorMsg[Code].ErrMsg+

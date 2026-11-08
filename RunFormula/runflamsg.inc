@@ -42,7 +42,7 @@ const
       (ErrCode : IllegalBracket; ErrMsg : 'Mismatched bracket or block terminator'),
       (ErrCode : UnknownFunc; ErrMsg : 'Function is not found'),
       (ErrCode : VarExpected; ErrMsg : 'Variable expected'),
-      (ErrCode : VariantError; ErrMsg : 'Variant Conversion Error'),
+  //    (ErrCode : VariantError; ErrMsg : 'Variant Conversion Error'),
       (ErrCode : UnknownVar; ErrMsg : 'Variable is not found'),
       (ErrCode : ParamNumber; ErrMsg : 'Incorrect number of parameters'),
       (ErrCode : DefExists; ErrMsg : 'Define already exists'),

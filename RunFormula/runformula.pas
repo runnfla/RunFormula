@@ -40,8 +40,8 @@ type
       3 : (LIntBnd, RIntBnd : SizeInt);
   end;
 
-  TRunFlaVar = function(constref Name:string; out Save:boolean; var Dim:SizeInt):Variant;
-  TRunFlaFunc = function(ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
+  TRunFlaVar = procedure(constref Name:string; var VrtResult:TRFVariant; var Save:boolean);
+  TRunFlaFunc = procedure(ParamCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}
@@ -50,11 +50,9 @@ function RunFlaParse(constref Fla:string; out Error:TRunFlaError):string;
 function RunFlaParse(constref Fla:string):string;
 function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):string;
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
-function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
-function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil);
-function RunFlaParam(Offset:SizeInt; Context:pointer; PDim:PSizeInt=nil):Variant;
+procedure RunFlaParam(Offset:SizeInt; Context:pointer; out VrtResult:TRFVariant);
 function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
@@ -222,13 +220,12 @@ begin
   with Context.FuncArg do Result:=Term(PPByte(List[Count+Offset])^, Context);
 end;
 
-function RunFlaParam(Offset:SizeInt; Context:pointer; PDim:PSizeInt=nil):Variant;
-type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Func RunFlaParam
+procedure RunFlaParam(Offset:SizeInt; Context:pointer; out VrtResult:TRFVariant);
+type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Proc RunFlaParam
 begin
   with PContext(Context)^.FuncArg do begin
     if (Offset>=0) or (Offset<(-Count)) then RaiseError(ParamNumber);
-    Result:=AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^));
-    if PDim<>nil then PDim^:=PContext(Context)^.TermResult^.VPhy;
+    AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^), VrtResult);
   end;
   PostParam(PContext(Context)^);
 end;
@@ -353,35 +350,22 @@ begin
   FreeValue(@R);
 end;
 
-function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
-var R : TValRec;                                          //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecVrt
-begin
-  Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
-  FreeValue(@R);
-end;
-
-function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
+procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
 var Error : TRunFlaError = (Code : Unknown);              //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecVrt
     R : TValRec;             // prevent filling
 begin
-  Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
+  Exec(Fla, Error, FlaVar, @R);
+  AsVrt(@R, VrtResult);
   FreeValue(@R);
 end;
 
-
-
-
-procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
-begin
-
-end;
-
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil);
+var R : TValRec;
 begin
-
+  Exec(Fla, Error, FlaVar, @R);
+  AsVrt(@R, VrtResult);
+  FreeValue(@R);
 end;
-
-
 
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oRFla.Main -cRev.2026.05.03: Proc RunFlaRaise
 begin
