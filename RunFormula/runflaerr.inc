@@ -28,8 +28,6 @@ type
     InvalidChar,       // Invalid character
     InvalidFormat,     // Invalid string format
     UnexpectedEnd,     // Unexpected End
-    IncompType_CF,     // Incompatible operand type: got Complex but expected Real
-    IncompType_CG,     // Incompatible operand type: got Complex but expected Interval
     NoneDisallow,      // Invalid None operand
     FloatDisallow,     // Invalid Float operand
     CplexDisallow,     // Invalid Complex operand
@@ -70,8 +68,5 @@ type
     Code : TRunFlaErrCode;
     Position : integer;
     Value : string;
-    Phy : SizeInt;
-    Cplex, Mgin : TRFloat;
-    LeftBound, RightBound : SizeInt;
   end;
 

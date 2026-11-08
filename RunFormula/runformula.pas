@@ -28,14 +28,20 @@ interface
 type
   TRFloat = Double;             // or Extended... or Single...
 
+  TRFVariant = record
+    VrType : (VrNone=0, VrInt=1, VrFloat=2, VrCplex=4, VrString=6, VrRange=7, VrIntRng=8);
+    Dummy  : integer;
+    Dim    : SizeInt;
+    Str    : string;
+    case byte of
+      0 : (Int : SizeInt);
+      1 : (Float, Image : TRFloat);
+      2 : (LBound, RBound : TRFloat);
+      3 : (LIntBnd, RIntBnd : SizeInt);
+  end;
+
   TRunFlaVar = function(constref Name:string; out Save:boolean; var Dim:SizeInt):Variant;
   TRunFlaFunc = function(ParamCount:SizeInt; Context:pointer; var Dim:SizeInt):Variant;
-
-const
-  RFVrtCplex = $D50;           // Variant contains pointers to a complex number
-  RFVrtRange = $D51;           // Variant contains pointers to range bounds
-  RFVrtMginRange = $D52;       // Variant contains pointers to center and margin
-  RFVrtIntRange = $D53;        // Variant contains integer range bounds
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}
@@ -46,6 +52,8 @@ function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunF
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
 function RunFlaExecVrt(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):Variant;
 function RunFlaExecVrt(constref Fla:string; FlaVar:TRunFlaVar=nil):Variant;
+procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
+procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil);
 function RunFlaParam(Offset:SizeInt; Context:pointer; PDim:PSizeInt=nil):Variant;
 function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);
@@ -328,27 +336,6 @@ begin
     MemListFree(LVStack);
     MemListFree(FuncArg);
   end;
-
-  with Error do begin
-    Phy:=Result^.VPhy;
-    Cplex:=0;
-    Mgin:=0;
-    LeftBound:=0;
-    RightBound:=0;
-
-    case Result^.VType of
-      VCplex : Cplex:=Result^.Img;
-      VGap   : Mgin:=Result^.Img*0.5-Result^.Flo*0.5;
-      VIGap  : begin
-                 Mgin:=Result^.IGap*0.5-Result^.Int*0.5;
-                 LeftBound:=Result^.Int;
-                 RightBound:=Result^.IGap;
-               end;
-    end;
-
-  end;
-
-
 end;
 
 function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil):string;
@@ -380,6 +367,21 @@ begin
   Result:=AsVrt(Exec(Fla, Error, FlaVar, @R));
   FreeValue(@R);
 end;
+
+
+
+
+procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
+begin
+
+end;
+
+procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil);
+begin
+
+end;
+
+
 
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);            //DONE -oRFla.Main -cRev.2026.05.03: Proc RunFlaRaise
 begin

@@ -223,8 +223,8 @@ begin
                                    then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
-        TagPlusQD   : QBall(AsRe(L)+AsRe(R), AsMgin(L), AsMgin(R));          // +~
-        TagMinusQD  : QBall(AsRe(L)-AsRe(R), AsMgin(L), AsMgin(R));          // -~
+        TagPlusQD   : QBall(AsFloat(L)+AsFloat(R), AsMgin(L), AsMgin(R));    // +~
+        TagMinusQD  : QBall(AsFloat(L)-AsFloat(R), AsMgin(L), AsMgin(R));    // -~
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
                         VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
@@ -266,11 +266,11 @@ begin
                         else TypeDisallow(L, R);
                       end;
         TagMultQD   : begin                                                  // *~
-                        fb:=AsRe(R); fa:=AsRe(L);
+                        fb:=AsFloat(R); fa:=AsFloat(L);
                         QBall(fa*fb, AsMgin(L)*fb, AsMgin(R)*fa);
                       end;
         TagSlashQD  : begin                                                  // /~
-                        fb:=AsRe(R); fa:=AsRe(L); fc:=fa/fb;
+                        fb:=AsFloat(R); fa:=AsFloat(L); fc:=fa/fb;
                         QBall(fc, AsMgin(L)/fb, AsMgin(R)/fb*fc);
                       end;
         TagVectDot  : LVal(AsRe(L)*AsRe(R)+AsIm(L)*AsIm(R));                 // *.
@@ -412,7 +412,7 @@ end;
 procedure Vrt2Val(constref V:Variant; PV:PValRec);             //DONE -oRFla.Term -cRev.2026.03.30: Proc Vrt2Val
 var p : pointer;
 begin
-  p:=@PVrtRec(@V)^.VrtData;
+ { p:=@PVrtRec(@V)^.VrtData;
   with PV^ do case VrCodes(PVrtRec(@V)^.VrtCode) of
     VrEmpty, VrNull : VType:=VNone;
     VrSmallInt : begin Int:=PSmallInt(p)^; VType:=VInt; end;
@@ -457,7 +457,7 @@ begin
                    VType:=VIGap;
                  end;
     else RaiseError(VariantError);
-  end;
+  end;    }
 end;
 
 function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;          //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar

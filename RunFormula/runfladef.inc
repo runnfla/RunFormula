@@ -77,22 +77,6 @@ type
 
   PAnsiRec = ^TAnsiRec;
 
-  VrCodes = (VrEmpty = 0, VrNull = 1, VrSmallInt = 2, VrInteger = 3, VrSingle = 4,
-              VrDouble = 5, VrShortInt = 16, VrByte = 17, VrWord = 18, VrLongWord = 19,
-              VrInt64 = 20, VrQWord = 21, VrString = $100, VrCplex = RFVrtCplex,
-              VrGap = RFVrtRange, VrMGap = RFVrtMginRange, VrIGap = RFVrtIntRange);
-
-  TVrtRec = packed record
-    VrtCode : word;
-    Dummy : array [1..3] of word;
-    case byte of
-      0 : (VrtData : byte);
-      1 : (VrtPFlo, VrtPImg : ^TRFloat);
-      2 : (VrtLInt, VrtRInt : PtrInt);
-  end;
-
-  PVrtRec = ^TVrtRec;
-
   TMemList = record
     List : PPointer;          // list of pointers, must be first !!!
     Tail : PPointer;          // tail of last block
@@ -111,7 +95,7 @@ type
     CW8087 : word;
   end;
 
-  TVType = (VNone = 0, VInt, VFloat, VRsvd, VCplex, VChar, VStr, VGap, VIGap, VArr);
+  TVType = (VNone = 0, VInt=1, VFloat=2, VRsvd=3, VCplex=4, VChar=5, VStr=6, VGap=7, VIGap=8, VArr=9);
 
   TValRec = record
     VType : TVType;

@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Built-in functions
-//  Rev. 15.09.2026
+//  Rev. 5.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -469,9 +469,9 @@ begin
             Flo:=Int;
             Img:=t;
             VType:=VGap;
-            MinMax(AsLGap(pv), AsRGap(pv), Result);
           end;
-      end else MinMax(AsLGap(pv), AsRGap(pv), Result);
+      end;
+      if VType=VGap then MinMax(AsLGap(pv), AsRGap(pv), Result);
       if VPhy<>pv^.VPhy then RaiseError(DimMismatch);
       PostParam(Context);
     end;

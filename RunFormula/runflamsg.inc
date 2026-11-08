@@ -31,8 +31,6 @@ const
       (ErrCode : InvalidChar; ErrMsg : 'Invalid character'),
       (ErrCode : InvalidFormat; ErrMsg : 'Invalid format'),
       (ErrCode : UnexpectedEnd; ErrMsg : 'Unexpected End'),
-      (ErrCode : IncompType_CF; ErrMsg : 'Incompatible operand type: got Complex but expected Real'),
-      (ErrCode : IncompType_CG; ErrMsg : 'Incompatible operand type: got Complex but expected Interval'),
       (ErrCode : NoneDisallow; ErrMsg : 'Invalid None operand'),
       (ErrCode : FloatDisallow; ErrMsg : 'Invalid Float operand'),    // real but integer expected
       (ErrCode : CplexDisallow; ErrMsg : 'Invalid Complex operand'),

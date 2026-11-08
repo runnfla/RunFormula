@@ -366,7 +366,6 @@ begin
   with PV^ do case VType of
     VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
-    VCplex : RaiseError(IncompType_CF);
     VGap   : Result:=Flo*0.5+Img*0.5;
     VIGap  : Result:=Int*0.5+IGap*0.5;
     else TypeDisallow(VType);
@@ -414,7 +413,6 @@ begin
   with PV^ do case VType of
     VInt, VChar, VIGap : Result:=Int;
     VFloat, VGap : Result:=Flo;
-    VCplex : RaiseError(IncompType_CG);
     else TypeDisallow(VType);
   end;
 end;
@@ -424,7 +422,6 @@ begin
   with PV^ do case VType of
     VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
-    VCplex : RaiseError(IncompType_CG);
     VGap   : Result:=Img;
     VIGap  : Result:=IGap;
     else TypeDisallow(VType);
@@ -435,7 +432,6 @@ function AsMgin(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cR
 begin
   with PV^ do case VType of
     VInt, VFloat, VChar : Result:=0;
-    VCplex : RaiseError(IncompType_CG);
     VGap   : Result:=Img*0.5-Flo*0.5;
     VIGap  : Result:=IGap*0.5-Int*0.5;
     else TypeDisallow(VType);
@@ -531,6 +527,30 @@ begin
     VGap  : Result:=(Flo+Img)/2;
     VIGap : Result:=(Int+IGap)/2;
     VArr  : raise EError.Create(ArrDisallow);
+  end;
+end;
+
+procedure AsVrt(PV:PValRec; out Vrt:TRFVariant);
+begin
+  with PV^ do begin;
+    PByte(Vrt.Str):=nil;
+    Vrt.Dim:=VPhy;
+    case VType of
+      VNone  : ;
+      VInt   : Vrt.Int:=Int;
+      VFloat : Vrt.Float:=Flo;
+      VCplex, VGap : begin Vrt.Float:=Flo; Vrt.Image:=Img; end;
+      VChar  : begin
+                 Vrt.Str:=string(MakeStrPtr(1));
+                 Vrt.Str[1]:=char(Int);
+                 Vrt.VrType:=VrString;
+                 exit;
+               end;
+      VStr   : Vrt.Str:=Str2Str(string(Str));
+      VIGap  : begin Vrt.Int:=Int; Vrt.RIntBnd:=IGap; end;
+      VArr   : RaiseError(ArrDisallow);
+    end;
+    TVType(Vrt.VrType):=VType;
   end;
 end;
 
