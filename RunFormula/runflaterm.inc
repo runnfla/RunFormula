@@ -409,12 +409,11 @@ begin
   end else ValCopy(Pini, pv);
 end;
 
-function Vrt2Val(constref V:TRFVariant):PValRec;               //DONE -oRFla.Term -cRev.2026.03.30: Func Vrt2Val
+function Vrt2Val(constref V:TRFVariant):PValRec;               //DONE -oRFla.Term -cRev.2026.11.09: Func Vrt2Val
 var p : PSizeInt;
 begin
   Result:=NewLV(Context);
   with Result^ do begin
-    VPhy:=V.Dim;
     VType:=TVType(V.VrType);
     case VType of
       VNone  : ;
@@ -427,33 +426,34 @@ begin
                    Int:=PByte(p)^;
                    VType:=VChar;
                  end else Str:=Str2Ptr(V.Str);
-                 VPhy:=0;
+                 if V.Dim<>0 then RaiseError(InvalidVariant);
                end;
       VGap   : begin
-                 Flo:=V.Float; Img:=V.Image;
-                 if Img>Flo then RaiseError(InvalidRange);
+                 Flo:=V.LBound; Img:=V.RBound;
+                 if Img<Flo then RaiseError(InvalidRange);
                end;
       VIGap  : begin
-                 Int:=V.Int; IGap:=V.RIntBnd;
+                 Int:=V.LIntBnd; IGap:=V.RIntBnd;
                  if IGap<Int then RaiseError(InvalidRange);
                end;
-    //  else RaiseError(////////);
+      else RaiseError(InvalidVariant);
     end;
+    VPhy:=V.Dim;
   end;
 end;
 
-function DoRunFlaVar(var Context:TContext; I:SizeInt):PValRec;          //DONE -oRFla.Term -cRev.2026.04.25: Func DoRunFlaVar
-var V : TRFVariant = (VrType : VrNone; Dummy : 0; Dim : 0; Str : '');
+function DoRunFlaVar(I:SizeInt):PValRec;                       //DONE -oRFla.Term -cRev.2026.11.09: Func DoRunFlaVar
+var v : TRFVariant = (VrType : VrNone; Dummy : 0; Dim : 0; Str : '');
 begin                                                   // not inline
-  flg:=false;
-  with Context do RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), V, flg);
-  Result:=Vrt2Val(V);
+  flg:=true;
+  with Context do RunFlaVar(string(VarTable+PSizeInt(VarTable)[I]), v, flg);
+  Result:=Vrt2Val(v);
 end;
 
-function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;   //DONE -oRFla.Term -cRev.2026.04.25: Func DoUserFunc
-var V : TRFVariant = (VrType : VrNone; Dummy : 0; Dim : 0; Str : '');
+function DoUserFunc(UFunc:TRunFlaFunc; I:SizeInt; P:pointer):PValRec;   //DONE -oRFla.Term -cRev.2026.11.09: Func DoUserFunc
+var v : TRFVariant = (VrType : VrNone; Dummy : 0; Dim : 0; Str : '');
 begin                                                   // not inline
-  UFunc(I, P, V);
-  Result:=Vrt2Val(V);
+  UFunc(I, P, v);
+  Result:=Vrt2Val(v);
 end;
 

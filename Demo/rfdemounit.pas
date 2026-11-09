@@ -122,6 +122,7 @@ begin
     Float:=StrToFloat(InputBox('', 'Get value for variable <'+Name+'>', ''));
     VrType:=VrFloat;
   end;
+  Save:=false;
 end;
 
 procedure AppendResult(ParamCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);

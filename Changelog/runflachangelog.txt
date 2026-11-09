@@ -80,4 +80,7 @@ IncompType_NG
 - реализовано получение результат в виде комплексного числа и интервала (detailed in help)
 - реализована передача с скрипт комплексных чисел и интервалов (detailed in help)
 - result() renamed to abort()
+- собственный вариантный тип результата
+VariantError --> InvalidVariant
+- fix "_" lowcasing in variable name
 

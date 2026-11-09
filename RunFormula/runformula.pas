@@ -113,7 +113,7 @@ begin
                    if idx<0 then begin
                      if PToken(Pnt+IndexTokenSize)^.Tag<>TagAssign then begin
                        if RunFlaVar=nil then raise EError.Create(UnknownVar);
-                       Result:=DoRunFlaVar(Context, Index);
+                       Result:=DoRunFlaVar(Index);
                        if flg then ValCopy(Result, NewVar(Pnt, idx, false));
                      end else Result:=NewVar(Pnt, loc);
                    end else begin
@@ -215,8 +215,8 @@ begin
   end;
 end;
 
-function Param(Offset:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Main -cRev.2026.04.21: Func Param
-begin
+function Param(Offset:SizeInt; var Context:TContext):PValRec;
+begin                                         //DONE -oRFla.Main -cRev.2026.04.21: Func Param
   with Context.FuncArg do Result:=Term(PPByte(List[Count+Offset])^, Context);
 end;
 
@@ -250,7 +250,7 @@ begin
   end;
 end;
 
-procedure RestoreRegFPU(var Reg:TRegFPU); inline;          //DONE -oRFla.Main -cRev.2026.07.04: Inline RestoreRegFPU
+procedure RestoreRegFPU(constref Reg:TRegFPU); inline;     //DONE -oRFla.Main -cRev.2026.07.04: Inline RestoreRegFPU
 begin
   with Reg do begin
     SetMXCSR(MXCSR);
@@ -423,7 +423,7 @@ begin
       inc(ofs, AlignString(PFlaRec(VarList.List[i])^.Lng));
     end;
     for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do
-      WriteString(ID, Lng, AlignString(Lng));
+      WriteString(ID, Lng, AlignString(Lng), true);
     i:=length(Buf)-1;
     SetLength(Buf[i], BufP-SBuf);
     if i>0 then begin

@@ -494,63 +494,28 @@ begin
   end;
 end;
 
-function AsVrt(PV:PValRec):Variant;                        //DONE -oRFla.Lib -cRev.2026.03.30: Func AsVrt
-var p : pointer;
-begin
-//  p:=@PVrtRec(@Result)^.VrtData;
-  with PV^ do case VType of
-//    VNone : PVrtRec(@Result)^.VrtCode:=word(VrNull);
-//    VInt  : begin
-//              PSizeInt(p)^:=Int;
-//{$if SI = 8}  PVrtRec(@Result)^.VrtCode:=word(VrInt64); {$endif}
-//{$if SI = 4}  PVrtRec(@Result)^.VrtCode:=word(VrInt64); {$endif}
-//{$if SI = 2}  PVrtRec(@Result)^.VrtCode:=word(VrInt64); {$endif}
-//            end;
-//    VFloat, VCplex : begin
-
-
-//             end;
-//    VChar, VStr : begin
-
-//                  end;
-//    VGap  :
-//    VIGap :
-
-
-    VNone : with PVarData(@Result)^ do begin
-              vtype:=varString;
-              vstring:=nil;
-            end;
-    VInt, VChar : Result:=Int;
-    VFloat, VCplex : Result:=Flo;
-    VStr  : Result:=Str2Str(string(Str));
-    VGap  : Result:=(Flo+Img)/2;
-    VIGap : Result:=(Int+IGap)/2;
-    VArr  : raise EError.Create(ArrDisallow);
-  end;
-end;
-
-procedure AsVrt(PV:PValRec; out Vrt:TRFVariant);
+procedure AsVrt(PV:PValRec; out V:TRFVariant);             //DONE -oRFla.Lib -cRev.2026.11.09: Proc AsVrt
 begin
   with PV^ do begin;
-    PByte(Vrt.Str):=nil;
-    Vrt.Dim:=VPhy;
+    PByte(V.Str):=nil;
+    TVType(V.VrType):=VType;
     case VType of
       VNone  : ;
-      VInt   : Vrt.Int:=Int;
-      VFloat : Vrt.Float:=Flo;
-      VCplex, VGap : begin Vrt.Float:=Flo; Vrt.Image:=Img; end;
+      VInt   : V.Int:=Int;
+      VFloat : V.Float:=Flo;
+      VCplex : begin V.Float:=Flo; V.Image:=Img; end;
       VChar  : begin
-                 Vrt.Str:=string(MakeStrPtr(1));
-                 Vrt.Str[1]:=char(Int);
-                 Vrt.VrType:=VrString;
-                 exit;
+                 V.Int:=Int;
+                 V.Str:=string(MakeStrPtr(1));
+                 V.Str[1]:=char(Int);
+                 V.VrType:=VrString;
                end;
-      VStr   : Vrt.Str:=Str2Str(string(Str));
-      VIGap  : begin Vrt.Int:=Int; Vrt.RIntBnd:=IGap; end;
+      VStr   : V.Str:=Str2Str(string(Str));
+      VGap   : begin V.LBound:=Flo; V.RBound:=Img; end;
+      VIGap  : begin V.LIntBnd:=Int; V.RIntBnd:=IGap; end;
       VArr   : RaiseError(ArrDisallow);
     end;
-    TVType(Vrt.VrType):=VType;
+    V.Dim:=VPhy;
   end;
 end;
 
@@ -669,12 +634,12 @@ end;
 
 // ===== MemList routines =====
 
-function MemListGetLast(var MemList:TMemList):pointer; inline;
+function MemListGetLast(constref MemList:TMemList):pointer; inline;
 begin                                                    //DONE -oRFla.Lib -cRev.2026.04.18: Inline MemListGetLast
   with MemList do Result:=List[Count-1];
 end;
 
-function MemListIsLegs(var MemList:TMemList; Index:SizeInt):boolean; inline;
+function MemListIsLegs(constref MemList:TMemList; Index:SizeInt):boolean; inline;
 begin                                                    //DONE -oRFla.Lib -cRev.2026.04.18: Inline MemListIsLegs
   with MemList do Result:=List[Index]=Legs;
 end;
@@ -761,7 +726,7 @@ begin
   end;
 end;
 
-function MemListFind(var MemList:TMemList; P, Fin:pointer):SizeInt;
+function MemListFind(constref MemList:TMemList; P, Fin:pointer):SizeInt;
 var L : SizeInt = 0;                                //DONE -oRFla.Lib -cRev.2026.04.18: Func MemListFind
     R, d, diff : SizeInt;                       // find index in sorted list
     px, py : PByte;                             // if not found, return inverted index
@@ -884,4 +849,5 @@ begin
       else inc(Count);
   end;
 end;
+
 

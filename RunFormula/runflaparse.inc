@@ -75,8 +75,9 @@ begin
   if (Result and SIm1)>0 then Result:=(Result or (SI-1))+1;    // aligning to SizeInt
 end;
 
-procedure WriteString(P:PByte; Lng, Size:SizeInt; Mask:integer=$20202020);
+procedure WriteString(P:PByte; Lng, Size:SizeInt; IsName:boolean);
 var fin, dst : PByte;                                 //DONE -oRFla.Parse -cRev.2026.05.01: Proc WriteString
+    t : integer;
 begin
   RequestBuf(Size);
   with PAnsiRec(BufP)^ do begin
@@ -86,19 +87,23 @@ begin
     Len:=Lng;
   end;
   dst:=BufP+SAnsiRec;
-  fin:=P+Lng-Sint;
-  while P<=fin do begin
-    PInteger(dst)^:=PInteger(P)^ or Mask;
-    inc(dst, Sint);
-    inc(P, Sint);
-  end;
-  inc(fin, Sint);
-  while P<fin do begin
-    dst^:=P^ or byte(Mask);
-    inc(dst);
-    inc(P);
-  end;
-  dst^:=0;
+  (dst+Lng)^:=0;
+  if IsName then begin
+    fin:=P+Lng-Sint;
+    while P<=fin do begin
+      t:=PInteger(P)^ or $20202020;
+      PInteger(dst)^:=(((t+$01010101) and $80808080) shr 2) xor t;    // correct "_"
+      inc(dst, Sint);
+      inc(P, Sint);
+    end;
+    inc(fin, Sint);
+    while P<fin do begin
+      t:=P^ or $20;
+      dst^:=(((t+1) and $80) shr 2) xor t;
+      inc(dst);
+      inc(P);
+    end;
+  end else DataCopy(P, dst, Lng);
   inc(BufP, Size);
 end;
 
@@ -180,10 +185,10 @@ var vr : TValRec;
       Size:=sz+ExprTokenSize;
     end;
     inc(BufP, ExprTokenSize);
-    WriteString(PByte(P), Lng, sz, 0);
+    WriteString(PByte(P), Lng, sz, false);
   end;
 
-  procedure ValueToken(var V:TValRec);                //DONE -oRFla.Parse -cRev.2026.05.10: Proc ValueToken
+  procedure ValueToken(constref V:TValRec);           //DONE -oRFla.Parse -cRev.2026.05.10: Proc ValueToken
   var L : SizeInt;
   begin
     case V.VType of

@@ -39,7 +39,7 @@ type
     IllegalBracket,    // Mismatched bracket or block terminator
     UnknownFunc,       // Function is not found
     VarExpected,       // Variable expected
- //   VariantError,      // Variant Conversion Error
+    InvalidVariant,    // Invalid Variant value
     UnknownVar,        // Variable is not found
     ParamNumber,       // Incorrect number of parameters
     DefExists,         // Define already exists
