@@ -428,19 +428,33 @@ begin
   end;
 end;
 
-function AsMgin(PV:PValRec):TRFloat;                       //DONE -oRFla.Lib -cRev.2026.10.16: Func AsMgin
-begin
-  with PV^ do case VType of
-    VInt, VFloat, VChar : Result:=0;
-    VGap   : Result:=Img*0.5-Flo*0.5;
-    VIGap  : Result:=IGap*0.5-Int*0.5;
-    else TypeDisallow(VType);
-  end;
-end;
-
 function AsIGap(PV:PValRec):SizeInt; inline;               //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsIGap
 begin
   with PV^ do if VType=VIGap then Result:=IGap else Result:=Int;
+end;
+
+function AsBall(PV:PValRec; out Mgin:TRFloat):TRFloat;     //DONE -oRFla.Lib -cRev.2026.11.11: Func AsBall
+var m : TRFloat = 0;
+    f : TRFloat;
+begin
+  with PV^ do case VType of
+    VInt, VChar : Result:=Int;
+    VFloat : Result:=Flo;
+    VGap   : begin
+               f:=Flo*0.5;
+               m:=Img*0.5;
+               Result:=m+f;
+               m:=m-f;
+             end;
+    VIGap  : begin
+               f:=Int*0.5;
+               m:=IGap*0.5;
+               Result:=m+f;
+               m:=m-f;
+             end;
+    else TypeDisallow(VType);
+  end;
+  Mgin:=m;
 end;
 
 function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr

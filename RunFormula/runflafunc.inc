@@ -384,16 +384,27 @@ begin
   PostParam(Context);
 end;
 
-function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_MARGIN
+function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.11: Func Fla_MARGIN
+var f : TRFloat = 0;
+    phy : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  Result:=NewLV(Context);
-  with Result^ do begin
-    Flo:=AsMgin(Param(-1, Context));
-    VType:=VFloat;
-    VPhy:=Context.TermResult^.VPhy;
+  with Param(-1, Context)^ do begin
+    case VType of
+      VInt, VFloat, VChar : ;
+      VGap  : f:=Img*0.5-Flo*0.5;
+      VIGap : f:=IGap*0.5-Int*0.5;
+      else TypeDisallow(VType);
+    end;
+    phy:=VPhy;
   end;
   PostParam(Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    Flo:=f;
+    VType:=VFloat;
+    VPhy:=phy;
+  end;
 end;
 
 function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RANGE

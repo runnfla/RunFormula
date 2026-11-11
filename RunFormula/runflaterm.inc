@@ -223,8 +223,14 @@ begin
                                    then LGap(TRFloat(L^.Int)-AsRGap(R), AsRGap(L)-TRFloat(R^.Int)) else LGap(I, J);
                         else TypeDisallow(L, R);
                       end;
-        TagPlusQD   : QBall(AsFloat(L)+AsFloat(R), AsMgin(L), AsMgin(R));    // +~
-        TagMinusQD  : QBall(AsFloat(L)-AsFloat(R), AsMgin(L), AsMgin(R));    // -~
+        TagPlusQD   : begin                                                  // +~
+                        fa:=AsBall(L, fb); fc:=AsBall(R, fd);
+                        QBall(fa+fc, fb, fd);
+                      end;
+        TagMinusQD  : begin                                                  // -~
+                        fa:=AsBall(L, fb); fc:=AsBall(R, fd);
+                        QBall(fa-fc, fb, fd);
+                      end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
                         VInt   : if Mult(L^.Int, R^.Int, I) then LVal(TRFloat(L^.Int)*TRFloat(R^.Int)) else LVal(I);
                         VFloat : LVal(AsFloat(L)*AsFloat(R));
@@ -266,12 +272,13 @@ begin
                         else TypeDisallow(L, R);
                       end;
         TagMultQD   : begin                                                  // *~
-                        fb:=AsFloat(R); fa:=AsFloat(L);
-                        QBall(fa*fb, AsMgin(L)*fb, AsMgin(R)*fa);
+                        fa:=AsBall(L, fb); fc:=AsBall(R, fd);
+                        QBall(fa*fc, fa*fd, fb*fc);
                       end;
         TagSlashQD  : begin                                                  // /~
-                        fb:=AsFloat(R); fa:=AsFloat(L); fc:=fa/fb;
-                        QBall(fc, AsMgin(L)/fb, AsMgin(R)/fb*fc);
+                        fc:=AsBall(R, fd);
+                        fa:=AsBall(L, fb)/fc;
+                        QBall(fa, fb/fc, fd/fc*fa);
                       end;
         TagVectDot  : LVal(AsRe(L)*AsRe(R)+AsIm(L)*AsIm(R));                 // *.
         TagSHL      : Ichk(L^.Int shl R^.Int);                               // shl <<

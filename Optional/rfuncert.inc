@@ -27,63 +27,35 @@
 
 {$ifdef runfla_optfunc}
 
-function CentMgin(PV:PValRec; out Mgin:TRFloat):TRFloat;
-var f, m : TRFloat;
-begin
-  with PV^ do case VType of
-    VInt, VChar : begin
-                    Mgin:=0;
-                    Result:=Int;
-                  end;
-    VFloat : begin
-               Mgin:=0;
-               Result:=Flo;
-             end;
-    VGap   : begin
-               f:=Flo*0.5;
-               m:=Img*0.5;
-               Mgin:=m-f;
-               Result:=f+m;
-             end;
-    VIGap  : begin
-               f:=Int*0.5;
-               m:=IGap*0.5;
-               Mgin:=m-f;
-               Result:=f+m;
-             end;
-    else TypeDisallow(VType);
-  end;
-end;
-
-function Fla_UNCEXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCEXP
+function Fla_UNCEXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCEXP
 var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
+  f:=exp(AsBall(Param(-1, Context), m));
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
   Result:=NewLV(Context);
-  f:=exp(CentMgin(Param(-1, Context), m));
   Ball(f, f*m, Result);
-  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
 end;
 
-function Fla_UNCLN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCLN
+function Fla_UNCLN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCLN
 var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  Result:=NewLV(Context);
-  f:=CentMgin(Param(-1, Context), m);
-  Ball(ln(f), m/f, Result);
+  f:=AsBall(Param(-1, Context), m);
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
+  Result:=NewLV(Context);
+  Ball(ln(f), m/f, Result);
 end;
 
-function Fla_UNCSQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCSQRT
+function Fla_UNCSQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCSQRT
 var f, m : TRFloat;
     phy : SizeInt;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  f:=sqrt(CentMgin(Param(-1, Context), m));
+  f:=sqrt(AsBall(Param(-1, Context), m));
   Ball(f, m/f*0.5, Result);
   if Context.TermResult^.VPhy<>0 then begin
     phy:=Context.TermResult^.VPhy;
@@ -93,7 +65,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_UNCCBRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCCBRT
+function Fla_UNCCBRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCCBRT
 var f, fx, m : TRFloat;
     phy : TDPhy;
     i : integer;
@@ -101,11 +73,9 @@ var f, fx, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  fx:=CentMgin(Param(-1, Context), m);
-  if fx<>0 then begin
-    f:=exp(ln(abs(fx))*(1/3));
-    if fx<0 then f:= -f;
-  end else f:=0;
+  fx:=AsBall(Param(-1, Context), m);
+  f:=exp(ln(abs(fx))*(1/3));
+  if fx<0 then f:= -f;
   Ball(f, m/sqr(f)*(1/3), Result);
   if Context.TermResult^.VPhy<>0 then begin
     phy.DI:=Context.TermResult^.VPhy;
@@ -119,101 +89,107 @@ begin
   PostParam(Context);
 end;
 
-function Fla_UNCSIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCSIN
+function Fla_UNCSIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCSIN
 var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
+  f:=AsBall(Param(-1, Context), m);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
   Result:=NewLV(Context);
-  f:=CentMgin(Param(-1, Context), m);
   Ball(sin(f), abs(cos(f)*m), Result);
-  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
 end;
 
-function Fla_UNCCOS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCCOS
+function Fla_UNCCOS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCCOS
 var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
+  f:=AsBall(Param(-1, Context), m);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
   Result:=NewLV(Context);
-  f:=CentMgin(Param(-1, Context), m);
   Ball(cos(f), abs(sin(f)*m), Result);
-  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
 end;
 
-function Fla_UNCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCTAN
+function Fla_UNCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCTAN
 var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  Result:=NewLV(Context);
-  f:=CentMgin(Param(-1, Context), m);
+  f:=AsBall(Param(-1, Context), m);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
   f:=sin(f)/cos(f);
+  Result:=NewLV(Context);
   Ball(f, (sqr(f)+1)*m, Result);
-  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
 end;
 
-function Fla_UNCARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCARCTAN
+function Fla_UNCARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCARCTAN
 var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
-  Result:=NewLV(Context);
-  f:=CentMgin(Param(-1, Context), m);
-  Ball(arctan(f), m/(sqr(f)+1), Result);
+  f:=AsBall(Param(-1, Context), m);
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
+  Result:=NewLV(Context);
+  Ball(arctan(f), m/(sqr(f)+1), Result);
 end;
 
-
-
-
-
-
-function Fla_UNCHYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Uncert -cRev.2026.11.03: Func Fla_UNCHYPOT
-var X, Y : PValRec;
-    f, fx, fy : TRFloat;
+function Fla_UNCHYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Uncert -cRev.2026.11.11: Func Fla_UNCHYPOT
+var f, fx, fy, mx, my : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
-    Y:=Param(-1, Context);
-    fy:=AsRe(Y); fx:=AsRe(X);
-    f:=Hypot2(fx, fy);
-    Ball(f*2, Hypot2(AsMgin(X)*fx, AsMgin(Y)*fy)/f, Result);
-    VPhy:=X^.VPhy;
-    if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
+    fx:=AsBall(Param(-2, Context), mx);
+    VPhy:=Context.TermResult^.VPhy;
+    PostParam(Context);
+    fy:=AsBall(Param(-1, Context), my);
+    if VPhy<>Context.TermResult^.VPhy then RaiseError(DimMismatch);
+    PostParam(Context);
   end;
-  PostParam(Context);
-  PostParam(X, Context);
+  f:=Hypot2(fx, fy);
+  Ball(f*2, Hypot2(mx*fx, my*fy)/f, Result);
 end;
+
+
+
+
+
+
+
+
+
+
+
 
 function Fla_UNCSPAN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_UNCSPAN
 var phy, i : SizeInt;
-    m : TRFloat = 0;
-    d, f, t : TRFloat;
+    mg : TRFloat = 0;
+    d, f, t, tm, summ : TRFloat;
 begin
   if ParamCount<2 then RaiseError(ParamNumber);
-  f:=AsFloat(Param(-1, Context));
+  f:=AsBall(Param(-1, Context), tm);
   phy:=Context.TermResult^.VPhy;
   PostParam(Context);
+  summ:=sqr(tm);
   for i:=2 to ParamCount do begin            // Welford's algorithm
-    t:=AsFloat(Param(-i, Context));
+    t:=AsBall(Param(-i, Context), tm);
     d:=t-f;
     f:=d/i+f;
-    m:=(t-f)*d+m;
+    mg:=(t-f)*d+mg;
+    summ:=sqr(tm)+summ;
     if phy<>Context.TermResult^.VPhy then RaiseError(DimMismatch);
     PostParam(Context);
   end;
   d:=ParamCount;
   Result:=NewLV(Context);
-  Ball(f, sqrt(m/((d-1)*d)), Result);
+  Ball(f, sqrt((mg/(d-1)+summ/d)/d), Result);
   Result^.VPhy:=phy;
 end;
 
 
 
-
+ {
 function Fla_UNCSPAN_INTERV(ParamCount:SizeInt; var Context:TContext):PValRec;
 var phy, i : SizeInt;
     m : TRFloat = 0;           // Для случайного разброса центров
@@ -227,7 +203,7 @@ begin
   // 1. Разбираем первый интервал
   ParamRec := Param(-1, Context);
   f        := AsRe(ParamRec);   // Центр первого измерения (номинал)
-  t_error  := AsMgin(ParamRec); // Приборная погрешность первого измерения
+ // t_error  := AsMgin(ParamRec); // Приборная погрешность первого измерения
   phy      := ParamRec^.VPhy;
   PostParam(Context);
 
@@ -239,7 +215,7 @@ begin
     if phy <> ParamRec^.VPhy then RaiseError(DimMismatch);
 
     t_center := AsRe(ParamRec);   // Центр текущего интервала
-    t_error  := AsMgin(ParamRec); // Погрешность текущего интервала
+  //  t_error  := AsMgin(ParamRec); // Погрешность текущего интервала
 
     // Алгоритм Велфорда по центрам (оцениваем случайный разброс опытов)
     d := t_center - f;
@@ -270,7 +246,7 @@ begin
   end;
 
   Result^.VPhy := phy;
-end;
+end;                       }
 
 
 
