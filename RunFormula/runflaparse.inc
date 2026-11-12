@@ -431,7 +431,6 @@ begin
           if IsKey('and') then begin OpToken(TagAND); continue; end;
           if IsKey('or') then begin OpToken(TagOR); continue; end;
           if IsKey('not') then begin OpToken(TagNOT, true); continue; end;
-          if IsKey('in') then begin OpToken(TagIN); continue; end;
           if IsKey('func') then begin
             FirstChar(tf, FirstChars);                // check first char
             ExprToken(TagSubr, TagSubr);
@@ -538,6 +537,7 @@ begin
                     ExprToken(TagExpr, TagExpr);
                   end;
             else
+              if IsKey('in') then begin OpToken(TagIN); continue; end;
               I:=MemListFind(DefList, P, tf);
               if I>=0 then begin
                 if InDef>=DefDepth then raise EError.Create(MaxDepth);

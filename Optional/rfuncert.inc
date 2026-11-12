@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Optional Uncertainty Calculation Module
+//  Optional Uncertainty Calculation functions
 //  Rev. 3.11.2026
 
 //  Author: Alexander Torubarov
@@ -118,8 +118,8 @@ begin
   f:=AsBall(Param(-1, Context), m);
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
-  f:=sin(f)/cos(f);
   Result:=NewLV(Context);
+  f:=sin(f)/cos(f);
   Ball(f, (sqr(f)+1)*m, Result);
 end;
 
@@ -151,6 +151,46 @@ begin
   Ball(f*2, Hypot2(mx*fx, my*fy)/f, Result);
 end;
 
+function Fla_UNCLOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.12: Func Fla_UNCLOG
+var f, fx, mx, fa, ma, lna : TRFloat;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  fx:=AsBall(Param(-2, Context), mx);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
+  fa:=AsBall(Param(-1, Context), ma);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
+  Result:=NewLV(Context);
+  lna:=ln(fa);
+  f:=ln(fx)/lna;
+  Ball(f, Hypot2(mx/fx, ma/fa*f)/abs(lna)*2, Result);
+end;
+
+function Fla_UNCPOW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.12: Func Fla_UNCPOW
+var pv : PValRec;
+    f, fx, mx, fa, ma : TRFloat;
+    phy : SizeInt;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  fx:=AsBall(Param(-2, Context), mx);
+  phy:=Context.TermResult^.VPhy;
+  PostParam(Context);
+  Result:=NewLV(Context);
+  pv:=Param(-1, Context);
+  if pv^.VPhy<>0 then RaiseError(DimDisallow);
+  with pv^ do if VType in VIntTypes then begin
+    f:=Power(fx, Int);
+    Ball(f, abs(Power(fx, Int-1)*Int)*mx, Result);
+    Result^.VPhy:=PhyMult(phy, Int);
+  end else begin
+    if phy<>0 then RaiseError(DimDisallow);
+    fa:=AsBall(pv, ma);
+    f:=RealPow(fx, fa);
+    Ball(f, Hypot2(mx/fx*fa, ln(fx)*ma)*f*2, Result);
+  end;
+  PostParam(Context);
+end;
 
 
 
@@ -162,10 +202,21 @@ end;
 
 
 
-function Fla_UNCSPAN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_UNCSPAN
-var phy, i : SizeInt;
+
+
+
+
+
+
+
+
+
+
+
+function Fla_UNCSPAN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.00.00: Func Fla_UNCSPAN
+var d, f, t, tm, summ : TRFloat;
     mg : TRFloat = 0;
-    d, f, t, tm, summ : TRFloat;
+    phy, i : SizeInt;
 begin
   if ParamCount<2 then RaiseError(ParamNumber);
   f:=AsBall(Param(-1, Context), tm);
@@ -186,6 +237,79 @@ begin
   Ball(f, sqrt((mg/(d-1)+summ/d)/d), Result);
   Result^.VPhy:=phy;
 end;
+
+
+
+
+
+
+
+
+
+
+
+function Fla_WEIGHTED(ParamCount:SizeInt; var Context:TContext):PValRec;
+var d, f, t, tm, w, wsum, err : TRFloat;
+    mg : TRFloat = 0;
+    phy, i : SizeInt;
+    exactCount : SizeInt = 0;
+begin
+  if ParamCount<2 then RaiseError(ParamNumber);
+  t:=AsBall(Param(-1, Context), tm);
+  phy:=Context.TermResult^.VPhy;
+  PostParam(Context);
+
+  if tm=0 then begin
+    exactCount:=1;
+    f:=t;
+    wsum:=0;
+  end else begin
+    wsum:=1/sqr(tm);
+    f:=t;
+  end;
+
+  for i:=2 to ParamCount do begin            // Weighted Welford's algorithm
+    t:=AsBall(Param(-i, Context), tm);
+    if phy<>Context.TermResult^.VPhy then RaiseError(DimMismatch);
+    PostParam(Context);
+
+    if tm=0 then begin
+      if exactCount=0 then begin
+        f:=t;
+        mg:=0;
+      end else begin
+        d:=t-f;
+        f:=d/(exactCount+1)+f;
+        mg:=(t-f)*d+mg;
+      end;
+      Inc(exactCount);
+    end else if exactCount=0 then begin
+      w:=1/sqr(tm);
+      wsum:=wsum+w;
+      d:=t-f;
+      f:=(w/wsum)*d+f;
+      mg:=w*(t-f)*d+mg;
+    end;
+  end;
+
+  Result:=NewLV(Context);
+  if exactCount>0 then begin
+    if exactCount=1 then err:=0
+    else err:=sqrt(mg/(exactCount-1)/exactCount);
+    Ball(f, err, Result);
+  end else begin
+    d:=mg/(ParamCount-1);                    // Birge ratio (chi^2 / ndf)
+    if d>1 then err:=sqrt(d/wsum)
+    else err:=1/sqrt(wsum);
+    Ball(f, err, Result);
+  end;
+  Result^.VPhy:=phy;
+end;
+
+
+
+
+
 
 
 
@@ -275,7 +399,15 @@ FuncReg('unc.cos', @Fla_UNCCOS);
 FuncReg('unc.tan', @Fla_UNCTAN);
 FuncReg('unc.arctan', @Fla_UNCARCTAN);
 FuncReg('unc.hypot', @Fla_UNCHYPOT);
+FuncReg('unc.log', @Fla_UNCLOG);
+FuncReg('unc.pow', @Fla_UNCPOW);
+
+
+
+
 FuncReg('unc.span', @Fla_UNCSPAN);
+
+FuncReg('unc.merge', @Fla_UNCSPAN);
 
 {$endif}
 

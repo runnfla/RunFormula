@@ -64,6 +64,7 @@ const
       (ErrCode : UnDecodeDim; ErrMsg : 'Can not decode dimension, list of units is incomplete'),
       (ErrCode : RangeType; ErrMsg : 'Range bounds must be integers'),
       (ErrCode : CommaDigit; ErrMsg : 'Space required between number and comma/semicolon'),
-      (ErrCode : EmptyString; ErrMsg : 'Empty String disallow')
+      (ErrCode : EmptyString; ErrMsg : 'Empty String disallow'),
+      (ErrCode : LoopTimeOut; ErrMsg : 'Loop TimeOut')
     );
 

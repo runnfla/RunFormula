@@ -15,9 +15,9 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Func -cRev.2026.00.00: Make repeat timeout
+// TODO -oRFla.Func -cRev.2026.00.00:
 
-function Fla_ABORT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_ABORT
+function Fla_ABORT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_ABORT
 begin
   case ParamCount of
     0 : Context.TermResult:=@CVnone;
@@ -66,7 +66,7 @@ begin
     else if ParamCount=-3 then Result:=Param(-1, Context);
 end;
 
-function Fla_IN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_IN
+function Fla_IN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.11: Func Fla_IN
 var pv : PValRec;
     b, i : SizeInt;
 begin
@@ -74,7 +74,7 @@ begin
   ParamCount:= -ParamCount;
   pv:=Param(ParamCount, Context);
   for i:=ParamCount+1 to -1 do begin
-    b:=Compare(pv, Param(ParamCount+i, Context)) and 1;
+    b:=Compare(pv, Param(i, Context)) and 1;
     PostParam(Context);
     if b=0 then break;
   end;
@@ -87,16 +87,27 @@ begin
 end;
 
 function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_REPEAT
-var b : boolean;
+var tout : QWord = 10000;       // 10 sec
+    t : QWord;
+    b : boolean;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
+  if ParamCount=3 then begin
+    tout:=AsInt(Param(-1, Context));
+    if tout>(high(QWord) div 1000) then RaiseError(InvalidValue);
+    tout:=tout*1000;
+    if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+    PostParam(Context);
+  end;
+  ParamCount:= -ParamCount;
+  if tout<>0 then t:=GetTickCount64;
   Result:=@CVnone;
   repeat
-    b:=AsBool(Param(-2, Context));
+    b:=AsBool(Param(ParamCount, Context));
     PostParam(Context);
     if not b then exit;
     PostParam(Result, Context);
-    Result:=Param(-1, Context);
+    Result:=Param(ParamCount+1, Context);
     with Context do case Flow of
       EXT : exit;
       BRK : begin
@@ -105,6 +116,7 @@ begin
             end;
       CON : Flow:=NML;
     end;
+    if (tout<>0) and ((GetTickCount64-t)>=tout) then RaiseError(LoopTimeOut);
   until false;
 end;
 
@@ -116,7 +128,7 @@ begin
   pv:=Param(-2, Context);
   with pv^ do begin
     if VAlloc<>VP then RaiseError(VarExpected);
-    if not (VType in IGapTypes) then RaiseError(RangeType);
+    if not (VType in VIGapTypes) then RaiseError(RangeType);
 
     r:=AsIGap(pv);
     VType:=VInt;
@@ -473,7 +485,7 @@ begin
     for i:=-2 downto -ParamCount do begin
       pv:=Param(i, Context);
       if VType=VIGap then begin
-        if pv^.VType in IGapTypes
+        if pv^.VType in VIGapTypes
           then MinMax(pv^.Int, AsIGap(pv), Result)
           else begin
             t:=IGap;
@@ -706,7 +718,7 @@ var s : string;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   with Param(-1, Context)^ do begin
-    if not (VType in IGapTypes) then RaiseError(RangeType);
+    if not (VType in VIGapTypes) then RaiseError(RangeType);
     if VPhy<>0 then RaiseError(DimDisallow);
     L:=Int;
     R:=AsIGap(Context.TermResult);

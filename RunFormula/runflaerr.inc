@@ -61,7 +61,8 @@ type
     UnDecodeDim,       // Can not decode dimension, list of units is incomplete
     RangeType,         // Range bounds must be integers
     CommaDigit,        // Space required between number and comma/semicolon
-    EmptyString
+    EmptyString,       // Empty String disallow
+    LoopTimeOut        // Loop TimeOut
   );
 
   TRunFlaError = packed record

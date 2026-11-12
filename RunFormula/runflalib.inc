@@ -358,7 +358,7 @@ end;
 
 function AsInt(PV:PValRec):SizeInt; inline;                //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsInt
 begin
-  with PV^ do if VType in IntTypes then Result:=Int else TypeDisallow(VType);
+  with PV^ do if VType in VIntTypes then Result:=Int else TypeDisallow(VType);
 end;
 
 function AsFloat(PV:PValRec):TRFloat;                      //DONE -oRFla.Lib -cRev.2026.10.16: Func AsFloat

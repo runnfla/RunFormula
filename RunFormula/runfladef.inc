@@ -312,8 +312,8 @@ const
     91,      // TagPower      **   right-associative, 4**3**2 = 4**9
    120);     // TagPhy must have highest priority
 
-  IntTypes = [VInt, VChar];
-  IGapTypes = [VInt, VChar, VIGap];
+  VIntTypes = [VInt, VChar];
+  VIGapTypes = [VInt, VChar, VIGap];
 
   CaseType : array[TVType, TVType] of TVType = (
 // results: VNone VInt VFloat VCplex VStr VGap VIGap VArr

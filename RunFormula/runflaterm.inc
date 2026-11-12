@@ -318,7 +318,7 @@ begin
                                    LVal(fc, fd);
                                  end;
                         VGap   : begin
-                                   if not (R^.VType in IGapTypes) then RaiseError(RangeType);
+                                   if not (R^.VType in VIGapTypes) then RaiseError(RangeType);
                                    I:=R^.Int;
                                    fb:=AsRGap(L); fa:=AsLGap(L);
                                    if (fa<0) or ((fa=0) and (I<0)) then RaiseError(InvalidValue);
