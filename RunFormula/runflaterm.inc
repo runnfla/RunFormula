@@ -93,7 +93,7 @@ var L : PValRec = @CVnone;        // init VMode
     FreeLR;
     with L^ do begin
       Int:=GL;
-      IGap:=GR;
+      IBnd:=GR;
       VType:=VIGap;
     end;
   end;
@@ -224,11 +224,11 @@ begin
                         else TypeDisallow(L, R);
                       end;
         TagPlusQD   : begin                                                  // +~
-                        fa:=AsBall(L, fb); fc:=AsBall(R, fd);
+                        AsBall(L, fa, fb); AsBall(R, fc, fd);
                         QBall(fa+fc, fb, fd);
                       end;
         TagMinusQD  : begin                                                  // -~
-                        fa:=AsBall(L, fb); fc:=AsBall(R, fd);
+                        AsBall(L, fa, fb); AsBall(R, fc, fd);
                         QBall(fa-fc, fb, fd);
                       end;
         TagMult     : case CaseType[L^.VType, R^.VType] of                   // *
@@ -272,12 +272,12 @@ begin
                         else TypeDisallow(L, R);
                       end;
         TagMultQD   : begin                                                  // *~
-                        fa:=AsBall(L, fb); fc:=AsBall(R, fd);
+                        AsBall(L, fa, fb); AsBall(R, fc, fd);
                         QBall(fa*fc, fa*fd, fb*fc);
                       end;
         TagSlashQD  : begin                                                  // /~
-                        fc:=AsBall(R, fd);
-                        fa:=AsBall(L, fb)/fc;
+                        AsBall(L, fa, fb); AsBall(R, fc, fd);
+                        fa:=fa/fc;
                         QBall(fa, fb/fc, fd/fc*fa);
                       end;
         TagVectDot  : LVal(AsRe(L)*AsRe(R)+AsIm(L)*AsIm(R));                 // *.
@@ -296,7 +296,7 @@ begin
                         VFloat : LVal(-Flo);
                         VCplex : LVal(-Flo, -Img);
                         VGap   : LGap(-Img, -Flo);
-                        VIGap  : if Int<>LI then LGap(-IGap, -Int) else LGap(-TRFloat(IGap), FALI);
+                        VIGap  : if Int<>LI then LGap(-IBnd, -Int) else LGap(-TRFloat(IBnd), FALI);
                         else TypeDisallow(VType);
                       end;
         TagNOT      : LVal(not AsInt(R));                                    // not unary
@@ -440,8 +440,8 @@ begin
                  if Img<Flo then RaiseError(InvalidRange);
                end;
       VIGap  : begin
-                 Int:=V.LIntBnd; IGap:=V.RIntBnd;
-                 if IGap<Int then RaiseError(InvalidRange);
+                 Int:=V.LIntBnd; IBnd:=V.RIntBnd;
+                 if IBnd<Int then RaiseError(InvalidRange);
                end;
       else RaiseError(InvalidVariant);
     end;

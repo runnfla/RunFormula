@@ -102,7 +102,7 @@ type
     VAlloc : (BC, VP, LV);
     VPhy : SizeInt;
     case byte of
-      0 : (Int, IGap : SizeInt);
+      0 : (Int, IBnd : SizeInt);
       1 : (Flo, Img : TRFloat);
       2 : (Str : PByte);
       3 : (Ansi : PSizeInt);

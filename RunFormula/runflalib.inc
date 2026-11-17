@@ -232,18 +232,18 @@ procedure MinMax(A, B:SizeInt; PV:PValRec);                //DONE -oRFla.Lib -cR
 begin
   with PV^ do if VType<>VIGap then begin
     if A<=B then begin
-      Int:=A; IGap:=B;
+      Int:=A; IBnd:=B;
     end else begin
-      Int:=B; IGap:=A;
+      Int:=B; IBnd:=A;
     end;
     VType:=VIGap;
   end else begin
     if A<=B then begin
       if A<Int then Int:=A;
-      if B>IGap then IGap:=B;
+      if B>IBnd then IBnd:=B;
     end else begin
       if B<Int then Int:=B;
-      if A>IGap then IGap:=A;
+      if A>IBnd then IBnd:=A;
     end;
   end;
 end;
@@ -343,7 +343,7 @@ begin                                                      //DONE -oRFla.Lib -cR
       VIGap  : begin
                  VType:=VGap;
                  Flo:=Int*Scl+Offs;
-                 Img:=IGap*Scl+Offs;
+                 Img:=IBnd*Scl+Offs;
                end;
     end;
     VPhy:=Phy;
@@ -367,7 +367,34 @@ begin
     VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
     VGap   : Result:=Flo*0.5+Img*0.5;
-    VIGap  : Result:=Int*0.5+IGap*0.5;
+    VIGap  : Result:=Int*0.5+IBnd*0.5;
+    else TypeDisallow(VType);
+  end;
+end;
+
+procedure AsCplex(PV:PValRec; out Re, Im:TRFloat);         //DONE -oRFla.Lib -cRev.2026.11.16: Proc AsCplex
+begin
+  Im:=0;
+  with PV^ do case VType of
+    VInt, VChar : Re:=Int;
+    VFloat : Re:=Flo;
+    VCplex : begin
+               Re:=Flo;
+               Im:=Img;
+             end;
+    VGap   : Re:=Flo*0.5+Img*0.5;
+    VIGap  : Re:=Int*0.5+IBnd*0.5;
+    else TypeDisallow(VType);
+  end;
+end;
+
+procedure AsGap(PV:PValRec; out L, R:TRFloat);             //DONE -oRFla.Lib -cRev.2026.11.16: Proc AsGap
+begin
+  with PV^ do case VType of
+    VInt, VChar : begin L:=Int; R:=Int; end;
+    VFloat : begin L:=Flo; R:=Flo; end;
+    VGap   : begin L:=Flo; R:=Img; end;
+    VIGap  : begin L:=Int; R:=IBnd; end;
     else TypeDisallow(VType);
   end;
 end;
@@ -378,7 +405,7 @@ begin
     VInt, VChar : Result:=Int;
     VFloat, VCplex : Result:=Flo;
     VGap  : Result:=Flo*0.5+Img*0.5;
-    VIGap : Result:=Int*0.5+IGap*0.5;
+    VIGap : Result:=Int*0.5+IBnd*0.5;
     else TypeDisallow(VType);
   end;
 end;
@@ -402,7 +429,7 @@ begin
       VFloat : Result:=Flo<>0;
       VCplex, VGap : Result:=(Flo<>0) or (Img<>0);
       VStr   : Result:=Ansi[-1]<>0;
-      VIGap  : Result:=(Int<>0) or (IGap<>0);
+      VIGap  : Result:=(Int<>0) or (IBnd<>0);
       VArr   : RaiseError(ArrDisallow);
     end;
   end;
@@ -423,38 +450,36 @@ begin
     VInt, VChar : Result:=Int;
     VFloat : Result:=Flo;
     VGap   : Result:=Img;
-    VIGap  : Result:=IGap;
+    VIGap  : Result:=IBnd;
     else TypeDisallow(VType);
   end;
 end;
 
 function AsIGap(PV:PValRec):SizeInt; inline;               //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsIGap
 begin
-  with PV^ do if VType=VIGap then Result:=IGap else Result:=Int;
+  with PV^ do if VType=VIGap then Result:=IBnd else Result:=Int;
 end;
 
-function AsBall(PV:PValRec; out Mgin:TRFloat):TRFloat;     //DONE -oRFla.Lib -cRev.2026.11.11: Func AsBall
-var m : TRFloat = 0;
-    f : TRFloat;
+procedure AsBall(PV:PValRec; out Cnt, Mgin:TRFloat);
+var m : TRFloat = 0;                         //DONE -oRFla.Lib -cRev.2026.11.11: Proc AsBall
+    f : TRFloat = 0;
 begin
   with PV^ do case VType of
-    VInt, VChar : Result:=Int;
-    VFloat : Result:=Flo;
+    VInt, VChar : Cnt:=Int;
+    VFloat : Cnt:=Flo;
     VGap   : begin
                f:=Flo*0.5;
                m:=Img*0.5;
-               Result:=m+f;
-               m:=m-f;
+               Cnt:=m+f;
              end;
     VIGap  : begin
                f:=Int*0.5;
-               m:=IGap*0.5;
-               Result:=m+f;
-               m:=m-f;
+               m:=IBnd*0.5;
+               Cnt:=m+f;
              end;
     else TypeDisallow(VType);
   end;
-  Mgin:=m;
+  Mgin:=m-f;
 end;
 
 function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
@@ -481,7 +506,7 @@ begin
           VFloat : s:=SelectPref(Flo/scl, 0, scl, flg)+s;
           VCplex : s:=SelectPref(Hypot2(Flo, Img)/scl*2, 0, scl, flg)+s;
           VGap   : s:=SelectPref(Flo/scl, Img/scl, scl, flg)+s;
-          VIGap  : s:=SelectPref(Int/scl, IGap/scl, scl, flg)+s;
+          VIGap  : s:=SelectPref(Int/scl, IBnd/scl, scl, flg)+s;
         end;
 
 
@@ -494,14 +519,14 @@ begin
         VFloat : Result:=FloatToStr((Flo-ofs)/scl, F);
         VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+', '+FloatToStr(Img/scl, F)+')';
         VGap   : Result:='['+FloatToStr((Flo-ofs)/scl, F)+':'+FloatToStr((Img-ofs)/scl, F)+']';
-        VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IGap-ofs)/scl, F)+']';
+        VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IBnd-ofs)/scl, F)+']';
       end else case VType of
         VInt   : Result:=IntToStr(Int);
         VFloat : Result:=FloatToStr(Flo, F);
         VCplex : Result:='('+FloatToStr(Flo, F)+', '+FloatToStr(Img, F)+')';
         VChar  : if VPhy=0 then Result:=char(Int) else Result:=IntToStr(Int);
         VGap   : Result:='['+FloatToStr(Flo, F)+':'+FloatToStr(Img, F)+']';
-        VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IGap)+']';
+        VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IBnd)+']';
       end;
       Result:=Result+s;
       PAnsiRec(PByte(Result)-SAnsiRec)^.CodePage:=CP_ACP;
@@ -526,7 +551,7 @@ begin
                end;
       VStr   : V.Str:=Str2Str(string(Str));
       VGap   : begin V.LBound:=Flo; V.RBound:=Img; end;
-      VIGap  : begin V.LIntBnd:=Int; V.RIntBnd:=IGap; end;
+      VIGap  : begin V.LIntBnd:=Int; V.RIntBnd:=IBnd; end;
       VArr   : RaiseError(ArrDisallow);
     end;
     V.Dim:=VPhy;
@@ -556,7 +581,7 @@ begin
               end;
       VIGap : begin
                 Int:=Src^.Int;
-                IGap:=Src^.IGap;
+                IBnd:=Src^.IBnd;
               end;
     end;
     VPhy:=Src^.VPhy;

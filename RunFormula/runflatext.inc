@@ -399,7 +399,7 @@ begin
       $171,                                   // 0+0 "+0
       $271,
       $B171D,                                 // [0+0] ["+0]
-      $B271D  : if (not flg) or Plus(IL, I, Int) or Plus(IL, -I, IGap) then begin
+      $B271D  : if (not flg) or Plus(IL, I, Int) or Plus(IL, -I, IBnd) then begin
                   if F>0 then RaiseError(InvalidFormat);
                   Flo:=FL+F;
                   Img:=FL-F;
@@ -418,7 +418,7 @@ begin
       $B2A2D  : if flg then begin
                   if IL>I then RaiseError(InvalidRange);
                   Int:=IL;
-                  IGap:=I;
+                  IBnd:=I;
                   VType:=VIGap;
                 end else begin
                   if FL>F then RaiseError(InvalidRange);
@@ -431,7 +431,7 @@ begin
       $B1AAD,                                  // [0::] ["::]
       $B2AAD  : if flg then begin
                   Int:=I;
-                  IGap:=HI;
+                  IBnd:=HI;
                   VType:=VIGap;
                 end else begin
                   Flo:=F;
@@ -444,7 +444,7 @@ begin
       $BAA2D  : if flg then begin
                   if I=LI then RaiseError(InvalidRange);
                   Int:=LI+1;
-                  IGap:=I;
+                  IBnd:=I;
                   VType:=VIGap;
                 end else begin
                   Flo:= -HF.F;

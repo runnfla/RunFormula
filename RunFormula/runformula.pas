@@ -17,7 +17,8 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Main -cRev.2026.00.00:
+// TODO -oRFla.Main -cRev.2026.11.16: make Global()
+// TODO -oRFla.Main -cRev.2026.11.16: move runflamsg.inc to opt file
 
 unit RunFormula;
 
@@ -351,7 +352,7 @@ begin
 end;
 
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
-var Error : TRunFlaError = (Code : Unknown);              //DONE -oRFla.Main -cRev.2026.05.03: Func RunFlaExecVrt
+var Error : TRunFlaError = (Code : Unknown);              //DONE -oRFla.Main -cRev.2026.00.00: Proc RunFlaExecVrt
     R : TValRec;             // prevent filling
 begin
   Exec(Fla, Error, FlaVar, @R);
@@ -360,7 +361,7 @@ begin
 end;
 
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil);
-var R : TValRec;
+var R : TValRec;                                          //DONE -oRFla.Main -cRev.2026.00.00: Proc RunFlaExecVrt
 begin
   Exec(Fla, Error, FlaVar, @R);
   AsVrt(@R, VrtResult);
@@ -505,7 +506,7 @@ end;
 {$include runflaopt.inc}
 {$undef runfla_optfunc}
 
-procedure Init;
+procedure Init;                                           //DONE -oRFla.Main -cRev.2026.00.00: Proc Init
 var UnitDesc : TUnitDesc;
     PrefAbbr : TPrefAbbr;
 begin

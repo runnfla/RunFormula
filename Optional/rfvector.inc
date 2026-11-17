@@ -17,14 +17,6 @@
 
 // TODO -oRFla.Vector -cRev.2026.00.00:
 
-{$ifdef runfla_optface}
-
-{$endif}
-
-{$ifdef runfla_optuses}
-
-{$endif}
-
 {$ifdef runfla_optfunc}
 
 function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_CROSS

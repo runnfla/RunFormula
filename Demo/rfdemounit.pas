@@ -185,7 +185,7 @@ begin
                               S:=S+'[0x'+IntToHex(Int)+']';
                             end;
                    VGap   : S:=': Range = ['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
-                   VIGap  : S:=': Integer Range = ['+IntToStr(Int)+':'+IntToStr(IGap)+']';
+                   VIGap  : S:=': Integer Range = ['+IntToStr(Int)+':'+IntToStr(IBnd)+']';
                    end;
 
                    S:=S+' Phy: '+IntToHex(ValRec.VPhy);

@@ -257,26 +257,36 @@ end;
 
 // -----
 
-function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_RE
+function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_RE
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with Result^ do begin
-    Flo:=AsRe(Param(-1, Context));
-    VType:=VFloat;
-    VPhy:=Context.TermResult^.VPhy;
+  with Param(-1, Context)^ do begin
+    case VType of
+      VInt, VChar : Result^.Flo:=Int;
+      VFloat, VCplex : Result^.Flo:=Flo;
+      VGap  : Result^.Flo:=Flo*0.5+Img*0.5;
+      VIGap : Result^.Flo:=Int*0.5+IBnd*0.5;
+      else TypeDisallow(VType);
+    end;
+    Result^.VType:=VFloat;
+    Result^.VPhy:=VPhy;
   end;
   PostParam(Context);
 end;
 
-function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_IM
+function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_IM
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with Result^ do begin
-    Flo:=AsIm(Param(-1, Context));
-    VType:=VFloat;
-    VPhy:=Context.TermResult^.VPhy;
+  with Param(-1, Context)^ do begin
+    case VType of
+      VNone, VStr, VArr : TypeDisallow(VType);
+      VCplex : Result^.Flo:=Img;
+      else Result^.Flo:=0;
+    end;
+    Result^.VType:=VFloat;
+    Result^.VPhy:=VPhy;
   end;
   PostParam(Context);
 end;
@@ -297,13 +307,13 @@ begin
 end;
 
 function Fla_ARG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_ARG
-var pv : PValRec;
+var f, m : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
-    Flo:=FlArcTan(AsIm(pv), AsRe(pv));
+    AsCplex(Param(-1, Context), f, m);
+    Flo:=FlArcTan(m, f);
     VType:=VFloat;
   end;
   PostParam(Context);
@@ -386,7 +396,7 @@ begin
                  VType:=VFloat;
                end;
       VIGap  : begin
-                 Int:=pv^.IGap;
+                 Int:=pv^.IBnd;
                  VType:=VInt;
                end;
       else TypeDisallow(pv^.VType);
@@ -396,27 +406,21 @@ begin
   PostParam(Context);
 end;
 
-function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.11: Func Fla_MARGIN
-var f : TRFloat = 0;
-    phy : SizeInt;
+function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_MARGIN
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
   with Param(-1, Context)^ do begin
     case VType of
-      VInt, VFloat, VChar : ;
-      VGap  : f:=Img*0.5-Flo*0.5;
-      VIGap : f:=IGap*0.5-Int*0.5;
+      VInt, VFloat, VChar : Result^.Flo:=0;
+      VGap  : Result^.Flo:=Img*0.5-Flo*0.5;
+      VIGap : Result^.Flo:=IBnd*0.5-Int*0.5;
       else TypeDisallow(VType);
     end;
-    phy:=VPhy;
+    Result^.VType:=VFloat;
+    Result^.VPhy:=VPhy;
   end;
   PostParam(Context);
-  Result:=NewLV(Context);
-  with Result^ do begin
-    Flo:=f;
-    VType:=VFloat;
-    VPhy:=phy;
-  end;
 end;
 
 function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RANGE
@@ -429,8 +433,8 @@ begin
     R:=Param(-1, Context);
     if CaseType[L^.VType, R^.VType]=VInt then begin
       Int:=L^.Int;
-      IGap:=R^.Int;
-      if IGap<Int then RaiseError(InvalidRange);
+      IBnd:=R^.Int;
+      if IBnd<Int then RaiseError(InvalidRange);
       VType:=VIGap;
     end else begin
       Flo:=AsFloat(L);
@@ -454,7 +458,7 @@ begin
     C:=Param(-2, Context);
     M:=Param(-1, Context);
     if (CaseType[C^.VType, M^.VType]<>VInt) or Plus(C^.Int, -M^.Int, Int)
-      or Plus(C^.Int, M^.Int, IGap) then begin
+      or Plus(C^.Int, M^.Int, IBnd) then begin
         Ball(AsFloat(C), AsFloat(M), Result);
         if Img<Flo then RaiseError(InvalidRange);
       end else begin
@@ -476,7 +480,7 @@ begin
   Result:=NewLV(Context);
   with ValCopy(Param(-1, Context), Result)^ do begin
     case VType of
-      VInt, VChar : begin IGap:=Int; VType:=VIGap; end;
+      VInt, VChar : begin IBnd:=Int; VType:=VIGap; end;
       VFloat : begin Img:=Flo; VType:=VGap; end;
       VGap, VIGap : ;
       else TypeDisallow(VType);
@@ -488,7 +492,7 @@ begin
         if pv^.VType in VIGapTypes
           then MinMax(pv^.Int, AsIGap(pv), Result)
           else begin
-            t:=IGap;
+            t:=IBnd;
             Flo:=Int;
             Img:=t;
             VType:=VGap;
@@ -553,7 +557,7 @@ begin
                if (Flo>=LI) and (Flo<=HI) and (Img>=LI) and (Img<=HI) then begin
                  t:=trunc(Img);
                  Int:=trunc(Flo);
-                 IGap:=t;
+                 IBnd:=t;
                  VType:=VIGap;
                end;
              end;
@@ -628,7 +632,7 @@ begin
                if Img>0 then t:=1 else if Img=0 then t:=0;
              end;
     VGap   : if Flo>0 then t:=1 else if (Flo<=0) and (Img>=0) then t:=0;
-    VIGap  : if Int>0 then t:=1 else if (Int<=0) and (IGap>=0) then t:=0;
+    VIGap  : if Int>0 then t:=1 else if (Int<=0) and (IBnd>=0) then t:=0;
     else TypeDisallow(VType);
   end;
   PostParam(Context);
@@ -1152,11 +1156,11 @@ begin
                  if (pv^.Flo<0) and (pv^.Img>0) then Flo:=0;
                end;
       VIGap  : if pv^.Int>LI then begin
-                 MinMax(abs(pv^.Int), abs(pv^.IGap), Result);
-                 if (pv^.Int<0) and (pv^.IGap>0) then Int:=0;
+                 MinMax(abs(pv^.Int), abs(pv^.IBnd), Result);
+                 if (pv^.Int<0) and (pv^.IBnd>0) then Int:=0;
                end else begin
-                 MinMax(abs(TRFloat(pv^.IGap)), FALI, Result);
-                 if pv^.IGap>0 then Flo:=0;
+                 MinMax(abs(TRFloat(pv^.IBnd)), FALI, Result);
+                 if pv^.IBnd>0 then Flo:=0;
                end;
       else TypeDisallow(VType);
     end;
@@ -1165,7 +1169,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_HYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_HYPOT
+function Fla_HYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_HYPOT
 var X, Y : PValRec;
     fa, fb, fc, fd : TRFloat;
     flg : boolean;
@@ -1312,7 +1316,7 @@ begin
   PostParam(Context);
 end;
 
-procedure FuncRegister;
+procedure FuncRegister;                                                  //DONE -oRFla.Func -cRev.2026.00.00: Proc FuncRegister
 begin
   FuncReg('abort', @Fla_ABORT);
   FuncReg('exit', @Fla_EXIT);
