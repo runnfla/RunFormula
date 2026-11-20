@@ -21,18 +21,21 @@
 
 function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_CROSS
 var X, Y : PValRec;
+    fx, mx, fy, my : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Y:=Param(-1, Context);
     X:=Param(-2, Context);
-    Flo:=AsRe(X)*AsIm(Y)-AsIm(X)*AsRe(Y);
+    AsCplex(X, fx, mx);
+    Y:=Param(-1, Context);
+    AsCplex(Y, fy, my);
+    Flo:=fx*my-mx*fy;
     VType:=VFloat;
     if (X^.VPhy or Y^.VPhy)<>0 then VPhy:=PhyPlus(X^.VPhy, Y^.VPhy);
   end;
   PostParam(Context);
-  PostParam(Y, Context);
+  PostParam(X, Context);
 end;
 
 function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ROTATE

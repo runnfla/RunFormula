@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Optional Uncertainty Calculation functions
-//  Rev. 3.11.2026
+//  Rev. 17.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -128,7 +128,7 @@ begin
   Ball(arctan(f), m/(sqr(f)+1), Result);
 end;
 
-function Fla_UNCHYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Uncert -cRev.2026.11.13: Func Fla_UNCHYPOT
+function Fla_UNCHYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Uncert -cRev.2026.11.13: Func Fla_UNCHYPOT
 var f, fx, fy, mx, my : TRFloat;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
@@ -189,7 +189,7 @@ begin
 end;
 
 function Fla_UNCSPAN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.13: Func Fla_UNCSPAN
-var d, f, t, tm, summ : TRFloat;
+var d, f, t, tm, msum : TRFloat;
     mg : TRFloat = 0;
     phy, i : SizeInt;
 begin
@@ -197,19 +197,92 @@ begin
   AsBall(Param(-1, Context), f, tm);
   phy:=Context.TermResult^.VPhy;
   PostParam(Context);
-  summ:=sqr(tm);
+  msum:=sqr(tm);
   for i:=2 to ParamCount do begin            // Welford's algorithm
     AsBall(Param(-i, Context), t, tm);
     if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
     PostParam(Context);
     d:=t-f;                  // deviation
     f:=d/i+f;                // current mean
-    mg:=(t-f)*d+mg;          // dispersion
-    summ:=sqr(tm)+summ;
+    mg:=(t-f)*d+mg;          // sum of squared deviations
+    msum:=sqr(tm)+msum;
   end;
   Result:=NewLV(Context);
-  Ball(f, sqrt((mg/(ParamCount-1)+summ/ParamCount)/ParamCount), Result);
+  Ball(f, sqrt((mg/(ParamCount-1)+msum/ParamCount)/ParamCount), Result);
   Result^.VPhy:=phy;
+end;
+
+function Fla_UNCACCUM(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Uncert -cRev.2026.11.13: Func Fla_UNCACCUM
+var d, t, f, m : TRFloat;
+    phy, n : SizeInt;
+begin                                 // unc.accum(old range, value, number)
+  if ParamCount<>3 then RaiseError(ParamNumber);
+  n:=AsInt(Param(-1, Context));
+  if n<=0 then RaiseError(InvalidValue);
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
+  t:=AsFloat(Param(-2, Context));
+  phy:=Context.TermResult^.VPhy;
+  PostParam(Context);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    if n>1 then begin
+      AsBall(Param(-3, Context), f, m);
+      if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
+      PostParam(Context);
+      d:=(t-f)/n;
+      Ball(d+f, Hypot2(sqrt(1-2/n)*m, d)*2, Result);
+    end else begin
+      Flo:=t;
+      Img:=t;
+      VType:=VGap;
+    end;
+    VPhy:=phy;
+  end;
+end;
+
+function Fla_UNCWMEAN(ParamCount: SizeInt; var Context: TContext): PValRec; //DONE -oRFla.Uncert -cRev.2026.11.17: Func Fla_UNCWMEAN
+var d, t, tm, w, f, wsum : TRFloat;
+    mg : TRFloat = 0;
+    phy, i : SizeInt;
+begin
+  if ParamCount<2 then RaiseError(ParamNumber);
+  AsBall(Param(-1, Context), f, tm);
+  if tm=0 then RaiseError(InvalidValue);
+  phy:=Context.TermResult^.VPhy;
+  PostParam(Context);
+  wsum:=1/sqr(tm);
+  for i:=2 to ParamCount do begin            // weighted Welford's algorithm
+    AsBall(Param(-i, Context), t, tm);
+    if tm=0 then RaiseError(InvalidValue);
+    if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
+    PostParam(Context);
+    w:=1/sqr(tm);
+    wsum:=wsum+w;
+    d:=t-f;
+    f:=(w/wsum)*d+f;
+    mg:=(t-f)*w*d+mg;
+  end;
+  d:=mg/(ParamCount-1);                      // sqr Birge ratio (chi^2 / ndf)
+  if d>1 then wsum:=sqrt(d/wsum) else wsum:=1/sqrt(wsum);
+  Result:=NewLV(Context);
+  Ball(f, wsum, Result);
+  Result^.VPhy:=phy;
+end;
+
+function Fla_UNCADD(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.18: Func Fla_UNCADD
+var f, m : TRFloat;
+begin
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    AsBall(Param(-2, Context), f, m);
+    VPhy:=Context.TermResult^.VPhy;
+    PostParam(Context);
+    Ball(f, Hypot2(AsFloat(Param(-1, Context)), m)*2, Result);
+    if VPhy<>Context.TermResult^.VPhy then RaiseError(DimMismatch);
+  end;
+  PostParam(Context);
 end;
 
 function Fla_INFLATE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.13: Func Fla_INFLATE
@@ -225,125 +298,19 @@ begin
   PostParam(Context);
 end;
 
-function Fla_UNCACCUM(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Uncert -cRev.2026.11.13: Func Fla_UNCACCUM
-var d, t, f, m : TRFloat;
-    phy, n : SizeInt;
-begin                                 // unc.accum(old range, value, number)
-  if ParamCount<>3 then RaiseError(ParamNumber);
-  n:=AsInt(Param(-1, Context));
-  if n<=0 then RaiseError(InvalidValue);
-  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
-  t:=AsFloat(Param(-2, Context));
-  phy:=Context.TermResult^.VPhy;
-  PostParam(Context);
-  Result:=NewLV(Context);
-  if n>1 then begin
-    AsBall(Param(-3, Context), f, m);
-    if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
-    PostParam(Context);
-    d:=(t-f)/n;
-    Ball(d+f, Hypot2(sqrt(1-2/n)*m, d)*2, Result);
-    Result^.VPhy:=phy;
-  end else with Result^ do begin
-    Flo:=t;
-    Img:=t;
-    VType:=VGap;
-    VPhy:=phy;
-  end;
-end;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function Fla_UNCWEIGHTED(ParamCount:SizeInt; var Context:TContext):PValRec;
-var d, f, t, tm, w, wsum, err : TRFloat;
-    mg : TRFloat = 0;
-    phy, i : SizeInt;
-    exactCount : SizeInt = 0;
-begin
-  if ParamCount<2 then RaiseError(ParamNumber);
-  AsBall(Param(-1, Context), t, tm);
-  phy:=Context.TermResult^.VPhy;
-  PostParam(Context);
-
-  if tm=0 then begin
-    exactCount:=1;
-    f:=t;
-    wsum:=0;
-  end else begin
-    wsum:=1/sqr(tm);
-    f:=t;
-  end;
-
-  for i:=2 to ParamCount do begin            // Weighted Welford's algorithm
-    AsBall(Param(-i, Context), t, tm);
-    if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
-    PostParam(Context);
-
-    if tm=0 then begin
-      if exactCount=0 then begin
-        f:=t;
-        mg:=0;
-      end else begin
-        d:=t-f;
-        f:=d/(exactCount+1)+f;
-        mg:=(t-f)*d+mg;
-      end;
-      Inc(exactCount);
-    end else if exactCount=0 then begin
-      w:=1/sqr(tm);
-      wsum:=wsum+w;
-      d:=t-f;
-      f:=(w/wsum)*d+f;
-      mg:=w*(t-f)*d+mg;
-    end;
-  end;
-
-  Result:=NewLV(Context);
-  if exactCount>0 then begin
-    if exactCount=1 then err:=0
-    else err:=sqrt(mg/(exactCount-1)/exactCount);
-    Ball(f, err, Result);
-  end else begin
-    d:=mg/(ParamCount-1);                    // Birge ratio (chi^2 / ndf)
-    if d>1 then err:=sqrt(d/wsum)
-    else err:=1/sqrt(wsum);
-    Ball(f, err, Result);
-  end;
-  Result^.VPhy:=phy;
-end;
-
-
-
-
-function Fla_TSTUD(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Uncert -cRev.2026.11.17: Func Fla_TSTUD
-var alpha, q, r, num, den, z, z2, z3, z5, z7, z9, df2, P, df, Rst : TRFloat;
-begin                                                      // Вычисляет двусторонний коэффициент Стьюдента t(P, df).
+function Fla_TCRIT(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Uncert -cRev.2026.11.17: Func Fla_TCRIT
+var alpha, q, r, num, den, z, z2, z3, z5, z7, z9, df2, P, df, rslt : TRFloat;
+begin                                                      // computes the two-tailed Student's t-critical value t(P, df)
   if ParamCount<>2 then RaiseError(ParamNumber);
-  P:=AsFloat(Param(-2, Context));                          // P  - доверительная вероятность (0 < P < 1), например 0.95
+  P:=AsFloat(Param(-2, Context));                          // P - confidence level (0 < P < 1), e.g., 0.95
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
-  df:=AsFloat(Param(-1, Context));                         // df - число степеней свободы (df >= 1), например n - 1
+  df:=AsFloat(Param(-1, Context));                         // df - degrees of freedom (df >= 1), e.g., n - 1
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
   PostParam(Context);
   alpha:=1-P;
-  if df=1 then Rst:=cos(alpha*(Cpi/2))/sin(alpha*(Cpi/2))
-    else if df=2 then Rst:=sqrt(2/(alpha*(2-alpha))-2)
+  if df=1 then rslt:=cos(alpha*(Cpi/2))/sin(alpha*(Cpi/2))
+    else if df=2 then rslt:=sqrt(2/(alpha*(2-alpha))-2)
       else begin
         q:=alpha*0.5;
         if q<0.02425 then begin
@@ -354,25 +321,25 @@ begin                                                      // Вычисляет
             3.754408661907416)*r+1);
           z:=-(num/den);
         end else begin
-          r:=sqr(0.5-q);  // <-- единственное изменение: полиномы от квадрата
+          r:=sqr(0.5-q);
           num:=(((((-39.69683028665376*r+220.9460984245205)*r-275.9285104469687)*r+
             138.3577518672690)*r-30.66479806614716)*r+2.506628277459239);
           den:=(((((-54.47609879822406*r+161.5858368580409)*r-155.6989798598866)*r+
             66.80131188771972)*r-13.28068155288572)*r+1);
           z:=(0.5-q)*num/den;
         end;
-        z2:=sqr(z);            // 2. Переход к распределению Стьюдента (разложение Корниша - Фишера)
+        z2:=sqr(z);            // approximation to Student's t-distribution (Cornish-Fisher expansion)
         z3:=z2*z;
         z5:=z3*z2;
         z7:=z5*z2;
         z9:=z7*z2;
         df2:=sqr(df);
-        Rst:=(z3+z)/(df*4)+(z5*5+z3*16+z*3)/(df2*96)+(z7*3+z5*19+z3*17-z*15)/(df2*df*384)+
+        rslt:=(z3+z)/(df*4)+(z5*5+z3*16+z*3)/(df2*96)+(z7*3+z5*19+z3*17-z*15)/(df2*df*384)+
           (z9*79+z7*776+z5*1482-z3*1920-z*945)/(df2*df2*92160)+z;
       end;
   Result:=NewLV(Context);
   with Result^ do begin
-    Flo:=Rst;
+    Flo:=rslt;
     VType:=VFloat;
   end;
 end;
@@ -393,13 +360,11 @@ FuncReg('unc.hypot', @Fla_UNCHYPOT);
 FuncReg('unc.log', @Fla_UNCLOG);
 FuncReg('unc.pow', @Fla_UNCPOW);
 FuncReg('unc.span', @Fla_UNCSPAN);
-FuncReg('inflate', @Fla_INFLATE);
 FuncReg('unc.accum', @Fla_UNCACCUM);
-
-FuncReg('tstud', @Fla_TSTUD);
+FuncReg('unc.wmean', @Fla_UNCWMEAN);
+FuncReg('unc.add', @Fla_UNCADD);
+FuncReg('inflate', @Fla_INFLATE);
+FuncReg('tcrit', @Fla_TCRIT);
 
 {$endif}
-
-
-
 
