@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Changelog
-//  Rev. 21.09.2026
+//  Rev. 20.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -65,7 +65,7 @@ IncompType_NG
 - Fixed: Allowing units with offset in composite dimensions
 
 ===== Version 0.2d - 20.11.2026 =====
-- Fixed: Incorrect variable name table indexing
+- Critical: Fixed incorrect variable name table indexing
 
 ===== Develop branch changes =====
 
