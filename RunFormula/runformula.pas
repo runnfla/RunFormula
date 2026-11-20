@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Version 0.2c
-//  Released at 28.09.2026
+//  Version 0.2d
+//  Released at 20.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -373,7 +373,7 @@ var Buf : array of string;
     Comment : char = #0;
     FlaPos : integer = 0;                    // position in Fla
     Pnt : PChar;
-    ofs, i : SizeInt;
+    ofs, alng, i : SizeInt;
 
 {$include runflaparse.inc}
 
@@ -395,15 +395,27 @@ begin
     CloseExpr;
     CloseToken(TagCode);
     OpToken(TagGreater);                           // insert stub
-    RequestBuf(VarList.Count*SI);                  // writing Var Name Table
-    ofs:=VarList.Count*SI+SAnsiRec;
-    for i:=0 to VarList.Count-1 do begin
-      PSizeInt(BufP)^:=ofs;
-      inc(BufP, SI);
-      inc(ofs, AlignString(PFlaRec(VarList.List[i])^.Lng));
+
+    ofs:=VarList.Count*SI;                         // writing Var Name Table
+    RequestBuf(ofs);
+    TokenAddr:=BufP;               // start of offset table
+    inc(BufP, ofs);
+    inc(ofs, SAnsiRec);
+    for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do begin
+      PSizeInt(TokenAddr+Index*SI)^:=ofs;
+      alng:=AlignString(Lng);
+      WriteString(ID, Lng, alng);
+      inc(ofs, alng);
     end;
-    for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do
-      WriteString(ID, Lng, AlignString(Lng));
+
+//    for i:=0 to VarList.Count-1 do begin
+//      PSizeInt(BufP)^:=ofs;
+//      inc(BufP, SI);
+//      inc(ofs, AlignString(PFlaRec(VarList.List[i])^.Lng));
+//    end;
+//    for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do
+//      WriteString(ID, Lng, AlignString(Lng), true);
+
     i:=length(Buf)-1;
     SetLength(Buf[i], BufP-SBuf);
     if i>0 then begin

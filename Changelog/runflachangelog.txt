@@ -64,5 +64,8 @@ IncompType_NG
 - Changed: Built-in function sign() is disallowed for None and string values
 - Fixed: Allowing units with offset in composite dimensions
 
+===== Version 0.2d - 20.11.2026 =====
+- Fixed: Incorrect variable name table indexing
+
 ===== Develop branch changes =====
 
