@@ -83,5 +83,5 @@ IncompType_NG
 - собственный вариантный тип результата
 VariantError --> InvalidVariant
 - fix "_" lowcasing in variable name
-- Fixed: Incorrect variable name table indexing
+- Critical: Fixed incorrect variable name table indexing
 

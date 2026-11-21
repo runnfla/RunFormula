@@ -1,7 +1,7 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
 //  Optional Uncertainty Calculation functions
-//  Rev. 17.11.2026
+//  Rev. 20.11.2026
 
 //  Author: Alexander Torubarov
 //  Contact: runfla@yandex.com
@@ -161,7 +161,7 @@ begin
   Ball(f, Hypot2(mx/fx, ma/fa*f)/abs(lna)*2, Result);
 end;
 
-function Fla_UNCPOW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.12: Func Fla_UNCPOW
+function Fla_UNCPOW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Uncert -cRev.2026.11.20: Func Fla_UNCPOW
 var pv : PValRec;
     f, fx, mx, fa, ma : TRFloat;
     phy : SizeInt;

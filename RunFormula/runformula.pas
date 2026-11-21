@@ -418,15 +418,17 @@ begin
     OpToken(TagGreater);                           // insert stub
 
     ofs:=VarList.Count*SI;                         // writing Var Name Table
-    RequestBuf(ofs);
-    TokenAddr:=BufP;               // start of offset table
-    inc(BufP, ofs);
-    inc(ofs, SAnsiRec);
-    for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do begin
-      PSizeInt(TokenAddr+Index*SI)^:=ofs;
-      alng:=AlignString(Lng);
-      WriteString(ID, Lng, alng, true);
-      inc(ofs, alng);
+    if ofs>0 then begin             //??
+      RequestBuf(ofs);
+      TokenAddr:=BufP;               // start of offset table
+      inc(BufP, ofs);
+      inc(ofs, SAnsiRec);
+      for i:=0 to VarList.Count-1 do with PFlaRec(VarList.List[i])^ do begin
+        PSizeInt(TokenAddr+Index*SI)^:=ofs;
+        alng:=AlignString(Lng);
+        WriteString(ID, Lng, alng, true);
+        inc(ofs, alng);
+      end;
     end;
 
 //    for i:=0 to VarList.Count-1 do begin
