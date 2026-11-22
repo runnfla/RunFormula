@@ -30,7 +30,7 @@ begin
     AsCplex(X, fx, mx);
     Y:=Param(-1, Context);
     AsCplex(Y, fy, my);
-    Flo:=fx*my-mx*fy;
+    Flo:=fx*my-fy*mx;
     VType:=VFloat;
     if (X^.VPhy or Y^.VPhy)<>0 then VPhy:=PhyPlus(X^.VPhy, Y^.VPhy);
   end;

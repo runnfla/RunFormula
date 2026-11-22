@@ -177,13 +177,13 @@ begin
                    with ValRec do case VType of
                    VNone  : S:=': None';
                    VInt   : S:=': Int = '+IntToStr(Int)+' [0x'+IntToHex(Int)+']';
-                   VFloat : S:=': Float = '+FloatToStr(Flo);
-                   VCplex : S:=': Complex = ('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
                    VChar  : begin
                               S:=': Char = ';
                               if (Int>$20) and (Int<$7F) then S:=S+'"'+char(Int)+'" ';
                               S:=S+'[0x'+IntToHex(Int)+']';
                             end;
+                   VFloat : S:=': Float = '+FloatToStr(Flo);
+                   VCplex : S:=': Complex = ('+FloatToStr(Flo)+','+FloatToStr(Img)+')';
                    VGap   : S:=': Range = ['+FloatToStr(Flo)+':'+FloatToStr(Img)+']';
                    VIGap  : S:=': Integer Range = ['+IntToStr(Int)+':'+IntToStr(IBnd)+']';
                    end;

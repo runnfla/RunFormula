@@ -412,7 +412,7 @@ begin
   Result:=NewLV(Context);
   with Param(-1, Context)^ do begin
     case VType of
-      VInt, VFloat, VChar : Result^.Flo:=0;
+      VInt, VChar, VFloat : Result^.Flo:=0;
       VGap  : Result^.Flo:=Img*0.5-Flo*0.5;
       VIGap : Result^.Flo:=IBnd*0.5-Int*0.5;
       else TypeDisallow(VType);
@@ -617,6 +617,45 @@ begin
                Img:=FlaRound(Img, 1);
              end;
     else TypeDisallow(VType);
+  end;
+  PostParam(Context);
+end;
+
+function Fla_XXX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_XXX
+var pv : PValRec;
+    f, m, pw, scl, ofs, x : TRFloat;
+    flg : SizeInt;
+begin
+  if ParamCount<>1 then RaiseError(ParamNumber);
+  Result:=NewLV(Context);
+  with Result^ do begin
+    pv:=Param(-1, Context);
+    case pv^.VType of
+      VCplex : begin
+ //                f:=exp(pv^.Flo);
+ //                Flo:=f*cos(pv^.Img);
+ //                Img:=f*sin(pv^.Img);
+ //                VType:=VCplex;
+               end;
+      VFloat, VGap, VIGap : begin
+                      AsBall(pv, f, m);
+
+
+
+                      pw:=Power(10, trunc(ln(abs(m))/ln(10))-1);
+                      Ball(FlaRound(f/pw, 0)*pw, FlaRound(m/pw, 1)*pw, Result);
+
+          ///            VType:=VFloat;
+
+ //                     Flo:=exp(AsLGap(pv));
+ //                     Img:=exp(AsRGap(pv));
+ //                     VType:=VGap;
+                    end;
+      else
+ //       Flo:=exp(AsFloat(pv));
+ //       VType:=VFloat;
+    end;
+    VPhy:=pv^.VPhy;
   end;
   PostParam(Context);
 end;
@@ -1139,6 +1178,10 @@ begin
                  Flo:=FALI;
                  VType:=VFloat;
                end;
+      VChar  : begin
+                 Int:=pv^.Int;
+                 VType:=VInt;
+               end;
       VFloat : begin
                  Flo:=abs(pv^.Flo);
                  VType:=VFloat;
@@ -1146,10 +1189,6 @@ begin
       VCplex : begin
                  Flo:=Hypot2(pv^.Flo, pv^.Img)*2;
                  VType:=VFloat;
-               end;
-      VChar  : begin
-                 Int:=pv^.Int;
-                 VType:=VInt;
                end;
       VGap   : begin
                  MinMax(abs(pv^.Flo), abs(pv^.Img), Result);
@@ -1304,16 +1343,30 @@ begin
 end;
 
 function Fla_UNITSTR(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_UNITSTR
-var f : TRFloat;
+var pv : PValRec;
+    s, pref : string;
+    f : TRFloat;
     t : SizeInt;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with Result^ do begin
-    Str:=Str2Ptr(DecodePhy(Param(-1, Context)^.VPhy, f, f, t));
+  with Result^ do begin              //if VPhy = 0 exit with ""
+    pv:=Param(-2, Context);
+    s:=DecodePhy(pv^.VPhy, f, f, t);
+    if AsBool(Param(-1, Context)) then begin
+    {  case pv^.VType of
+        VInt         : pref:=SelectPref(pv^.Int, 0, f, t);
+        VFloat       : pref:=SelectPref(pv^.Flo, 0, f, t);
+        VCplex, VGap : pref:=SelectPref(pv^.Flo, pv^.Img, f, t);
+        VIGap        : pref:=SelectPref(pv^.Int, pv^.IBnd, f, t);
+      end;             }
+      s:=pref+s;
+    end;
+    PostParam(Context);
+    Str:=Str2Ptr(s);
     VType:=VStr;
   end;
-  PostParam(Context);
+  PostParam(pv, Context);
 end;
 
 procedure FuncRegister;                                                  //DONE -oRFla.Func -cRev.2026.00.00: Proc FuncRegister
@@ -1345,6 +1398,7 @@ begin
   FuncReg('floor', @Fla_FLOOR);
   FuncReg('ceil', @Fla_CEIL);
   FuncReg('round', @Fla_ROUND);
+  FuncReg('xxx', @Fla_XXX);
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
   FuncReg('string', @Fla_STRING);

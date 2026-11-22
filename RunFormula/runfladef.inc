@@ -95,7 +95,7 @@ type
     CW8087 : word;
   end;
 
-  TVType = (VNone = 0, VInt=1, VFloat=2, VRsvd=3, VCplex=4, VChar=5, VStr=6, VGap=7, VIGap=8, VArr=9);
+  TVType = (VNone=0, VInt=1, VChar=2, VFloat=3, VRsvd=4, VCplex=5, VGap=6, VIGap=7, VStr=8, VArr=9);
 
   TValRec = record
     VType : TVType;
@@ -316,18 +316,18 @@ const
   VIGapTypes = [VInt, VChar, VIGap];
 
   CaseType : array[TVType, TVType] of TVType = (
-// results: VNone VInt VFloat VCplex VStr VGap VIGap VArr
-//           VNone  VInt    VFloat  VRsvd  VCplex  VChar   VStr    VGap    VIGap   VArr
-{ VNone  } ( VNone, VNone,  VNone,  VRsvd, VNone,  VNone,  VNone,  VNone,  VNone,  VArr  ),
-{ VInt   } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VFloat, VGap,   VIGap,  VArr  ),
-{ VFloat } ( VNone, VFloat, VFloat, VRsvd, VCplex, VFloat, VFloat, VGap,   VGap,   VArr  ),
-{ VRsvd  } ( VRsvd, VRsvd,  VRsvd,  VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr  ),
-{ VCplex } ( VNone, VCplex, VCplex, VRsvd, VCplex, VCplex, VCplex, VCplex, VCplex, VArr  ),
-{ VChar  } ( VNone, VInt,   VFloat, VRsvd, VCplex, VInt,   VStr,   VGap,   VIGap,  VArr  ),
-{ VStr   } ( VNone, VFloat, VFloat, VRsvd, VCplex, VStr,   VStr,   VGap,   VGap,   VArr  ),
-{ VGap   } ( VNone, VGap,   VGap,   VRsvd, VCplex, VGap,   VGap,   VGap,   VGap,   VArr  ),
-{ VIGap  } ( VNone, VIGap,  VGap,   VRsvd, VCplex, VIGap,  VGap,   VGap,   VIGap,  VArr  ),
-{ VArr   } ( VArr,  VArr,   VArr,   VArr,  VArr,   VArr,   VArr,   VArr,   VArr,   VArr  ));
+// results: VNone VInt VFloat VCplex VGap VIGap VStr VArr
+//           VNone  VInt    VChar   VFloat  VRsvd  VCplex  VGap    VIGap   VStr    VArr
+{ VNone  } ( VNone, VNone,  VNone,  VNone,  VRsvd, VNone,  VNone,  VNone,  VNone,  VArr),
+{ VInt   } ( VNone, VInt,   VInt,   VFloat, VRsvd, VCplex, VGap,   VIGap,  VFloat, VArr),
+{ VFloat } ( VNone, VFloat, VFloat, VFloat, VRsvd, VCplex, VGap,   VGap,   VFloat, VArr),
+{ VRsvd  } ( VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr),
+{ VCplex } ( VNone, VCplex, VCplex, VCplex, VRsvd, VCplex, VCplex, VCplex, VCplex, VArr),
+{ VChar  } ( VNone, VInt,   VInt,   VFloat, VRsvd, VCplex, VGap,   VIGap,  VStr,   VArr),
+{ VGap   } ( VNone, VGap,   VGap,   VGap,   VRsvd, VCplex, VGap,   VGap,   VGap,   VArr),
+{ VIGap  } ( VNone, VIGap,  VIGap,  VGap,   VRsvd, VCplex, VGap,   VIGap,  VGap,   VArr),
+{ VStr   } ( VNone, VFloat, VStr,   VFloat, VRsvd, VCplex, VGap,   VGap,   VStr,   VArr),
+{ VArr   } ( VArr,  VArr,   VArr,   VArr,   VArr,  VArr,   VArr,   VArr,   VArr,   VArr));
 
 var
   FuncList : TMemList;      // list of TFlaRec

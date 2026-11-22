@@ -84,4 +84,6 @@ IncompType_NG
 VariantError --> InvalidVariant
 - fix "_" lowcasing in variable name
 - Critical: Fixed incorrect variable name table indexing
+- unitstr() теперь требует 2 параметра - приставка
+- All Types number changed
 

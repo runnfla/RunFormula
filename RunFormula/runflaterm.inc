@@ -427,14 +427,6 @@ begin
       VInt   : Int:=V.Int;
       VFloat : Flo:=V.Float;
       VCplex : begin Flo:=V.Float; Img:=V.Image; end;
-      VStr   : begin
-                 p:=PSizeInt(V.Str);
-                 if (p<>nil) and (p[-1]=1) then begin
-                   Int:=PByte(p)^;
-                   VType:=VChar;
-                 end else Str:=Str2Ptr(V.Str);
-                 if V.Dim<>0 then RaiseError(InvalidVariant);
-               end;
       VGap   : begin
                  Flo:=V.LBound; Img:=V.RBound;
                  if Img<Flo then RaiseError(InvalidRange);
@@ -442,6 +434,14 @@ begin
       VIGap  : begin
                  Int:=V.LIntBnd; IBnd:=V.RIntBnd;
                  if IBnd<Int then RaiseError(InvalidRange);
+               end;
+      VStr   : begin
+                 p:=PSizeInt(V.Str);
+                 if (p<>nil) and (p[-1]=1) then begin
+                   Int:=PByte(p)^;
+                   VType:=VChar;
+                 end else Str:=Str2Ptr(V.Str);
+                 if V.Dim<>0 then RaiseError(InvalidVariant);
                end;
       else RaiseError(InvalidVariant);
     end;

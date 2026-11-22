@@ -196,8 +196,8 @@ var vr : TValRec;
       VInt, VChar  : L:=PtrUint(@TToken(nil^).ValRec.Int)+SI;
       VFloat       : L:=PtrUint(@TToken(nil^).ValRec.Flo)+SRFloat;
       VCplex, VGap : L:=PtrUint(@TToken(nil^).ValRec.Img)+SRFloat;
-  //    VStr   : begin TextToken(PChar(V.Str), V.Ansi[-1]); exit; end;
       VIGap        : L:=PtrUint(@TToken(nil^).ValRec.IBnd)+SI;
+      //    VStr   : begin TextToken(PChar(V.Str), V.Ansi[-1]); exit; end;
     end;
     L:=(L+SIm1) and (not SIm1);                          // aligning to SizeInt
     Sequence(TagValue);

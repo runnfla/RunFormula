@@ -86,8 +86,8 @@ begin
     VNone  : c:=NoneDisallow;
     VFloat : c:=FloatDisallow;
     VCplex : c:=CplexDisallow;
-    VStr   : c:=StrDisallow;
     VGap, VIGap : c:=RangeDisallow;
+    VStr   : c:=StrDisallow;
     VArr   : c:=ArrDisAllow;
   end;
   RaiseError(c);
@@ -428,8 +428,8 @@ begin
       VInt, VChar : Result:=Int<>0;
       VFloat : Result:=Flo<>0;
       VCplex, VGap : Result:=(Flo<>0) or (Img<>0);
-      VStr   : Result:=Ansi[-1]<>0;
       VIGap  : Result:=(Int<>0) or (IBnd<>0);
+      VStr   : Result:=Ansi[-1]<>0;
       VArr   : RaiseError(ArrDisallow);
     end;
   end;
@@ -522,9 +522,9 @@ begin
         VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IBnd-ofs)/scl, F)+']';
       end else case VType of
         VInt   : Result:=IntToStr(Int);
+        VChar  : if VPhy=0 then Result:=char(Int) else Result:=IntToStr(Int);
         VFloat : Result:=FloatToStr(Flo, F);
         VCplex : Result:='('+FloatToStr(Flo, F)+', '+FloatToStr(Img, F)+')';
-        VChar  : if VPhy=0 then Result:=char(Int) else Result:=IntToStr(Int);
         VGap   : Result:='['+FloatToStr(Flo, F)+':'+FloatToStr(Img, F)+']';
         VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IBnd)+']';
       end;
@@ -541,17 +541,17 @@ begin
     case VType of
       VNone  : ;
       VInt   : V.Int:=Int;
-      VFloat : V.Float:=Flo;
-      VCplex : begin V.Float:=Flo; V.Image:=Img; end;
       VChar  : begin
                  V.Int:=Int;
                  V.Str:=string(MakeStrPtr(1));
                  V.Str[1]:=char(Int);
                  V.VrType:=VrString;
                end;
-      VStr   : V.Str:=Str2Str(string(Str));
+      VFloat : V.Float:=Flo;
+      VCplex : begin V.Float:=Flo; V.Image:=Img; end;
       VGap   : begin V.LBound:=Flo; V.RBound:=Img; end;
       VIGap  : begin V.LIntBnd:=Int; V.RIntBnd:=IBnd; end;
+      VStr   : V.Str:=Str2Str(string(Str));
       VArr   : RaiseError(ArrDisallow);
     end;
     V.Dim:=VPhy;
@@ -570,6 +570,10 @@ begin
                        Flo:=Src^.Flo;
                        Img:=Src^.Img;
                      end;
+      VIGap : begin
+                Int:=Src^.Int;
+                IBnd:=Src^.IBnd;
+              end;
       VStr  : begin
                 Str:=Src^.Str;
                 if Ansi[-2]>0 then
@@ -578,10 +582,6 @@ begin
 {$else}
                   InterlockedIncrement(Ansi[-2]);
 {$endif}
-              end;
-      VIGap : begin
-                Int:=Src^.Int;
-                IBnd:=Src^.IBnd;
               end;
     end;
     VPhy:=Src^.VPhy;
@@ -647,11 +647,6 @@ begin
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
                if (AsRe(L)=AsRe(R)) and (AsIm(L)=AsIm(R)) then exit;
              end;
-    VStr   : begin
-               IL:=DiffStr;
-               if IL=0 then exit;
-               if IL>0 then Exit(1);
-             end;
     VGap   : begin
                if Ineq then RaiseError(RangeDisallow);
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
@@ -665,6 +660,11 @@ begin
                IL:=AsIGap(L); IR:=AsIGap(R);
                if (IR=IL) and (L^.Int=R^.Int) then exit;
                if (L^.Int>=R^.Int) and (IL<=IR) then Exit(2);
+             end;
+    VStr   : begin
+               IL:=DiffStr;
+               if IL=0 then exit;
+               if IL>0 then Exit(1);
              end;
     VArr   : RaiseError(ArrDisallow);
   end;

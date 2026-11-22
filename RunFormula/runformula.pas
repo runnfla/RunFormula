@@ -30,7 +30,7 @@ type
   TRFloat = Double;             // or Extended... or Single...
 
   TRFVariant = record
-    VrType : (VrNone=0, VrInt=1, VrFloat=2, VrCplex=4, VrString=6, VrRange=7, VrIntRng=8);
+    VrType : (VrNone=0, VrInt=1, VrFloat=3, VrCplex=5, VrRange=6, VrIntRng=7, VrString=8);
     Dummy  : integer;
     Dim    : SizeInt;
     Str    : string;
@@ -76,7 +76,7 @@ implementation
 
 {$define runfla_optuses}
 
-uses SysUtils
+uses SysUtils                      , Dialogs
 
 {$include runflaopt.inc}
 {$undef runfla_optuses} ;
