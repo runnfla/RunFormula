@@ -621,39 +621,62 @@ begin
   PostParam(Context);
 end;
 
-function Fla_XXX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_XXX
+function Fla_SIGNIF(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.22: Func Fla_SIGNIF
 var pv : PValRec;
-    f, m, pw, scl, ofs, x : TRFloat;
-    flg : SizeInt;
+    f, m, mf : TRFloat;
+    n : SizeInt = 1;
+
+  function Fmul(const F:TRFloat):TRFloat;
+  begin
+    if F<1 then inc(n);
+    Result:=Power(10, trunc(ln(abs(F))/ln(10))-n);
+  end;
+
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  case ParamCount of
+    1 : ;
+    2 : begin
+          n:=AsInt(Param(-1, Context))-1;
+          if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+          PostParam(Context);
+        end;
+    else RaiseError(ParamNumber);
+  end;
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Param(-ParamCount, Context);
     case pv^.VType of
-      VCplex : begin
- //                f:=exp(pv^.Flo);
- //                Flo:=f*cos(pv^.Img);
- //                Img:=f*sin(pv^.Img);
- //                VType:=VCplex;
+      VInt   : begin
+                 mf:=Fmul(pv^.Int);
+                 f:=FlaRound(pv^.Int/mf, 0)*mf;
+                 if abs(f)<=HI then begin
+                   Int:=trunc(f);
+                   VType:=VInt;
+                 end else begin
+                   Flo:=f;
+                   VType:=VFloat;
+                 end;
                end;
-      VFloat, VGap, VIGap : begin
+      VFloat : begin
+                 mf:=Fmul(pv^.Flo);
+                 Flo:=FlaRound(pv^.Flo/mf, 0)*mf;
+                 VType:=VFloat;
+               end;
+      VCplex : begin
+                 m:=FlArcTan(pv^.Img, pv^.Flo)*(180/Cpi);
+                 mf:=Fmul(m);
+                 f:=FlaRound(Hypot2(pv^.Flo, pv^.Img)*2/mf, 0)*mf;
+                 m:=FlaRound(m/mf, 1)*mf*(Cpi/180);
+                 Flo:=m*cos(f);
+                 Img:=m*sin(f);
+                 VType:=VCplex;
+               end;
+      VGap, VIGap : begin
                       AsBall(pv, f, m);
-
-
-
-                      pw:=Power(10, trunc(ln(abs(m))/ln(10))-1);
-                      Ball(FlaRound(f/pw, 0)*pw, FlaRound(m/pw, 1)*pw, Result);
-
-          ///            VType:=VFloat;
-
- //                     Flo:=exp(AsLGap(pv));
- //                     Img:=exp(AsRGap(pv));
- //                     VType:=VGap;
+                      mf:=Fmul(m);
+                      Ball(FlaRound(f/mf, 0)*mf, FlaRound(m/mf, 1)*mf, Result);
                     end;
-      else
- //       Flo:=exp(AsFloat(pv));
- //       VType:=VFloat;
+      else TypeDisallow(VType);
     end;
     VPhy:=pv^.VPhy;
   end;
@@ -1398,7 +1421,7 @@ begin
   FuncReg('floor', @Fla_FLOOR);
   FuncReg('ceil', @Fla_CEIL);
   FuncReg('round', @Fla_ROUND);
-  FuncReg('xxx', @Fla_XXX);
+  FuncReg('signif', @Fla_SIGNIF);
   FuncReg('sign', @Fla_SIGN);
   FuncReg('length', @Fla_LENGTH);
   FuncReg('string', @Fla_STRING);

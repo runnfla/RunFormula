@@ -319,11 +319,11 @@ const
 // results: VNone VInt VFloat VCplex VGap VIGap VStr VArr
 //           VNone  VInt    VChar   VFloat  VRsvd  VCplex  VGap    VIGap   VStr    VArr
 { VNone  } ( VNone, VNone,  VNone,  VNone,  VRsvd, VNone,  VNone,  VNone,  VNone,  VArr),
+{ VChar  } ( VNone, VInt,   VInt,   VFloat, VRsvd, VCplex, VGap,   VIGap,  VStr,   VArr),
 { VInt   } ( VNone, VInt,   VInt,   VFloat, VRsvd, VCplex, VGap,   VIGap,  VFloat, VArr),
 { VFloat } ( VNone, VFloat, VFloat, VFloat, VRsvd, VCplex, VGap,   VGap,   VFloat, VArr),
 { VRsvd  } ( VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd, VRsvd,  VRsvd,  VRsvd,  VRsvd,  VArr),
 { VCplex } ( VNone, VCplex, VCplex, VCplex, VRsvd, VCplex, VCplex, VCplex, VCplex, VArr),
-{ VChar  } ( VNone, VInt,   VInt,   VFloat, VRsvd, VCplex, VGap,   VIGap,  VStr,   VArr),
 { VGap   } ( VNone, VGap,   VGap,   VGap,   VRsvd, VCplex, VGap,   VGap,   VGap,   VArr),
 { VIGap  } ( VNone, VIGap,  VIGap,  VGap,   VRsvd, VCplex, VGap,   VIGap,  VGap,   VArr),
 { VStr   } ( VNone, VFloat, VStr,   VFloat, VRsvd, VCplex, VGap,   VGap,   VStr,   VArr),
