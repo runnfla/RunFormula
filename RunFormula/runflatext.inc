@@ -566,12 +566,21 @@ begin
   FreeMem(buf);
 end;
 
-function SelectPref(const X, Y:TRFloat; var Scl:TRFloat; Flg:SizeInt):string;
-var i : SizeInt;                                      //DONE -oRFla.Text -cRev.2026.10.07: Func SelectPref
+function SelectPref(PV:PValRec; var Scl:TRFloat; Flg:SizeInt):string;    //DONE -oRFla.Text -cRev.2026.10.07: Func SelectPref
+var i : SizeInt;
     f, t : TRFloat;
 begin
-  if Y=0 then f:=abs(X) else if X=0 then f:=abs(Y) else f:=abs(X)*0.5+abs(Y)*0.5;
   PByte(Result):=nil;
+  if (Flg and UPF)<>0 then exit;
+  with PV^ do case VType of
+    VNone  : exit;
+    VCplex : f:=Hypot2(Flo, Img)*2;
+    else
+      AsBall(PV, f, t);
+      f:=abs(f);
+      if f=t then f:=f*2;
+  end;
+  f:=f/Scl;
   for i:=0 to PrefList.Count-1 do with PPrefAbbr(PrefList.List[i])^ do begin
     if (Flag and (Flg or UOP))<>0 then continue;
     t:=f/Scale;

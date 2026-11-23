@@ -598,7 +598,7 @@ begin
   PostParam(Context);
 end;
 
-function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_ROUND
+function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_ROUND
 var md, ar : TRFloat;
 begin
   if ParamCount<>1 then RaiseError(ParamNumber);
@@ -607,10 +607,8 @@ begin
     VInt, VChar, VIGap : ;
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
-               md:=FlaRound(Hypot2(Flo, Img)*2, 0);
-               ar:=FlaRound(FlArcTan(Img, Flo)*(180/Cpi), 0)*(Cpi/180);
-               Flo:=md*cos(ar);
-               Img:=md*sin(ar);
+               Flo:=FlaRound(Flo, 0);
+               Img:=FlaRound(Img, 0);
              end;
     VGap   : begin
                Flo:=FlaRound(Flo, -1);
@@ -621,30 +619,29 @@ begin
   PostParam(Context);
 end;
 
-function Fla_SIGNIF(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.22: Func Fla_SIGNIF
+function Fla_SIGNIF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_SIGNIF
 var pv : PValRec;
     f, m, mf : TRFloat;
-    n : SizeInt = 1;
+    n : SizeInt;
 
-  function Fmul(const F:TRFloat):TRFloat;
+  function Fmul(F:TRFloat):TRFloat;                                      //DONE -oRFla.Func -cRev.2026.11.23: Func Fmul
   begin
-    if F<1 then inc(n);
-    Result:=Power(10, trunc(ln(abs(F))/ln(10))-n);
+    if n>0 then begin              // Fmul must be called only once
+      if F=0 then Exit(1);
+      F:=abs(F);
+      if F>=1 then dec(n);
+      Result:=Power(10, trunc(ln(F)/ln(10))-n);
+    end else Result:=Power(10, n);
   end;
 
 begin
-  case ParamCount of
-    1 : ;
-    2 : begin
-          n:=AsInt(Param(-1, Context))-1;
-          if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-          PostParam(Context);
-        end;
-    else RaiseError(ParamNumber);
-  end;
+  if ParamCount<>2 then RaiseError(ParamNumber);
+  n:=AsInt(Param(-1, Context));
+  if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+  PostParam(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-ParamCount, Context);
+    pv:=Param(-2, Context);
     case pv^.VType of
       VInt   : begin
                  mf:=Fmul(pv^.Int);
@@ -663,12 +660,12 @@ begin
                  VType:=VFloat;
                end;
       VCplex : begin
-                 m:=FlArcTan(pv^.Img, pv^.Flo)*(180/Cpi);
-                 mf:=Fmul(m);
-                 f:=FlaRound(Hypot2(pv^.Flo, pv^.Img)*2/mf, 0)*mf;
-                 m:=FlaRound(m/mf, 1)*mf*(Cpi/180);
-                 Flo:=m*cos(f);
-                 Img:=m*sin(f);
+                 f:=Hypot2(pv^.Flo, pv^.Img)*2;
+                 mf:=Fmul(f);
+                 f:=FlaRound(f/mf, 0)*mf;
+                 m:=FlaRound(FlArcTan(pv^.Img, pv^.Flo)*(180/Cpi), 0)*(Cpi/180);
+                 Flo:=f*cos(m);
+                 Img:=f*sin(m);
                  VType:=VCplex;
                end;
       VGap, VIGap : begin
@@ -1367,26 +1364,20 @@ end;
 
 function Fla_UNITSTR(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_UNITSTR
 var pv : PValRec;
-    s, pref : string;
-    f : TRFloat;
-    t : SizeInt;
+    s : string;
+    scl, ofs : TRFloat;
+    flg : SizeInt;
 begin
   if ParamCount<>2 then RaiseError(ParamNumber);
   Result:=NewLV(Context);
-  with Result^ do begin              //if VPhy = 0 exit with ""
+  with Result^ do begin
     pv:=Param(-2, Context);
-    s:=DecodePhy(pv^.VPhy, f, f, t);
-    if AsBool(Param(-1, Context)) then begin
-    {  case pv^.VType of
-        VInt         : pref:=SelectPref(pv^.Int, 0, f, t);
-        VFloat       : pref:=SelectPref(pv^.Flo, 0, f, t);
-        VCplex, VGap : pref:=SelectPref(pv^.Flo, pv^.Img, f, t);
-        VIGap        : pref:=SelectPref(pv^.Int, pv^.IBnd, f, t);
-      end;             }
-      s:=pref+s;
-    end;
-    PostParam(Context);
-    Str:=Str2Ptr(s);
+    if pv^.VPhy<>0 then begin
+      s:=DecodePhy(pv^.VPhy, scl, ofs, flg);
+      if AsBool(Param(-1, Context)) then s:=SelectPref(pv, scl, flg)+s;
+      PostParam(Context);
+      Str:=Str2Ptr(s);
+    end else Str:=@CEmptyStr.Zero;
     VType:=VStr;
   end;
   PostParam(pv, Context);

@@ -20,7 +20,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="RFDemoUnit"/>
-        <EditorIndex Value="19"/>
+        <EditorIndex Value="18"/>
         <TopLine Value="165"/>
         <CursorPos Y="187"/>
         <UsageCount Value="200"/>
@@ -106,7 +106,7 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\inc\systemh.inc"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="15"/>
         <TopLine Value="317"/>
         <CursorPos X="3" Y="330"/>
         <UsageCount Value="100"/>
@@ -165,7 +165,7 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\inc\astrings.inc"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="282"/>
         <CursorPos X="21" Y="295"/>
         <UsageCount Value="100"/>
@@ -211,7 +211,7 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\x86_64\x86_64.inc"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="83"/>
         <CursorPos X="45" Y="88"/>
         <UsageCount Value="100"/>
@@ -268,7 +268,7 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\sysutils\sysstrh.inc"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="38"/>
         <CursorPos Y="53"/>
         <UsageCount Value="100"/>
@@ -277,9 +277,11 @@
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\math.pp"/>
         <UnitName Value="Math"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="33" Y="87"/>
-        <UsageCount Value="9"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="1019"/>
+        <CursorPos X="15" Y="1005"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\include\application.inc"/>
@@ -295,9 +297,9 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\inc\mathh.inc"/>
-        <EditorIndex Value="13"/>
-        <TopLine Value="104"/>
-        <CursorPos X="64" Y="120"/>
+        <EditorIndex Value="14"/>
+        <TopLine Value="211"/>
+        <CursorPos X="47" Y="9"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -489,14 +491,14 @@
       <Unit>
         <Filename Value="..\RunFormula\runformula.pas"/>
         <UnitName Value="RunFormula"/>
-        <TopLine Value="33"/>
-        <CursorPos X="46" Y="26"/>
+        <TopLine Value="180"/>
+        <CursorPos X="22" Y="195"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaerr.inc"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="16"/>
         <TopLine Value="42"/>
         <CursorPos X="16" Y="56"/>
         <UsageCount Value="100"/>
@@ -504,7 +506,7 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflamsg.inc"/>
-        <EditorIndex Value="16"/>
+        <EditorIndex Value="17"/>
         <TopLine Value="26"/>
         <CursorPos X="63" Y="48"/>
         <UsageCount Value="100"/>
@@ -512,24 +514,23 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaopt.inc"/>
-        <EditorIndex Value="17"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="8"/>
         <UsageCount Value="100"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runfladef.inc"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="310"/>
-        <CursorPos Y="327"/>
+        <TopLine Value="85"/>
+        <CursorPos X="68" Y="98"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflalib.inc"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="174"/>
-        <CursorPos Y="187"/>
+        <TopLine Value="489"/>
+        <CursorPos X="51" Y="503"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -544,16 +545,17 @@
       <Unit>
         <Filename Value="..\RunFormula\runflaterm.inc"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="410"/>
-        <CursorPos X="63" Y="439"/>
+        <TopLine Value="427"/>
+        <CursorPos X="27" Y="443"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="617"/>
-        <CursorPos X="20" Y="631"/>
+        <TopLine Value="615"/>
+        <CursorPos X="48" Y="625"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -582,7 +584,7 @@
       </Unit>
       <Unit>
         <Filename Value="..\Example\runflaexample.txt"/>
-        <EditorIndex Value="21"/>
+        <EditorIndex Value="20"/>
         <TopLine Value="10"/>
         <CursorPos X="27" Y="30"/>
         <UsageCount Value="100"/>
@@ -636,9 +638,9 @@
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflatext.inc"/>
-        <EditorIndex Value="10"/>
-        <TopLine Value="558"/>
-        <CursorPos X="10" Y="569"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="550"/>
+        <CursorPos X="21" Y="574"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -663,16 +665,16 @@
       </Unit>
       <Unit>
         <Filename Value="..\Changelog\runflachangelog.txt"/>
-        <EditorIndex Value="20"/>
-        <TopLine Value="62"/>
-        <CursorPos X="75" Y="68"/>
+        <EditorIndex Value="19"/>
+        <TopLine Value="63"/>
+        <CursorPos X="41" Y="87"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Text"/>
       </Unit>
       <Unit>
         <Filename Value="..\RunFormula\runflaunits.inc"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="94"/>
         <CursorPos Y="10"/>
         <UsageCount Value="100"/>
@@ -713,15 +715,15 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\x86_64\math.inc"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="310"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="21"/>
         <CursorPos X="33" Y="359"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\inc\sstrings.inc"/>
-        <EditorIndex Value="22"/>
+        <EditorIndex Value="21"/>
         <TopLine Value="504"/>
         <CursorPos Y="521"/>
         <UsageCount Value="100"/>
@@ -782,12 +784,9 @@
       </Unit>
       <Unit>
         <Filename Value="..\Optional\rfuncert.inc"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="18"/>
-        <TopLine Value="124"/>
-        <CursorPos X="68" Y="137"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="45" Y="7"/>
         <UsageCount Value="55"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\Tmp\4\LMath_and_Components_0_6_1\LMath\lmMathStat\ustudind.pas"/>
@@ -819,126 +818,126 @@
         <UsageCount Value="9"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="28">
+      <Position>
+        <Filename Value="..\RunFormula\runflatext.inc"/>
+        <Caret Line="573" Column="59" TopLine="561"/>
+      </Position>
       <Position>
         <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="567" Column="13" TopLine="554"/>
+        <Caret Line="352" TopLine="340"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflatext.inc"/>
+        <Caret Line="577" Column="5" TopLine="565"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflatext.inc"/>
+        <Caret Line="587" Column="3" TopLine="566"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="505" TopLine="499"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="1382" Column="50" TopLine="1363"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runformula.pas"/>
+        <Caret Line="195" Column="22" TopLine="180"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="86" Column="7" TopLine="74"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="157" Column="7" TopLine="144"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="394" Column="13" TopLine="381"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflaterm.inc"/>
+        <Caret Line="443" Column="27" TopLine="427"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="726" Column="5" TopLine="713"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="737" Column="5" TopLine="715"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="795" Column="5" TopLine="783"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="804" Column="7" TopLine="783"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="1381" Column="7" TopLine="1364"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="1382" Column="14" TopLine="1364"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="535" Column="20" TopLine="522"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="543" Column="18" TopLine="522"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="557" Column="12" TopLine="555"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="1378" Column="25" TopLine="1364"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflatext.inc"/>
+        <Caret Line="569" Column="61" TopLine="556"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="504" Column="40" TopLine="492"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="1378" Column="35" TopLine="1365"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflalib.inc"/>
+        <Caret Line="503" Column="51" TopLine="489"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflatext.inc"/>
+        <Caret Line="573" TopLine="556"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflatext.inc"/>
+        <Caret Line="574" TopLine="556"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="627" Column="121" TopLine="1396"/>
+      </Position>
+      <Position>
+        <Filename Value="..\RunFormula\runflafunc.inc"/>
+        <Caret Line="658" Column="34" TopLine="658"/>
       </Position>
       <Position>
         <Filename Value="..\RunFormula\runfladef.inc"/>
-        <Caret Line="98" Column="30" TopLine="88"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflatext.inc"/>
-        <Caret Line="569" Column="20" TopLine="558"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="1359" Column="30" TopLine="1346"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="1360" Column="30" TopLine="1346"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="1361" Column="30" TopLine="1346"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="1362" Column="30" TopLine="1346"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="505" Column="23" TopLine="490"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="506" Column="23" TopLine="490"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="507" Column="23" TopLine="490"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="508" Column="23" TopLine="490"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflalib.inc"/>
-        <Caret Line="509" Column="23" TopLine="490"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflatext.inc"/>
-        <Caret Line="569" Column="10" TopLine="558"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflatext.inc"/>
-        <Caret Line="570" Column="97" TopLine="558"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflatext.inc"/>
-        <Caret Line="569" Column="10" TopLine="558"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="650" Column="71" TopLine="634"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="626" Column="14" TopLine="619"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="654" Column="64" TopLine="640"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="648" Column="43" TopLine="635"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="633" Column="71" TopLine="292"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="623" Column="20" TopLine="623"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="654" Column="32" TopLine="644"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="655" Column="32" TopLine="647"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="665" TopLine="658"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="1419" Column="46" TopLine="1415"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="663" Column="59" TopLine="656"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="1423" TopLine="1412"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflafunc.inc"/>
-        <Caret Line="662" Column="48" TopLine="638"/>
-      </Position>
-      <Position>
-        <Filename Value="..\RunFormula\runflaopt.inc"/>
-        <Caret Line="8"/>
-      </Position>
-      <Position>
-        <Filename Value="..\Optional\rfuncert.inc"/>
-        <Caret Line="179" Column="74" TopLine="163"/>
+        <Caret Line="98" Column="68" TopLine="85"/>
       </Position>
     </JumpHistory>
     <RunParams>

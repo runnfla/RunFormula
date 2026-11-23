@@ -350,12 +350,6 @@ begin                                                      //DONE -oRFla.Lib -cR
   end;
 end;
 
-// ===== Text =====
-
-{$include runflatext.inc}
-
-// ===== Data =====
-
 function AsInt(PV:PValRec):SizeInt; inline;                //DONE -oRFla.Lib -cRev.2026.10.16: Inline AsInt
 begin
   with PV^ do if VType in VIntTypes then Result:=Int else TypeDisallow(VType);
@@ -482,6 +476,12 @@ begin
   Mgin:=m-f;
 end;
 
+// ===== Text =====
+
+{$include runflatext.inc}
+
+// ===== Data =====
+
 function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
 const F : TFormatSettings =
         (CurrencyFormat : 0;
@@ -501,20 +501,9 @@ begin
       PByte(s):=nil;
       if VPhy<>0 then begin
         s:=DecodePhy(VPhy, scl, ofs, flg);
-        if (flg and UPF)=0 then case VType of
-          VInt   : s:=SelectPref(Int/scl, 0, scl, flg)+s;
-          VFloat : s:=SelectPref(Flo/scl, 0, scl, flg)+s;
-          VCplex : s:=SelectPref(Hypot2(Flo, Img)/scl*2, 0, scl, flg)+s;
-          VGap   : s:=SelectPref(Flo/scl, Img/scl, scl, flg)+s;
-          VIGap  : s:=SelectPref(Int/scl, IBnd/scl, scl, flg)+s;
-        end;
-
-
-
-
-        s:=#$20+s;                                   // Li должно выводиться как float
+        s:=#$20+SelectPref(PV, scl, flg)+s;
       end;
-      if (scl<>1) or (ofs<>0) then case VType of
+      if (scl<>1) or (ofs<>0) then case VType of         // Li должно выводиться как float
         VInt, VChar : Result:=FloatToStr((Int-ofs)/scl, F);
         VFloat : Result:=FloatToStr((Flo-ofs)/scl, F);
         VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+', '+FloatToStr(Img/scl, F)+')';

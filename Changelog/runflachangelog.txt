@@ -86,4 +86,5 @@ VariantError --> InvalidVariant
 - Critical: Fixed incorrect variable name table indexing
 - unitstr() теперь требует 2 параметра - приставка
 - All Types number changed
+- режим округления комплексных в round()
 
