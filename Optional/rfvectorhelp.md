@@ -1,7 +1,7 @@
 <pre>
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  2D Radius-Vector Help
+//  2D Radius-Vector Add-on Help
 //  Rev. 3.11.2026
 
 //  Author: Alexander Torubarov
@@ -16,6 +16,8 @@
 
 // TODO -oRFla.VectHelp -cRev.2026.00.00:
 </pre>
+
+### Подключаемый модуль для расчетов с 2D радиус-векторами
 
 #### 1. Введение
 

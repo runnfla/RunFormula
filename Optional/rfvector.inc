@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Optional 2D Radius-Vector functions
+//  Optional 2D Radius-Vector Add-on
 //  Rev. 2.11.2026
 
 //  Author: Alexander Torubarov

@@ -671,7 +671,7 @@ begin
       VGap, VIGap : begin
                       AsBall(pv, f, m);
                       mf:=Fmul(m);
-                      Ball(FlaRound(f/mf, 0)*mf, FlaRound(m/mf, 1)*mf, Result);
+                      Ball(FlaRound(f/mf, 0)*mf, FlaRound(m/mf, 0)*mf, Result);
                     end;
       else TypeDisallow(VType);
     end;

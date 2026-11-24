@@ -1,7 +1,7 @@
 <pre>
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Uncertainty Calculation Help
+//  Uncertainty Calculation Add-on Help
 //  Rev. 23.11.2026
 
 //  Author: Alexander Torubarov
@@ -16,6 +16,8 @@
 
 // TODO -oRFla.UncHelp -cRev.2026.00.00:
 </pre>
+
+### Подключаемый модуль для расчетов величин с неопределенностью
 
 #### 1. Введение
 
@@ -129,10 +131,10 @@ for(N = [1:100],
 Z = inflate(X, tcrit(0.95, 100 - 1));  // результат
 
 // вывод результата
-Z = signif(Z);
-S = unitstr(re(A), true);
+Z = signif(Z, 2);
+S = unitstr(re(Z), true);
 Z = conv(Z, S);
-"[ " & re(Z) & " +- " & signif(margin(Z)) & " ] " & S;
+"[ " & re(Z) & " +- " & signif(margin(Z), 2) & " ] " & S;    
 ```
 
 #### 7. Оценка неопределенности измерений по методике GUM

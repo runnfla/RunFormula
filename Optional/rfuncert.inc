@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Optional Uncertainty Calculation functions
+//  Optional Uncertainty Calculation Add-on
 //  Rev. 20.11.2026
 
 //  Author: Alexander Torubarov

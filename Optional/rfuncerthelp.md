@@ -1,7 +1,7 @@
 <pre>
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Uncertainty Calculation Help
+//  Uncertainty Calculation Add-on Help
 //  Rev. 23.11.2026
 
 //  Author: Alexander Torubarov
@@ -16,6 +16,8 @@
 
 // TODO -oRFla.UncHelp -cRev.2026.00.00:
 </pre>
+
+### Подключаемый модуль для расчетов величин с неопределенностью
 
 #### 1. Введение
 

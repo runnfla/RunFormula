@@ -1,6 +1,6 @@
 //******************************************************
 //  RunFormula Unit-aware Expression Scripting Engine
-//  Optional modules connector
+//  Optional add-on connector
 //  Rev. 3.11.2026
 
 //  Author: Alexander Torubarov
@@ -17,7 +17,7 @@
 
 // TODO -oRFla.Opt -cRev.2026.00.00:
 
-{$include ../Optional/rfvector.inc}         // 2D Radius-Vector functions
+{$include ../Optional/rfvector.inc}         // 2D Radius-Vector Add-on
 
-{$include ../Optional/rfuncert.inc}         // Uncertainty Calculation
+{$include ../Optional/rfuncert.inc}         // Uncertainty Calculation Add-on
 
