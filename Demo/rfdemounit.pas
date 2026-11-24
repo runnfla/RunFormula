@@ -125,9 +125,9 @@ begin
   Save:=false;
 end;
 
-procedure AppendResult(ParamCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);
+procedure AppendResult(ArgCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);
 begin
-  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaParamAsStr(-1, Context);
+  DemoForm.ResultMemo.Text:=DemoForm.ResultMemo.Text+RunFlaArgAsStr(-1, Context);
 end;
 
 procedure TDemoForm.ParseButtonClick(Sender: TObject);

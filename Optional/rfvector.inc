@@ -19,50 +19,50 @@
 
 {$ifdef runfla_optfunc}
 
-function Fla_CROSS(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_CROSS
+function Fla_CROSS(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_CROSS
 var X, Y : PValRec;
     fx, mx, fy, my : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
+    X:=Arg(-2, Context);
     AsCplex(X, fx, mx);
-    Y:=Param(-1, Context);
+    Y:=Arg(-1, Context);
     AsCplex(Y, fy, my);
     Flo:=fx*my-fy*mx;
     VType:=VFloat;
     if (X^.VPhy or Y^.VPhy)<>0 then VPhy:=PhyPlus(X^.VPhy, Y^.VPhy);
   end;
-  PostParam(Context);
-  PostParam(X, Context);
+  PostArg(Context);
+  PostArg(X, Context);
 end;
 
-function Fla_ROTATE(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ROTATE
+function Fla_ROTATE(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ROTATE
 var pv : PValRec;
     f : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  f:=AsFloat(Param(-1, Context));
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  f:=AsFloat(Arg(-1, Context));
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-2, Context);
+    pv:=Arg(-2, Context);
     CplexMult(AsRe(pv), AsIm(pv), cos(f), sin(f), Flo, Img);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_NORM(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_NORM
+function Fla_NORM(ArgCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_NORM
 var f, re, im : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
-  re:=AsRe(Param(-1, Context));
+  if ArgCount<>1 then RaiseError(ArgNumber);
+  re:=AsRe(Arg(-1, Context));
   im:=AsIm(Context.TermResult);
-  PostParam(Context);
+  PostArg(Context);
   f:=Hypot2(re, im)*2;
   Result:=NewLV(Context);
   with Result^ do begin
@@ -72,52 +72,52 @@ begin
   end;
 end;
 
-function Fla_ANGLE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ANGLE
+function Fla_ANGLE(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_ANGLE
 var X, Y : PValRec;
     re, im : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Y:=Param(-1, Context);
-    X:=Param(-2, Context);
+    Y:=Arg(-1, Context);
+    X:=Arg(-2, Context);
     CplexMult(AsRe(X), -AsIm(X), AsRe(Y), AsIm(Y), re, im);
     Flo:=FlArcTan(im, re);
     VType:=VFloat;
   end;
-  PostParam(Context);
-  PostParam(Y, Context);
+  PostArg(Context);
+  PostArg(Y, Context);
 end;
 
-function Fla_PROJ(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PROJECT
+function Fla_PROJ(ArgCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PROJECT
 var pv : PValRec;
     re, im, f, t : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  re:=AsRe(Param(-1, Context));
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  re:=AsRe(Arg(-1, Context));
   im:=AsIm(Context.TermResult);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-2, Context);
+    pv:=Arg(-2, Context);
     CplexDiv(AsRe(pv), AsIm(pv), re, im, f, t);
     Flo:=re*f;
     Img:=im*f;
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_DISTSQ(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_DISTSQ
+function Fla_DISTSQ(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_DISTSQ
 var X, Y : PValRec;
     phy : SizeInt;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
-    Y:=Param(-1, Context);
+    X:=Arg(-2, Context);
+    Y:=Arg(-1, Context);
     Flo:=sqr(AsRe(Y)-AsRe(X))+sqr(AsIm(Y)-AsIm(X));
     VType:=VFloat;
     if (X^.VPhy or Y^.VPhy)<>0 then begin
@@ -126,62 +126,62 @@ begin
       VPhy:=PhyPlus(phy, phy);
     end;
   end;
-  PostParam(Context);
-  PostParam(X, Context);
+  PostArg(Context);
+  PostArg(X, Context);
 end;
 
-function Fla_PERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PERP
+function Fla_PERP(ArgCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_PERP
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     Flo:= -AsIm(pv);
     Img:=AsRe(pv);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_LERP(ParamCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_LERP
+function Fla_LERP(ArgCount:SizeInt; var Context:TContext):PValRec;        //DONE -oRFla.Vector -cRev.2026.10.31: Func Fla_LERP
 var X, Y : PValRec;
     t, t1 : TRFloat;
 begin
-  if ParamCount<>3 then RaiseError(ParamNumber);
-  t:=AsFloat(Param(-1, Context));
+  if ArgCount<>3 then RaiseError(ArgNumber);
+  t:=AsFloat(Arg(-1, Context));
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
+  PostArg(Context);
   t1:=1-t;
   Result:=NewLV(Context);
   with Result^ do begin
-    Y:=Param(-2, Context);
-    X:=Param(-3, Context);
+    Y:=Arg(-2, Context);
+    X:=Arg(-3, Context);
     Flo:=AsRe(X)*t1+AsRe(Y)*t;
     Img:=AsIm(X)*t1+AsIm(Y)*t;
     VType:=VCplex;
     VPhy:=X^.VPhy;
     if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
   end;
-  PostParam(Context);
-  PostParam(Y, Context);
+  PostArg(Context);
+  PostArg(Y, Context);
 end;
 
-function Fla_CMPVECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.11.02: Func Fla_CMPVECT
+function Fla_CMPVECT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Vector -cRev.2026.11.02: Func Fla_CMPVECT
 var X, Y : PValRec;
     fa, fb, t : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  Y:=Param(-1, Context);
-  X:=Param(-2, Context);
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  Y:=Arg(-1, Context);
+  X:=Arg(-2, Context);
   if X^.VPhy<>Y^.VPhy then RaiseError(DimMismatch);
   fb:=AsRe(Y); fa:=AsRe(X);
   t:=(fa+fb)*(fa-fb);
   fb:=AsIm(Y); fa:=AsIm(X);
   t:=(fa+fb)*(fa-fb)+t;
-  PostParam(Context);
-  PostParam(Y, Context);
+  PostArg(Context);
+  PostArg(Y, Context);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=-1;

@@ -41,7 +41,7 @@ type
     VarExpected,       // Variable expected
     InvalidVariant,    // Invalid Variant value
     UnknownVar,        // Variable is not found
-    ParamNumber,       // Incorrect number of parameters
+    ArgNumber,         // Incorrect number of arguments
     DefExists,         // Define already exists
     MaxDepth,          // Maximum depth has been exceeded
     Unsupported,       // Unsupported Feature

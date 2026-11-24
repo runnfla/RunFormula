@@ -18,7 +18,7 @@
 // TODO -oRFla.Term -cRev.2026.07.10: Review Concal function
 
 procedure FreeTerm(PV:PValRec); inline;                        //DONE -oRFla.Term -cRev.2026.04.18: Inline FreeTerm
-begin                              // like PostParam
+begin                              // like PostArg
   if PV^.VAlloc=LV then begin
     FreeValue(PV);
     dec(Context.LVStack.Count);
@@ -412,7 +412,7 @@ begin
       t:=Expr(p, fin, 0);
       ValCopy(t, pv);
       FreeTerm(t);
-    end else if Eflag then raise EError.Create(ParamNumber, Pnt);
+    end else if Eflag then raise EError.Create(ArgNumber, Pnt);
   end else ValCopy(Pini, pv);
 end;
 

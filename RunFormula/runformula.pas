@@ -42,7 +42,7 @@ type
   end;
 
   TRunFlaVar = procedure(constref Name:string; var VrtResult:TRFVariant; var Save:boolean);
-  TRunFlaFunc = procedure(ParamCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);
+  TRunFlaFunc = procedure(ArgCount:SizeInt; Context:pointer; var VrtResult:TRFVariant);
 
 {$include runflaerr.inc}
 {$include runflamsg.inc}
@@ -53,8 +53,8 @@ function RunFlaExecStr(constref Fla:string; var Error:TRunFlaError; FlaVar:TRunF
 function RunFlaExecStr(constref Fla:string; FlaVar:TRunFlaVar=nil):string;
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; FlaVar:TRunFlaVar=nil);
 procedure RunFlaExecVrt(constref Fla:string; out VrtResult:TRFVariant; var Error:TRunFlaError; FlaVar:TRunFlaVar=nil);
-procedure RunFlaParam(Offset:SizeInt; Context:pointer; out VrtResult:TRFVariant);
-function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
+procedure RunFlaArg(Offset:SizeInt; Context:pointer; out VrtResult:TRFVariant);
+function RunFlaArgAsStr(Offset:SizeInt; Context:pointer):string;
 procedure RunFlaRaise(ErrCode:TRunFlaErrCode);
 function RunFlaFuncReg(constref Name:string; Func:TRunFlaFunc):TRunFlaErrCode;
 
@@ -170,7 +170,7 @@ begin
                      inc(p, PToken(p)^.Size);
                      inc(i);
                    end;
-                   if i<FuncArg.Count then raise EError.Create(ParamNumber, Pnt);
+                   if i<FuncArg.Count then raise EError.Create(ArgNumber, Pnt);
                    for i:=FuncArg.Count-1 downto idx do FreeTerm(PPValRec(FuncArg.List[i])^);
                    FuncArg.Count:=idx;
                    Result:=@CVnone;
@@ -216,29 +216,29 @@ begin
   end;
 end;
 
-function Param(Offset:SizeInt; var Context:TContext):PValRec;
-begin                                         //DONE -oRFla.Main -cRev.2026.04.21: Func Param
+function Arg(Offset:SizeInt; var Context:TContext):PValRec;
+begin                                         //DONE -oRFla.Main -cRev.2026.04.21: Func Arg
   with Context.FuncArg do Result:=Term(PPByte(List[Count+Offset])^, Context);
 end;
 
-procedure RunFlaParam(Offset:SizeInt; Context:pointer; out VrtResult:TRFVariant);
-type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Proc RunFlaParam
+procedure RunFlaArg(Offset:SizeInt; Context:pointer; out VrtResult:TRFVariant);
+type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Proc RunFlaArg
 begin
   with PContext(Context)^.FuncArg do begin
-    if (Offset>=0) or (Offset<(-Count)) then RaiseError(ParamNumber);
+    if (Offset>=0) or (Offset<(-Count)) then RaiseError(ArgNumber);
     AsVrt(Term(PPByte(List[Count+Offset])^, PContext(Context)^), VrtResult);
   end;
-  PostParam(PContext(Context)^);
+  PostArg(PContext(Context)^);
 end;
 
-function RunFlaParamAsStr(Offset:SizeInt; Context:pointer):string;
-type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Func RunFlaParamAsStr
+function RunFlaArgAsStr(Offset:SizeInt; Context:pointer):string;
+type PContext = ^TContext;                    //DONE -oRFla.Main -cRev.2026.04.21: Func RunFlaArgAsStr
 begin
   with PContext(Context)^.FuncArg do begin
-    if (Offset>=0) or (Offset<(-Count)) then RaiseError(ParamNumber);
+    if (Offset>=0) or (Offset<(-Count)) then RaiseError(ArgNumber);
     Result:=Str2Str(AsStr(Term(PPByte(List[Count+Offset])^, PContext(Context)^)));
   end;
-  PostParam(PContext(Context)^);
+  PostArg(PContext(Context)^);
 end;
 
 procedure SetRegFPU(out Reg:TRegFPU); inline;              //DONE -oRFla.Main -cRev.2026.07.04: Inline SetRegFPU
@@ -289,7 +289,7 @@ begin
   with Context do begin
     MemListInit(LVStack, SValRec, LVStackGrow);
     MemListInit(VarPool, SizeOf(TMemList), VarPoolGrow);
-    MemListInit(FuncArg, SPtr, ParamGrow);
+    MemListInit(FuncArg, SPtr, ArgGrow);
     RunFlaVar:=FlaVar;
     TermResult:=@CVnone;
     ProcToken:=@InitProc;

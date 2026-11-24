@@ -145,7 +145,7 @@ const
   VarPoolGrow = 16;       // variable list pool size increment
   VarGrow = 16;           // variables per list increment
   LVStackGrow = 64;       // stack depth increment
-  ParamGrow = 32;         // parameter buffer increment (total for nested calls)
+  ArgGrow = 32;           // argument buffer increment (total for nested calls)
   UnitDescGrow = 32;
   PrefAbbrGrow = 32;
 
@@ -181,7 +181,7 @@ type
     Flow       : TFlow;
   end;
 
-  TFlaFunc = function(ParamCount:SizeInt; var Context:TContext):PValRec;
+  TFlaFunc = function(ArgCount:SizeInt; var Context:TContext):PValRec;
 
   TFlaRec = record
   ID : PByte;

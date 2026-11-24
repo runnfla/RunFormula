@@ -842,7 +842,7 @@ begin
   end;
 end;
 
-procedure PostParam(var Context:TContext);                    //DONE -oRFla.Lib -cRev.2026.04.18: Proc PostParam TermResult
+procedure PostArg(var Context:TContext);                      //DONE -oRFla.Lib -cRev.2026.04.18: Proc PostArg TermResult
 begin
   with Context do if TermResult^.VAlloc=LV then begin
     FreeValue(TermResult);
@@ -850,7 +850,7 @@ begin
   end;
 end;
 
-procedure PostParam(PV:PValRec; var Context:TContext);        //DONE -oRFla.Lib -cRev.2026.06.10: Proc PostParam PV
+procedure PostArg(PV:PValRec; var Context:TContext);          //DONE -oRFla.Lib -cRev.2026.06.10: Proc PostArg PV
 begin
   if PV^.VAlloc=LV then begin
     FreeValue(PV);

@@ -17,68 +17,68 @@
 
 // TODO -oRFla.Func -cRev.2026.00.00:
 
-function Fla_ABORT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_ABORT
+function Fla_ABORT(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_ABORT
 begin
-  case ParamCount of
+  case ArgCount of
     0 : Context.TermResult:=@CVnone;
-    1 : Context.TermResult:=Param(-1, Context);
-    else RaiseError(ParamNumber);
+    1 : Context.TermResult:=Arg(-1, Context);
+    else RaiseError(ArgNumber);
   end;
   raise EAbortScript.Create('');
 end;
 
-function Fla_EXIT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_EXIT
+function Fla_EXIT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_EXIT
 begin
-  case ParamCount of
+  case ArgCount of
     0 : Result:=@CVnone;
-    1 : Result:=Param(-1, Context);
-    else RaiseError(ParamNumber);
+    1 : Result:=Arg(-1, Context);
+    else RaiseError(ArgNumber);
   end;
   Context.Flow:=EXT;
 end;
 
-function Fla_BREAK(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_BREAK
+function Fla_BREAK(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_BREAK
 begin
-  case ParamCount of
+  case ArgCount of
     0 : Result:=@CVnone;
-    1 : Result:=Param(-1, Context);
-    else RaiseError(ParamNumber);
+    1 : Result:=Arg(-1, Context);
+    else RaiseError(ArgNumber);
   end;
   Context.Flow:=BRK;
 end;
 
-function Fla_CONTINUE(ParamCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_CONTINUE
+function Fla_CONTINUE(ArgCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_CONTINUE
 begin
-  if ParamCount<>0 then RaiseError(ParamNumber);
+  if ArgCount<>0 then RaiseError(ArgNumber);
   Context.Flow:=CON;
   Result:=@CVnone;
 end;
 
-function Fla_IF(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_IF
+function Fla_IF(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_IF
 var b : boolean;
 begin
-  if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  ParamCount:= -ParamCount;
-  b:=AsBool(Param(ParamCount, Context));
-  PostParam(Context);
+  if (ArgCount<2) or (ArgCount>3) then RaiseError(ArgNumber);
+  ArgCount:= -ArgCount;
+  b:=AsBool(Arg(ArgCount, Context));
+  PostArg(Context);
   Result:=@CVnone;
-  if b then Result:=Param(ParamCount+1, Context)
-    else if ParamCount=-3 then Result:=Param(-1, Context);
+  if b then Result:=Arg(ArgCount+1, Context)
+    else if ArgCount=-3 then Result:=Arg(-1, Context);
 end;
 
-function Fla_IN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.11: Func Fla_IN
+function Fla_IN(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.11: Func Fla_IN
 var pv : PValRec;
     b, i : SizeInt;
 begin
-  if ParamCount<2 then RaiseError(ParamNumber);
-  ParamCount:= -ParamCount;
-  pv:=Param(ParamCount, Context);
-  for i:=ParamCount+1 to -1 do begin
-    b:=Compare(pv, Param(i, Context)) and 1;
-    PostParam(Context);
+  if ArgCount<2 then RaiseError(ArgNumber);
+  ArgCount:= -ArgCount;
+  pv:=Arg(ArgCount, Context);
+  for i:=ArgCount+1 to -1 do begin
+    b:=Compare(pv, Arg(i, Context)) and 1;
+    PostArg(Context);
     if b=0 then break;
   end;
-  PostParam(pv, Context);
+  PostArg(pv, Context);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=b-1;
@@ -86,28 +86,28 @@ begin
   end;
 end;
 
-function Fla_REPEAT(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_REPEAT
+function Fla_REPEAT(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_REPEAT
 var tout : QWord = 10000;       // 10 sec
     t : QWord;
     b : boolean;
 begin
-  if (ParamCount<2) or (ParamCount>3) then RaiseError(ParamNumber);
-  if ParamCount=3 then begin
-    tout:=AsInt(Param(-1, Context));
+  if (ArgCount<2) or (ArgCount>3) then RaiseError(ArgNumber);
+  if ArgCount=3 then begin
+    tout:=AsInt(Arg(-1, Context));
     if tout>(high(QWord) div 1000) then RaiseError(InvalidValue);
     tout:=tout*1000;
     if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-    PostParam(Context);
+    PostArg(Context);
   end;
-  ParamCount:= -ParamCount;
+  ArgCount:= -ArgCount;
   if tout<>0 then t:=GetTickCount64;
   Result:=@CVnone;
   repeat
-    b:=AsBool(Param(ParamCount, Context));
-    PostParam(Context);
+    b:=AsBool(Arg(ArgCount, Context));
+    PostArg(Context);
     if not b then exit;
-    PostParam(Result, Context);
-    Result:=Param(ParamCount+1, Context);
+    PostArg(Result, Context);
+    Result:=Arg(ArgCount+1, Context);
     with Context do case Flow of
       EXT : exit;
       BRK : begin
@@ -120,12 +120,12 @@ begin
   until false;
 end;
 
-function Fla_FOR(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_FOR
+function Fla_FOR(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_FOR
 var pv : PValRec;
     r : SizeInt;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  pv:=Param(-2, Context);
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  pv:=Arg(-2, Context);
   with pv^ do begin
     if VAlloc<>VP then RaiseError(VarExpected);
     if not (VType in VIGapTypes) then RaiseError(RangeType);
@@ -135,8 +135,8 @@ begin
 
     Result:=@CVnone;
     repeat
-      PostParam(Result, Context);
-      Result:=Param(-1, Context);
+      PostArg(Result, Context);
+      Result:=Arg(-1, Context);
       if Int=r then exit;
       inc(Int);
       case Context.Flow of
@@ -151,20 +151,20 @@ begin
   end;
 end;
 
-function Fla_TYPE(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TYPE
+function Fla_TYPE(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TYPE
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Int:=SizeInt(Param(-1, Context)^.VType);
+    Int:=SizeInt(Arg(-1, Context)^.VType);
     VType:=VInt;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_TICK(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TICK
+function Fla_TICK(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TICK
 begin
-  if ParamCount<>0 then RaiseError(ParamNumber);
+  if ArgCount<>0 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=GetTickCount64;
@@ -257,11 +257,11 @@ end;
 
 // -----
 
-function Fla_RE(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_RE
+function Fla_RE(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_RE
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with Param(-1, Context)^ do begin
+  with Arg(-1, Context)^ do begin
     case VType of
       VInt, VChar : Result^.Flo:=Int;
       VFloat, VCplex : Result^.Flo:=Flo;
@@ -272,14 +272,14 @@ begin
     Result^.VType:=VFloat;
     Result^.VPhy:=VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_IM(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_IM
+function Fla_IM(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_IM
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with Param(-1, Context)^ do begin
+  with Arg(-1, Context)^ do begin
     case VType of
       VNone, VStr, VArr : TypeDisallow(VType);
       VCplex : Result^.Flo:=Img;
@@ -288,77 +288,77 @@ begin
     Result^.VType:=VFloat;
     Result^.VPhy:=VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_CPLEX(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_CPLEX
+function Fla_CPLEX(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_CPLEX
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Flo:=AsFloat(Param(-2, Context));
+    Flo:=AsFloat(Arg(-2, Context));
     VPhy:=Context.TermResult^.VPhy;
-    PostParam(Context);
-    Img:=AsFloat(Param(-1, Context));
+    PostArg(Context);
+    Img:=AsFloat(Arg(-1, Context));
     if VPhy<>Context.TermResult^.VPhy then RaiseError(DimMismatch);
     VType:=VCplex;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_ARG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_ARG
+function Fla_ARG(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_ARG
 var f, m : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    AsCplex(Param(-1, Context), f, m);
+    AsCplex(Arg(-1, Context), f, m);
     Flo:=FlArcTan(m, f);
     VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_CONJ(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_CONJ
+function Fla_CONJ(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.06: Func Fla_CONJ
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     Flo:=AsRe(pv);
     Img:= -AsIm(pv);
     VType:=VCplex;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_RECT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RECT
+function Fla_RECT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RECT
 var md, ar : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  ar:=AsFloat(Param(-1, Context));
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  ar:=AsFloat(Arg(-1, Context));
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    md:=AsFloat(Param(-2, Context));
+    md:=AsFloat(Arg(-2, Context));
     Flo:=md*cos(ar);
     Img:=md*sin(ar);
     VType:=VCplex;
     VPhy:=Context.TermResult^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_LEFT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_LEFT
+function Fla_LEFT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_LEFT
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     case pv^.VType of
       VInt, VChar, VIGap : begin
                              Int:=pv^.Int;
@@ -372,16 +372,16 @@ begin
     end;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_RIGHT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RIGHT
+function Fla_RIGHT(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RIGHT
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     case pv^.VType of
       VInt, VChar : begin
                       Int:=pv^.Int;
@@ -403,14 +403,14 @@ begin
     end;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_MARGIN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_MARGIN
+function Fla_MARGIN(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.13: Func Fla_MARGIN
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with Param(-1, Context)^ do begin
+  with Arg(-1, Context)^ do begin
     case VType of
       VInt, VChar, VFloat : Result^.Flo:=0;
       VGap  : Result^.Flo:=Img*0.5-Flo*0.5;
@@ -420,17 +420,17 @@ begin
     Result^.VType:=VFloat;
     Result^.VPhy:=VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_RANGE(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RANGE
+function Fla_RANGE(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_RANGE
 var L, R : PValRec;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    L:=Param(-2, Context);
-    R:=Param(-1, Context);
+    L:=Arg(-2, Context);
+    R:=Arg(-1, Context);
     if CaseType[L^.VType, R^.VType]=VInt then begin
       Int:=L^.Int;
       IBnd:=R^.Int;
@@ -445,18 +445,18 @@ begin
     VPhy:=L^.VPhy;
     if VPhy<>R^.VPhy then RaiseError(DimMismatch);
   end;
-  PostParam(Context);
-  PostParam(L, Context);
+  PostArg(Context);
+  PostArg(L, Context);
 end;
 
-function Fla_BALL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.26: Func Fla_BALL
+function Fla_BALL(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.26: Func Fla_BALL
 var C, M : PValRec;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    C:=Param(-2, Context);
-    M:=Param(-1, Context);
+    C:=Arg(-2, Context);
+    M:=Arg(-1, Context);
     if (CaseType[C^.VType, M^.VType]<>VInt) or Plus(C^.Int, -M^.Int, Int)
       or Plus(C^.Int, M^.Int, IBnd) then begin
         Ball(AsFloat(C), AsFloat(M), Result);
@@ -468,26 +468,26 @@ begin
     VPhy:=C^.VPhy;
     if VPhy<>M^.VPhy then RaiseError(DimMismatch);
   end;
-  PostParam(Context);
-  PostParam(C, Context);
+  PostArg(Context);
+  PostArg(C, Context);
 end;
 
-function Fla_SPAN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_SPAN
+function Fla_SPAN(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_SPAN
 var pv : PValRec;
     t, i : SizeInt;
 begin
-  if ParamCount<2 then RaiseError(ParamNumber);
+  if ArgCount<2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with ValCopy(Param(-1, Context), Result)^ do begin
+  with ValCopy(Arg(-1, Context), Result)^ do begin
     case VType of
       VInt, VChar : begin IBnd:=Int; VType:=VIGap; end;
       VFloat : begin Img:=Flo; VType:=VGap; end;
       VGap, VIGap : ;
       else TypeDisallow(VType);
     end;
-    PostParam(Context);
-    for i:=-2 downto -ParamCount do begin
-      pv:=Param(i, Context);
+    PostArg(Context);
+    for i:=-2 downto -ArgCount do begin
+      pv:=Arg(i, Context);
       if VType=VIGap then begin
         if pv^.VType in VIGapTypes
           then MinMax(pv^.Int, AsIGap(pv), Result)
@@ -500,18 +500,18 @@ begin
       end;
       if VType=VGap then MinMax(AsLGap(pv), AsRGap(pv), Result);
       if VPhy<>pv^.VPhy then RaiseError(DimMismatch);
-      PostParam(Context);
+      PostArg(Context);
     end;
   end;
 end;
 
-function Fla_FRAC(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_FRAC
+function Fla_FRAC(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_FRAC
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     case pv^.VType of
       VInt, VChar : begin
                       Flo:=0;                       // frac always float
@@ -530,15 +530,15 @@ begin
     end;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_TRUNC(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TRUNC
+function Fla_TRUNC(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TRUNC
 var t : SizeInt;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with ValCopy(Param(-1, Context), Result)^ do case VType of
+  with ValCopy(Arg(-1, Context), Result)^ do case VType of
     VInt, VChar, VIGap : ;
     VFloat : begin
                Flo:=System.int(Flo);
@@ -563,14 +563,14 @@ begin
              end;
     else TypeDisallow(VType);
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_FLOOR(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_FLOOR
+function Fla_FLOOR(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_FLOOR
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with ValCopy(Param(-1, Context), Result)^ do case VType of
+  with ValCopy(Arg(-1, Context), Result)^ do case VType of
     VInt, VChar, VIGap : ;
     VFloat       : Flo:=FlaRound(Flo, -1);
     VCplex, VGap : begin
@@ -579,14 +579,14 @@ begin
                    end;
     else TypeDisallow(VType);
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_CEIL(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_CEIL
+function Fla_CEIL(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_CEIL
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with ValCopy(Param(-1, Context), Result)^ do case VType of
+  with ValCopy(Arg(-1, Context), Result)^ do case VType of
     VInt, VChar, VIGap : ;
     VFloat       : Flo:=FlaRound(Flo, 1);
     VCplex, VGap : begin
@@ -595,15 +595,15 @@ begin
                    end;
     else TypeDisallow(VType);
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_ROUND(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_ROUND
+function Fla_ROUND(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_ROUND
 var md, ar : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  with ValCopy(Param(-1, Context), Result)^ do case VType of
+  with ValCopy(Arg(-1, Context), Result)^ do case VType of
     VInt, VChar, VIGap : ;
     VFloat : Flo:=FlaRound(Flo, 0);
     VCplex : begin
@@ -616,10 +616,10 @@ begin
              end;
     else TypeDisallow(VType);
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_SIGNIF(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_SIGNIF
+function Fla_SIGNIF(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_SIGNIF
 var pv : PValRec;
     f, m, mf : TRFloat;
     n : SizeInt;
@@ -635,13 +635,13 @@ var pv : PValRec;
   end;
 
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  n:=AsInt(Param(-1, Context));
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  n:=AsInt(Arg(-1, Context));
   if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-2, Context);
+    pv:=Arg(-2, Context);
     case pv^.VType of
       VInt   : begin
                  mf:=Fmul(pv^.Int);
@@ -677,14 +677,14 @@ begin
     end;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_SIGN(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.02: Func Fla_SIGN
+function Fla_SIGN(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.02: Func Fla_SIGN
 var t : SizeInt = -1;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
-  with Param(-1, Context)^ do case VType of
+  if ArgCount<>1 then RaiseError(ArgNumber);
+  with Arg(-1, Context)^ do case VType of
     VInt, VChar : if Int>0 then t:=1 else if Int=0 then t:=0;
     VFloat : if Flo>0 then t:=1 else if Flo=0 then t:=0;
     VCplex : if Flo>0 then t:=1 else if Flo=0 then begin
@@ -694,7 +694,7 @@ begin
     VIGap  : if Int>0 then t:=1 else if (Int<=0) and (IBnd>=0) then t:=0;
     else TypeDisallow(VType);
   end;
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=t;
@@ -702,71 +702,71 @@ begin
   end;
 end;
 
-function Fla_LENGTH(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_LENGTH
+function Fla_LENGTH(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_LENGTH
 var s : string;
     p : PSizeInt;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=0;
-    s:=AsStr(Param(-1, Context));
+    s:=AsStr(Arg(-1, Context));
     p:=PSizeInt(s);
     if p<>nil then Int:=p[-1];
     VType:=VInt;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_STRING(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_STRING
+function Fla_STRING(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_STRING
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Str:=Str2Ptr(AsStr(Param(-1, Context)));
+    Str:=Str2Ptr(AsStr(Arg(-1, Context)));
     VType:=VStr;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_HEXSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_HEXSTR
+function Fla_HEXSTR(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_HEXSTR
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Str:=Hex2Str(AsInt(Param(-1, Context)));
+    Str:=Hex2Str(AsInt(Arg(-1, Context)));
     VType:=VStr;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_FIND(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_FIND
+function Fla_FIND(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_FIND
 var ofs : SizeInt = 0;
     s, sb : string;
     ps, psub : PByte;
 begin
-  case ParamCount of
+  case ArgCount of
     2 : ;
     3 : begin
-          ofs:=AsInt(Param(-1, Context));
+          ofs:=AsInt(Arg(-1, Context));
           if ofs<0 then RaiseError(InvalidValue);
           if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-          PostParam(Context);
+          PostArg(Context);
         end;
-    else RaiseError(ParamNumber);
+    else RaiseError(ArgNumber);
   end;
-  ParamCount:= -ParamCount;
-  s:=AsStr(Param(ParamCount, Context));
+  ArgCount:= -ArgCount;
+  s:=AsStr(Arg(ArgCount, Context));
   ps:=PByte(s);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=-1;
     VType:=VInt;
     if ps=nil then exit;
-    sb:=AsStr(Param(ParamCount+1, Context));
+    sb:=AsStr(Arg(ArgCount+1, Context));
     psub:=PByte(sb);
-    PostParam(Context);
+    PostArg(Context);
     if psub<>nil then begin
       Int:=SubPos(ps+ofs, ps+PSizeInt(ps)[-1], psub);
       if (ofs>0) and (Int<>-1) then inc(Int, ofs);
@@ -774,22 +774,22 @@ begin
   end;
 end;
 
-function Fla_SUBSTR(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_SUBSTR
+function Fla_SUBSTR(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.14: Func Fla_SUBSTR
 var s : string;
     p : PByte;
     L, R, lng : SizeInt;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  with Param(-1, Context)^ do begin
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  with Arg(-1, Context)^ do begin
     if not (VType in VIGapTypes) then RaiseError(RangeType);
     if VPhy<>0 then RaiseError(DimDisallow);
     L:=Int;
     R:=AsIGap(Context.TermResult);
   end;
-  PostParam(Context);
-  s:=AsStr(Param(-2, Context));
+  PostArg(Context);
+  s:=AsStr(Arg(-2, Context));
   p:=PByte(s);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
     Str:=@CEmptyStr.Zero;
@@ -810,26 +810,26 @@ begin
   end;
 end;
 
-function Fla_VAL(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_VAL
+function Fla_VAL(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_VAL
 var s : string;
     p : PByte;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  s:=AsStr(Param(-1, Context));
+  s:=AsStr(Arg(-1, Context));
   p:=PByte(s);
   if p=nil then RaiseError(EmptyString);
   ParseValue(PChar(p), PChar(p+PSizeInt(p)[-1]), Result);
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_EXP(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_EXP
+function Fla_EXP(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_EXP
 var pv : PValRec;
     f : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  pv:=Arg(-1, Context);
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
@@ -847,15 +847,15 @@ begin
       Flo:=exp(AsFloat(pv));
       VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_LN(ParamCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_LN
+function Fla_LN(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_LN
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  pv:=Arg(-1, Context);
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
@@ -872,19 +872,19 @@ begin
       Flo:=ln(AsFloat(pv));
       VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_POW(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_POW
+function Fla_POW(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_POW
 var X, Y : PValRec;               // pow(X, Y) = X^Y
     f, fe, ft, m : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Y:=Param(-1, Context);
+    Y:=Arg(-1, Context);
     if Y^.VPhy<>0 then RaiseError(DimDisallow);
-    X:=Param(-2, Context);
+    X:=Arg(-2, Context);
     if X^.VPhy<>0 then RaiseError(DimDisallow);
     case CaseType[X^.VType, Y^.VType] of
       VCplex : begin
@@ -917,20 +917,20 @@ begin
         VType:=VFloat;
     end;
   end;
-  PostParam(Context);
-  PostParam(Y, Context);
+  PostArg(Context);
+  PostArg(Y, Context);
 end;
 
-function Fla_LOG(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_LOG
+function Fla_LOG(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_LOG
 var X, Y : PValRec;               // log(X, Y) = logY(X)
     f, fe, ft, m : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
+    X:=Arg(-2, Context);
     if X^.VPhy<>0 then RaiseError(DimDisallow);
-    Y:=Param(-1, Context);
+    Y:=Arg(-1, Context);
     if Y^.VPhy<>0 then RaiseError(DimDisallow);
     case CaseType[X^.VType, Y^.VType] of
       VCplex : begin
@@ -958,17 +958,17 @@ begin
         VType:=VFloat;
     end;
   end;
-  PostParam(Context);
-  PostParam(X, Context);
+  PostArg(Context);
+  PostArg(X, Context);
 end;
 
-function Fla_SIN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_SIN
+function Fla_SIN(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_SIN
 var pv : PValRec;
     fa, fb : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  pv:=Arg(-1, Context);
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
@@ -992,16 +992,16 @@ begin
       Flo:=sin(AsFloat(pv));
       VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_COS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_COS
+function Fla_COS(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_COS
 var pv : PValRec;
     fa, fb : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  pv:=Arg(-1, Context);
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
@@ -1025,16 +1025,16 @@ begin
       Flo:=cos(AsFloat(pv));
       VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_TAN(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_TAN
+function Fla_TAN(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_TAN
 var pv : PValRec;
     f, fc, fx : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  pv:=Arg(-1, Context);
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
@@ -1064,18 +1064,18 @@ begin
       Flo:=sin(f)/cos(f);
       VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_SQRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_SQRT
+function Fla_SQRT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_SQRT
 var pv : PValRec;
     f, m : TRFloat;
     phy : SizeInt;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     case pv^.VType of
       VCplex : begin
                  m:=Hypot2(pv^.Flo, pv^.Img);
@@ -1102,10 +1102,10 @@ begin
       VPhy:=(phy shr 1) or (phy and $8080808080808080);
     end;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_CBRT(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_CBRT
+function Fla_CBRT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_CBRT
 var pv : PValRec;
     f, m : TRFloat;
     phy : TDPhy;
@@ -1121,10 +1121,10 @@ var pv : PValRec;
   end;
 
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     case pv^.VType of
       VCplex : begin
                  m:=Fcbrt(Hypot2(pv^.Flo, pv^.Img))*1.25992104989487316477;
@@ -1152,16 +1152,16 @@ begin
       VPhy:=phy.DI;
     end;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_ARCTAN(ParamCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_ARCTAN
+function Fla_ARCTAN(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_ARCTAN
 var pv : PValRec;
     f, m : TRFloat;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
-  pv:=Param(-1, Context);
+  pv:=Arg(-1, Context);
   if pv^.VPhy<>0 then RaiseError(DimDisallow);
   with Result^ do case pv^.VType of
     VCplex : begin
@@ -1180,16 +1180,16 @@ begin
       Flo:=arctan(AsFloat(pv));
       VType:=VFloat;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_ABS(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_ABS
+function Fla_ABS(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_ABS
 var pv : PValRec;
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-1, Context);
+    pv:=Arg(-1, Context);
     case pv^.VType of
       VInt   : if pv^.Int>LI then begin
                  Int:=abs(pv^.Int);
@@ -1225,19 +1225,19 @@ begin
     end;
     VPhy:=pv^.VPhy;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_HYPOT(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_HYPOT
+function Fla_HYPOT(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.05: Func Fla_HYPOT
 var X, Y : PValRec;
     fa, fb, fc, fd : TRFloat;
     flg : boolean;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    X:=Param(-2, Context);
-    Y:=Param(-1, Context);
+    X:=Arg(-2, Context);
+    Y:=Arg(-1, Context);
     case CaseType[X^.VType, Y^.VType] of
       VCplex : begin
                  Flo:=Hypot2(Hypot2(AsRe(X), AsIm(X)), Hypot2(AsRe(Y), AsIm(Y)))*4;
@@ -1264,44 +1264,44 @@ begin
     VPhy:=X^.VPhy;
     if VPhy<>Y^.VPhy then RaiseError(DimMismatch);
   end;
-  PostParam(Context);
-  PostParam(X, Context);
+  PostArg(Context);
+  PostArg(X, Context);
 end;
 
-function Fla_CHAR(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_CHAR
+function Fla_CHAR(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_CHAR
 begin
-  if ParamCount<>1 then RaiseError(ParamNumber);
+  if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    Int:=byte(AsInt(Param(-1, Context)));
+    Int:=byte(AsInt(Arg(-1, Context)));
     if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
     VType:=VChar;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_COMPARE(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_COMPARE
+function Fla_COMPARE(ArgCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_COMPARE
 var pv : PValRec;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-2, Context);
-    Int:=Compare(pv, Param(-1, Context), true);
+    pv:=Arg(-2, Context);
+    Int:=Compare(pv, Arg(-1, Context), true);
     VType:=VInt;
   end;
-  PostParam(Context);
-  PostParam(pv, Context);
+  PostArg(Context);
+  PostArg(pv, Context);
 end;
 
-function Fla_MATCH(ParamCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_MATCH
+function Fla_MATCH(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_MATCH
 var phy : SizeInt;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  phy:=Param(-2, Context)^.VPhy;
-  PostParam(Context);
-  phy:=Param(-1, Context)^.VPhy xor phy;
-  PostParam(Context);
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  phy:=Arg(-2, Context)^.VPhy;
+  PostArg(Context);
+  phy:=Arg(-1, Context)^.VPhy xor phy;
+  PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
     Int:=-1;
@@ -1310,37 +1310,37 @@ begin
   end;
 end;
 
-function Fla_QTY(ParamCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_QTY
+function Fla_QTY(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_QTY
 var s : string;
     p : PByte;
     phy : SizeInt;
     scl, ofs : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  s:=AsStr(Param(-1, Context));
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  s:=AsStr(Arg(-1, Context));
   p:=PByte(s);
   if p=nil then RaiseError(EmptyString);
   phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
-  ApplyPhyToPV(ValCopy(Param(-2, Context), Result), phy, scl, ofs);
-  PostParam(Context);
+  ApplyPhyToPV(ValCopy(Arg(-2, Context), Result), phy, scl, ofs);
+  PostArg(Context);
 end;
 
-function Fla_CONV(ParamCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_CONV
+function Fla_CONV(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.10: Func Fla_CONV
 var s : string;
     p : PByte;
     phy : SizeInt;
     r, scl, ofs : TRFloat;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
-  s:=AsStr(Param(-1, Context));
+  if ArgCount<>2 then RaiseError(ArgNumber);
+  s:=AsStr(Arg(-1, Context));
   p:=PByte(s);
   if p=nil then RaiseError(EmptyString);
   phy:=PhyCapture(PChar(p), PChar(p+PSizeInt(p)[-1]), scl, ofs);
-  PostParam(Context);
+  PostArg(Context);
   Result:=NewLV(Context);
-  with ValCopy(Param(-2, Context), Result)^ do begin
+  with ValCopy(Arg(-2, Context), Result)^ do begin
     if VPhy<>phy then RaiseError(DimMismatch);
     if (scl<>1) or (ofs<>0) then case VType of
       VCplex : begin
@@ -1359,28 +1359,28 @@ begin
     end;
     VPhy:=0;
   end;
-  PostParam(Context);
+  PostArg(Context);
 end;
 
-function Fla_UNITSTR(ParamCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_UNITSTR
+function Fla_UNITSTR(ArgCount:SizeInt; var Context:TContext):PValRec;  //DONE -oRFla.Func -cRev.2026.10.08: Func Fla_UNITSTR
 var pv : PValRec;
     s : string;
     scl, ofs : TRFloat;
     flg : SizeInt;
 begin
-  if ParamCount<>2 then RaiseError(ParamNumber);
+  if ArgCount<>2 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
   with Result^ do begin
-    pv:=Param(-2, Context);
+    pv:=Arg(-2, Context);
     if pv^.VPhy<>0 then begin
       s:=DecodePhy(pv^.VPhy, scl, ofs, flg);
-      if AsBool(Param(-1, Context)) then s:=SelectPref(pv, scl, flg)+s;
-      PostParam(Context);
+      if AsBool(Arg(-1, Context)) then s:=SelectPref(pv, scl, flg)+s;
+      PostArg(Context);
       Str:=Str2Ptr(s);
     end else Str:=@CEmptyStr.Zero;
     VType:=VStr;
   end;
-  PostParam(pv, Context);
+  PostArg(pv, Context);
 end;
 
 procedure FuncRegister;                                                  //DONE -oRFla.Func -cRev.2026.00.00: Proc FuncRegister

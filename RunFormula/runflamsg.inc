@@ -44,7 +44,7 @@ const
       (ErrCode : VarExpected; ErrMsg : 'Variable expected'),
       (ErrCode : InvalidVariant; ErrMsg : 'Invalid Variant value'),
       (ErrCode : UnknownVar; ErrMsg : 'Variable is not found'),
-      (ErrCode : ParamNumber; ErrMsg : 'Incorrect number of parameters'),
+      (ErrCode : ArgNumber; ErrMsg : 'Incorrect number of arguments'),
       (ErrCode : DefExists; ErrMsg : 'Define already exists'),
       (ErrCode : MaxDepth; ErrMsg : 'Maximum depth has been exceeded'),
       (ErrCode : Unsupported; ErrMsg : 'Unsupported Feature'),

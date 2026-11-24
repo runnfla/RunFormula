@@ -20,7 +20,7 @@
 
 ===== Version 0.1.b - 1.06.2026 =====
 - Changed: Error message structure is updated
-- Changed: Phy renamed to Dim in callback function parameters
+- Changed: Phy renamed to Dim in callback function arguments
 - Added: Physical dimension handling
 - Changed: Char value is converted to a Variant of type byte
 
@@ -87,4 +87,6 @@ VariantError --> InvalidVariant
 - unitstr() теперь требует 2 параметра - приставка
 - All Types number changed
 - режим округления комплексных в round()
+- ParamNumber error code renamed to ArgNumber
+- RunFlaParamAsStr function renamed to RunFlaArgAsStr
 
