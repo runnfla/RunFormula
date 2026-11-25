@@ -599,7 +599,6 @@ begin
 end;
 
 function Fla_ROUND(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_ROUND
-var md, ar : TRFloat;
 begin
   if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
@@ -619,19 +618,32 @@ begin
   PostArg(Context);
 end;
 
-function Fla_SIGNIF(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.23: Func Fla_SIGNIF
-var pv : PValRec;
-    f, m, mf : TRFloat;
+function Fla_SIGNIF(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.25: Func Fla_SIGNIF
+const
+{$if SRFloat = 4}  k = 27; k1 = 1E27; k2 = 1E-27; tr = -38;   mxf = 1.7E7;  {$endif}
+{$if SRFloat = 8}  k = 36; k1 = 1E36; k2 = 1E-36; tr = -308;  mxf = 9.1E15; {$endif}
+{$if SRFloat = 10} k = 39; k1 = 1E39; k2 = 1E-39; tr = -4932; mxf = 1.9E19; {$endif}
+var pv : PValRec;                 // k = - (-324 - (max digits-1) + 308)
+    f, m, mf : TRFloat;           // max digits = 21
     n : SizeInt;
 
-  function Fmul(F:TRFloat):TRFloat;                                      //DONE -oRFla.Func -cRev.2026.11.23: Func Fmul
+  function Fmul(F:TRFloat):TRFloat;                                    //DONE -oRFla.Func -cRev.2026.11.25: Func Fmul
   begin
     if n>0 then begin              // Fmul must be called only once
       if F=0 then Exit(1);
       F:=abs(F);
       if F>=1 then dec(n);
-      Result:=Power(10, trunc(ln(F)/ln(10))-n);
-    end else Result:=Power(10, n);
+      n:=trunc(ln(F)/ln(10))-n;
+    end;
+    if n>=tr then Result:=Power(10, abs(n)) else Result:=Power(10, -n-k);
+  end;
+
+  function Frnd(const F, M:TRFloat):TRFloat;                           //DONE -oRFla.Func -cRev.2026.11.25: Func Frnd
+  begin
+    if (n<=0) and (abs(F)>mxf) then Exit(F);
+    if n>=tr then begin
+      if n>=0 then Result:=FlaRound(F/M, 0)*M else Result:=FlaRound(F*M, 0)/M;
+    end else Result:=(FlaRound((F*k1)*M, 0)*k2)/M;
   end;
 
 begin
@@ -644,8 +656,8 @@ begin
     pv:=Arg(-2, Context);
     case pv^.VType of
       VInt   : begin
-                 mf:=Fmul(pv^.Int);
-                 f:=FlaRound(pv^.Int/mf, 0)*mf;
+                 f:=pv^.Int;
+                 f:=Frnd(f, Fmul(f));
                  if abs(f)<=HI then begin
                    Int:=trunc(f);
                    VType:=VInt;
@@ -655,14 +667,12 @@ begin
                  end;
                end;
       VFloat : begin
-                 mf:=Fmul(pv^.Flo);
-                 Flo:=FlaRound(pv^.Flo/mf, 0)*mf;
+                 Flo:=Frnd(pv^.Flo, Fmul(pv^.Flo));
                  VType:=VFloat;
                end;
       VCplex : begin
                  f:=Hypot2(pv^.Flo, pv^.Img)*2;
-                 mf:=Fmul(f);
-                 f:=FlaRound(f/mf, 0)*mf;
+                 f:=Frnd(f, Fmul(f));
                  m:=FlaRound(FlArcTan(pv^.Img, pv^.Flo)*(180/Cpi), 0)*(Cpi/180);
                  Flo:=f*cos(m);
                  Img:=f*sin(m);
@@ -670,8 +680,10 @@ begin
                end;
       VGap, VIGap : begin
                       AsBall(pv, f, m);
-                      mf:=Fmul(m);
-                      Ball(FlaRound(f/mf, 0)*mf, FlaRound(m/mf, 0)*mf, Result);
+                      if m<>0 then begin
+                        mf:=Fmul(m);
+                        Ball(Frnd(f, mf), Frnd(m, mf), Result);
+                      end else Ball(f, 0, Result);
                     end;
       else TypeDisallow(VType);
     end;
@@ -1112,7 +1124,7 @@ var pv : PValRec;
     i : integer;
     t : ShortInt;
 
-  function Fcbrt(const F:TRFloat):TRFloat;                               //DONE -oRFla.Func -cRev.2026.10.12: Func Fcbrt
+  function Fcbrt(const F:TRFloat):TRFloat;                             //DONE -oRFla.Func -cRev.2026.10.12: Func Fcbrt
   begin
     if F<>0 then begin
       Result:=exp(ln(abs(F))*(1/3));
@@ -1383,7 +1395,7 @@ begin
   PostArg(pv, Context);
 end;
 
-procedure FuncRegister;                                                  //DONE -oRFla.Func -cRev.2026.00.00: Proc FuncRegister
+procedure FuncRegister;                                                //DONE -oRFla.Func -cRev.2026.00.00: Proc FuncRegister
 begin
   FuncReg('abort', @Fla_ABORT);
   FuncReg('exit', @Fla_EXIT);
@@ -1439,3 +1451,4 @@ begin
   FuncReg('conv', @Fla_CONV);
   FuncReg('unitstr', @Fla_UNITSTR);
 end;
+
