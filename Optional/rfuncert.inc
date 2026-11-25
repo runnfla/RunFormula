@@ -248,13 +248,11 @@ var d, t, tm, w, f, wsum : TRFloat;
 begin
   if ArgCount<2 then RaiseError(ArgNumber);
   AsBall(Arg(-1, Context), f, tm);
-  if tm=0 then RaiseError(InvalidValue);
   phy:=Context.TermResult^.VPhy;
   PostArg(Context);
   wsum:=1/sqr(tm);
   for i:=2 to ArgCount do begin            // weighted Welford's algorithm
     AsBall(Arg(-i, Context), t, tm);
-    if tm=0 then RaiseError(InvalidValue);
     if Context.TermResult^.VPhy<>phy then RaiseError(DimMismatch);
     PostArg(Context);
     w:=1/sqr(tm);
