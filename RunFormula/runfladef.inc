@@ -99,7 +99,7 @@ type
 
   TValRec = record
     VType : TVType;
-    VAlloc : (BC, VP, LV);
+    VAlloc : (BC, LV, VP, RV);
     VPhy : SizeInt;
     case byte of
       0 : (Int, IBnd : SizeInt);
@@ -179,6 +179,7 @@ type
     ByteCode   : PByte;
     PoolIndex  : SizeInt;            // variable list index in VarPool
     Flow       : TFlow;
+    Tick       : SizeInt;
   end;
 
   TFlaFunc = function(ArgCount:SizeInt; var Context:TContext):PValRec;
@@ -212,7 +213,7 @@ type
     constructor Create(Code:TRunFlaErrCode; Token:PByte);
   end;
 
-  EAbortScript = class(Exception);
+  EFlaAbort = class(Exception);
 
   TCharSet = set of char;
 

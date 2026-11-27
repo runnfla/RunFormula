@@ -168,7 +168,7 @@ begin
                      scl:=scl*10+(byte(c)-$30);
                      inc(P);
                    until false;
-                   if Z='-' then scl:=-scl;
+                   if Z='-' then scl:= -scl;
                    break;
                  end;
       '_'      : ;
@@ -269,7 +269,7 @@ begin
             if not flg then raise EError.Create(InvalidFormat, fp);
             c:=P^;
           end;
-          if mf then exp:=-exp;
+          if mf then exp:= -exp;
           Scl:=Scl*Power(t, exp);
           Result:=PhyPlus(Result, PhyMult(Sig, exp));
           break;
@@ -524,7 +524,7 @@ begin
       if (exp=0) and (emns=0) then break;
     end;
     if (exp=0) and (emns=0) then continue;
-    if exp=0 then exp:=-emns;
+    if exp=0 then exp:= -emns;
     buf[i]:=exp;
     Scl:=Scl*Power(Scale, exp);
     dx.DI:=PhyMinus(dx.DI, PhyMult(Sig, exp));
@@ -555,7 +555,7 @@ begin
     if b=2 then Result:=Result+'(';
     fu:=true;
     for i:=0 to L do begin
-      exp:=-buf[i];
+      exp:= -buf[i];
       if exp<=0 then continue;
       if fu then fu:=false else Result:=Result+#$20;
       Result:=Result+PUnitDesc(UnitList.List[i])^.Abbr;

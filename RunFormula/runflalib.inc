@@ -657,7 +657,7 @@ begin
              end;
     VArr   : RaiseError(ArrDisallow);
   end;
-  Result:=-1;
+  Result:= -1;
 end;
 
 // ===== MemList routines =====

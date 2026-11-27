@@ -68,7 +68,7 @@ IncompType_NG
 - подчеркивание в числах
 - возможность добавления своих интерфейсных функций
 - Fix - выбор приставки для комплексных и интервалов
-- новые функции - tick(), for(), cbrt(), in(), hypot(), span() signif()
+- новые функции - tick(), for(), cbrt(), in(), hypot(), span() signif() case()
 - ощибки FloatDisallow CplexDisallow RangeDisallow EmptyString LoopTimeOut
 - удалены InvalidType IncompType_FI IncompType_CI IncompType_GI IncompType_CF IncompType_CG
 - точка как разделитель в размерностях
@@ -89,4 +89,5 @@ VariantError --> InvalidVariant
 - режим округления комплексных в round()
 - ParamNumber error code renamed to ArgNumber
 - RunFlaParamAsStr function renamed to RunFlaArgAsStr
+- LoopTimeout in Releat()
 

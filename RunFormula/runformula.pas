@@ -19,6 +19,7 @@
 
 // TODO -oRFla.Main -cRev.2026.11.16: make Global()
 // TODO -oRFla.Main -cRev.2026.11.16: move runflamsg.inc to opt file
+// TODO -oRFla.Main -cRev.2026.11.16: make RO flag in TRunFlaVar
 
 unit RunFormula;
 
@@ -98,6 +99,7 @@ begin
   with Context, PToken(Pnt)^ do begin
 
            TermResult:=@CVnone;       ///!!!?     for exception
+           if Context.Flow<>NML then Exit(@CVnone);    /// м.б. вообхще убрать
 
     ProcToken:=Pnt;
     case Tag of
@@ -181,7 +183,7 @@ begin
                      Result:=Expr(p, fn, 0);
                    end;
                    if Flow=EXT then Flow:=NML;
-                   if (Result^.VAlloc=VP) and (PoolIndex=loc) then
+                   if (Result^.VAlloc in [VP, RV]) and (PoolIndex=loc) then
                      Result:=ValCopy(Result, NewLV(Context));
                    with PMemList(VarPool.List[loc])^ do begin
                      for i:=Count-1 downto 0 do FreeValue(@PVariable(List[i])^.Value);
@@ -295,6 +297,7 @@ begin
     ProcToken:=@InitProc;
     ByteCode:=p;
     Flow:=NML;
+    Tick:=GetTickCount64;
   end;
   SetRegFPU(RegFPU);
   try
@@ -306,7 +309,7 @@ begin
     FillError(OK);
   except
     on E:EError do FillError(E.FCode, E.FToken);
-    on E:EAbortScript do begin
+    on E:EFlaAbort do begin
       Result:=Context.TermResult;
       FillError(OK);
     end;

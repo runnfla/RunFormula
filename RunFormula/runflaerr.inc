@@ -38,7 +38,7 @@ type
     MissingBracket,    // One or more closing brackets or block terminators are missing
     IllegalBracket,    // Mismatched bracket or block terminator
     UnknownFunc,       // Function is not found
-    VarExpected,       // Variable expected
+    VarExpected,       // Variable expected or assign to RO variable
     InvalidVariant,    // Invalid Variant value
     UnknownVar,        // Variable is not found
     ArgNumber,         // Incorrect number of arguments

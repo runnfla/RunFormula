@@ -34,7 +34,7 @@ var L : PValRec = @CVnone;        // init VMode
     phy, I, J, K, Q : SizeInt;
 
   procedure FreeLR; inline;                                    //DONE -oRFla.Term -cRev.2026.05.18: Inline FreeLR
-  begin                                            // LVal should be called singly
+  begin                                            // LVal must be called only once
     FreeTerm(R);
     if L^.VAlloc<>LV then begin
       L:=MemListAdd(Context.LVStack);              // like NewLV
@@ -74,7 +74,7 @@ var L : PValRec = @CVnone;        // init VMode
   begin
     FreeLR;
     with L^ do begin
-      if B then Int:=-1 else Int:=0;
+      if B then Int:= -1 else Int:=0;
       VType:=VInt;
     end;
   end;

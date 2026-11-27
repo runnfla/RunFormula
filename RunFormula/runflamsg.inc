@@ -41,7 +41,7 @@ const
       (ErrCode : MissingBracket; ErrMsg : 'One or more closing brackets or block terminators are missing'),
       (ErrCode : IllegalBracket; ErrMsg : 'Mismatched bracket or block terminator'),
       (ErrCode : UnknownFunc; ErrMsg : 'Function is not found'),
-      (ErrCode : VarExpected; ErrMsg : 'Variable expected'),
+      (ErrCode : VarExpected; ErrMsg : 'Variable expected, or assigned variable is read-only'),
       (ErrCode : InvalidVariant; ErrMsg : 'Invalid Variant value'),
       (ErrCode : UnknownVar; ErrMsg : 'Variable is not found'),
       (ErrCode : ArgNumber; ErrMsg : 'Incorrect number of arguments'),

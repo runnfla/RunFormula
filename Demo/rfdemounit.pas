@@ -296,7 +296,7 @@ begin
   ResultMemo.Append('Is TAnsiRec valid'+YN(flg));
   s:='0123456789';
   ResultMemo.Append('Is PSizeInt(string)[-1] = length(stirng)'+YN(PSizeInt(s)[-1]=10));
-  ResultMemo.Append('Is PSizeInt(string)[-2] = stirng ref'+YN(PSizeInt(s)[-2]=-1));
+  ResultMemo.Append('Is PSizeInt(string)[-2] = stirng ref'+YN(PSizeInt(s)[-2]= -1));
   ResultMemo.Append('Is SAnsiRec = SizeInt * 3'+YN(SAnsiRec=SI*3));
   SetLength(s, 0);
   ResultMemo.Append('Is SetLength(S, 0) = nil'+YN(PByte(s)=nil));

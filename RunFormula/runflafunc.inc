@@ -15,19 +15,33 @@
 //  for full license information.
 //******************************************************
 
-// TODO -oRFla.Func -cRev.2026.00.00:
+// TODO -oRFla.Func -cRev.2026.00.00: make salt()
 
-function Fla_ABORT(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_ABORT
+function GetTimeout(IsArg:boolean; var Context:TContext):SizeInt;      //DONE -oRFla.Func -cRev.2026.11.25: Func GetTimeout
+begin
+  if IsArg then begin
+    Result:=AsInt(Arg(-1, Context));
+    if (Result<0) or (Result>(HI div 1000)) then RaiseError(InvalidValue);
+    if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
+    PostArg(Context);
+  end else Result:=10;                // 10 sec
+  if Result>0 then begin
+    Result:=Result*1000+Context.Tick;
+    if Result=0 then Result:=1;
+  end;
+end;
+
+function Fla_ABORT(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_ABORT
 begin
   case ArgCount of
     0 : Context.TermResult:=@CVnone;
     1 : Context.TermResult:=Arg(-1, Context);
     else RaiseError(ArgNumber);
   end;
-  raise EAbortScript.Create('');
+  raise EFlaAbort.Create('');
 end;
 
-function Fla_EXIT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_EXIT
+function Fla_EXIT(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_EXIT
 begin
   case ArgCount of
     0 : Result:=@CVnone;
@@ -37,7 +51,7 @@ begin
   Context.Flow:=EXT;
 end;
 
-function Fla_BREAK(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_BREAK
+function Fla_BREAK(ArgCount:SizeInt; var Context:TContext):PValRec;    //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_BREAK
 begin
   case ArgCount of
     0 : Result:=@CVnone;
@@ -47,23 +61,22 @@ begin
   Context.Flow:=BRK;
 end;
 
-function Fla_CONTINUE(ArgCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.10.16: Func Fla_CONTINUE
+function Fla_CONTINUE(ArgCount:SizeInt; var Context:TContext):PValRec; //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_CONTINUE
 begin
   if ArgCount<>0 then RaiseError(ArgNumber);
   Context.Flow:=CON;
   Result:=@CVnone;
 end;
 
-function Fla_IF(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.10.12: Func Fla_IF
+function Fla_IF(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_IF
 var b : boolean;
 begin
   if (ArgCount<2) or (ArgCount>3) then RaiseError(ArgNumber);
   ArgCount:= -ArgCount;
   b:=AsBool(Arg(ArgCount, Context));
   PostArg(Context);
-  Result:=@CVnone;
   if b then Result:=Arg(ArgCount+1, Context)
-    else if ArgCount=-3 then Result:=Arg(-1, Context);
+    else if ArgCount= -3 then Result:=Arg(-1, Context) else Result:=@CVnone;
 end;
 
 function Fla_IN(ArgCount:SizeInt; var Context:TContext):PValRec;       //DONE -oRFla.Func -cRev.2026.11.11: Func Fla_IN
@@ -86,72 +99,83 @@ begin
   end;
 end;
 
-function Fla_REPEAT(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.09.02: Func Fla_REPEAT
-var tout : QWord = 10000;       // 10 sec
-    t : QWord;
+function Fla_CASE(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.27: Func Fla_CASE
+var pv : PValRec;
     b : boolean;
 begin
-  if (ArgCount<2) or (ArgCount>3) then RaiseError(ArgNumber);
-  if ArgCount=3 then begin
-    tout:=AsInt(Arg(-1, Context));
-    if tout>(high(QWord) div 1000) then RaiseError(InvalidValue);
-    tout:=tout*1000;
-    if Context.TermResult^.VPhy<>0 then RaiseError(DimDisallow);
-    PostArg(Context);
-  end;
+  if ArgCount<3 then RaiseError(ArgNumber);
   ArgCount:= -ArgCount;
-  if tout<>0 then t:=GetTickCount64;
+  pv:=Arg(ArgCount, Context);
+  inc(ArgCount);
+  repeat
+    b:=(Compare(pv, Arg(ArgCount, Context)) and 1)=0;
+    PostArg(Context);
+    inc(ArgCount);
+    if b then break;
+    inc(ArgCount);
+  until ArgCount>= -1;
+  PostArg(pv, Context);
+  if ArgCount<0 then Result:=Arg(ArgCount, Context) else Result:=@CVnone;
+end;
+
+function Fla_REPEAT(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.27: Func Fla_REPEAT
+var b : boolean;
+    tout : SizeInt;
+begin
+  if (ArgCount<2) or (ArgCount>3) then RaiseError(ArgNumber);
+  tout:=GetTimeout(ArgCount=3, Context);
+  ArgCount:= -ArgCount;
   Result:=@CVnone;
   repeat
     b:=AsBool(Arg(ArgCount, Context));
     PostArg(Context);
-    if not b then exit;
+    if not b then break;
     PostArg(Result, Context);
     Result:=Arg(ArgCount+1, Context);
     with Context do case Flow of
-      EXT : exit;
+      EXT : break;
       BRK : begin
               Flow:=NML;
-              exit;
+              break;
             end;
       CON : Flow:=NML;
     end;
-    if (tout<>0) and ((GetTickCount64-t)>=tout) then RaiseError(LoopTimeOut);
+    if (tout<>0) and ((SizeInt(GetTickCount64)-tout)>=0) then RaiseError(LoopTimeOut);
   until false;
 end;
 
-function Fla_FOR(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.00.00: Func Fla_FOR
-var pv : PValRec;
-    r : SizeInt;
+function Fla_FOR(ArgCount:SizeInt; var Context:TContext):PValRec;      //DONE -oRFla.Func -cRev.2026.11.27: Func Fla_FOR
+var bnd, tout : SizeInt;
 begin
-  if ArgCount<>2 then RaiseError(ArgNumber);
-  pv:=Arg(-2, Context);
-  with pv^ do begin
+  if (ArgCount<2) or (ArgCount>3) then RaiseError(ArgNumber);
+  tout:=GetTimeout(ArgCount=3, Context);
+  ArgCount:= -ArgCount;
+  with Arg(ArgCount, Context)^ do begin
     if VAlloc<>VP then RaiseError(VarExpected);
-    if not (VType in VIGapTypes) then RaiseError(RangeType);
-
-    r:=AsIGap(pv);
+    if VType<>VIGap then RaiseError(RangeType);
+    bnd:=IBnd;
     VType:=VInt;
-
-    Result:=@CVnone;
+    VAlloc:=RV;
     repeat
-      PostArg(Result, Context);
-      Result:=Arg(-1, Context);
-      if Int=r then exit;
-      inc(Int);
-      case Context.Flow of
-        EXT : exit;
+      Result:=Arg(ArgCount+1, Context);
+      with Context do case Flow of
+        EXT : break;
         BRK : begin
-                Context.Flow:=NML;
-                exit;
+                Flow:=NML;
+                break;
               end;
-        CON : Context.Flow:=NML;
+        CON : Flow:=NML;
       end;
+      if Int>=bnd then break;
+      PostArg(Context);       // no need to free pv since it's a variable
+      inc(Int);
+      if (tout<>0) and ((SizeInt(GetTickCount64)-tout)>=0) then RaiseError(LoopTimeOut);
     until false;
+    VAlloc:=VP;
   end;
 end;
 
-function Fla_TYPE(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TYPE
+function Fla_TYPE(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_TYPE
 begin
   if ArgCount<>1 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
@@ -162,7 +186,7 @@ begin
   PostArg(Context);
 end;
 
-function Fla_TICK(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.10.07: Func Fla_TICK
+function Fla_TICK(ArgCount:SizeInt; var Context:TContext):PValRec;     //DONE -oRFla.Func -cRev.2026.11.26: Func Fla_TICK
 begin
   if ArgCount<>0 then RaiseError(ArgNumber);
   Result:=NewLV(Context);
@@ -230,7 +254,7 @@ begin
     end;
     inc(plook);
   end;
-  Result:=-1;
+  Result:= -1;
 end;
 
 function RealPow(const Base, Scale:TRFloat):TRFloat;       //DONE -oRFla.Func -cRev.2026.10.06: Func RealPow
@@ -251,7 +275,7 @@ begin
   if d<1 then Exit(0);
   if d>=2 then Exit(2);
   d:=FlaRound(fl*0.5, -2);
-  Result:=-1;
+  Result:= -1;
   if (d>0.25) and (d<0.75) then Result:=1;
 end;
 
@@ -486,7 +510,7 @@ begin
       else TypeDisallow(VType);
     end;
     PostArg(Context);
-    for i:=-2 downto -ArgCount do begin
+    for i:= -2 downto -ArgCount do begin
       pv:=Arg(i, Context);
       if VType=VIGap then begin
         if pv^.VType in VIGapTypes
@@ -620,9 +644,9 @@ end;
 
 function Fla_SIGNIF(ArgCount:SizeInt; var Context:TContext):PValRec;   //DONE -oRFla.Func -cRev.2026.11.25: Func Fla_SIGNIF
 const
-{$if SRFloat = 4}  k = 27; k1 = 1E27; k2 = 1E-27; tr = -38;   mxf = 1.7E7;  {$endif}
-{$if SRFloat = 8}  k = 36; k1 = 1E36; k2 = 1E-36; tr = -308;  mxf = 9.1E15; {$endif}
-{$if SRFloat = 10} k = 39; k1 = 1E39; k2 = 1E-39; tr = -4932; mxf = 1.9E19; {$endif}
+{$if SRFloat = 4}  k = 27; k1 = 1E+27; k2 = 1E-27; tr = -38;   mxf = 1.7E+7;  {$endif}
+{$if SRFloat = 8}  k = 36; k1 = 1E+36; k2 = 1E-36; tr = -308;  mxf = 9.1E+15; {$endif}
+{$if SRFloat = 10} k = 39; k1 = 1E+39; k2 = 1E-39; tr = -4932; mxf = 1.9E+19; {$endif}
 var pv : PValRec;                 // k = - (-324 - (max digits-1) + 308)
     f, m, mf : TRFloat;           // max digits = 21
     n : SizeInt;
@@ -773,7 +797,7 @@ begin
   PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    Int:=-1;
+    Int:= -1;
     VType:=VInt;
     if ps=nil then exit;
     sb:=AsStr(Arg(ArgCount+1, Context));
@@ -995,9 +1019,9 @@ begin
                     fb:=AsRGap(pv);
                     MinMax(sin(fa), sin(fb), Result);
                     case SCosGap(fa-(Cpi/2), fb-(Cpi/2)) of
-                      -1 : Flo:=-1;
+                      -1 : Flo:= -1;
                        1 : Img:=1;
-                       2 : begin Flo:=-1; Img:=1; end;
+                       2 : begin Flo:= -1; Img:=1; end;
                     end;
                   end;
     else
@@ -1028,9 +1052,9 @@ begin
                     fb:=AsRGap(pv);
                     MinMax(cos(fa), cos(fb), Result);
                     case SCosGap(fa, fb) of
-                      -1 : Flo:=-1;
+                      -1 : Flo:= -1;
                        1 : Img:=1;
-                       2 : begin Flo:=-1; Img:=1; end;
+                       2 : begin Flo:= -1; Img:=1; end;
                     end;
                   end;
     else
@@ -1058,7 +1082,7 @@ begin
                  Img:=(f-1/f)/(fc*2+fx);
                except
                  Flo:=0;
-                 if pv^.Img>0 then Img:=1 else if pv^.Img<0 then Img:=-1 else Img:=0;
+                 if pv^.Img>0 then Img:=1 else if pv^.Img<0 then Img:= -1 else Img:=0;
                end;
                VType:=VCplex;
              end;
@@ -1316,7 +1340,7 @@ begin
   PostArg(Context);
   Result:=NewLV(Context);
   with Result^ do begin
-    Int:=-1;
+    Int:= -1;
     if phy<>0 then Int:=0;
     VType:=VInt;
   end;
@@ -1403,6 +1427,7 @@ begin
   FuncReg('continue', @Fla_CONTINUE);
   FuncReg('if', @Fla_IF);
   FuncReg('in', @Fla_IN);
+  FuncReg('case', @Fla_CASE);
   FuncReg('repeat', @Fla_REPEAT);
   FuncReg('for', @Fla_FOR);
   FuncReg('type', @Fla_TYPE);

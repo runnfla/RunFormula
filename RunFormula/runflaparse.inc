@@ -83,7 +83,7 @@ begin
   with PAnsiRec(BufP)^ do begin
     CodePage:=TextCodePage;
     ElementSize:=1;
-    Ref:=-1;                             // const string
+    Ref:= -1;                             // const string
     Len:=Lng;
   end;
   dst:=BufP+SAnsiRec;
