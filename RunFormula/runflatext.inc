@@ -82,6 +82,21 @@ begin
   PWord(Result)^:=Hex0x;
 end;
 
+function Num2Str(const F:TRFloat):string;                          //DONE -oRFla.Text -cRev.2026.11.28: Func Num2Str Float
+const frmt : TFormatSettings =
+        (CurrencyFormat : 0;
+         NegCurrFormat : 0;
+         ThousandSeparator : #0;
+         DecimalSeparator : '.');
+begin
+  Result:=FloatToStr(F, frmt);
+end;
+
+function Num2Str(I:SizeInt):string;                                //DONE -oRFla.Text -cRev.2026.11.28: Func Num2Str Int
+begin
+  if I<>LI then Result:=IntToStr(I) else Result:=Num2Str(TRFloat(LI));
+end;
+
 function IntCapture(P, Fin:PChar; out Done:boolean):SizeInt;       //DONE -oRFla.Text -cRev.2026.04.29: Func IntCapture
 var Base : (DecI, HexI, BinI) = HexI;
     c : char;

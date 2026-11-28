@@ -90,4 +90,5 @@ VariantError --> InvalidVariant
 - ParamNumber error code renamed to ArgNumber
 - RunFlaParamAsStr function renamed to RunFlaArgAsStr
 - LoopTimeout in Releat()
+- % больше не оператор
 

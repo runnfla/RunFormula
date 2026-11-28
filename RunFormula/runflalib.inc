@@ -477,17 +477,9 @@ begin
 end;
 
 // ===== Text =====
-
 {$include runflatext.inc}
 
-// ===== Data =====
-
 function AsStr(PV:PValRec):string;                         //DONE -oRFla.Lib -cRev.2026.05.13: Func AsStr
-const F : TFormatSettings =
-        (CurrencyFormat : 0;
-         NegCurrFormat : 0;
-         ThousandSeparator : #0;
-         DecimalSeparator : '.');
 var scl : TRFloat = 1;
     ofs : TRFloat = 0;
     s : string;
@@ -503,19 +495,19 @@ begin
         s:=DecodePhy(VPhy, scl, ofs, flg);
         s:=#$20+SelectPref(PV, scl, flg)+s;
       end;
-      if (scl<>1) or (ofs<>0) then case VType of         // Li должно выводиться как float
-        VInt, VChar : Result:=FloatToStr((Int-ofs)/scl, F);
-        VFloat : Result:=FloatToStr((Flo-ofs)/scl, F);
-        VCplex : Result:='('+FloatToStr((Flo-ofs)/scl, F)+', '+FloatToStr(Img/scl, F)+')';
-        VGap   : Result:='['+FloatToStr((Flo-ofs)/scl, F)+':'+FloatToStr((Img-ofs)/scl, F)+']';
-        VIGap  : Result:='['+FloatToStr((Int-ofs)/scl, F)+':'+FloatToStr((IBnd-ofs)/scl, F)+']';
+      if (scl<>1) or (ofs<>0) then case VType of
+        VInt, VChar : Result:=Num2Str((Int-ofs)/scl);
+        VFloat : Result:=Num2Str((Flo-ofs)/scl);
+        VCplex : Result:='('+Num2Str((Flo-ofs)/scl)+', '+Num2Str(Img/scl)+')';
+        VGap   : Result:='['+Num2Str((Flo-ofs)/scl)+':'+Num2Str((Img-ofs)/scl)+']';
+        VIGap  : Result:='['+Num2Str((Int-ofs)/scl)+':'+Num2Str((IBnd-ofs)/scl)+']';
       end else case VType of
         VInt   : Result:=IntToStr(Int);
         VChar  : if VPhy=0 then Result:=char(Int) else Result:=IntToStr(Int);
-        VFloat : Result:=FloatToStr(Flo, F);
-        VCplex : Result:='('+FloatToStr(Flo, F)+', '+FloatToStr(Img, F)+')';
-        VGap   : Result:='['+FloatToStr(Flo, F)+':'+FloatToStr(Img, F)+']';
-        VIGap  : Result:='['+IntToStr(Int)+':'+IntToStr(IBnd)+']';
+        VFloat : Result:=Num2Str(Flo);
+        VCplex : Result:='('+Num2Str(Flo)+', '+Num2Str(Img)+')';
+        VGap   : Result:='['+Num2Str(Flo)+':'+Num2Str(Img)+']';
+        VIGap  : Result:='['+Num2Str(Int)+':'+Num2Str(IBnd)+']';
       end;
       Result:=Result+s;
       PAnsiRec(PByte(Result)-SAnsiRec)^.CodePage:=CP_ACP;
@@ -577,11 +569,11 @@ begin
   end;
 end;
 
-function Compare(L, R:PValRec; Ineq:boolean=false):SizeInt;      //DONE -oRFla.Lib -cRev.2026.10.26: Func Compare
-var IL, IR : SizeInt;
-    fa, fb, fc, fd : TRFloat;
+function Compare(L, R:PValRec; Ineq:boolean=false):SizeInt;      //DONE -oRFla.Lib -cRev.2026.11.28: Func Compare
+var fa, fb, fc, fd : TRFloat;
+    IL, IR : SizeInt;
 
-  function DiffStr:SizeInt;                                //DONE -oRFla.Lib -cRev.2026.10.26: Func DiffStr
+  function DiffStr:SizeInt;                                //DONE -oRFla.Lib -cRev.2026.11.28: Func DiffStr
   var lng : SizeInt = 0;                   // not inline, diffsize = 8
       px, py, fin : PByte;
       sx, sy : string;                     // ansistrings, null terminator is used
@@ -634,12 +626,13 @@ begin
     VCplex : begin
                if Ineq then RaiseError(CplexDisallow);
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
-               if (AsRe(L)=AsRe(R)) and (AsIm(L)=AsIm(R)) then exit;
+               AsCplex(L, fa, fb); AsCplex(R, fc, fd);
+               if (fa=fc) and (fb=fd) then exit;
              end;
     VGap   : begin
                if Ineq then RaiseError(RangeDisallow);
                if L^.VPhy<>R^.VPhy then RaiseError(DimMismatch);
-               fa:=AsLGap(L); fb:=AsRGap(L); fc:=AsLGap(R); fd:=AsRGap(R);
+               AsGap(L, fa, fb); AsGap(R, fc, fd);
                if (fa=fc) and (fb=fd) then exit;
                if (fa>=fc) and (fb<=fd) then Exit(2);
              end;
